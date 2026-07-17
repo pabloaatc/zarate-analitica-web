@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V10.3 (Cloud)</title>
+    <title>Panel de Control Directivo | Zárate Remates V10.4 (Cloud)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = { 
-            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { panel: '#ffffff', accent: '#FF6B35', success: '#10B981', info: '#0284c7', danger: '#EF4444', slate: '#64748b' } } } } 
-        }
-    </script>
+    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{panel:'#ffffff',accent:'#FF6B35',success:'#10B981',info:'#0284c7',danger:'#EF4444',slate:'#64748b'}}}}}</script>
     <style>
         body { background-color: #f8fafc; color: #1e293b; }
         .glass-panel { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
@@ -30,9 +26,7 @@
         input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
         input[type="checkbox"]:checked { background-color: #FF6B35; border-color: #FF6B35; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
-        ::-webkit-scrollbar { width: 6px; height: 6px; } 
-        ::-webkit-scrollbar-track { background: transparent; } 
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .modal-bg { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
         .badge-falso { background: rgba(239,68,68,0.1); color: #EF4444; border: 1px solid rgba(239,68,68,0.2); }
         .badge-real { background: rgba(16,185,129,0.1); color: #10B981; border: 1px solid rgba(16,185,129,0.2); }
@@ -40,16 +34,11 @@
         thead th { background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600; }
         tbody tr { border-bottom: 1px solid #f1f5f9; }
         tbody tr:hover { background-color: #f8fafc; }
-        @media print {
-            aside, header, .no-print { display: none !important; }
-            main { padding: 0 !important; background: white !important; }
-            .glass-panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
-        }
+        @media print { aside, header, .no-print { display: none !important; } main { padding: 0 !important; background: white !important; } .glass-panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } }
         th.cursor-pointer:hover { background-color: #e2e8f0; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
-    
     <header class="border-b border-slate-200 bg-white z-20 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm no-print">
         <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-xl shadow-md">Z</div>
@@ -66,7 +55,6 @@
     </header>
 
     <div class="flex-1 flex overflow-hidden">
-        
         <aside class="w-[320px] border-r border-slate-200 bg-white overflow-y-auto p-5 flex flex-col shrink-0 no-print">
             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Estructura Corporativa</div>
             <div id="nav-mod-remates" class="nav-item nav-active mb-2" onclick="cambiarSeccion('remates')"><span class="text-sm">📊 Informe de Remates</span></div>
@@ -75,21 +63,12 @@
             <div id="nav-mod-custom" class="nav-item nav-inactive mb-2" onclick="cambiarSeccion('custom')"><span class="text-sm">📋 Informe Personalizado</span></div>
             <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-2" onclick="cambiarSeccion('conclusiones')"><span class="text-sm">🧠 Conclusiones MKT/SAC</span></div>
             <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="cambiarSeccion('buscador')"><span class="text-sm">🔍 Buscador Global</span></div>
-            
-            <div id="tree-container">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
-                    <span>Navegación Temporal</span><button onclick="limpiarSeleccion()" class="hover:text-brand-accent text-slate-500">Desmarcar todo</button>
-                </div>
-                <div id="nav-tree" class="flex flex-col text-[13px] text-slate-700"></div>
-            </div>
+            <div id="tree-container"><div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center"><span>Navegación Temporal</span><button onclick="limpiarSeleccion()" class="hover:text-brand-accent text-slate-500">Desmarcar todo</button></div><div id="nav-tree" class="flex flex-col text-[13px] text-slate-700"></div></div>
         </aside>
 
         <main class="flex-1 overflow-y-auto p-8 relative bg-slate-50">
-            
             <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-slate-50/90 backdrop-blur-sm no-print">
-                <div class="w-20 h-20 rounded-3xl bg-brand-accent/10 flex items-center justify-center mb-6 border border-brand-accent/20">
-                    <svg class="w-10 h-10 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                </div>
+                <div class="w-20 h-20 rounded-3xl bg-brand-accent/10 flex items-center justify-center mb-6 border border-brand-accent/20"><svg class="w-10 h-10 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg></div>
                 <p class="font-bold text-2xl text-slate-800" id="es-title">Zárate Analítica Cloud</p>
                 <p class="text-sm text-slate-500 mt-2 text-center max-w-md" id="es-desc">Por favor, seleccione un periodo en el panel lateral o cargue sus reportes matrices.</p>
                 <div id="error-log" class="mt-4 text-brand-danger font-semibold text-xs text-center max-w-md"></div>
@@ -99,17 +78,13 @@
             <div id="module-remates" class="hidden space-y-8 max-w-[1500px] mx-auto pb-10">
                 <div id="single-view" class="space-y-6 hidden">
                     <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-2">
-                        <div class="min-w-0 flex-1">
-                            <h2 class="text-3xl font-extrabold tracking-tight truncate text-slate-900" id="sv-titulo">-</h2>
-                            <p class="text-sm text-slate-500 font-medium mt-1" id="sv-subtitulo">-</p>
-                        </div>
+                        <div class="min-w-0 flex-1"><h2 class="text-3xl font-extrabold tracking-tight truncate text-slate-900" id="sv-titulo">-</h2><p class="text-sm text-slate-500 font-medium mt-1" id="sv-subtitulo">-</p></div>
                         <div class="flex gap-6 text-right glass-panel p-5 shrink-0 overflow-x-auto no-print">
                             <div><p class="text-[10px] text-slate-400 uppercase font-bold" title="Comisión 12% + IVA">Comisión Estimada</p><p class="text-2xl font-extrabold text-brand-accent mt-1" id="sv-kpi-comision-top">$0</p></div>
                             <div class="px-6 border-l border-slate-200"><p class="text-[10px] text-slate-400 uppercase font-bold">Ticket Promedio</p><p class="text-2xl font-extrabold text-slate-800 mt-1" id="sv-kpi-ticket-promedio">$0</p></div>
                             <div class="pl-6 border-l border-slate-200"><p class="text-[10px] text-slate-400 uppercase font-bold">Venta Total Efectiva</p><p class="text-2xl font-extrabold text-brand-success mt-1" id="sv-kpi-venta">$0</p></div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                         <div class="glass-panel p-6 border-t-4 border-t-brand-info">
                             <h4 class="font-bold text-sm mb-5 text-slate-800">Efectividad del Catálogo</h4>
@@ -119,41 +94,23 @@
                                 <div class="flex justify-between items-center pb-1"><span class="text-xs text-slate-500 font-bold uppercase">Efectividad del Remate</span><span class="font-bold text-lg text-brand-success" id="sv-kpi-eficacia-resumen">0%</span></div>
                             </div>
                         </div>
-
                         <div class="glass-panel p-6 border-t-4 border-t-brand-accent">
                             <h4 class="font-bold text-sm mb-5 text-slate-800">Comportamiento Cartera de Clientes</h4>
                             <div class="space-y-4">
                                 <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-slate-500 font-medium">Clientes con Garantía Registrada</span><span class="font-bold text-lg text-slate-800" id="sv-kpi-garantias">0</span></div>
                                 <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-slate-500 font-medium">Compradores Efectivos</span><span class="font-bold text-lg text-brand-success" id="sv-kpi-ganadores">0</span></div>
                                 <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-red-500 font-medium">No Compradores (Fuga Transaccional)</span><span class="font-bold text-lg text-brand-danger" id="sv-kpi-perdedores">0</span></div>
-                                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                                    <span class="text-xs text-slate-500 font-medium">Nuevos Ganadores Registrados</span>
-                                    <div><span class="font-bold text-lg text-brand-info" id="sv-kpi-1racompra">0</span><span class="text-xs text-slate-400 ml-1" id="sv-kpi-1racompra-pct"></span></div>
-                                </div>
-                                <div class="flex justify-between items-center pb-1">
-                                    <span class="text-xs text-slate-500 font-medium">Volumen Múltiple (> 1 lote)</span>
-                                    <div class="flex items-center gap-2"><span class="font-bold text-lg text-slate-800" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[10px] text-brand-info hover:text-brand-accent underline font-semibold no-print">(Ver lista)</button></div>
-                                </div>
+                                <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-slate-500 font-medium">Nuevos Ganadores Registrados</span><div><span class="font-bold text-lg text-brand-info" id="sv-kpi-1racompra">0</span><span class="text-xs text-slate-400 ml-1" id="sv-kpi-1racompra-pct"></span></div></div>
+                                <div class="flex justify-between items-center pb-1"><span class="text-xs text-slate-500 font-medium">Volumen Múltiple (> 1 lote)</span><div class="flex items-center gap-2"><span class="font-bold text-lg text-slate-800" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[10px] text-brand-info hover:text-brand-accent underline font-semibold no-print">(Ver lista)</button></div></div>
                             </div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                         <div class="xl:col-span-2 glass-panel p-6">
                             <h4 class="font-bold text-sm mb-4 text-slate-800">Lotes de Mayor Tracción (Posturas Reales Coincidentes)</h4>
                             <div class="overflow-y-auto max-h-[400px]">
                                 <table class="w-full text-sm text-left whitespace-nowrap">
-                                    <thead>
-                                        <tr>
-                                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Lote ↕️</th>
-                                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Detalle Estructurado ↕️</th>
-                                            <th class="p-3 text-center text-brand-accent cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Pujadores Reales ↕️</th>
-                                            <th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Mínimo Base ↕️</th>
-                                            <th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
-                                            <th class="p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Delta Puja ($) ↕️</th>
-                                            <th class="p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'percent')">Delta (%) ↕️</th>
-                                        </tr>
-                                    </thead>
+                                    <thead><tr><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Lote ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Detalle Estructurado ↕️</th><th class="p-3 text-center text-brand-accent cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Pujadores Reales ↕️</th><th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Mínimo Base ↕️</th><th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th><th class="p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Delta Puja ($) ↕️</th><th class="p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'percent')">Delta (%) ↕️</th></tr></thead>
                                     <tbody id="sv-tabla-top-lotes"></tbody>
                                 </table>
                             </div>
@@ -164,25 +121,11 @@
                         </div>
                     </div>
                 </div>
-
                 <div id="compare-view" class="space-y-6 hidden">
                     <h2 class="text-2xl font-extrabold text-slate-900 mb-4 font-sans">Tabla de Consolidación Estratégica</h2>
                     <div class="glass-panel overflow-x-auto">
                         <table class="w-full text-[13px] text-left whitespace-nowrap">
-                            <thead>
-                                <tr>
-                                    <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Selección ↕️</th>
-                                    <th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Venta Efectiva ↕️</th>
-                                    <th class="p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Comisiones ↕️</th>
-                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">L.Vend. ↕️</th>
-                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">L.Disp. ↕️</th>
-                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'percent')">Efectividad % ↕️</th>
-                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Gar. Reales ↕️</th>
-                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Nuevos(G) ↕️</th>
-                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">1ra Compra ↕️</th>
-                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Delta Puja ($) ↕️</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Selección ↕️</th><th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Venta Efectiva ↕️</th><th class="p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Comisiones ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">L.Vend. ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">L.Disp. ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'percent')">Efectividad % ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Gar. Reales ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Nuevos(G) ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">1ra Compra ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Delta Puja ($) ↕️</th></tr></thead>
                             <tbody id="cv-tabla-comparativa"></tbody>
                         </table>
                     </div>
@@ -193,7 +136,7 @@
                 </div>
             </div>
 
-            <!-- MODULE: MODELOS Y VEHICULOS -->
+            <!-- MODULE: AUTOS -->
             <div id="module-autos" class="hidden space-y-6 max-w-[1500px] mx-auto pb-10">
                 <div class="flex justify-between items-end gap-6 mb-4 no-print">
                     <div><h2 class="text-3xl font-extrabold text-slate-900">Análisis de Modelos y Vehículos</h2><p class="text-sm text-slate-500 mt-1">Estructura del catálogo físico adjudicado.</p></div>
@@ -206,17 +149,7 @@
                 <div class="glass-panel p-6">
                     <div class="overflow-x-auto max-h-[700px]">
                         <table class="w-full text-sm text-left whitespace-nowrap">
-                            <thead>
-                                <tr>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Remate Origen ↕️</th>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Lote ↕️</th>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Identificador Matriz ↕️</th>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Marca/Modelo Extraído ↕️</th>
-                                    <th class="p-4 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Valor Mínimo Base ↕️</th>
-                                    <th class="p-4 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
-                                    <th class="p-4 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Delta Puja ↕️</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Remate Origen ↕️</th><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Lote ↕️</th><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Identificador Matriz ↕️</th><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Marca/Modelo Extraído ↕️</th><th class="p-4 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Valor Mínimo Base ↕️</th><th class="p-4 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th><th class="p-4 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Delta Puja ↕️</th></tr></thead>
                             <tbody id="flota-tabla-resultados"></tbody>
                         </table>
                     </div>
@@ -241,13 +174,7 @@
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <div id="bi-ficha-cliente" class="glass-panel p-6 xl:col-span-3 hidden border border-brand-accent/30 bg-orange-50/30">
                         <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-slate-900" id="ficha-nombre">-</h3>
-                                <div class="flex gap-4 mt-2 text-xs font-mono text-slate-600 bg-white/50 px-3 py-1 rounded inline-block">
-                                    <span class="font-semibold">RUT/Identificador:</span> <span id="ficha-rut" class="text-slate-800 mr-4"></span>
-                                    <span class="font-semibold">Contacto:</span> <span id="ficha-email" class="text-slate-800"></span>
-                                </div>
-                            </div>
+                            <div><h3 class="text-2xl font-bold text-slate-900" id="ficha-nombre">-</h3><div class="flex gap-4 mt-2 text-xs font-mono text-slate-600 bg-white/50 px-3 py-1 rounded inline-block"><span class="font-semibold">RUT/Identificador:</span> <span id="ficha-rut" class="text-slate-800 mr-4"></span><span class="font-semibold">Contacto:</span> <span id="ficha-email" class="text-slate-800"></span></div></div>
                             <button onclick="cerrarFicha()" class="text-slate-500 hover:text-slate-800 bg-slate-200 px-3 py-1 rounded-full text-xs font-semibold no-print">✕ Cerrar</button>
                         </div>
                         <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mt-4 mb-6">
@@ -260,15 +187,7 @@
                         <h4 class="text-sm font-bold text-slate-800 mb-3">Historial Analítico del Cliente</h4>
                         <div class="overflow-y-auto max-h-[300px] bg-white rounded-lg border border-slate-200">
                             <table class="w-full text-left text-sm whitespace-nowrap">
-                                <thead class="text-[10px] uppercase text-slate-500 bg-slate-100 sticky top-0 border-b border-slate-200">
-                                    <tr>
-                                        <th class="p-3 pl-4 cursor-pointer select-none transition" onclick="sortTable(this, 'date')">Fecha ↕️</th>
-                                        <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Matriz Remate ↕️</th>
-                                        <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Segmento ↕️</th>
-                                        <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Lote Interno ↕️</th>
-                                        <th class="p-3 text-right pr-4 cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Monto Liquidado ↕️</th>
-                                    </tr>
-                                </thead>
+                                <thead class="text-[10px] uppercase text-slate-500 bg-slate-100 sticky top-0 border-b border-slate-200"><tr><th class="p-3 pl-4 cursor-pointer select-none transition" onclick="sortTable(this, 'date')">Fecha ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Matriz Remate ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Segmento ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Lote Interno ↕️</th><th class="p-3 text-right pr-4 cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Monto Liquidado ↕️</th></tr></thead>
                                 <tbody id="ficha-historial-tabla"></tbody>
                             </table>
                         </div>
@@ -277,15 +196,7 @@
                         <h4 class="font-bold text-sm mb-4 text-slate-800">Directorio General de Clientes Reales</h4>
                         <div class="overflow-x-auto max-h-[500px]">
                             <table class="w-full text-sm text-left whitespace-nowrap">
-                                <thead>
-                                    <tr>
-                                        <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Razón Social / Nombre ↕️</th>
-                                        <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Frecuencia ↕️</th>
-                                        <th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Inversión Bruta ↕️</th>
-                                        <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Recencia (Días) ↕️</th>
-                                        <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Segmentación ↕️</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Razón Social / Nombre ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Frecuencia ↕️</th><th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Inversión Bruta ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Recencia (Días) ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Segmentación ↕️</th></tr></thead>
                                 <tbody id="bi-tabla-clientes"></tbody>
                             </table>
                         </div>
@@ -297,10 +208,7 @@
             <!-- MODULE: INFORME PERSONALIZADO -->
             <div id="module-custom" class="hidden space-y-6 max-w-[1500px] mx-auto pb-10">
                 <div class="flex justify-between items-end gap-6 mb-6 no-print">
-                    <div>
-                        <h2 class="text-3xl font-extrabold text-slate-900">📋 Creador de Informe Personalizado</h2>
-                        <p class="text-sm text-slate-500 mt-1">Seleccione los indicadores que requiere exportar y construya un reporte a medida.</p>
-                    </div>
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">📋 Creador de Informe Personalizado</h2><p class="text-sm text-slate-500 mt-1">Seleccione los indicadores que requiere exportar y construya un reporte a medida.</p></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="glass-panel p-6 bg-slate-50 border-dashed no-print">
@@ -326,13 +234,8 @@
                         <button onclick="generarInformePersonalizado()" class="w-full mt-6 py-2 bg-brand-accent hover:bg-orange-600 text-white font-bold rounded-lg transition shadow-md">Generar Vista Previa</button>
                     </div>
                     <div class="lg:col-span-2 space-y-4">
-                        <div class="flex justify-between items-center no-print">
-                            <h3 class="font-bold text-slate-800">2. Vista Previa del Documento</h3>
-                            <button onclick="window.print()" class="px-4 py-1.5 bg-slate-800 text-white text-sm font-semibold rounded-lg hover:bg-slate-700 shadow-sm flex items-center gap-2">🖨️ Imprimir PDF</button>
-                        </div>
-                        <div id="custom-report-output" class="glass-panel p-8 bg-white min-h-[500px]">
-                            <div class="text-center text-slate-400 mt-20">Presiona "Generar Vista Previa" para construir el informe.</div>
-                        </div>
+                        <div class="flex justify-between items-center no-print"><h3 class="font-bold text-slate-800">2. Vista Previa del Documento</h3><button onclick="window.print()" class="px-4 py-1.5 bg-slate-800 text-white text-sm font-semibold rounded-lg hover:bg-slate-700 shadow-sm flex items-center gap-2">🖨️ Imprimir PDF</button></div>
+                        <div id="custom-report-output" class="glass-panel p-8 bg-white min-h-[500px]"><div class="text-center text-slate-400 mt-20">Presiona "Generar Vista Previa" para construir el informe.</div></div>
                     </div>
                 </div>
             </div>
@@ -340,15 +243,10 @@
             <!-- MODULE: CONCLUSIONES IA -->
             <div id="module-conclusiones" class="hidden space-y-6 max-w-[1400px] mx-auto pb-10">
                 <div class="flex justify-between items-end gap-6 mb-6 no-print">
-                    <div>
-                        <h2 class="text-3xl font-extrabold text-slate-900">🧠 Resumen Ejecutivo de Negocio (Directorio)</h2>
-                        <p class="text-sm text-slate-500 mt-1">Conclusiones directas basadas en la selección de remates.</p>
-                    </div>
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">🧠 Resumen Ejecutivo de Negocio (Directorio)</h2><p class="text-sm text-slate-500 mt-1">Conclusiones directas basadas en la selección de remates.</p></div>
                     <button onclick="window.print()" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-50 text-slate-700">Exportar Informe Ejecutivo</button>
                 </div>
-                <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700">
-                    <!-- Inyección dinámica -->
-                </div>
+                <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700"></div>
             </div>
 
             <!-- MODULE: BUSCADOR -->
@@ -360,109 +258,19 @@
                 <div class="glass-panel p-6">
                     <div class="overflow-x-auto max-h-[600px]">
                         <table class="w-full text-sm text-left whitespace-nowrap">
-                            <thead>
-                                <tr>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'date')">Fecha ↕️</th>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Matriz Remate ↕️</th>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Lote ↕️</th>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Detalle Identificador ↕️</th>
-                                    <th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Adjudicatario ↕️</th>
-                                    <th class="p-4 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Monto ↕️</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'date')">Fecha ↕️</th><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Matriz Remate ↕️</th><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Lote ↕️</th><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Detalle Identificador ↕️</th><th class="p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Adjudicatario ↕️</th><th class="p-4 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Monto ↕️</th></tr></thead>
                             <tbody id="buscador-tabla-resultados"><tr><td colspan="6" class="p-8 text-center text-slate-500">Ingrese un parámetro mínimo de 3 caracteres.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 
-    <!-- MODAL PUJADORES -->
-    <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-6">
-        <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-6 border-b border-slate-200 flex justify-between items-start bg-slate-50">
-                <div><h3 class="text-xl font-extrabold text-slate-800" id="modal-titulo">Pujas del Lote</h3><p class="text-xs text-slate-500 mt-1" id="modal-subtitulo"></p></div>
-                <button onclick="cerrarModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button>
-            </div>
-            <div class="p-4 bg-slate-100 flex gap-4 text-xs border-b border-slate-200">
-                <div><span class="text-slate-500">Total Pujas:</span> <span class="font-bold text-slate-800" id="modal-total-pujas">0</span></div>
-                <div><span class="text-slate-500">Pujadores Únicos Reales:</span> <span class="font-bold text-brand-accent" id="modal-unicos-reales">0</span></div>
-                <div><span class="text-slate-500">Pujas Falsas (RZ/@zarate):</span> <span class="font-bold text-brand-danger" id="modal-falsas">0</span></div>
-                <div class="ml-auto flex gap-2"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded-full bg-brand-accent text-white font-bold">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400">Solo Reales</button><button onclick="filtrarModal('falsos')" id="btn-filtro-falsos" class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400">Solo Falsos</button></div>
-            </div>
-            <div class="flex-1 overflow-y-auto p-0">
-                <table class="w-full text-sm text-left whitespace-nowrap">
-                    <thead>
-                        <tr>
-                            <th class="p-3 pl-6 cursor-pointer select-none transition" onclick="sortTable(this, 'number')"># ↕️</th>
-                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'date')">Fecha Puja ↕️</th>
-                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Rut ↕️</th>
-                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Nombre Pujador ↕️</th>
-                            <th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Monto Puja ↕️</th>
-                            <th class="p-3 text-center pr-6 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Estado ↕️</th>
-                        </tr>
-                    </thead>
-                    <tbody id="modal-tabla-pujas"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL CLIENTES MULTILOTE -->
-    <div id="modal-multilote" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-6">
-        <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-6 border-b border-slate-200 flex justify-between items-start bg-slate-50">
-                <div><h3 class="text-xl font-extrabold text-slate-800">Distribución de Compradores por Volumen</h3><p class="text-xs text-slate-500 mt-1">Clientes con más de una adjudicación efectiva en la muestra.</p></div>
-                <button onclick="cerrarModalMulti()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button>
-            </div>
-            <div class="p-0 flex-1 overflow-y-auto">
-                <table class="w-full text-sm text-left whitespace-nowrap">
-                    <thead>
-                        <tr>
-                            <th class="p-3 pl-6 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Razón Social / Nombre ↕️</th>
-                            <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Unidades Compradas ↕️</th>
-                            <th class="p-3 text-right pr-6 cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Monto Consolidado ↕️</th>
-                        </tr>
-                    </thead>
-                    <tbody id="modal-tabla-multilote"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL FUGA DE CLIENTES (EXPORTABLE) -->
-    <div id="modal-fuga" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-6">
-        <div class="bg-white max-w-5xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                <div>
-                    <h3 class="text-xl font-extrabold text-brand-danger flex items-center gap-2">🚨 Reporte de Fuga Comercial (Oportunidad Remarketing)</h3>
-                    <p class="text-xs text-slate-500 mt-1">Clientes con liquidez demostrada que no adjudicaron en el periodo consultado.</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="exportarFugaExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded-lg shadow-sm text-sm flex items-center gap-2">
-                        ⬇️ Descargar Excel
-                    </button>
-                    <button onclick="cerrarModalFuga()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button>
-                </div>
-            </div>
-            <div class="flex-1 overflow-y-auto p-0">
-                <table class="w-full text-sm text-left whitespace-nowrap">
-                    <thead class="bg-slate-100 sticky top-0 border-b border-slate-200 shadow-sm">
-                        <tr>
-                            <th class="p-3 pl-6 text-slate-800 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Remate Fuga ↕️</th>
-                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Hace cuánto no participa ↕️</th>
-                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Nombre del Cliente ↕️</th>
-                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">RUT ↕️</th>
-                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Email Contacto ↕️</th>
-                        </tr>
-                    </thead>
-                    <tbody id="modal-tabla-fuga"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <!-- MODALS -->
+    <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-6"><div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl"><div class="p-6 border-b border-slate-200 flex justify-between items-start bg-slate-50"><div><h3 class="text-xl font-extrabold text-slate-800" id="modal-titulo">Pujas del Lote</h3><p class="text-xs text-slate-500 mt-1" id="modal-subtitulo"></p></div><button onclick="cerrarModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button></div><div class="p-4 bg-slate-100 flex gap-4 text-xs border-b border-slate-200"><div><span class="text-slate-500">Total Pujas:</span> <span class="font-bold text-slate-800" id="modal-total-pujas">0</span></div><div><span class="text-slate-500">Pujadores Únicos Reales:</span> <span class="font-bold text-brand-accent" id="modal-unicos-reales">0</span></div><div><span class="text-slate-500">Pujas Falsas (RZ/@zarate):</span> <span class="font-bold text-brand-danger" id="modal-falsas">0</span></div><div class="ml-auto flex gap-2"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded-full bg-brand-accent text-white font-bold">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400">Solo Reales</button><button onclick="filtrarModal('falsos')" id="btn-filtro-falsos" class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400">Solo Falsos</button></div></div><div class="flex-1 overflow-y-auto p-0"><table class="w-full text-sm text-left whitespace-nowrap"><thead><tr><th class="p-3 pl-6 cursor-pointer select-none transition" onclick="sortTable(this, 'number')"># ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'date')">Fecha Puja ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Rut ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Nombre Pujador ↕️</th><th class="p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Monto Puja ↕️</th><th class="p-3 text-center pr-6 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Estado ↕️</th></tr></thead><tbody id="modal-tabla-pujas"></tbody></table></div></div></div>
+    <div id="modal-multilote" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-6"><div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl"><div class="p-6 border-b border-slate-200 flex justify-between items-start bg-slate-50"><div><h3 class="text-xl font-extrabold text-slate-800">Distribución de Compradores por Volumen</h3><p class="text-xs text-slate-500 mt-1">Clientes con más de una adjudicación efectiva en la muestra.</p></div><button onclick="cerrarModalMulti()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button></div><div class="p-0 flex-1 overflow-y-auto"><table class="w-full text-sm text-left whitespace-nowrap"><thead><tr><th class="p-3 pl-6 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Razón Social / Nombre ↕️</th><th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Unidades Compradas ↕️</th><th class="p-3 text-right pr-6 cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Monto Consolidado ↕️</th></tr></thead><tbody id="modal-tabla-multilote"></tbody></table></div></div></div>
+    <div id="modal-fuga" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-6"><div class="bg-white max-w-5xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl"><div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50"><div><h3 class="text-xl font-extrabold text-brand-danger flex items-center gap-2">🚨 Reporte de Fuga Comercial (Oportunidad Remarketing)</h3><p class="text-xs text-slate-500 mt-1">Clientes con liquidez demostrada que no adjudicaron en el periodo consultado.</p></div><div class="flex items-center gap-4"><button onclick="exportarFugaExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded-lg shadow-sm text-sm flex items-center gap-2">⬇️ Descargar Excel</button><button onclick="cerrarModalFuga()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button></div></div><div class="flex-1 overflow-y-auto p-0"><table class="w-full text-sm text-left whitespace-nowrap"><thead class="bg-slate-100 sticky top-0 border-b border-slate-200 shadow-sm"><tr><th class="p-3 pl-6 text-slate-800 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Remate Fuga ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Hace cuánto no participa ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Nombre del Cliente ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">RUT ↕️</th><th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Email Contacto ↕️</th></tr></thead><tbody id="modal-tabla-fuga"></tbody></table></div></div></div>
 
 <script>
 // === CONFIGURACIÓN DE SUPABASE (LA NUBE) ===
@@ -470,20 +278,13 @@ const { createClient } = supabase;
 const supabaseUrl = 'https://gxfvjmuzxzpghlbzzmui.supabase.co';
 const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
-// ===========================================
 
-window.addEventListener('error', function(e) {
-    console.error("Error global capturado: ", e);
-    const log = document.getElementById('error-log');
-    if(log) log.innerHTML += `<div class="text-red-500 mt-1 text-sm bg-red-50 p-2 rounded border border-red-200">El sistema evitó un colapso de memoria. Por favor presiona <b>"Vaciar Base de Datos"</b> y recarga la página.</div>`;
-});
+window.addEventListener('error', function(e) { console.error("Error global capturado: ", e); const log = document.getElementById('error-log'); if(log) log.innerHTML += `<div class="text-red-500 mt-1 text-sm bg-red-50 p-2 rounded border border-red-200">El sistema evitó un colapso. Presiona <b>"Vaciar Base de Datos"</b> y recarga la página.</div>`; });
 
 let db = { remates: [] };
 let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
 let svChartRetencionInst=null, svChartVentasInst=null, cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
-let currentModule='remates';
-let globalMapCMulti = {}; 
-let globalAgg = null;
+let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
 
 if(typeof Chart !== 'undefined') { Chart.defaults.color = '#64748b'; Chart.defaults.font.family = 'Inter'; }
 
@@ -491,15 +292,13 @@ async function initApp() {
     const statusLabel = document.getElementById('db-status');
     const esTitle = document.getElementById('es-title');
     const esDesc = document.getElementById('es-desc');
-    
     try {
         statusLabel.innerText = "Sincronizando con la nube...";
         statusLabel.classList.add('animate-pulse');
-        
-        const { data, error } = await supabaseClient.from('app_state').select('payload').eq('id', 1).single();
-        
-        if (data && data.payload && data.payload.remates) {
-            db = data.payload;
+        const { data, error } = await supabaseClient.from('app_state').select('*');
+        if (data && data.length > 0) {
+            if (data.length === 1 && data[0].payload && data[0].payload.remates) { db = data[0].payload; } 
+            else { db.remates = data.map(row => { let r = row.payload; r._dbId = row.id; return r; }); }
             statusLabel.innerText = `🟢 Base Cloud Conectada (${db.remates.length} matrices)`;
             statusLabel.classList.replace('text-brand-info', 'text-brand-success');
         } else {
@@ -507,172 +306,78 @@ async function initApp() {
             statusLabel.classList.replace('text-brand-info', 'text-orange-500');
         }
     } catch (e) {
-        console.error("Error conectando a Supabase:", e);
         statusLabel.innerText = "🔴 Error de conexión";
         statusLabel.classList.replace('text-brand-info', 'text-red-500');
         esTitle.innerText = "Error de Conexión";
         esDesc.innerText = "No se pudo establecer contacto con la base de datos central.";
     }
-    
     statusLabel.classList.remove('animate-pulse');
     if(db.remates && db.remates.length > 0) { actualizarSidebar(); }
 }
 window.onload = initApp;
 
 function sortTable(thElement, type) {
-    const table = thElement.closest('table');
-    const tbody = table.querySelector('tbody');
-    if(!tbody) return;
+    const table = thElement.closest('table'); const tbody = table.querySelector('tbody'); if(!tbody) return;
     const rows = Array.from(tbody.querySelectorAll('tr'));
-    
     if(rows.length === 0 || (rows.length === 1 && rows[0].innerText.includes('Sin'))) return;
-
     const colIndex = Array.from(thElement.parentNode.children).indexOf(thElement);
-    let asc = thElement.getAttribute('data-asc') === 'true';
-    asc = !asc;
-    thElement.setAttribute('data-asc', asc);
-    
-    Array.from(thElement.parentNode.children).forEach(th => {
-        th.innerHTML = th.innerHTML.replace(' 🔼', '').replace(' 🔽', '').replace(' ↕️', ' ↕️');
-        if(!th.innerHTML.includes('↕️')) th.innerHTML += ' ↕️';
-    });
+    let asc = thElement.getAttribute('data-asc') === 'true'; asc = !asc; thElement.setAttribute('data-asc', asc);
+    Array.from(thElement.parentNode.children).forEach(th => { th.innerHTML = th.innerHTML.replace(' 🔼', '').replace(' 🔽', '').replace(' ↕️', ' ↕️'); if(!th.innerHTML.includes('↕️')) th.innerHTML += ' ↕️'; });
     thElement.innerHTML = thElement.innerHTML.replace(' ↕️', asc ? ' 🔼' : ' 🔽');
-    
     rows.sort((a, b) => {
-        let valA = a.children[colIndex].innerText || a.children[colIndex].textContent;
-        let valB = b.children[colIndex].innerText || b.children[colIndex].textContent;
-        
-        valA = parseValueForSort(valA, type);
-        valB = parseValueForSort(valB, type);
-        
-        if (valA < valB) return asc ? -1 : 1;
-        if (valA > valB) return asc ? 1 : -1;
-        return 0;
+        let valA = parseValueForSort(a.children[colIndex].innerText || a.children[colIndex].textContent, type);
+        let valB = parseValueForSort(b.children[colIndex].innerText || b.children[colIndex].textContent, type);
+        if (valA < valB) return asc ? -1 : 1; if (valA > valB) return asc ? 1 : -1; return 0;
     });
-    
-    tbody.innerHTML = '';
-    rows.forEach(row => tbody.appendChild(row));
+    tbody.innerHTML = ''; rows.forEach(row => tbody.appendChild(row));
 }
 
 function parseValueForSort(str, type) {
     if(!str || str.trim()==='-' || str.trim()==='' || str.trim() === 'Desconocido' || str.trim().includes('Sin Registro')) return -9999999999;
     str = str.trim();
-    if(type === 'money') {
-        let isNeg = str.includes('-');
-        let numStr = str.replace(/[^\d,]/g, '');
-        if(!numStr) return -9999999999;
-        let num = parseFloat(numStr.replace(',','.')) || 0;
-        if(str.includes('MM')) num *= 1000000;
-        return isNeg ? -num : num;
-    }
-    if(type === 'percent') {
-        let isNeg = str.includes('-');
-        let num = parseFloat(str.replace(/[^\d,]/g, '').replace(',','.')) || 0;
-        return isNeg ? -num : num;
-    }
-    if(type === 'number') {
-        let isNeg = str.includes('-');
-        let num = parseFloat(str.replace(/[^\d]/g, '')) || 0;
-        return isNeg ? -num : num;
-    }
-    if(type === 'date') {
-        let parts = str.split(' ')[0].split('-');
-        if(parts.length === 3) {
-            return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).getTime();
-        }
-        return 0;
-    }
+    if(type === 'money') { let isNeg = str.includes('-'); let numStr = str.replace(/[^\d,]/g, ''); if(!numStr) return -9999999999; let num = parseFloat(numStr.replace(',','.')) || 0; if(str.includes('MM')) num *= 1000000; return isNeg ? -num : num; }
+    if(type === 'percent') { let isNeg = str.includes('-'); let num = parseFloat(str.replace(/[^\d,]/g, '').replace(',','.')) || 0; return isNeg ? -num : num; }
+    if(type === 'number') { let isNeg = str.includes('-'); let num = parseFloat(str.replace(/[^\d]/g, '')) || 0; return isNeg ? -num : num; }
+    if(type === 'date') { let parts = str.split(' ')[0].split('-'); if(parts.length === 3) { return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).getTime(); } return 0; }
     return str.toLowerCase();
 }
 
 const dropZone=document.getElementById('drop-zone');
-document.body.addEventListener('dragover', e=>{e.preventDefault(); dropZone.classList.add('dragover');});
-document.body.addEventListener('dragleave', e=>{e.preventDefault(); dropZone.classList.remove('dragover');});
+document.body.addEventListener('dragover', e=>{e.preventDefault(); dropZone.classList.add('dragover');}); document.body.addEventListener('dragleave', e=>{e.preventDefault(); dropZone.classList.remove('dragover');});
 document.body.addEventListener('drop', async e=>{ 
     e.preventDefault(); dropZone.classList.remove('dragover'); 
     const items=e.dataTransfer.items; const allFiles=[]; 
-    if(items){ 
-        const promises=[]; 
-        for(let i=0;i<items.length;i++){ 
-            const item=items[i].webkitGetAsEntry(); 
-            if(item) promises.push(traverseFileTree(item, allFiles)); 
-        } 
-        await Promise.all(promises);
-    } else { allFiles.push(...e.dataTransfer.files); } 
+    if(items){ const promises=[]; for(let i=0;i<items.length;i++){ const item=items[i].webkitGetAsEntry(); if(item) promises.push(traverseFileTree(item, allFiles)); } await Promise.all(promises); } else { allFiles.push(...e.dataTransfer.files); } 
     iniciarProcesamiento(allFiles);
 });
 
 function traverseFileTree(item, filesArray){ 
     return new Promise(resolve=>{ 
         if(item.isFile){ item.file(file=>{filesArray.push(file); resolve();}); } 
-        else if(item.isDirectory){ 
-            const dirReader=item.createReader(); const entries=[]; 
-            const readEntries=()=>{ 
-                dirReader.readEntries(async results=>{ 
-                    if(!results.length){ for(let entry of entries) await traverseFileTree(entry, filesArray); resolve(); } 
-                    else { entries.push(...results); readEntries(); } 
-                }); 
-            }; 
-            readEntries(); 
-        } 
+        else if(item.isDirectory){ const dirReader=item.createReader(); const entries=[]; const readEntries=()=>{ dirReader.readEntries(async results=>{ if(!results.length){ for(let entry of entries) await traverseFileTree(entry, filesArray); resolve(); } else { entries.push(...results); readEntries(); } }); }; readEntries(); } 
     }); 
 }
 
 function formatExcelDate(excelDate) {
     if(!excelDate) return '-';
-    if(typeof excelDate === 'number') {
-        if(excelDate > 1000000) {
-            return new Date(excelDate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'});
-        }
-        let d = new Date(Math.round((excelDate - 25569) * 86400 * 1000));
-        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        return d.toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'});
-    }
-    if(typeof excelDate === 'string') {
-        return excelDate.trim().split(' ')[0]; 
-    }
-    return String(excelDate);
+    if(typeof excelDate === 'number') { if(excelDate > 1000000) { return new Date(excelDate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}); } let d = new Date(Math.round((excelDate - 25569) * 86400 * 1000)); d.setMinutes(d.getMinutes() + d.getTimezoneOffset()); return d.toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}); }
+    if(typeof excelDate === 'string') { return excelDate.trim().split(' ')[0]; } return String(excelDate);
 }
 
 function esClienteFalso(nombre, email=''){
     const txt = (String(nombre||'')+' '+String(email||'')).toLowerCase().trim();
-    if(txt.length<=2 && txt !== '') return true;
-    if(txt.includes('@zarate') || txt.includes('zarate.cl') || txt.includes('@plataforma')) return true;
-    if(txt.includes('rz rz') || txt.includes('rzrz') || txt.includes('test') || txt.includes('prueba')) return true;
-    if(/^\s*(rz|zz|aa|qq)\s*$/.test(txt)) return true;
-    if(/^\s*99\.999\.999-9\s*$/.test(txt) || /^\s*11\.111\.111/.test(txt)) return true;
-    if(/([a-z])\1{3,}/.test(txt.replace(/\s/g,'')) && txt.length<10) return true;
-    return false;
+    if(txt.length<=2 && txt !== '') return true; if(txt.includes('@zarate') || txt.includes('zarate.cl') || txt.includes('@plataforma')) return true; if(txt.includes('rz rz') || txt.includes('rzrz') || txt.includes('test') || txt.includes('prueba')) return true; if(/^\s*(rz|zz|aa|qq)\s*$/.test(txt)) return true; if(/^\s*99\.999\.999-9\s*$/.test(txt) || /^\s*11\.111\.111/.test(txt)) return true; if(/([a-z])\1{3,}/.test(txt.replace(/\s/g,'')) && txt.length<10) return true; return false;
 }
 
 function extraerMarcaModelo(loteStr) {
-    let txt = loteStr.toUpperCase();
-    if (txt.includes(':')) txt = txt.split(':')[1];
-    txt = txt.replace(/\bLOTE\s*\d+\b/g, '').replace(/\bN[°º]?\s*\d+\b/g, '');
-    txt = txt.replace(/\b\d\.\d\b/g, '').replace(/\b\d,\d\b/g, ''); 
-    txt = txt.replace(/\b20\d{2}\b/g, '').replace(/\b19\d{2}\b/g, ''); 
-    
+    let txt = loteStr.toUpperCase(); if (txt.includes(':')) txt = txt.split(':')[1];
+    txt = txt.replace(/\bLOTE\s*\d+\b/g, '').replace(/\bN[°º]?\s*\d+\b/g, ''); txt = txt.replace(/\b\d\.\d\b/g, '').replace(/\b\d,\d\b/g, ''); txt = txt.replace(/\b20\d{2}\b/g, '').replace(/\b19\d{2}\b/g, ''); 
     const marcasConocidas = ['MERCEDES BENZ','LAND ROVER','GREAT WALL','ALFA ROMEO','ASTON MARTIN','CHEVROLET','NISSAN','KIA','HYUNDAI','SUZUKI','TOYOTA','PEUGEOT','FORD','MITSUBISHI','MAZDA','SSANGYONG','BMW','AUDI','VOLKSWAGEN','SUBARU','RENAULT','CHRYSLER','DODGE','JEEP','HONDA','VOLVO','FIAT','CHERY','MG','CHANGAN','JAC','GEELY','MAHINDRA','MAXUS','OPEL','DFSK','DATSUN','LEXUS','PORSCHE','MINI','RAM','SEAT','SKODA','CITROEN','BYD','BAIC','HAVAL','LIFAN','ZX','FOTON','KTM','IVECO'];
     const ignorarCar = ['AUTOMOVIL','VEHICULO','CAMIONETA','STATION','WAGON','JEEP','FURGON','MOTO','MOTOCICLETA','BUS','MINIBUS','CAMION','MAQUINARIA','CHATARRA','RESTOS','AUT','MT','AT','M/T','A/T','4X4','4X2','GLX','GLS','EX','LX','DX','TX','MPI','HB','SEDAN','SPORT','MOTORS','NEW','MEC','MECANICO','AUTOMATICO','DAKAR','CORE','PREMIER','LIMITED','LITE', 'HDI', 'TDI', 'CDI', 'CRDI', 'AWD', 'FWD', 'CVT'];
-
-    let marca = "SIN MARCA";
-    let modelo = "";
-    
-    for(let m of marcasConocidas) {
-        if(txt.includes(m)) {
-            marca = m;
-            let resto = txt.substring(txt.indexOf(m) + m.length).trim();
-            let words = resto.split(/[\s-]+/).filter(w => w.length > 1 && !w.match(/^\d+$/) && !ignorarCar.includes(w));
-            modelo = words.slice(0, 2).join(' '); 
-            break;
-        }
-    }
-    if(marca === "SIN MARCA") {
-        let words = txt.split(/[\s-]+/).filter(w => w.length > 1 && !w.match(/^\d+$/) && !ignorarCar.includes(w));
-        if(words.length > 0) { marca = words[0]; modelo = words.slice(1, 3).join(' '); }
-    }
+    let marca = "SIN MARCA"; let modelo = "";
+    for(let m of marcasConocidas) { if(txt.includes(m)) { marca = m; let resto = txt.substring(txt.indexOf(m) + m.length).trim(); let words = resto.split(/[\s-]+/).filter(w => w.length > 1 && !w.match(/^\d+$/) && !ignorarCar.includes(w)); modelo = words.slice(0, 2).join(' '); break; } }
+    if(marca === "SIN MARCA") { let words = txt.split(/[\s-]+/).filter(w => w.length > 1 && !w.match(/^\d+$/) && !ignorarCar.includes(w)); if(words.length > 0) { marca = words[0]; modelo = words.slice(1, 3).join(' '); } }
     if (marca === "KIA MOTORS" || txt.includes("KIA MOTORS")) marca = "KIA";
-    
     return { categoria: marca, modeloStr: modelo };
 }
 
@@ -680,41 +385,32 @@ const normalizarCliente = (nombre)=>{ if(!nombre) return 'DESCONOCIDO'; let n=St
 const formatMoney = (num)=>{ if(!num || isNaN(num)) return '$0'; if(Math.abs(num) >= 1e6) { let val = Math.round(num/1e6); return `$${val.toLocaleString('es-CL')} MM`; } return `$${Math.round(num).toLocaleString('es-CL')}`; };
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
 const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
-
-function getSelectedRemates() {
-    let uniqueMap = new Map();
-    checkedNodes.forEach(id => {
-        if(nodeRematesMap[id] && nodeRematesMap[id].remates) {
-            nodeRematesMap[id].remates.forEach(r => uniqueMap.set(r.id, r));
-        }
-    });
-    return Array.from(uniqueMap.values());
-}
+function getSelectedRemates() { let uniqueMap = new Map(); checkedNodes.forEach(id => { if(nodeRematesMap[id] && nodeRematesMap[id].remates) { nodeRematesMap[id].remates.forEach(r => uniqueMap.set(r.id, r)); } }); return Array.from(uniqueMap.values()); }
 
 async function iniciarProcesamiento(files){
     const validFiles=Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
-    
     const statusLabel=document.getElementById('db-status'); const errorLog=document.getElementById('error-log'); 
-    statusLabel.classList.add('text-brand-accent','animate-pulse'); 
-    statusLabel.classList.remove('text-brand-success', 'text-brand-info');
-    statusLabel.innerText = "Procesando y subiendo a la nube...";
-    errorLog.innerHTML=""; let successCount=0;
+    statusLabel.classList.add('text-brand-accent','animate-pulse'); statusLabel.classList.remove('text-brand-success', 'text-brand-info');
+    statusLabel.innerText = "Procesando y subiendo a la nube..."; errorLog.innerHTML=""; let successCount=0;
     
     setTimeout(async () => {
+        // 1. Extraer los datos de cada Excel
         for(let i=0;i<validFiles.length;i++){ 
             try{ 
                 const data=await parseExcel(validFiles[i]); 
                 if(data) {
                     const existsIdx=db.remates.findIndex(r=>r.fileName===data.fileName); 
+                    data._dbId = (existsIdx >= 0 && db.remates[existsIdx]._dbId) ? db.remates[existsIdx]._dbId : Math.floor(Math.random() * 2000000000);
                     if(existsIdx>=0) db.remates[existsIdx]=data; else db.remates.push(data); 
                     successCount++; 
                 }
             } catch(err){ console.error(err); errorLog.innerHTML+=`<div class="text-orange-500">${validFiles[i].name}: ${err.message}</div>`; } 
         }
+        
+        // 2. Calcular los cruces globales para Marketing y SAC
         db.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp);
         let clientesGlobales=[]; let adjudicatariosGlobales=[];
-        
         db.remates.forEach(remate=>{ 
             let nuevos=0, antiguos=0; 
             remate.garantiasEmailsReales.forEach(email=>{ if(clientesGlobales.includes(email)) antiguos++; else { nuevos++; clientesGlobales.push(email); } }); 
@@ -726,8 +422,11 @@ async function iniciarProcesamiento(files){
             remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
         });
         
+        // 3. Subir a Supabase (uno por uno para evitar el rebote de 5MB)
         try { 
-            await supabaseClient.from('app_state').update({ payload: db }).eq('id', 1);
+            for(let remate of db.remates) {
+                await supabaseClient.from('app_state').upsert({ id: remate._dbId, payload: remate });
+            }
             statusLabel.classList.replace('text-brand-accent', 'text-brand-success'); 
             statusLabel.innerText=`🟢 Base Cloud Actualizada (${db.remates.length} matrices)`;
         } catch (e) { 
@@ -736,9 +435,7 @@ async function iniciarProcesamiento(files){
             statusLabel.innerText=`🔴 Error guardando nube`;
         }
         
-        statusLabel.classList.remove('animate-pulse');
-        document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
-        
+        statusLabel.classList.remove('animate-pulse'); document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
         if(successCount>0){ actualizarSidebar(); procesarDatosClientes(); actualizarVistaActual(); }
     }, 50);
 }
@@ -749,10 +446,7 @@ async function parseExcel(file){
     const sAdjudicados=getSheet(['adjudic']); const sPosturas=getSheet(['postura']); const sGarantias=getSheet(['garantía','garantia']); const sInscritos=getSheet(['inscrit']);
     if(!sAdjudicados) throw new Error("Reporte Matriz de Adjudicaciones no encontrado.");
     const rawAdjud=XLSX.utils.sheet_to_json(sAdjudicados,{header:1,raw:false}); const fechaInfo=extraerFechaInfo(file, rawAdjud);
-
-    let numRemateMatch = file.name.match(/(?:REMATE|ZARATE).*?(\d{3,5})/i) || file.name.match(/\b(\d{4})\b/);
-    let numRemate = numRemateMatch ? (numRemateMatch[1] || numRemateMatch[0]) : '-';
-
+    let numRemateMatch = file.name.match(/(?:REMATE|ZARATE).*?(\d{3,5})/i) || file.name.match(/\b(\d{4})\b/); let numRemate = numRemateMatch ? (numRemateMatch[1] || numRemateMatch[0]) : '-';
     let correosReales=[]; let garantiasListaDetallada=[]; 
     if(sGarantias){
         const data=XLSX.utils.sheet_to_json(sGarantias,{header:1});
@@ -768,9 +462,7 @@ async function parseExcel(file){
                     if(!esClienteFalso(nom,identifier) && identifier.length>3) { 
                         correosReales.push(identifier); 
                         let nomNorm = normalizarCliente(nom);
-                        if(!garantiasListaDetallada.some(g=>g.nombreNorm === nomNorm)){
-                            garantiasListaDetallada.push({ nombreNorm: nomNorm, nombre: nom, rut: rutV, email: emailV, numRemate: numRemate, fechaRemate: fechaInfo.timestamp });
-                        }
+                        if(!garantiasListaDetallada.some(g=>g.nombreNorm === nomNorm)){ garantiasListaDetallada.push({ nombreNorm: nomNorm, nombre: nom, rut: rutV, email: emailV, numRemate: numRemate, fechaRemate: fechaInfo.timestamp }); }
                     }
                 }
             }
@@ -782,38 +474,16 @@ async function parseExcel(file){
     {
         const data=XLSX.utils.sheet_to_json(sAdjudicados,{header:1});
         const {index:headerIdx, headers:h}=findHeaderRow(data,['lote','descrip','mínimo','minimo','base','monto','total','indemnizado','patente','vehículo']);
-        let iLote=h.findIndex(x=>x.includes('lote') || x.includes('descrip') || x.includes('patente') || x.includes('detalle'));
-        let iNumeroLote = h.findIndex(x => x === 'n°' || x === 'número' || x === 'numero' || x.includes('nº') || x === 'n');
-        let iMinimo=h.findIndex(x=>x.includes('indemnizado') || x.includes('base') || x === 'minimo' || x.includes('mínimo'));
-        let iMonto=h.findIndex(x=>x.includes('monto') || x.includes('total') || x.includes('precio') || x.includes('adjudic'));
-        let iNombre=h.findIndex(x=>x.includes('nombre') || x.includes('cliente') || x.includes('comprador')); 
-        let iRut=h.findIndex(x=>x.includes('rut')); let iEmail=h.findIndex(x=>x.includes('email'));
-        
+        let iLote=h.findIndex(x=>x.includes('lote') || x.includes('descrip') || x.includes('patente') || x.includes('detalle')); let iNumeroLote = h.findIndex(x => x === 'n°' || x === 'número' || x === 'numero' || x.includes('nº') || x === 'n'); let iMinimo=h.findIndex(x=>x.includes('indemnizado') || x.includes('base') || x === 'minimo' || x.includes('mínimo')); let iMonto=h.findIndex(x=>x.includes('monto') || x.includes('total') || x.includes('precio') || x.includes('adjudic')); let iNombre=h.findIndex(x=>x.includes('nombre') || x.includes('cliente') || x.includes('comprador')); let iRut=h.findIndex(x=>x.includes('rut')); let iEmail=h.findIndex(x=>x.includes('email'));
         if (iLote < 0) iLote = 1; if (iMonto < 0) iMonto = h.length - 1; 
-        
         for(let i=headerIdx+1;i<data.length;i++){
             let row=data[i]; if(!row||!row.length) continue;
             let loteStr=String(row[iLote]||'').toUpperCase().trim(); if(!loteStr) continue;
-            let numeroLote = iNumeroLote >= 0 ? String(row[iNumeroLote]||'').trim() : '';
-            let minimo = iMinimo >= 0 ? Number(String(row[iMinimo]||'').replace(/[^0-9]/g,""))||0 : 0;
-            let monto = iMonto >= 0 ? Number(String(row[iMonto]||'').replace(/[^0-9]/g,""))||0 : 0;
-            
-            let comision = monto > 0 ? (monto * 0.12) * 1.19 : 0;
-
-            let nombreRaw=iNombre >= 0 ? String(row[iNombre]||'').trim() : 'DESCONOCIDO'; 
-            let rutRaw=iRut >= 0 ? String(row[iRut]||'').trim() : ''; let emailRaw=iEmail >= 0 ? String(row[iEmail]||'').trim() : ''; 
-            
-            let esFalso=esClienteFalso(nombreRaw, emailRaw);
-            let clienteReal = esFalso ? 'FALSO' : normalizarCliente(nombreRaw);
-            let esChatarra = loteStr.toLowerCase().includes('chatarra') || loteStr.toLowerCase().includes('restos');
-            
+            let numeroLote = iNumeroLote >= 0 ? String(row[iNumeroLote]||'').trim() : ''; let minimo = iMinimo >= 0 ? Number(String(row[iMinimo]||'').replace(/[^0-9]/g,""))||0 : 0; let monto = iMonto >= 0 ? Number(String(row[iMonto]||'').replace(/[^0-9]/g,""))||0 : 0;
+            let comision = monto > 0 ? (monto * 0.12) * 1.19 : 0; let nombreRaw=iNombre >= 0 ? String(row[iNombre]||'').trim() : 'DESCONOCIDO'; let rutRaw=iRut >= 0 ? String(row[iRut]||'').trim() : ''; let emailRaw=iEmail >= 0 ? String(row[iEmail]||'').trim() : ''; 
+            let esFalso=esClienteFalso(nombreRaw, emailRaw); let clienteReal = esFalso ? 'FALSO' : normalizarCliente(nombreRaw); let esChatarra = loteStr.toLowerCase().includes('chatarra') || loteStr.toLowerCase().includes('restos');
             if(monto/1e6 > 500) continue; 
-
-            if(monto>0 || esFalso){
-                if (!esFalso && monto>0) { ventaTotal+=monto; comisionTotal+=comision; lotesCount++; } 
-                else if (esFalso) { lotesFalsosCount++; }
-                tempAdjud.push({ numeroLote, loteStr, minimo, monto, comision, clienteReal, esFalso, nombreRaw, esChatarra, rut: rutRaw, email: emailRaw });
-            }
+            if(monto>0 || esFalso){ if (!esFalso && monto>0) { ventaTotal+=monto; comisionTotal+=comision; lotesCount++; } else if (esFalso) { lotesFalsosCount++; } tempAdjud.push({ numeroLote, loteStr, minimo, monto, comision, clienteReal, esFalso, nombreRaw, esChatarra, rut: rutRaw, email: emailRaw }); }
         }
     }
 
@@ -821,111 +491,54 @@ async function parseExcel(file){
     if(sPosturas){
         const dataPostRaw=XLSX.utils.sheet_to_json(sPosturas,{header:1}); 
         if(dataPostRaw.length){
-            const {index:headerIdx, headers:h}=findHeaderRow(dataPostRaw,['lote','postura']);
-            let iLote=h.findIndex(x=>x.includes('lote')); let iRut=h.findIndex(x=>x.includes('rut')); let iNombre=h.findIndex(x=>x.includes('nombre') || x.includes('cliente')); let iPostura=h.findIndex(x=>x.includes('postura') || x.includes('monto')); let iFecha=h.findIndex(x=>x.includes('fecha'));
+            const {index:headerIdx, headers:h}=findHeaderRow(dataPostRaw,['lote','postura']); let iLote=h.findIndex(x=>x.includes('lote')); let iRut=h.findIndex(x=>x.includes('rut')); let iNombre=h.findIndex(x=>x.includes('nombre') || x.includes('cliente')); let iPostura=h.findIndex(x=>x.includes('postura') || x.includes('monto')); let iFecha=h.findIndex(x=>x.includes('fecha'));
             for(let i=headerIdx+1;i<dataPostRaw.length;i++){
                 let rowRaw=dataPostRaw[i]; if(!rowRaw||!rowRaw.length) continue;
                 let loteStr=String(rowRaw[iLote]||'').toUpperCase().trim(); if(!loteStr) continue;
                 let rut=String(rowRaw[iRut]||'').trim(); let nombre=String(rowRaw[iNombre]||'').trim(); let monto=Number(String(rowRaw[iPostura]||'').replace(/[^0-9]/g,""))||0; 
-                
-                let fecha = formatExcelDate(rowRaw[iFecha]);
-
-                let esFalso=esClienteFalso(nombre, rut);
+                let fecha = formatExcelDate(rowRaw[iFecha]); let esFalso=esClienteFalso(nombre, rut);
                 if(!posturasPorLote[loteStr]) posturasPorLote[loteStr]=[];
                 posturasPorLote[loteStr].push({ rut, nombre, nombreNorm: normalizarCliente(nombre), monto, fecha, esFalso });
             }
         }
     }
 
-    let isRetail=file.name.toUpperCase().includes('RETAIL') || file.name.toUpperCase().includes('MIX') || file.name.toUpperCase().includes('HOGAR'); 
-    if(!isRetail && lotesCount>150) isRetail=true; const tipo=isRetail?'Retail':'Siniestrados';
-    let inscritos=sInscritos ? Math.max(0, XLSX.utils.sheet_to_json(sInscritos).length) : 0; if(inscritos<correosReales.length) inscritos=Math.round(correosReales.length/0.8);
+    let isRetail=file.name.toUpperCase().includes('RETAIL') || file.name.toUpperCase().includes('MIX') || file.name.toUpperCase().includes('HOGAR'); if(!isRetail && lotesCount>150) isRetail=true; const tipo=isRetail?'Retail':'Siniestrados'; let inscritos=sInscritos ? Math.max(0, XLSX.utils.sheet_to_json(sInscritos).length) : 0; if(inscritos<correosReales.length) inscritos=Math.round(correosReales.length/0.8);
 
     const adjudicaciones=tempAdjud.map(r=>{
-        let pujas=posturasPorLote[r.loteStr]||[]; let pujasReales=pujas.filter(p=>!p.esFalso);
-        let pujadoresUnicosReales=[...new Set(pujasReales.map(p=>p.nombreNorm))];
-        let exData = extraerMarcaModelo(r.loteStr);
-        let categoria = isRetail ? 'RETAIL' : exData.categoria;
-        let modeloStr = isRetail ? '' : exData.modeloStr;
-        let añoStr = "";
-        if(!isRetail) {
-            const matchAño=r.loteStr.match(/\b(199\d|20[0-2]\d)\b/); 
-            if(matchAño) añoStr=matchAño[1];
-        }
-
+        let pujas=posturasPorLote[r.loteStr]||[]; let pujasReales=pujas.filter(p=>!p.esFalso); let pujadoresUnicosReales=[...new Set(pujasReales.map(p=>p.nombreNorm))];
+        let exData = extraerMarcaModelo(r.loteStr); let categoria = isRetail ? 'RETAIL' : exData.categoria; let modeloStr = isRetail ? '' : exData.modeloStr; let añoStr = "";
+        if(!isRetail) { const matchAño=r.loteStr.match(/\b(199\d|20[0-2]\d)\b/); if(matchAño) añoStr=matchAño[1]; }
         return { ...r, pujas, pujadoresRealesCount: pujadoresUnicosReales.length, pujadoresTotales: pujas.length, categoria, modeloStr, añoStr, kmStr:"" };
     });
 
-    return { id:Date.now().toString() + Math.random().toString(), fileName:file.name, tipo, fechaData:fechaInfo, inscritos, garantias:correosReales.length, garantiasEmailsReales:correosReales, garantiasListaDetallada, ventaTotal, minimoTotal, comisionTotal, lotesCount, lotesDisponibles: lotesCount + lotesFalsosCount, adjudicaciones, posturasPorLote, ganadoresNuevos:0, ventaNuevos:0, ventaAntiguos:0, ganadoresUnicosCount:0 };
+    return { fileName:file.name, tipo, fechaData:fechaInfo, inscritos, garantias:correosReales.length, garantiasEmailsReales:correosReales, garantiasListaDetallada, ventaTotal, minimoTotal, comisionTotal, lotesCount, lotesDisponibles: lotesCount + lotesFalsosCount, adjudicaciones, posturasPorLote, ganadoresNuevos:0, ventaNuevos:0, ventaAntiguos:0, ganadoresUnicosCount:0 };
 }
 
 function buildAgg(rematesList,id,label){
     const agg={ id,label,venta:0,comisionTotal:0,lotes:0,lotesDisponibles:0,inscritos:0,garantias:0,ganadoresUnicosCount:0,nuevos:0,antiguos:0,ventaSiniestros:0,ventaRetail:0,ganadoresNuevos:0,ventaGanadoresNuevos:0,ventaGanadoresAntiguos:0,adjudicaciones:[], sumMontoValido: 0, sumMinimoValido: 0, garantiasLista: [] };
     let uniqueGanadoresSet=new Set();
-    
     rematesList.forEach(r=>{
-        agg.venta+=r.ventaTotal; agg.comisionTotal+=r.comisionTotal||0; agg.lotes+=r.lotesCount; agg.lotesDisponibles+=r.lotesDisponibles; agg.inscritos+=r.inscritos; agg.garantias+=r.garantias; agg.nuevos+=r.nuevos; agg.antiguos+=r.antiguos; agg.ganadoresNuevos+=(r.ganadoresNuevos||0); agg.ventaGanadoresNuevos+=(r.ventaNuevos||0); agg.ventaGanadoresAntiguos+=(r.ventaAntiguos||0); 
-        agg.adjudicaciones=agg.adjudicaciones.concat(r.adjudicaciones);
+        agg.venta+=r.ventaTotal; agg.comisionTotal+=r.comisionTotal||0; agg.lotes+=r.lotesCount; agg.lotesDisponibles+=r.lotesDisponibles; agg.inscritos+=r.inscritos; agg.garantias+=r.garantias; agg.nuevos+=r.nuevos; agg.antiguos+=r.antiguos; agg.ganadoresNuevos+=(r.ganadoresNuevos||0); agg.ventaGanadoresNuevos+=(r.ventaNuevos||0); agg.ventaGanadoresAntiguos+=(r.ventaAntiguos||0); agg.adjudicaciones=agg.adjudicaciones.concat(r.adjudicaciones);
         r.adjudicaciones.forEach(a=>{ if(!a.esFalso) uniqueGanadoresSet.add(a.clienteReal); });
-        
-        r.adjudicaciones.forEach(a=>{
-            if(a.minimo > 0 && a.monto > 0 && !a.esFalso && !a.esChatarra) {
-                agg.sumMontoValido += a.monto;
-                agg.sumMinimoValido += a.minimo;
-            }
-        });
-
-        if(r.garantiasListaDetallada) {
-            r.garantiasListaDetallada.forEach(g => {
-                if(!agg.garantiasLista.some(x => x.nombreNorm === g.nombreNorm)) agg.garantiasLista.push(g);
-            });
-        }
+        r.adjudicaciones.forEach(a=>{ if(a.minimo > 0 && a.monto > 0 && !a.esFalso && !a.esChatarra) { agg.sumMontoValido += a.monto; agg.sumMinimoValido += a.minimo; } });
+        if(r.garantiasListaDetallada) { r.garantiasListaDetallada.forEach(g => { if(!agg.garantiasLista.some(x => x.nombreNorm === g.nombreNorm)) agg.garantiasLista.push(g); }); }
         if(r.tipo==='Siniestrados') agg.ventaSiniestros+=r.ventaTotal; if(r.tipo==='Retail') agg.ventaRetail+=r.ventaTotal;
     });
-    
-    agg.ganadoresUnicosCount=uniqueGanadoresSet.size; agg.perdedoresCount=Math.max(0,agg.garantias-agg.ganadoresUnicosCount);
-    agg.conversion=agg.inscritos?(agg.garantias/agg.inscritos*100):0; agg.ticketPromedio=agg.lotes?(agg.venta/agg.lotes):0; agg.eficaciaLotes=agg.lotesDisponibles?(agg.lotes/agg.lotesDisponibles*100):0; agg.pctVentaNuevos=agg.venta?(agg.ventaGanadoresNuevos/agg.venta*100):0;
-    
-    agg.deltaPujaTotal = agg.sumMontoValido - agg.sumMinimoValido;
-    agg.deltaPujaPromedio = agg.lotes ? (agg.deltaPujaTotal / agg.lotes) : 0;
-    agg.sobreprecioReal = agg.sumMinimoValido > 0 ? ((agg.sumMontoValido / agg.sumMinimoValido) * 100) - 100 : 0;
-    
-    agg.fugaList = agg.garantiasLista.filter(g => !uniqueGanadoresSet.has(g.nombreNorm));
-
+    agg.ganadoresUnicosCount=uniqueGanadoresSet.size; agg.perdedoresCount=Math.max(0,agg.garantias-agg.ganadoresUnicosCount); agg.conversion=agg.inscritos?(agg.garantias/agg.inscritos*100):0; agg.ticketPromedio=agg.lotes?(agg.venta/agg.lotes):0; agg.eficaciaLotes=agg.lotesDisponibles?(agg.lotes/agg.lotesDisponibles*100):0; agg.pctVentaNuevos=agg.venta?(agg.ventaGanadoresNuevos/agg.venta*100):0; agg.deltaPujaTotal = agg.sumMontoValido - agg.sumMinimoValido; agg.deltaPujaPromedio = agg.lotes ? (agg.deltaPujaTotal / agg.lotes) : 0; agg.sobreprecioReal = agg.sumMinimoValido > 0 ? ((agg.sumMontoValido / agg.sumMinimoValido) * 100) - 100 : 0; agg.fugaList = agg.garantiasLista.filter(g => !uniqueGanadoresSet.has(g.nombreNorm));
     return agg;
 }
 
 function cambiarSeccion(mod){ 
     try {
-        currentModule=mod; 
-        document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; 
-        document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; 
-        document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; 
-        document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-2 border border-brand-accent':'nav-item nav-inactive mb-2 border border-slate-200'; 
-        document.getElementById('nav-mod-custom').className=mod==='custom'?'nav-item nav-active mb-2 border border-brand-accent':'nav-item nav-inactive mb-2 border border-slate-200'; 
-        document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mb-8':'nav-item nav-inactive mb-8'; 
-        
-        ['module-remates', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-custom', 'module-buscador'].forEach(id => {
-            const el = document.getElementById(id); if (el) el.classList.add('hidden');
-        });
-        
+        currentModule=mod; document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-2 border border-brand-accent':'nav-item nav-inactive mb-2 border border-slate-200'; document.getElementById('nav-mod-custom').className=mod==='custom'?'nav-item nav-active mb-2 border border-brand-accent':'nav-item nav-inactive mb-2 border border-slate-200'; document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mb-8':'nav-item nav-inactive mb-8'; 
+        ['module-remates', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-custom', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
         const tree = document.getElementById('tree-container'); const empty = document.getElementById('empty-state');
-        
         if(mod==='remates'){ tree.classList.remove('hidden'); document.getElementById('module-remates').classList.remove('hidden'); renderDashboard(); } 
         else if(mod==='conclusiones'){ tree.classList.remove('hidden'); document.getElementById('module-conclusiones').classList.remove('hidden'); renderConclusiones(); }
         else if(mod==='autos'){ tree.classList.remove('hidden'); document.getElementById('module-autos').classList.remove('hidden'); renderPanelAutos(); }
         else if(mod==='custom'){ tree.classList.remove('hidden'); document.getElementById('module-custom').classList.remove('hidden'); generarInformePersonalizado(); }
-        else if(mod==='clientes'){ 
-            tree.classList.remove('hidden');
-            if(checkedNodes.length===0){
-                empty.classList.remove('hidden');
-            } else {
-                empty.classList.add('hidden');
-                document.getElementById('module-clientes').classList.remove('hidden');
-                procesarDatosClientes(); 
-                renderPanelClientesData(clientDB,false); 
-            }
-        } 
+        else if(mod==='clientes'){ tree.classList.remove('hidden'); if(checkedNodes.length===0){ empty.classList.remove('hidden'); } else { empty.classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); renderPanelClientesData(clientDB,false); } } 
         else { tree.classList.add('hidden'); document.getElementById('module-buscador').classList.remove('hidden'); empty.classList.add('hidden'); buscarPatente(); } 
     } catch(e) { console.error("Error cambiando sección:", e); }
 }
@@ -934,36 +547,15 @@ function toggleNode(id){ if(checkedNodes.includes(id)) checkedNodes=checkedNodes
 function limpiarSeleccion(){ checkedNodes=[]; document.querySelectorAll('input[type="checkbox"]').forEach(chk=>chk.checked=false); actualizarVistaActual(); }
 function actualizarVistaActual() { 
     try {
-        if (currentModule === 'remates') renderDashboard(); 
-        else if (currentModule === 'autos') renderPanelAutos(); 
-        else if (currentModule === 'conclusiones') renderConclusiones(); 
-        else if (currentModule === 'custom') generarInformePersonalizado(); 
-        else if (currentModule === 'clientes') { 
-            if(checkedNodes.length===0){ 
-                document.getElementById('empty-state').classList.remove('hidden'); 
-                document.getElementById('module-clientes').classList.add('hidden');
-            } else {
-                document.getElementById('empty-state').classList.add('hidden'); 
-                document.getElementById('module-clientes').classList.remove('hidden');
-                procesarDatosClientes(); 
-                renderPanelClientesData(clientDB, false); 
-            }
-        }
+        if (currentModule === 'remates') renderDashboard(); else if (currentModule === 'autos') renderPanelAutos(); else if (currentModule === 'conclusiones') renderConclusiones(); else if (currentModule === 'custom') generarInformePersonalizado(); 
+        else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); renderPanelClientesData(clientDB, false); } }
     } catch(e) { console.error("Error actualizando vista:", e); }
 }
 
 async function limpiarBase(){ 
-    db = {remates:[]}; 
-    checkedNodes = []; 
-    clientDB = []; 
-    document.getElementById('empty-state').classList.remove('hidden'); 
-    try {
-        await supabaseClient.from('app_state').update({ payload: db }).eq('id', 1);
-    } catch (e) {
-        console.error("Error vaciando nube:", e);
-    }
-    actualizarSidebar(); 
-    location.reload(); 
+    db = {remates:[]}; checkedNodes = []; clientDB = []; document.getElementById('empty-state').classList.remove('hidden'); 
+    try { await supabaseClient.from('app_state').delete().gte('id', 0); } catch (e) { console.error("Error vaciando nube:", e); }
+    actualizarSidebar(); location.reload(); 
 }
 
 function toggleAccordion(e,targetId,iconId){ e.stopPropagation(); const target=document.getElementById(targetId); const icon=document.getElementById(iconId); if(target.classList.contains('hidden')){ target.classList.remove('hidden'); icon.style.transform='rotate(0deg)'; } else { target.classList.add('hidden'); icon.style.transform='rotate(-90deg)'; } }
@@ -972,26 +564,13 @@ function buildTreeNodeHTML(id,label,level,hasChildren,childHtml,forceOpen=false)
 
 function actualizarSidebar(){ 
     try {
-        const container=document.getElementById('nav-tree'); container.innerHTML=''; nodeRematesMap={}; if(!db.remates.length) return; 
-        const tree={}; 
+        const container=document.getElementById('nav-tree'); container.innerHTML=''; nodeRematesMap={}; if(!db.remates.length) return; const tree={}; 
         db.remates.forEach(r=>{ 
             const fd=r.fechaData; const t=r.tipo; const y=fd.year; const s=fd.semester; const q=fd.quarter; const m=fd.yearMonth; 
-            if(!tree[t]) tree[t]={id:`T-${t}`,label:t==='Retail'?'🛍 Retail':'🚗 Siniestrados',children:{}}; 
-            if(!tree[t].children[y]) tree[t].children[y]={id:`Y-${t}-${y}`,label:`Año ${y}`,children:{}}; 
-            if(!tree[t].children[y].children[s]) tree[t].children[y].children[s]={id:`S-${t}-${y}-${s}`,label:`Semestre ${s}`,children:{}}; 
-            if(!tree[t].children[y].children[s].children[q]) tree[t].children[y].children[s].children[q]={id:`Q-${t}-${y}-${q}`,label:`Trimestre ${q}`,children:{}}; 
-            if(!tree[t].children[y].children[s].children[q].children[m]) tree[t].children[y].children[s].children[q].children[m]={id:`M-${t}-${m}`,label:fd.mesStr,remates:[]}; 
-            tree[t].children[y].children[s].children[q].children[m].remates.push(r); 
-            
-            const addMap=(id,label)=>{ if(!nodeRematesMap[id]) nodeRematesMap[id]={label,remates:[]}; nodeRematesMap[id].remates.push(r); }; 
-            addMap(`T-${t}`,`Total ${t}`); 
-            addMap(`Y-${t}-${y}`,`${t} ${y}`); 
-            addMap(`S-${t}-${y}-${s}`,`${t} Sem ${s} ${y}`); 
-            addMap(`Q-${t}-${y}-${q}`,`${t} Q${q} ${y}`); 
-            addMap(`M-${t}-${m}`,`${t} ${fd.mesStr.substring(0,3)} ${y}`); 
+            if(!tree[t]) tree[t]={id:`T-${t}`,label:t==='Retail'?'🛍 Retail':'🚗 Siniestrados',children:{}}; if(!tree[t].children[y]) tree[t].children[y]={id:`Y-${t}-${y}`,label:`Año ${y}`,children:{}}; if(!tree[t].children[y].children[s]) tree[t].children[y].children[s]={id:`S-${t}-${y}-${s}`,label:`Semestre ${s}`,children:{}}; if(!tree[t].children[y].children[s].children[q]) tree[t].children[y].children[s].children[q]={id:`Q-${t}-${y}-${q}`,label:`Trimestre ${q}`,children:{}}; if(!tree[t].children[y].children[s].children[q].children[m]) tree[t].children[y].children[s].children[q].children[m]={id:`M-${t}-${m}`,label:fd.mesStr,remates:[]}; tree[t].children[y].children[s].children[q].children[m].remates.push(r); 
+            const addMap=(id,label)=>{ if(!nodeRematesMap[id]) nodeRematesMap[id]={label,remates:[]}; nodeRematesMap[id].remates.push(r); }; addMap(`T-${t}`,`Total ${t}`); addMap(`Y-${t}-${y}`,`${t} ${y}`); addMap(`S-${t}-${y}-${s}`,`${t} Sem ${s} ${y}`); addMap(`Q-${t}-${y}-${q}`,`${t} Q${q} ${y}`); addMap(`M-${t}-${m}`,`${t} ${fd.mesStr.substring(0,3)} ${y}`); 
         }); 
-        const getRemates=(node)=>{ if(node.remates) return node.remates; let arr=[]; Object.values(node.children).forEach(c=>{ arr=arr.concat(getRemates(c)); }); return arr; }; 
-        let html=''; 
+        const getRemates=(node)=>{ if(node.remates) return node.remates; let arr=[]; Object.values(node.children).forEach(c=>{ arr=arr.concat(getRemates(c)); }); return arr; }; let html=''; 
         Object.keys(tree).sort().reverse().forEach(t=>{ 
             const nodeT=tree[t]; nodeRematesMap[nodeT.id]={label:`Total ${t}`,remates:getRemates(nodeT)}; let htmlY=''; 
             Object.keys(nodeT.children).sort((a,b)=>b-a).forEach(y=>{ 
@@ -1001,11 +580,9 @@ function actualizarSidebar(){
                     Object.keys(nodeS.children).sort((a,b)=>b-a).forEach(q=>{ 
                         const nodeQ=nodeS.children[q]; nodeRematesMap[nodeQ.id]={label:`${t} Q${q} ${y}`,remates:getRemates(nodeQ)}; let htmlM=''; 
                         Object.keys(nodeQ.children).sort((a,b)=>b-a).forEach(m=>{ 
-                            const nodeM=nodeQ.children[m]; nodeRematesMap[nodeM.id]={label:`${t} ${nodeM.label} ${y}`,remates:getRemates(nodeM)}; let htmlR=''; 
+                            const nodeM=nodeQ.children[m]; let htmlR=''; 
                             nodeM.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp).forEach((r,idx)=>{ 
-                                const semanaNum=idx+1; const labelR=`Sem ${semanaNum} - ${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,10)}`; 
-                                htmlR+=buildTreeNodeHTML(`R-${r.id}`,labelR,5,false,''); 
-                                nodeRematesMap[`R-${r.id}`]={label:`${t} S${semanaNum} ${nodeM.label.substring(0,3)} ${y}`,remates:[r]}; 
+                                const semanaNum=idx+1; const labelR=`Sem ${semanaNum} - ${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,10)}`; htmlR+=buildTreeNodeHTML(`R-${r.id}`,labelR,5,false,''); nodeRematesMap[`R-${r.id}`]={label:`${t} S${semanaNum} ${nodeM.label.substring(0,3)} ${y}`,remates:[r]}; 
                             }); htmlM+=buildTreeNodeHTML(nodeM.id,nodeM.label,4,true,htmlR,false); 
                         }); htmlQ+=buildTreeNodeHTML(nodeQ.id,nodeQ.label,3,true,htmlM,false); 
                     }); htmlS+=buildTreeNodeHTML(nodeS.id,nodeS.label,2,true,htmlQ,true); 
@@ -1020,10 +597,7 @@ function renderDashboard(){
         if(currentModule!=='remates') return; const emptyState=document.getElementById('empty-state'); const dashboard=document.getElementById('module-remates'); const singleView=document.getElementById('single-view'); const compareView=document.getElementById('compare-view'); 
         if(checkedNodes.length===0){ emptyState.classList.remove('hidden'); dashboard.classList.add('hidden'); return; } 
         emptyState.classList.add('hidden'); dashboard.classList.remove('hidden'); 
-        
-        let allRemates = getSelectedRemates();
-        globalAgg = buildAgg(allRemates, 'G', 'Selección Global');
-        
+        let allRemates = getSelectedRemates(); globalAgg = buildAgg(allRemates, 'G', 'Selección Global');
         if(checkedNodes.length===1){ singleView.classList.remove('hidden'); compareView.classList.add('hidden'); renderSingleView(checkedNodes[0]); } else { singleView.classList.add('hidden'); compareView.classList.remove('hidden'); setTimeout(()=>{ renderCompareView(checkedNodes); },50); } 
     } catch(e) { console.error("Error renderDashboard", e); }
 }
@@ -1031,47 +605,21 @@ function renderDashboard(){
 function renderSingleView(nodeId){
     try {
         const node=nodeRematesMap[nodeId]; const agg=buildAgg(node.remates,nodeId,node.label);
-        
-        if(document.getElementById('sv-titulo')) document.getElementById('sv-titulo').innerText=agg.label; 
-        if(document.getElementById('sv-subtitulo')) document.getElementById('sv-subtitulo').innerText=`${node.remates.length} matrices consolidadas`;
-        
-        if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal);
-        if(document.getElementById('sv-kpi-ticket-promedio')) document.getElementById('sv-kpi-ticket-promedio').innerText=formatMoney(agg.ticketPromedio); 
-        if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta);
-        
-        if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
-        
-        if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-1racompra')) document.getElementById('sv-kpi-1racompra').innerText=agg.ganadoresNuevos.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-1racompra-pct')) document.getElementById('sv-kpi-1racompra-pct').innerText=`(${agg.pctVentaNuevos.toFixed(1)}% de venta)`;
-
+        if(document.getElementById('sv-titulo')) document.getElementById('sv-titulo').innerText=agg.label; if(document.getElementById('sv-subtitulo')) document.getElementById('sv-subtitulo').innerText=`${node.remates.length} matrices consolidadas`;
+        if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-ticket-promedio')) document.getElementById('sv-kpi-ticket-promedio').innerText=formatMoney(agg.ticketPromedio); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta);
+        if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
+        if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-1racompra')) document.getElementById('sv-kpi-1racompra').innerText=agg.ganadoresNuevos.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-1racompra-pct')) document.getElementById('sv-kpi-1racompra-pct').innerText=`(${agg.pctVentaNuevos.toFixed(1)}% de venta)`;
         const mapC={}; agg.adjudicaciones.forEach(a=>{ if(a.esFalso) return; if(!mapC[a.clienteReal]) mapC[a.clienteReal]={lotes:0,total:0}; mapC[a.clienteReal].lotes++; mapC[a.clienteReal].total+=a.monto; }); let multi=0; Object.values(mapC).forEach(c=>{ if(c.lotes>1) multi++; }); 
-        if(document.getElementById('sv-kpi-multilote')) document.getElementById('sv-kpi-multilote').innerText=multi; 
-        
-        globalMapCMulti = mapC;
-
+        if(document.getElementById('sv-kpi-multilote')) document.getElementById('sv-kpi-multilote').innerText=multi; globalMapCMulti = mapC;
         const topLotes=[...agg.adjudicaciones].filter(a=>!a.esFalso).sort((a,b)=>b.pujadoresRealesCount-a.pujadoresRealesCount).slice(0,10);
         if(document.getElementById('sv-tabla-top-lotes')) document.getElementById('sv-tabla-top-lotes').innerHTML=topLotes.map(l=>{
-            let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0;
-            let deltaPct = l.minimo > 0 ? ((l.monto - l.minimo) / l.minimo * 100) : 0;
-            let dSignL = deltaLote >= 0 ? '+' : '';
-            let dColorL = deltaLote >= 0 ? 'text-brand-info' : 'text-brand-danger';
+            let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let deltaPct = l.minimo > 0 ? ((l.monto - l.minimo) / l.minimo * 100) : 0; let dSignL = deltaLote >= 0 ? '+' : ''; let dColorL = deltaLote >= 0 ? 'text-brand-info' : 'text-brand-danger';
             return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')"><td class="py-3 font-semibold text-xs text-slate-500 w-16 text-center">N° ${l.numeroLote||'-'}</td><td class="py-3 font-mono text-[11px] max-w-[250px] truncate text-slate-800" title="${l.loteStr}">${l.loteStr}</td><td class="py-3 text-center"><span class="bg-orange-50 text-brand-accent px-3 py-1 rounded-full font-bold hover:bg-brand-accent hover:text-white transition">${l.pujadoresRealesCount}</span></td><td class="py-3 text-right font-mono text-xs text-slate-500">${formatMoney(l.minimo)}</td><td class="py-3 text-right font-mono text-xs font-bold text-brand-success">${formatMoney(l.monto)}</td><td class="py-3 text-right font-mono text-xs font-bold ${dColorL}">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td><td class="py-3 text-right font-mono text-xs font-bold ${dColorL}">${l.minimo>0?(dSignL+deltaPct.toFixed(1)+'%'):'-'}</td></tr>`;
         }).join('');
-
-        const sortedRems=[...node.remates].sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp); const labels=sortedRems.map((r,idx)=>`S${idx+1}`);
-        let showRetencion = sortedRems.some(r => r.nuevos > 0 || r.antiguos > 0); let showVentas = sortedRems.some(r => r.ventaTotal > 0);
-        
+        const sortedRems=[...node.remates].sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp); const labels=sortedRems.map((r,idx)=>`S${idx+1}`); let showRetencion = sortedRems.some(r => r.nuevos > 0 || r.antiguos > 0); let showVentas = sortedRems.some(r => r.ventaTotal > 0);
         try {
-            if(svChartRetencionInst) svChartRetencionInst.destroy(); 
-            if(showRetencion && document.getElementById('sv-chartRetencion')) { svChartRetencionInst=new Chart(document.getElementById('sv-chartRetencion').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Nuevos',data:sortedRems.map(r=>r.nuevos),backgroundColor:'#FF6B35',borderRadius:4},{label:'Recurrentes',data:sortedRems.map(r=>r.antiguos),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f1f5f9'}}}}}); }
-            
-            if(svChartVentasInst) svChartVentasInst.destroy(); 
-            if(showVentas && document.getElementById('sv-chartVentas')) { svChartVentasInst=new Chart(document.getElementById('sv-chartVentas').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Venta Siniestrados',data:sortedRems.map(r=>r.tipo==='Siniestrados'?r.ventaTotal:0),backgroundColor:'#0ea5e9',borderRadius:4},{label:'Venta Retail',data:sortedRems.map(r=>r.tipo==='Retail'?r.ventaTotal:0),backgroundColor:'#8B5CF6',borderRadius:4}] }}); }
+            if(svChartRetencionInst) svChartRetencionInst.destroy(); if(showRetencion && document.getElementById('sv-chartRetencion')) { svChartRetencionInst=new Chart(document.getElementById('sv-chartRetencion').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Nuevos',data:sortedRems.map(r=>r.nuevos),backgroundColor:'#FF6B35',borderRadius:4},{label:'Recurrentes',data:sortedRems.map(r=>r.antiguos),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f1f5f9'}}}}}); }
+            if(svChartVentasInst) svChartVentasInst.destroy(); if(showVentas && document.getElementById('sv-chartVentas')) { svChartVentasInst=new Chart(document.getElementById('sv-chartVentas').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Venta Siniestrados',data:sortedRems.map(r=>r.tipo==='Siniestrados'?r.ventaTotal:0),backgroundColor:'#0ea5e9',borderRadius:4},{label:'Venta Retail',data:sortedRems.map(r=>r.tipo==='Retail'?r.ventaTotal:0),backgroundColor:'#8B5CF6',borderRadius:4}] }}); }
         } catch(ec) { console.error("Error en gráfico single view", ec); }
     } catch (e) { console.error("Error en renderSingleView", e); }
 }
@@ -1081,89 +629,49 @@ function renderCompareView(nodesList){
         const compareData=nodesList.map(id=>buildAgg(nodeRematesMap[id].remates,id,nodeRematesMap[id].label)); 
         if(document.getElementById('cv-tabla-comparativa')) {
             document.getElementById('cv-tabla-comparativa').innerHTML=compareData.map(d=>{
-                let dSign = d.deltaPujaTotal >= 0 ? '+' : '';
-                let dColor = d.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger';
-                return `<tr class="border-b border-slate-100 hover:bg-slate-50">
-                    <td class="p-3 font-bold max-w-[150px] truncate text-slate-800" title="${d.label}">${d.label}</td>
-                    <td class="p-3 text-right font-mono font-bold text-brand-success">${formatMoney(d.venta)}</td>
-                    <td class="p-3 text-right font-mono font-bold text-brand-info">${formatMoney(d.comisionTotal)}</td>
-                    <td class="p-3 text-center text-slate-800 font-semibold">${d.lotes}</td>
-                    <td class="p-3 text-center text-slate-500">${d.lotesDisponibles}</td>
-                    <td class="p-3 text-center font-bold text-brand-success">${d.eficaciaLotes.toFixed(1)}%</td>
-                    <td class="p-3 text-center font-bold text-slate-700">${d.garantias}</td>
-                    <td class="p-3 text-center text-slate-600">${d.nuevos}</td>
-                    <td class="p-3 text-center font-bold text-brand-success">${d.ganadoresNuevos}</td>
-                    <td class="p-3 text-center font-bold ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)} <span class="text-xs">(${dSign}${d.sobreprecioReal.toFixed(1)}%)</span></td>
-                </tr>`;
+                let dSign = d.deltaPujaTotal >= 0 ? '+' : ''; let dColor = d.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger';
+                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-3 font-bold max-w-[150px] truncate text-slate-800" title="${d.label}">${d.label}</td><td class="p-3 text-right font-mono font-bold text-brand-success">${formatMoney(d.venta)}</td><td class="p-3 text-right font-mono font-bold text-brand-info">${formatMoney(d.comisionTotal)}</td><td class="p-3 text-center text-slate-800 font-semibold">${d.lotes}</td><td class="p-3 text-center text-slate-500">${d.lotesDisponibles}</td><td class="p-3 text-center font-bold text-brand-success">${d.eficaciaLotes.toFixed(1)}%</td><td class="p-3 text-center font-bold text-slate-700">${d.garantias}</td><td class="p-3 text-center text-slate-600">${d.nuevos}</td><td class="p-3 text-center font-bold text-brand-success">${d.ganadoresNuevos}</td><td class="p-3 text-center font-bold ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)} <span class="text-xs">(${dSign}${d.sobreprecioReal.toFixed(1)}%)</span></td></tr>`;
             }).join(''); 
         }
         const labels=compareData.map(d=>d.label); 
         try {
-            if(cvChartVentasInst) cvChartVentasInst.destroy(); 
-            if(document.getElementById('cv-chartVentas')) {
-                cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0ea5e9',borderRadius:4},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#8B5CF6',borderRadius:4}] }}); 
-            }
-            if(cvChartGarantiasInst) cvChartGarantiasInst.destroy(); 
-            if(document.getElementById('cv-chartGarantias')) {
-                cvChartGarantiasInst=new Chart(document.getElementById('cv-chartGarantias').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Nuevos',data:compareData.map(d=>d.nuevos),backgroundColor:'#FF6B35',borderRadius:4},{label:'Recurrentes',data:compareData.map(d=>d.antiguos),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f1f5f9'}}}}}); 
-            }
+            if(cvChartVentasInst) cvChartVentasInst.destroy(); if(document.getElementById('cv-chartVentas')) { cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0ea5e9',borderRadius:4},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#8B5CF6',borderRadius:4}] }}); }
+            if(cvChartGarantiasInst) cvChartGarantiasInst.destroy(); if(document.getElementById('cv-chartGarantias')) { cvChartGarantiasInst=new Chart(document.getElementById('cv-chartGarantias').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Nuevos',data:compareData.map(d=>d.nuevos),backgroundColor:'#FF6B35',borderRadius:4},{label:'Recurrentes',data:compareData.map(d=>d.antiguos),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f1f5f9'}}}}}); }
         } catch(ec) { console.error("Error en gráfico compare view", ec); }
     } catch (e) { console.error("Error en renderCompareView", e); }
 }
 
-function abrirModalMultiLote() {
-    let html = '';
-    Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => {
-        if(data.lotes > 1) {
-            html += `<tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-3 pl-6 text-sm font-semibold text-slate-800">${nombre}</td><td class="p-3 text-center font-bold text-brand-accent">${data.lotes}</td><td class="p-3 text-right pr-6 font-mono font-bold text-brand-success">${formatMoney(data.total)}</td></tr>`;
-        }
-    });
-    document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-slate-500">Ningún cliente se adjudicó más de 1 lote.</td></tr>';
-    document.getElementById('modal-multilote').classList.remove('hidden');
-}
+function abrirModalMultiLote() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-3 pl-6 text-sm font-semibold text-slate-800">${nombre}</td><td class="p-3 text-center font-bold text-brand-accent">${data.lotes}</td><td class="p-3 text-right pr-6 font-mono font-bold text-brand-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-slate-500">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); }
 function cerrarModalMulti() { document.getElementById('modal-multilote').classList.add('hidden'); }
 
 function renderConclusiones() {
     try {
-        if(currentModule !== 'conclusiones') return;
-        const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
+        if(currentModule !== 'conclusiones') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
         if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
         emptyState.classList.add('hidden'); container.classList.remove('hidden');
 
-        let allRemates = getSelectedRemates();
-        const agg = buildAgg(allRemates, 'G', 'Selección Global'); let html = '';
-        
-        globalAgg = agg; 
-        if(!clientDB.length) procesarDatosClientes(); 
+        let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates, 'G', 'Selección Global'); let html = ''; globalAgg = agg; if(!clientDB.length) procesarDatosClientes(); 
 
         if(checkedNodes.length > 1) {
-            let ref1 = buildAgg(nodeRematesMap[checkedNodes[0]].remates, 'R1', nodeRematesMap[checkedNodes[0]].label);
-            let ref2 = buildAgg(nodeRematesMap[checkedNodes[1]].remates, 'R2', nodeRematesMap[checkedNodes[1]].label);
-            let varVenta = ref1.venta > 0 ? ((ref2.venta - ref1.venta) / ref1.venta * 100) : 0;
-            let signoVar = varVenta >= 0 ? '+' : '';
+            let ref1 = buildAgg(nodeRematesMap[checkedNodes[0]].remates, 'R1', nodeRematesMap[checkedNodes[0]].label); let ref2 = buildAgg(nodeRematesMap[checkedNodes[1]].remates, 'R2', nodeRematesMap[checkedNodes[1]].label);
+            let varVenta = ref1.venta > 0 ? ((ref2.venta - ref1.venta) / ref1.venta * 100) : 0; let signoVar = varVenta >= 0 ? '+' : '';
             html += `<div class="glass-panel p-6 border-l-4 border-l-orange-500 md:col-span-2 shadow-sm mb-2"><h3 class="text-lg font-bold text-slate-800 mb-2">📋 Análisis de Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-sm text-slate-600 leading-relaxed">Al comparar <b>${nodeRematesMap[checkedNodes[0]].label}</b> con <b>${nodeRematesMap[checkedNodes[1]].label}</b>, se observa una variación en la venta total del <b>${signoVar}${varVenta.toFixed(1)}%</b>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
         }
 
-        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : '';
-        let sobreColor = agg.sobreprecioReal >= 0 ? 'text-brand-success' : 'text-brand-danger';
+        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-brand-success' : 'text-brand-danger';
 
         html += `<div class="glass-panel p-5 border-l-4 border-l-brand-info"><h4 class="font-bold text-sm text-slate-800 mb-2">1. Venta Total</h4><p class="text-xs text-slate-600 leading-relaxed">Las operaciones válidas sumaron una venta adjudicada de <b>${formatMoney(agg.venta)}</b>.</p></div>`;
         html += `<div class="glass-panel p-5 border-l-4 border-l-brand-info"><h4 class="font-bold text-sm text-slate-800 mb-2">2. Comisiones Estimadas (12% + IVA)</h4><p class="text-xs text-slate-600 leading-relaxed">El remate generó un ingreso por comisiones de <b>${formatMoney(agg.comisionTotal)}</b>.</p></div>`;
         html += `<div class="glass-panel p-5 border-l-4 border-l-brand-accent"><h4 class="font-bold text-sm text-slate-800 mb-2">3. Efectividad del Remate</h4><p class="text-xs text-slate-600 leading-relaxed">Se logró vender el <b>${agg.eficaciaLotes.toFixed(1)}%</b> de todos los lotes disponibles en el catálogo.</p></div>`;
         html += `<div class="glass-panel p-5 border-l-4 border-l-brand-accent"><h4 class="font-bold text-sm text-slate-800 mb-2">4. Incremento sobre el Mínimo (Delta)</h4><p class="text-xs text-slate-600 leading-relaxed">Las pujas incrementaron el valor de salida en <b>${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</b>, lo que representa un margen positivo del <b class="${sobreColor}">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</b> sobre los mínimos propuestos.</p></div>`;
         html += `<div class="glass-panel p-5 border-l-4 border-l-brand-success"><h4 class="font-bold text-sm text-slate-800 mb-2">5. Ticket Promedio</h4><p class="text-xs text-slate-600 leading-relaxed">El valor promedio de venta por cada lote adjudicado fue de <b>${formatMoney(agg.ticketPromedio)}</b>.</p></div>`;
-        
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
         html += `<div class="glass-panel p-5 border-l-4 border-l-brand-success"><h4 class="font-bold text-sm text-slate-800 mb-2">6. Tasa de Cierre de Clientes</h4><p class="text-xs text-slate-600 leading-relaxed">El <b>${tasaExito.toFixed(1)}%</b> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
-        
         html += `<div class="glass-panel p-5 border-l-4 border-l-brand-danger flex flex-col justify-between"><h4 class="font-bold text-sm text-slate-800 mb-2">7. Clientes sin Compras (Fuga)</h4><p class="text-xs text-slate-600 leading-relaxed">Hubo <b>${agg.perdedoresCount} clientes</b> que pagaron garantía pero no lograron comprar nada. Lista ideal para remarketing.</p><button onclick="abrirModalFuga()" class="mt-3 px-3 py-1.5 bg-red-100 text-red-700 font-bold rounded-lg hover:bg-red-200 text-xs text-center border border-red-200 transition no-print">🔍 Ver Listado de Fuga y Exportar</button></div>`;
-        
         let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
         html += `<div class="glass-panel p-5 border-l-4 border-l-purple-500"><h4 class="font-bold text-sm text-slate-800 mb-2">8. Clientes Nuevos</h4><p class="text-xs text-slate-600 leading-relaxed">El <b>${agg.pctVentaNuevos.toFixed(1)}%</b> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
-
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
         html += `<div class="glass-panel p-5 border-l-4 border-l-purple-500"><h4 class="font-bold text-sm text-slate-800 mb-2">9. Compradores de Volumen</h4><p class="text-xs text-slate-600 leading-relaxed">Un total de <b>${multi} clientes</b> operaron en volumen y compraron más de un lote.</p></div>`;
-
         let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
         html += `<div class="glass-panel p-5 border-l-4 border-l-slate-400"><h4 class="font-bold text-sm text-slate-800 mb-2">10. Limpieza de Datos</h4><p class="text-xs text-slate-600 leading-relaxed">Se aislaron automáticamente <b>${falsos} pujas internas o pruebas de sistema</b> para proteger la integridad de los resultados.</p></div>`;
 
@@ -1176,204 +684,100 @@ function renderPanelAutos(){
         if(currentModule !== 'autos') return; const emptyState=document.getElementById('empty-state'); const autosMod=document.getElementById('module-autos');
         if(checkedNodes.length===0){ emptyState.classList.remove('hidden'); autosMod.classList.add('hidden'); return; }
         emptyState.classList.add('hidden'); autosMod.classList.remove('hidden');
-        
-        let autos = []; let allRemates = getSelectedRemates();
-        allRemates.forEach(r => { r.adjudicaciones.forEach(a => { if(!a.esFalso && !a.esChatarra) autos.push({...a, remate: r.fileName}); }); });
-
-        let marcasMap = {}; let modelosMap = {};
-        autos.forEach(a => { 
-            if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') marcasMap[a.categoria] = (marcasMap[a.categoria]||0) + 1; 
-            if(a.modeloStr && a.modeloStr.trim() !== '') modelosMap[a.modeloStr] = (modelosMap[a.modeloStr]||0) + 1; 
-        });
-
+        let autos = []; let allRemates = getSelectedRemates(); allRemates.forEach(r => { r.adjudicaciones.forEach(a => { if(!a.esFalso && !a.esChatarra) autos.push({...a, remate: r.fileName}); }); });
+        let marcasMap = {}; let modelosMap = {}; autos.forEach(a => { if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') marcasMap[a.categoria] = (marcasMap[a.categoria]||0) + 1; if(a.modeloStr && a.modeloStr.trim() !== '') modelosMap[a.modeloStr] = (modelosMap[a.modeloStr]||0) + 1; });
         const marcasSorted = Object.entries(marcasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
         try {
-            if(flotaMarcasInst) flotaMarcasInst.destroy();
-            if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) {
-                flotaMarcasInst=new Chart(document.getElementById('flota-marcas-chart').getContext('2d'),{type:'doughnut',data:{labels:marcasSorted.map(m=>m[0]),datasets:[{data:marcasSorted.map(m=>m[1]),backgroundColor:['#FF6B35','#0ea5e9','#10B981','#8B5CF6','#f59e0b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'right'}}}});
-            }
-            
+            if(flotaMarcasInst) flotaMarcasInst.destroy(); if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { flotaMarcasInst=new Chart(document.getElementById('flota-marcas-chart').getContext('2d'),{type:'doughnut',data:{labels:marcasSorted.map(m=>m[0]),datasets:[{data:marcasSorted.map(m=>m[1]),backgroundColor:['#FF6B35','#0ea5e9','#10B981','#8B5CF6','#f59e0b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'right'}}}}); }
             const modelosSorted = Object.entries(modelosMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
-            if(flotaAniosInst) flotaAniosInst.destroy();
-            if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) {
-                flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades Adjudicadas',data:modelosSorted.map(a=>a[1]),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#f1f5f9'}},y:{grid:{display:false}}}}});
-            }
+            if(flotaAniosInst) flotaAniosInst.destroy(); if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades Adjudicadas',data:modelosSorted.map(a=>a[1]),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#f1f5f9'}},y:{grid:{display:false}}}}}); }
         } catch(ec) { console.error("Error renderizando gráficos Autos", ec); }
-
-        const term = (document.getElementById('search-flota').value || '').toLowerCase().trim();
-        if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term));
-
+        const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term));
         if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
-            let delta = a.minimo > 0 ? (a.monto - a.minimo) : 0;
-            let dSign = delta >= 0 ? '+' : '';
-            let dColor = delta >= 0 ? 'text-brand-info' : 'text-brand-danger';
+            let delta = a.minimo > 0 ? (a.monto - a.minimo) : 0; let dSign = delta >= 0 ? '+' : ''; let dColor = delta >= 0 ? 'text-brand-info' : 'text-brand-danger';
             return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 text-xs font-semibold text-slate-500 max-w-[150px] truncate" title="${a.remate}">${a.remate.substring(0,20)}</td><td class="p-4 text-center font-bold text-slate-800">Lote ${a.numeroLote||'-'}</td><td class="p-4 font-mono text-[10px] text-slate-400 max-w-[200px] truncate" title="${a.loteStr}">${a.loteStr}</td><td class="p-4 text-xs max-w-[200px] truncate"><span class="font-bold text-slate-800">${a.categoria}</span> ${a.modeloStr}</td><td class="p-4 text-right font-mono text-xs text-slate-500">${formatMoney(a.minimo)}</td><td class="p-4 text-right font-mono text-xs font-bold text-slate-800">${formatMoney(a.monto)}</td><td class="p-4 text-right font-mono text-[11px] font-bold ${dColor}">${a.minimo>0?(dSign+formatMoney(delta)):'-'}</td></tr>`;
         }).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-500">Sin vehículos en la selección actual.</td></tr>';
-    } catch (e) {
-        console.error("Error en renderPanelAutos", e);
-    }
+    } catch (e) { console.error("Error en renderPanelAutos", e); }
 }
 
 function generarInformePersonalizado() {
     try {
-        if(currentModule !== 'custom') return;
-        const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-custom');
+        if(currentModule !== 'custom') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-custom');
         if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
         emptyState.classList.add('hidden'); container.classList.remove('hidden');
-
-        let allRemates = getSelectedRemates();
-        const agg = buildAgg(allRemates, 'G', 'Selección Global'); 
-        
-        let out = `<div class="space-y-6">`;
-        out += `<div><h1 class="text-3xl font-extrabold text-slate-900 border-b border-slate-300 pb-2">Reporte de Gestión Comercial</h1><p class="text-sm text-slate-500 mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div>`;
-        
-        out += `<div class="grid grid-cols-2 gap-4 mt-6">`;
+        let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates, 'G', 'Selección Global'); 
+        let out = `<div class="space-y-6"><div><h1 class="text-3xl font-extrabold text-slate-900 border-b border-slate-300 pb-2">Reporte de Gestión Comercial</h1><p class="text-sm text-slate-500 mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div><div class="grid grid-cols-2 gap-4 mt-6">`;
         if(document.getElementById('chk-kpi-disp') && document.getElementById('chk-kpi-disp').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Lotes Disponibles</p><p class="text-xl font-bold text-slate-800">${agg.lotesDisponibles}</p></div>`;
         if(document.getElementById('chk-kpi-vend') && document.getElementById('chk-kpi-vend').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Lotes Vendidos (Efectivos)</p><p class="text-xl font-bold text-brand-info">${agg.lotes}</p></div>`;
         if(document.getElementById('chk-kpi-efi') && document.getElementById('chk-kpi-efi').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Efectividad del Remate</p><p class="text-xl font-bold text-brand-success">${agg.eficaciaLotes.toFixed(1)}%</p></div>`;
         if(document.getElementById('chk-kpi-venta') && document.getElementById('chk-kpi-venta').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Venta Total Adjudicada</p><p class="text-xl font-bold text-brand-success">${formatMoney(agg.venta)}</p></div>`;
         if(document.getElementById('chk-kpi-comision') && document.getElementById('chk-kpi-comision').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Comisión Generada (12%+IVA)</p><p class="text-xl font-bold text-brand-accent">${formatMoney(agg.comisionTotal)}</p></div>`;
         if(document.getElementById('chk-kpi-ticket') && document.getElementById('chk-kpi-ticket').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Ticket Promedio</p><p class="text-xl font-bold text-slate-800">${formatMoney(agg.ticketPromedio)}</p></div>`;
-        if(document.getElementById('chk-kpi-sobreprecio') && document.getElementById('chk-kpi-sobreprecio').checked) {
-            let dSign = agg.deltaPujaTotal >= 0 ? '+' : '';
-            let dColor = agg.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger';
-            out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Delta Puja ($ y %)</p><p class="text-xl font-bold ${dColor}">${dSign}${formatMoney(agg.deltaPujaTotal)} <span class="text-xs">(${dSign}${agg.sobreprecioReal.toFixed(1)}%)</span></p></div>`;
-        }
+        if(document.getElementById('chk-kpi-sobreprecio') && document.getElementById('chk-kpi-sobreprecio').checked) { let dSign = agg.deltaPujaTotal >= 0 ? '+' : ''; let dColor = agg.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger'; out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Delta Puja ($ y %)</p><p class="text-xl font-bold ${dColor}">${dSign}${formatMoney(agg.deltaPujaTotal)} <span class="text-xs">(${dSign}${agg.sobreprecioReal.toFixed(1)}%)</span></p></div>`; }
         if(document.getElementById('chk-kpi-participan') && document.getElementById('chk-kpi-participan').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Clientes Participantes (Garantías)</p><p class="text-xl font-bold text-slate-800">${agg.garantias}</p></div>`;
         if(document.getElementById('chk-kpi-ganadores') && document.getElementById('chk-kpi-ganadores').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Clientes que Compran</p><p class="text-xl font-bold text-brand-success">${agg.ganadoresUnicosCount}</p></div>`;
         if(document.getElementById('chk-kpi-fuga') && document.getElementById('chk-kpi-fuga').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Fuga (Pagan pero no compran)</p><p class="text-xl font-bold text-brand-danger">${agg.perdedoresCount}</p></div>`;
         if(document.getElementById('chk-kpi-nuevos') && document.getElementById('chk-kpi-nuevos').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Clientes Nuevos (Primera Compra)</p><p class="text-xl font-bold text-brand-info">${agg.ganadoresNuevos} <span class="text-xs text-slate-400 font-normal">(${agg.pctVentaNuevos.toFixed(1)}% Venta)</span></p></div>`;
-        
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
         if(document.getElementById('chk-kpi-multi') && document.getElementById('chk-kpi-multi').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Clientes > 1 Lote</p><p class="text-xl font-bold text-slate-800">${multi}</p></div>`;
-        
         out += `</div>`;
-
         if(document.getElementById('chk-kpi-lotesestrella') && document.getElementById('chk-kpi-lotesestrella').checked) {
             const topLotes=[...agg.adjudicaciones].filter(a=>!a.esFalso).sort((a,b)=>b.pujadoresRealesCount-a.pujadoresRealesCount).slice(0,5);
-            if(topLotes.length > 0) {
-                out += `<div class="mt-8 border border-slate-200 rounded-lg overflow-hidden">
-                    <div class="bg-slate-50 px-4 py-2 border-b border-slate-200 font-bold text-sm text-slate-700">Top 5 Lotes Estrella (Demanda)</div>
-                    <table class="w-full text-xs text-left">
-                        <thead class="bg-white border-b border-slate-100 text-slate-400"><tr><th class="p-2">Detalle</th><th class="p-2 text-center">Pujadores</th><th class="p-2 text-right">Adjudicado</th><th class="p-2 text-right">Delta ($)</th></tr></thead>
-                        <tbody>`;
-                topLotes.forEach(l => {
-                    let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0;
-                    let dSign = deltaLote >= 0 ? '+' : '';
-                    out += `<tr class="border-b border-slate-50"><td class="p-2 font-mono text-slate-600">${l.loteStr}</td><td class="p-2 text-center font-bold text-brand-accent">${l.pujadoresRealesCount}</td><td class="p-2 text-right font-bold text-brand-success">${formatMoney(l.monto)}</td><td class="p-2 text-right">${l.minimo>0?(dSign+formatMoney(deltaLote)):'-'}</td></tr>`;
-                });
-                out += `</tbody></table></div>`;
-            }
-        }
-        out += `</div>`;
+            if(topLotes.length > 0) { out += `<div class="mt-8 border border-slate-200 rounded-lg overflow-hidden"><div class="bg-slate-50 px-4 py-2 border-b border-slate-200 font-bold text-sm text-slate-700">Top 5 Lotes Estrella (Demanda)</div><table class="w-full text-xs text-left"><thead class="bg-white border-b border-slate-100 text-slate-400"><tr><th class="p-2">Detalle</th><th class="p-2 text-center">Pujadores</th><th class="p-2 text-right">Adjudicado</th><th class="p-2 text-right">Delta ($)</th></tr></thead><tbody>`; topLotes.forEach(l => { let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let dSign = deltaLote >= 0 ? '+' : ''; out += `<tr class="border-b border-slate-50"><td class="p-2 font-mono text-slate-600">${l.loteStr}</td><td class="p-2 text-center font-bold text-brand-accent">${l.pujadoresRealesCount}</td><td class="p-2 text-right font-bold text-brand-success">${formatMoney(l.monto)}</td><td class="p-2 text-right">${l.minimo>0?(dSign+formatMoney(deltaLote)):'-'}</td></tr>`; }); out += `</tbody></table></div>`; }
+        } out += `</div>`;
         if(document.getElementById('custom-report-output')) document.getElementById('custom-report-output').innerHTML = out;
-    } catch (e) {
-        console.error("Error en generarInformePersonalizado", e);
-    }
+    } catch (e) { console.error("Error en generarInformePersonalizado", e); }
 }
 
 function abrirModalFuga() {
     try {
-        if(!globalAgg) return;
-        let html = '';
+        if(!globalAgg) return; let html = '';
         if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
-            globalAgg.fugaList.sort((a,b)=>a.nombre.localeCompare(b.nombre));
-            
-            let hoy = Date.now();
-            globalAgg.fugaList.forEach(f => {
-                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0;
-                let textoDias = f.fechaRemate ? `Hace ${diasFuga} días` : 'Desconocido';
-                let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` : '-';
-                
-                html += `<tr class="border-b border-slate-200 hover:bg-slate-50">
-                    <td class="p-3 pl-6 font-bold text-slate-800">${nombreRemate}</td>
-                    <td class="p-3 text-xs font-bold text-brand-danger">${textoDias}</td>
-                    <td class="p-3 text-sm font-semibold text-slate-800">${f.nombre}</td>
-                    <td class="p-3 font-mono text-xs text-slate-600">${f.rut||'-'}</td>
-                    <td class="p-3 font-mono text-xs text-brand-info">${f.email||'-'}</td>
-                </tr>`;
-            });
-        } else {
-            html = '<tr><td colspan="5" class="p-8 text-center text-slate-500">No hay registros de fuga en esta selección.</td></tr>';
-        }
-        if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html;
-        if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
+            globalAgg.fugaList.sort((a,b)=>a.nombre.localeCompare(b.nombre)); let hoy = Date.now();
+            globalAgg.fugaList.forEach(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; let textoDias = f.fechaRemate ? `Hace ${diasFuga} días` : 'Desconocido'; let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` : '-'; html += `<tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-3 pl-6 font-bold text-slate-800">${nombreRemate}</td><td class="p-3 text-xs font-bold text-brand-danger">${textoDias}</td><td class="p-3 text-sm font-semibold text-slate-800">${f.nombre}</td><td class="p-3 font-mono text-xs text-slate-600">${f.rut||'-'}</td><td class="p-3 font-mono text-xs text-brand-info">${f.email||'-'}</td></tr>`; });
+        } else { html = '<tr><td colspan="5" class="p-8 text-center text-slate-500">No hay registros de fuga en esta selección.</td></tr>'; }
+        if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
     } catch (e) { console.error("Error abriendo modal fuga", e); }
 }
 function cerrarModalFuga() { document.getElementById('modal-fuga').classList.add('hidden'); }
 
 function exportarFugaExcel() {
     try {
-        if(!globalAgg || !globalAgg.fugaList) return;
-        
-        let hoy = Date.now();
-        const wsData = globalAgg.fugaList.map(f => {
-            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0;
-            return {
-                "N° Remate de Fuga": f.numRemate || '-',
-                "Días de Inactividad (Fuga)": diasFuga,
-                "Fecha de Participación": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-',
-                "Cliente / Razón Social": f.nombre,
-                "RUT": f.rut || 'No Registrado',
-                "Email de Contacto": f.email || 'No Registrado'
-            };
-        });
-        const ws = XLSX.utils.json_to_sheet(wsData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Fuga_Clientes_Zarate");
-        XLSX.writeFile(wb, `Listado_Fuga_Remarketing_${new Date().getTime()}.xlsx`);
+        if(!globalAgg || !globalAgg.fugaList) return; let hoy = Date.now();
+        const wsData = globalAgg.fugaList.map(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; return { "N° Remate de Fuga": f.numRemate || '-', "Días de Inactividad (Fuga)": diasFuga, "Fecha de Participación": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-', "Cliente / Razón Social": f.nombre, "RUT": f.rut || 'No Registrado', "Email de Contacto": f.email || 'No Registrado' }; });
+        const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Fuga_Clientes"); XLSX.writeFile(wb, `Fuga_${new Date().getTime()}.xlsx`);
     } catch (e) { console.error("Error exportando excel", e); }
 }
 
 function abrirModalPujadores(loteEncoded, nodeId){
     try {
-        const loteStr=decodeURIComponent(loteEncoded); const node=nodeRematesMap[nodeId]; let todasPujas=[];
-        node.remates.forEach(r=>{ if(r.posturasPorLote && r.posturasPorLote[loteStr]) todasPujas=todasPujas.concat(r.posturasPorLote[loteStr]); });
-        let adjudicado=null; node.remates.forEach(r=>{ let adj=r.adjudicaciones.find(a=>a.loteStr===loteStr); if(adj) adjudicado=adj; });
-        currentAdjudicadoModal = adjudicado; 
-        currentModalPujas=todasPujas.sort((a,b)=>b.monto-a.monto);
-        if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').innerText=loteStr;
-        if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adjudicado a: ${adjudicado && !adjudicado.esFalso?adjudicado.nombreRaw+' - '+formatMoney(adjudicado.monto):'FALSO o No adjudicado'} | Mínimo: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
-        if(document.getElementById('modal-total-pujas')) document.getElementById('modal-total-pujas').innerText=todasPujas.length;
-        if(document.getElementById('modal-unicos-reales')) document.getElementById('modal-unicos-reales').innerText=[...new Set(todasPujas.filter(p=>!p.esFalso).map(p=>p.nombreNorm))].length;
-        if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
-        currentFiltroModal='todos'; 
-        if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-full bg-brand-accent text-white font-bold'; 
-        if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400'; 
-        if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400';
-        renderModalTabla();
-        if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.remove('hidden');
+        const loteStr=decodeURIComponent(loteEncoded); const node=nodeRematesMap[nodeId]; let todasPujas=[]; node.remates.forEach(r=>{ if(r.posturasPorLote && r.posturasPorLote[loteStr]) todasPujas=todasPujas.concat(r.posturasPorLote[loteStr]); });
+        let adjudicado=null; node.remates.forEach(r=>{ let adj=r.adjudicaciones.find(a=>a.loteStr===loteStr); if(adj) adjudicado=adj; }); currentAdjudicadoModal = adjudicado; currentModalPujas=todasPujas.sort((a,b)=>b.monto-a.monto);
+        if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').innerText=loteStr; if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adjudicado a: ${adjudicado && !adjudicado.esFalso?adjudicado.nombreRaw+' - '+formatMoney(adjudicado.monto):'FALSO o No adjudicado'} | Mínimo: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
+        if(document.getElementById('modal-total-pujas')) document.getElementById('modal-total-pujas').innerText=todasPujas.length; if(document.getElementById('modal-unicos-reales')) document.getElementById('modal-unicos-reales').innerText=[...new Set(todasPujas.filter(p=>!p.esFalso).map(p=>p.nombreNorm))].length; if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
+        currentFiltroModal='todos'; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-full bg-brand-accent text-white font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400';
+        renderModalTabla(); if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.remove('hidden');
     } catch(e) { console.error("Error abriendo pujadores", e); }
 }
 
 function renderModalTabla(){
     try {
         let lista=currentModalPujas; let adjudicado = currentAdjudicadoModal;
-        if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso);
-        if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
+        if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso); if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
-            let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded text-[9px] font-bold badge-falso">FALSO: RZ</span>' : '<span class="px-2 py-0.5 rounded text-[9px] font-bold badge-real">REAL</span>';
-            if(esAdj) badge+=' <span class="ml-2 px-2 py-0.5 rounded bg-brand-success text-white text-[9px] font-bold">ADJUDICADO</span>';
+            let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded text-[9px] font-bold badge-falso">FALSO: RZ</span>' : '<span class="px-2 py-0.5 rounded text-[9px] font-bold badge-real">REAL</span>'; if(esAdj) badge+=' <span class="ml-2 px-2 py-0.5 rounded bg-brand-success text-white text-[9px] font-bold">ADJUDICADO</span>';
             return `<tr class="border-b border-slate-200 ${esAdj?'row-adjudicado':''} ${p.esFalso?'opacity-60 bg-red-50/50':''}"><td class="p-3 pl-6 text-xs text-slate-400">${i+1}</td><td class="p-3 text-xs font-mono">${p.fecha||'-'}</td><td class="p-3 text-xs font-mono">${p.rut}</td><td class="p-3 text-xs max-w-[200px] truncate" title="${p.nombre}">${p.nombre}</td><td class="p-3 text-right font-mono font-bold ${esAdj?'text-brand-success':'text-slate-700'}">${formatMoney(p.monto)}</td><td class="p-3 text-center pr-6">${badge}</td></tr>`;
         }).join('') || '<tr><td colspan="6" class="p-8 text-center text-slate-500">Sin pujas registradas para este filtro</td></tr>';
     } catch(e) { console.error("Error rendering modal tabla", e); }
 }
 
-function filtrarModal(tipo){ 
-    currentFiltroModal=tipo; 
-    if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-full bg-brand-accent text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
-    if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-full bg-brand-success text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
-    if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded-full bg-brand-danger text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
-    renderModalTabla(); 
-}
+function filtrarModal(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-full bg-brand-accent text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-full bg-brand-success text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded-full bg-brand-danger text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; renderModalTabla(); }
 function cerrarModal(){ if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.add('hidden'); }
 
 function procesarDatosClientes(){ 
     try {
-        let allRemates = getSelectedRemates();
-        if(!allRemates.length) { clientDB=[]; return; }
-        
+        let allRemates = getSelectedRemates(); if(!allRemates.length) { clientDB=[]; return; }
         const mapBI={}; const MAX_TIMESTAMP=Math.max(...allRemates.map(r=>r.fechaData.timestamp)); 
         allRemates.forEach(r=>{ 
             r.adjudicaciones.forEach(adj=>{ 
@@ -1384,68 +788,27 @@ function procesarDatosClientes(){
             }); 
         }); 
         clientDB=Object.values(mapBI).map(c=>{ 
-            c.compras.sort((a,b)=>b.fecha-a.fecha); 
-            c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null; 
-            c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null; 
-            c.frecuencia=c.compras.length; 
-            c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP-c.ultimaCompra)/(1000*60*60*24)) : 0; 
-            c.isHibrido=c.tipos.size>1; 
-            if(c.frecuencia>3 && c.recencyDias<=60){ c.segmento="Excelente"; c.color="text-brand-accent"; } 
-            else if(c.frecuencia>1 && c.recencyDias<=60){ c.segmento="Recurrente"; c.color="text-brand-info"; } 
-            else if(c.frecuencia===1 && c.recencyDias<=60){ c.segmento="Nuevo"; c.color="text-brand-success"; } 
-            else { c.segmento="En Riesgo"; c.color="text-slate-400"; } 
-            return c; 
+            c.compras.sort((a,b)=>b.fecha-a.fecha); c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null; c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null; c.frecuencia=c.compras.length; c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP-c.ultimaCompra)/(1000*60*60*24)) : 0; c.isHibrido=c.tipos.size>1; 
+            if(c.frecuencia>3 && c.recencyDias<=60){ c.segmento="Excelente"; c.color="text-brand-accent"; } else if(c.frecuencia>1 && c.recencyDias<=60){ c.segmento="Recurrente"; c.color="text-brand-info"; } else if(c.frecuencia===1 && c.recencyDias<=60){ c.segmento="Nuevo"; c.color="text-brand-success"; } else { c.segmento="En Riesgo"; c.color="text-slate-400"; } return c; 
         }).sort((a,b)=>b.totalGastado-a.totalGastado); 
     } catch(e) { console.error("Error en procesarDatosClientes", e); }
 }
 
 function renderPanelClientesData(filtered,isFiltered=false){ 
     try {
-        if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; 
-        if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); 
-        if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; 
-        if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) {
-            document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-slate-100"><td class="p-3 font-semibold text-xs text-slate-800">${c.nombre}</td><td class="p-3 text-center text-xs">${c.frecuencia}</td><td class="p-3 text-right font-mono text-xs font-bold text-brand-success">${formatMoney(c.totalGastado)}</td><td class="p-3 text-center text-xs text-slate-500">Hace ${c.recencyDias} días</td><td class="p-3 text-center text-[11px] font-bold ${c.color}">${c.segmento}</td></tr>`).join(''); 
-        }
-        if(!isFiltered){ 
-            const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); 
-            if(biChartSegmentsInst) biChartSegmentsInst.destroy(); 
-            if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { 
-                biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#FF6B35','#0ea5e9','#10B981','#94a3b8'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); 
-            } 
-        } 
+        if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
+        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-slate-100"><td class="p-3 font-semibold text-xs text-slate-800">${c.nombre}</td><td class="p-3 text-center text-xs">${c.frecuencia}</td><td class="p-3 text-right font-mono text-xs font-bold text-brand-success">${formatMoney(c.totalGastado)}</td><td class="p-3 text-center text-xs text-slate-500">Hace ${c.recencyDias} días</td><td class="p-3 text-center text-[11px] font-bold ${c.color}">${c.segmento}</td></tr>`).join(''); }
+        if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#FF6B35','#0ea5e9','#10B981','#94a3b8'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
     } catch(e) { console.error("Error renderizando clientes", e); }
 }
 
-function filtrarClientes(){ 
-    try {
-        const term=(document.getElementById('search-client').value||'').toLowerCase(); 
-        const tipo=document.getElementById('filter-client-type').value; 
-        let filtered=clientDB.filter(c=>{ 
-            const matchName=(c.nombre||'').toLowerCase().includes(term); 
-            let matchTipo=true; 
-            if(tipo==='siniestrados') matchTipo=c.lotesSiniestrados>0 && c.lotesRetail===0; 
-            if(tipo==='retail') matchTipo=c.lotesRetail>0 && c.lotesSiniestrados===0; 
-            if(tipo==='ambos') matchTipo=c.isHibrido; 
-            return matchName && matchTipo; 
-        }); 
-        renderPanelClientesData(filtered, term!=="" || tipo!=="todos"); 
-    } catch(e) { console.error("Error filtrando clientes", e); }
-}
+function filtrarClientes(){ try { const term=(document.getElementById('search-client').value||'').toLowerCase(); const tipo=document.getElementById('filter-client-type').value; let filtered=clientDB.filter(c=>{ const matchName=(c.nombre||'').toLowerCase().includes(term); let matchTipo=true; if(tipo==='siniestrados') matchTipo=c.lotesSiniestrados>0 && c.lotesRetail===0; if(tipo==='retail') matchTipo=c.lotesRetail>0 && c.lotesSiniestrados===0; if(tipo==='ambos') matchTipo=c.isHibrido; return matchName && matchTipo; }); renderPanelClientesData(filtered, term!=="" || tipo!=="todos"); } catch(e) { console.error("Error filtrando clientes", e); } }
 
 function abrirFichaCliente(nombreStr){ 
     try {
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
-        if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; 
-        if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; 
-        if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; 
-        if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?formatExcelDate(c.primeraCompra):'-'; 
-        if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} días`; 
-        if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; 
-        if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+b.monto,0)); 
-        if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+b.monto,0)); 
+        if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} días`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+b.monto,0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+b.monto,0)); 
         if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-2 pl-4 text-xs text-slate-500">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="p-2 text-xs truncate max-w-[200px] text-slate-800 font-semibold">${h.remate?h.remate.substring(0,25):'-'}</td><td class="p-2 text-center text-[10px] text-slate-400">${h.tipo}</td><td class="p-2 text-center text-xs font-mono font-bold text-brand-info">${h.lote}</td><td class="p-2 pr-4 text-right text-xs font-mono font-bold text-brand-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) { console.error("Error abriendo ficha cliente", e); }
@@ -1455,18 +818,9 @@ function cerrarFicha(){ if(document.getElementById('bi-ficha-cliente')) document
 
 function buscarPatente(){ 
     try {
-        const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); 
-        const tbody=document.getElementById('buscador-tabla-resultados'); 
+        const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); const tbody=document.getElementById('buscador-tabla-resultados'); 
         if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-8 text-center text-slate-500">Ingrese un parámetro mínimo de 3 caracteres.</td></tr>'; return; } 
-        let resultados=[]; 
-        db.remates.forEach(r=>{ 
-            r.adjudicaciones.forEach(adj=>{ 
-                if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ 
-                    resultados.push({fecha:r.fechaData.timestamp,remate:r.fileName,lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); 
-                } 
-            }); 
-        }); 
-        resultados.sort((a,b)=>b.fecha-a.fecha); 
+        let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData.timestamp,remate:r.fileName,lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
         if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-8 text-center text-brand-danger font-bold">Sin resultados</td></tr>`; return; } 
         tbody.innerHTML=resultados.map(res=>`<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 text-xs text-slate-500">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="p-4 font-semibold text-xs truncate max-w-[200px] text-slate-800">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="p-4 text-center font-bold text-slate-800">Lote ${res.numeroLote||'-'}</td><td class="p-4 font-mono text-[11px] text-slate-500 max-w-[300px] truncate">${res.lote}</td><td class="p-4 text-xs truncate max-w-[200px]">${res.cliente}</td><td class="p-4 text-right font-mono text-xs font-bold text-brand-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) { console.error("Error en buscador", e); }
