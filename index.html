@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V10.2 (Cloud)</title>
+    <title>Panel de Control Directivo | Zárate Remates V10.3 (Cloud)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- LIBRERÍA DE BASE DE DATOS EN LA NUBE (SUPABASE) -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
@@ -117,7 +116,6 @@
                             <div class="space-y-4">
                                 <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-slate-500 font-medium">Lotes Disponibles (Catálogo Base)</span><span class="font-bold text-lg text-slate-800" id="sv-kpi-lotes-disp">0</span></div>
                                 <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-slate-500 font-medium">Lotes Vendidos (Efectivos)</span><span class="font-bold text-lg text-brand-info" id="sv-kpi-lotes">0</span></div>
-                                <!-- Cambio aplicado: Efectividad del Remate y se eliminó el Delta inferior -->
                                 <div class="flex justify-between items-center pb-1"><span class="text-xs text-slate-500 font-bold uppercase">Efectividad del Remate</span><span class="font-bold text-lg text-brand-success" id="sv-kpi-eficacia-resumen">0%</span></div>
                             </div>
                         </div>
@@ -310,7 +308,7 @@
                         <div class="space-y-3 text-sm text-slate-700" id="custom-checkboxes">
                             <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-disp" checked> Lotes Disponibles (Catálogo)</label>
                             <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-vend" checked> Lotes Vendidos</label>
-                            <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-efi" checked> Efectividad / Rotación (%)</label>
+                            <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-efi" checked> Efectividad del Remate (%)</label>
                             <div class="my-2 border-b border-slate-200"></div>
                             <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-venta" checked> Venta Total Adjudicada</label>
                             <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-comision" checked> Comisión Generada (12%+IVA)</label>
@@ -343,10 +341,10 @@
             <div id="module-conclusiones" class="hidden space-y-6 max-w-[1400px] mx-auto pb-10">
                 <div class="flex justify-between items-end gap-6 mb-6 no-print">
                     <div>
-                        <h2 class="text-3xl font-extrabold text-slate-900">🧠 10 Conclusiones de Negocio (Marketing & SAC)</h2>
-                        <p class="text-sm text-slate-500 mt-1">Estandarización analítica y auditoría de comportamiento de la sala.</p>
+                        <h2 class="text-3xl font-extrabold text-slate-900">🧠 Resumen Ejecutivo de Negocio (Directorio)</h2>
+                        <p class="text-sm text-slate-500 mt-1">Conclusiones directas basadas en la selección de remates.</p>
                     </div>
-                    <button onclick="window.print()" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-50 text-slate-700">Exportar Informe Técnico</button>
+                    <button onclick="window.print()" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-50 text-slate-700">Exportar Informe Ejecutivo</button>
                 </div>
                 <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700">
                     <!-- Inyección dinámica -->
@@ -984,9 +982,12 @@ function actualizarSidebar(){
             if(!tree[t].children[y].children[s].children[q]) tree[t].children[y].children[s].children[q]={id:`Q-${t}-${y}-${q}`,label:`Trimestre ${q}`,children:{}}; 
             if(!tree[t].children[y].children[s].children[q].children[m]) tree[t].children[y].children[s].children[q].children[m]={id:`M-${t}-${m}`,label:fd.mesStr,remates:[]}; 
             tree[t].children[y].children[s].children[q].children[m].remates.push(r); 
+            
             const addMap=(id,label)=>{ if(!nodeRematesMap[id]) nodeRematesMap[id]={label,remates:[]}; nodeRematesMap[id].remates.push(r); }; 
-            addMap(`T-${t}`,`Total ${t}`); addMap(`Y-${t}-${y}`,`${t} ${y}`); addMap(`S-${t}-${y}-${s}`,`${t} Semestre ${s} ${y}`); addMap(`Q-${t}-${y}-${q}`,`${t} Q${q} ${y}`); 
-            // INYECCIÓN DE AÑO PARA EL MES:
+            addMap(`T-${t}`,`Total ${t}`); 
+            addMap(`Y-${t}-${y}`,`${t} ${y}`); 
+            addMap(`S-${t}-${y}-${s}`,`${t} Sem ${s} ${y}`); 
+            addMap(`Q-${t}-${y}-${q}`,`${t} Q${q} ${y}`); 
             addMap(`M-${t}-${m}`,`${t} ${fd.mesStr.substring(0,3)} ${y}`); 
         }); 
         const getRemates=(node)=>{ if(node.remates) return node.remates; let arr=[]; Object.values(node.children).forEach(c=>{ arr=arr.concat(getRemates(c)); }); return arr; }; 
@@ -1000,13 +1001,11 @@ function actualizarSidebar(){
                     Object.keys(nodeS.children).sort((a,b)=>b-a).forEach(q=>{ 
                         const nodeQ=nodeS.children[q]; nodeRematesMap[nodeQ.id]={label:`${t} Q${q} ${y}`,remates:getRemates(nodeQ)}; let htmlM=''; 
                         Object.keys(nodeQ.children).sort((a,b)=>b-a).forEach(m=>{ 
-                            const nodeM=nodeQ.children[m]; 
-                            // INYECCIÓN DE AÑO PARA LA SEMANA/ARCHIVO:
-                            let htmlR=''; 
+                            const nodeM=nodeQ.children[m]; nodeRematesMap[nodeM.id]={label:`${t} ${nodeM.label} ${y}`,remates:getRemates(nodeM)}; let htmlR=''; 
                             nodeM.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp).forEach((r,idx)=>{ 
                                 const semanaNum=idx+1; const labelR=`Sem ${semanaNum} - ${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,10)}`; 
                                 htmlR+=buildTreeNodeHTML(`R-${r.id}`,labelR,5,false,''); 
-                                nodeRematesMap[`R-${r.id}`]={label:`${t} S${semanaNum} ${nodeM.label.substring(0,3)} ${r.fechaData.year}`,remates:[r]}; 
+                                nodeRematesMap[`R-${r.id}`]={label:`${t} S${semanaNum} ${nodeM.label.substring(0,3)} ${y}`,remates:[r]}; 
                             }); htmlM+=buildTreeNodeHTML(nodeM.id,nodeM.label,4,true,htmlR,false); 
                         }); htmlQ+=buildTreeNodeHTML(nodeQ.id,nodeQ.label,3,true,htmlM,false); 
                     }); htmlS+=buildTreeNodeHTML(nodeS.id,nodeS.label,2,true,htmlQ,true); 
@@ -1142,31 +1141,31 @@ function renderConclusiones() {
             let ref2 = buildAgg(nodeRematesMap[checkedNodes[1]].remates, 'R2', nodeRematesMap[checkedNodes[1]].label);
             let varVenta = ref1.venta > 0 ? ((ref2.venta - ref1.venta) / ref1.venta * 100) : 0;
             let signoVar = varVenta >= 0 ? '+' : '';
-            html += `<div class="glass-panel p-6 border-l-4 border-l-orange-500 md:col-span-2 shadow-sm mb-2"><h3 class="text-lg font-bold text-slate-800 mb-2">📋 Análisis de Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-sm text-slate-600 leading-relaxed">Al auditar el comportamiento de mercado y contrastar <b>${nodeRematesMap[checkedNodes[0]].label}</b> con <b>${nodeRematesMap[checkedNodes[1]].label}</b>, se observa una variación porcentual en la recaudación del <b>${signoVar}${varVenta.toFixed(1)}%</b>. El volumen de adjudicaciones efectivas varió de ${ref1.lotes} a ${ref2.lotes} unidades vendidas, lo que altera directamente el umbral de captación de comisiones de la firma.</p></div>`;
+            html += `<div class="glass-panel p-6 border-l-4 border-l-orange-500 md:col-span-2 shadow-sm mb-2"><h3 class="text-lg font-bold text-slate-800 mb-2">📋 Análisis de Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-sm text-slate-600 leading-relaxed">Al comparar <b>${nodeRematesMap[checkedNodes[0]].label}</b> con <b>${nodeRematesMap[checkedNodes[1]].label}</b>, se observa una variación en la venta total del <b>${signoVar}${varVenta.toFixed(1)}%</b>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
         }
 
         let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : '';
         let sobreColor = agg.sobreprecioReal >= 0 ? 'text-brand-success' : 'text-brand-danger';
 
-        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-info"><h4 class="font-bold text-sm text-slate-800 mb-2">1. Liquidez Recaudada</h4><p class="text-xs text-slate-600 leading-relaxed">El volumen transaccional neto de las operaciones válidas sumó un total de <b>${formatMoney(agg.venta)}</b> liquidando las cuentas comerciales de la muestra.</p></div>`;
-        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-info"><h4 class="font-bold text-sm text-slate-800 mb-2">2. Comisiones del Negocio (12% + IVA)</h4><p class="text-xs text-slate-600 leading-relaxed">El modelo de tasación por martillo bruto generó comisiones exactas por un valor de <b>${formatMoney(agg.comisionTotal)}</b>, ingresando flujo directo a la compañía.</p></div>`;
-        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-accent"><h4 class="font-bold text-sm text-slate-800 mb-2">3. Rotación de Activos (Eficacia)</h4><p class="text-xs text-slate-600 leading-relaxed">El catálogo base registró una tasa de liquidación del <b>${agg.eficaciaLotes.toFixed(1)}%</b>, convirtiendo el stock físico en adjudicaciones transadas.</p></div>`;
-        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-accent"><h4 class="font-bold text-sm text-slate-800 mb-2">4. Delta de Puja (Incremento de Valor)</h4><p class="text-xs text-slate-600 leading-relaxed">El proceso de subasta logró incrementar el valor de los bienes en <b>${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</b> por sobre la suma de sus valores mínimos base de salida. En promedio, cada lote aumentó su valor en <b>${sobreSigno}${formatMoney(agg.deltaPujaPromedio)}</b> durante la disputa en sala, equivalente a un margen comercial de <b class="${sobreColor}">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</b>.</p></div>`;
-        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-success"><h4 class="font-bold text-sm text-slate-800 mb-2">5. Ticket Promedio por Lote</h4><p class="text-xs text-slate-600 leading-relaxed">La concentración del valor por unidad adjudicada se consolidó en los <b>${formatMoney(agg.ticketPromedio)}</b>, sirviendo de línea base para análisis macro corporativos.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-info"><h4 class="font-bold text-sm text-slate-800 mb-2">1. Venta Total</h4><p class="text-xs text-slate-600 leading-relaxed">Las operaciones válidas sumaron una venta adjudicada de <b>${formatMoney(agg.venta)}</b>.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-info"><h4 class="font-bold text-sm text-slate-800 mb-2">2. Comisiones Estimadas (12% + IVA)</h4><p class="text-xs text-slate-600 leading-relaxed">El remate generó un ingreso por comisiones de <b>${formatMoney(agg.comisionTotal)}</b>.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-accent"><h4 class="font-bold text-sm text-slate-800 mb-2">3. Efectividad del Remate</h4><p class="text-xs text-slate-600 leading-relaxed">Se logró vender el <b>${agg.eficaciaLotes.toFixed(1)}%</b> de todos los lotes disponibles en el catálogo.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-accent"><h4 class="font-bold text-sm text-slate-800 mb-2">4. Incremento sobre el Mínimo (Delta)</h4><p class="text-xs text-slate-600 leading-relaxed">Las pujas incrementaron el valor de salida en <b>${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</b>, lo que representa un margen positivo del <b class="${sobreColor}">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</b> sobre los mínimos propuestos.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-success"><h4 class="font-bold text-sm text-slate-800 mb-2">5. Ticket Promedio</h4><p class="text-xs text-slate-600 leading-relaxed">El valor promedio de venta por cada lote adjudicado fue de <b>${formatMoney(agg.ticketPromedio)}</b>.</p></div>`;
         
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-success"><h4 class="font-bold text-sm text-slate-800 mb-2">6. Conversión del Embudo Comercial</h4><p class="text-xs text-slate-600 leading-relaxed">La tasa de cierre real desde garantías depositadas a clientes ganadores se fijó en un <b>${tasaExito.toFixed(1)}%</b>, marcando el nivel de tracción comercial en sala.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-success"><h4 class="font-bold text-sm text-slate-800 mb-2">6. Tasa de Cierre de Clientes</h4><p class="text-xs text-slate-600 leading-relaxed">El <b>${tasaExito.toFixed(1)}%</b> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
         
-        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-danger flex flex-col justify-between"><h4 class="font-bold text-sm text-slate-800 mb-2">7. Fuga de Clientes con Garantía (SAC)</h4><p class="text-xs text-slate-600 leading-relaxed">Se detectaron <b>${agg.perdedoresCount} clientes</b> que, tras constituir su garantía, no se adjudicaron stock. Esto representa un bolsón de leads calientes con fondos validados para remarketing.</p><button onclick="abrirModalFuga()" class="mt-3 px-3 py-1.5 bg-red-100 text-red-700 font-bold rounded-lg hover:bg-red-200 text-xs text-center border border-red-200 transition no-print">🔍 Ver Listado de Fuga y Exportar</button></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-brand-danger flex flex-col justify-between"><h4 class="font-bold text-sm text-slate-800 mb-2">7. Clientes sin Compras (Fuga)</h4><p class="text-xs text-slate-600 leading-relaxed">Hubo <b>${agg.perdedoresCount} clientes</b> que pagaron garantía pero no lograron comprar nada. Lista ideal para remarketing.</p><button onclick="abrirModalFuga()" class="mt-3 px-3 py-1.5 bg-red-100 text-red-700 font-bold rounded-lg hover:bg-red-200 text-xs text-center border border-red-200 transition no-print">🔍 Ver Listado de Fuga y Exportar</button></div>`;
         
         let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
-        html += `<div class="glass-panel p-5 border-l-4 border-l-purple-500"><h4 class="font-bold text-sm text-slate-800 mb-2">8. Tasa de Captación (Marketing)</h4><p class="text-xs text-slate-600 leading-relaxed">El <b>${agg.pctVentaNuevos.toFixed(1)}%</b> de los fondos brutos adjudicados provino de compradores registrados por primera vez, validando los canales de prospección externos.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-purple-500"><h4 class="font-bold text-sm text-slate-800 mb-2">8. Clientes Nuevos</h4><p class="text-xs text-slate-600 leading-relaxed">El <b>${agg.pctVentaNuevos.toFixed(1)}%</b> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
 
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        html += `<div class="glass-panel p-5 border-l-4 border-l-purple-500"><h4 class="font-bold text-sm text-slate-800 mb-2">9. Concentración Mayorista de Sala</h4><p class="text-xs text-slate-600 leading-relaxed">Un total de <b>${multi} compradores</b> operaron bajo modalidad de volumen, adjudicándose 2 o más unidades en las sesiones registradas.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-purple-500"><h4 class="font-bold text-sm text-slate-800 mb-2">9. Compradores de Volumen</h4><p class="text-xs text-slate-600 leading-relaxed">Un total de <b>${multi} clientes</b> operaron en volumen y compraron más de un lote.</p></div>`;
 
         let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
-        html += `<div class="glass-panel p-5 border-l-4 border-l-slate-400"><h4 class="font-bold text-sm text-slate-800 mb-2">10. Aislamiento de Registros No Comerciales</h4><p class="text-xs text-slate-600 leading-relaxed">El motor aisló con éxito <b>${falsos} operaciones nominales (cuentas de prueba o sistema)</b>, protegiendo los estados de resultados para reportes de directorio limpios.</p></div>`;
+        html += `<div class="glass-panel p-5 border-l-4 border-l-slate-400"><h4 class="font-bold text-sm text-slate-800 mb-2">10. Limpieza de Datos</h4><p class="text-xs text-slate-600 leading-relaxed">Se aislaron automáticamente <b>${falsos} pujas internas o pruebas de sistema</b> para proteger la integridad de los resultados.</p></div>`;
 
         if(document.getElementById('conclusiones-content')) document.getElementById('conclusiones-content').innerHTML = html;
     } catch (e) { console.error("Error en renderConclusiones", e); }
