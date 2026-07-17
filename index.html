@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V9.2</title>
+    <title>Panel de Control Directivo | Zárate Remates V10 (Cloud)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- LIBRERÍA DE BASE DE DATOS EN LA NUBE (SUPABASE) -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { 
@@ -52,10 +54,10 @@
     <header class="border-b border-slate-200 bg-white z-20 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm no-print">
         <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-xl shadow-md">Z</div>
-            <div><h1 class="font-extrabold text-lg text-slate-800">Control de Gestión Comercial</h1><p class="text-xs text-slate-500" id="db-status">Métricas SAC y Catálogo v9.2</p></div>
+            <div><h1 class="font-extrabold text-lg text-slate-800">Control de Gestión Comercial</h1><p class="text-xs text-brand-info font-semibold" id="db-status">Iniciando sistema...</p></div>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="limpiarBase()" class="text-xs text-brand-danger font-semibold border border-brand-danger/30 px-4 py-1.5 rounded-full bg-red-50 hover:bg-red-100 transition shadow-sm">Limpiar Base Local</button>
+            <button onclick="limpiarBase()" class="text-xs text-brand-danger font-semibold border border-brand-danger/30 px-4 py-1.5 rounded-full bg-red-50 hover:bg-red-100 transition shadow-sm" title="Borrará los datos de la nube">Vaciar Base de Datos</button>
             <div id="drop-zone" class="upload-area rounded-full px-6 py-2 flex items-center gap-3">
                 <label for="file-input" class="font-bold text-sm text-brand-accent cursor-pointer">+ Cargar Archivos</label><span class="text-slate-300">|</span><label for="folder-input" class="font-bold text-sm text-brand-info cursor-pointer">+ Directorio</label>
                 <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="iniciarProcesamiento(this.files)">
@@ -89,8 +91,8 @@
                 <div class="w-20 h-20 rounded-3xl bg-brand-accent/10 flex items-center justify-center mb-6 border border-brand-accent/20">
                     <svg class="w-10 h-10 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                 </div>
-                <p class="font-bold text-2xl text-slate-800">Zárate Analítica V9.2</p>
-                <p class="text-sm text-slate-500 mt-2 text-center max-w-md">Por favor, seleccione un periodo en el panel lateral o cargue sus reportes matrices.</p>
+                <p class="font-bold text-2xl text-slate-800" id="es-title">Zárate Analítica Cloud</p>
+                <p class="text-sm text-slate-500 mt-2 text-center max-w-md" id="es-desc">Por favor, seleccione un periodo en el panel lateral o cargue sus reportes matrices.</p>
                 <div id="error-log" class="mt-4 text-brand-danger font-semibold text-xs text-center max-w-md"></div>
             </div>
 
@@ -452,11 +454,10 @@
                     <thead class="bg-slate-100 sticky top-0 border-b border-slate-200 shadow-sm">
                         <tr>
                             <th class="p-3 pl-6 text-slate-800 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">N° Remate Fuga ↕️</th>
-                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'date')">Fecha Participación ↕️</th>
+                            <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Hace cuánto no participa ↕️</th>
                             <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Nombre del Cliente ↕️</th>
                             <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">RUT ↕️</th>
                             <th class="p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Email Contacto ↕️</th>
-                            <th class="p-3 text-center pr-6 cursor-pointer select-none transition" onclick="sortTable(this, 'date')">Última Adjudicación Histórica ↕️</th>
                         </tr>
                     </thead>
                     <tbody id="modal-tabla-fuga"></tbody>
@@ -466,20 +467,20 @@
     </div>
 
 <script>
+// === CONFIGURACIÓN DE SUPABASE (LA NUBE) ===
+const { createClient } = supabase;
+const supabaseUrl = 'https://gxfvjmuzxzpghlbzzmui.supabase.co';
+const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
+const supabaseClient = createClient(supabaseUrl, supabaseKey);
+// ===========================================
+
 window.addEventListener('error', function(e) {
     console.error("Error global capturado: ", e);
     const log = document.getElementById('error-log');
-    if(log) log.innerHTML += `<div class="text-red-500 mt-1 text-sm bg-red-50 p-2 rounded border border-red-200">El sistema evitó un colapso de memoria. Por favor presiona <b>"Limpiar Base Local"</b> y recarga la página.</div>`;
+    if(log) log.innerHTML += `<div class="text-red-500 mt-1 text-sm bg-red-50 p-2 rounded border border-red-200">El sistema evitó un colapso de memoria. Por favor presiona <b>"Vaciar Base de Datos"</b> y recarga la página.</div>`;
 });
 
 let db = { remates: [] };
-try { 
-    const stored = localStorage.getItem('zarate_db_v92'); 
-    if (stored) db = JSON.parse(stored); 
-} catch (error) { 
-    localStorage.removeItem('zarate_db_v92'); 
-}
-
 let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
 let svChartRetencionInst=null, svChartVentasInst=null, cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
 let currentModule='remates';
@@ -487,6 +488,42 @@ let globalMapCMulti = {};
 let globalAgg = null;
 
 if(typeof Chart !== 'undefined') { Chart.defaults.color = '#64748b'; Chart.defaults.font.family = 'Inter'; }
+
+// INICIALIZACIÓN DESDE LA NUBE
+async function initApp() {
+    const statusLabel = document.getElementById('db-status');
+    const esTitle = document.getElementById('es-title');
+    const esDesc = document.getElementById('es-desc');
+    
+    try {
+        statusLabel.innerText = "Sincronizando con la nube...";
+        statusLabel.classList.add('animate-pulse');
+        
+        const { data, error } = await supabaseClient.from('app_state').select('payload').eq('id', 1).single();
+        
+        if (data && data.payload && data.payload.remates) {
+            db = data.payload;
+            statusLabel.innerText = `🟢 Base Cloud Conectada (${db.remates.length} matrices)`;
+            statusLabel.classList.replace('text-brand-info', 'text-brand-success');
+        } else {
+            statusLabel.innerText = "🟠 Base Cloud Vacía";
+            statusLabel.classList.replace('text-brand-info', 'text-orange-500');
+        }
+    } catch (e) {
+        console.error("Error conectando a Supabase:", e);
+        statusLabel.innerText = "🔴 Error de conexión";
+        statusLabel.classList.replace('text-brand-info', 'text-red-500');
+        esTitle.innerText = "Error de Conexión";
+        esDesc.innerText = "No se pudo establecer contacto con la base de datos central.";
+    }
+    
+    statusLabel.classList.remove('animate-pulse');
+    
+    if(db.remates && db.remates.length > 0) {
+        actualizarSidebar();
+    }
+}
+window.onload = initApp;
 
 // FUNCION MAESTRA DE ORDENAMIENTO DE TABLAS
 function sortTable(thElement, type) {
@@ -525,7 +562,7 @@ function sortTable(thElement, type) {
 }
 
 function parseValueForSort(str, type) {
-    if(!str || str.trim()==='-' || str.trim()==='' || str.trim() === 'Nunca / Sin Registro Previo' || str.trim() === 'Sin Registro / Nunca') return -9999999999;
+    if(!str || str.trim()==='-' || str.trim()==='' || str.trim() === 'Desconocido' || str.trim().includes('Sin Registro')) return -9999999999;
     str = str.trim();
     if(type === 'money') {
         let isNeg = str.includes('-');
@@ -588,7 +625,6 @@ function traverseFileTree(item, filesArray){
     }); 
 }
 
-// CORRECCIÓN ROBUSTA DE FECHAS (Elimina hora y cruces extraños)
 function formatExcelDate(excelDate) {
     if(!excelDate) return '-';
     if(typeof excelDate === 'number') {
@@ -616,16 +652,15 @@ function esClienteFalso(nombre, email=''){
     return false;
 }
 
-// EXTRACCIÓN INTELIGENTE DE MARCA Y MODELO
 function extraerMarcaModelo(loteStr) {
     let txt = loteStr.toUpperCase();
     if (txt.includes(':')) txt = txt.split(':')[1];
-    txt = txt.replace(/LOTE\s*\d*/g,'').replace(/N[°º]?\s*\d*/g,'');
+    txt = txt.replace(/\bLOTE\s*\d+\b/g, '').replace(/\bN[°º]?\s*\d+\b/g, '');
     txt = txt.replace(/\b\d\.\d\b/g, '').replace(/\b\d,\d\b/g, ''); 
     txt = txt.replace(/\b20\d{2}\b/g, '').replace(/\b19\d{2}\b/g, ''); 
     
     const marcasConocidas = ['MERCEDES BENZ','LAND ROVER','GREAT WALL','ALFA ROMEO','ASTON MARTIN','CHEVROLET','NISSAN','KIA','HYUNDAI','SUZUKI','TOYOTA','PEUGEOT','FORD','MITSUBISHI','MAZDA','SSANGYONG','BMW','AUDI','VOLKSWAGEN','SUBARU','RENAULT','CHRYSLER','DODGE','JEEP','HONDA','VOLVO','FIAT','CHERY','MG','CHANGAN','JAC','GEELY','MAHINDRA','MAXUS','OPEL','DFSK','DATSUN','LEXUS','PORSCHE','MINI','RAM','SEAT','SKODA','CITROEN','BYD','BAIC','HAVAL','LIFAN','ZX','FOTON','KTM','IVECO'];
-    const ignorarCar = ['AUTOMOVIL','VEHICULO','CAMIONETA','STATION','WAGON','JEEP','FURGON','MOTO','MOTOCICLETA','BUS','MINIBUS','CAMION','MAQUINARIA','CHATARRA','RESTOS','AUT','MT','AT','M/T','A/T','4X4','4X2','GLX','GLS','EX','LX','DX','TX','MPI','HB','SEDAN','SPORT','MOTORS','NEW','MEC','MECANICO','AUTOMATICO','DAKAR','CORE','PREMIER','LIMITED','LITE'];
+    const ignorarCar = ['AUTOMOVIL','VEHICULO','CAMIONETA','STATION','WAGON','JEEP','FURGON','MOTO','MOTOCICLETA','BUS','MINIBUS','CAMION','MAQUINARIA','CHATARRA','RESTOS','AUT','MT','AT','M/T','A/T','4X4','4X2','GLX','GLS','EX','LX','DX','TX','MPI','HB','SEDAN','SPORT','MOTORS','NEW','MEC','MECANICO','AUTOMATICO','DAKAR','CORE','PREMIER','LIMITED','LITE', 'HDI', 'TDI', 'CDI', 'CRDI', 'AWD', 'FWD', 'CVT'];
 
     let marca = "SIN MARCA";
     let modelo = "";
@@ -653,22 +688,14 @@ const formatMoney = (num)=>{ if(!num || isNaN(num)) return '$0'; if(Math.abs(num
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
 const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
-// MOTOR DE EXTRACCIÓN SEGURO
 function getSelectedRemates() {
-    let result = [];
-    let seen = new Set();
+    let uniqueMap = new Map();
     checkedNodes.forEach(id => {
         if(nodeRematesMap[id] && nodeRematesMap[id].remates) {
-            nodeRematesMap[id].remates.forEach(r => {
-                let uniqueKey = r.fileName; // Evita duplicidad de ID local
-                if(!seen.has(uniqueKey)) {
-                    seen.add(uniqueKey);
-                    result.push(r);
-                }
-            });
+            nodeRematesMap[id].remates.forEach(r => uniqueMap.set(r.id, r));
         }
     });
-    return result;
+    return Array.from(uniqueMap.values());
 }
 
 async function iniciarProcesamiento(files){
@@ -676,7 +703,10 @@ async function iniciarProcesamiento(files){
     if(!validFiles.length) return;
     
     const statusLabel=document.getElementById('db-status'); const errorLog=document.getElementById('error-log'); 
-    statusLabel.classList.add('text-brand-accent','animate-pulse'); errorLog.innerHTML=""; let successCount=0;
+    statusLabel.classList.add('text-brand-accent','animate-pulse'); 
+    statusLabel.classList.remove('text-brand-success', 'text-brand-info');
+    statusLabel.innerText = "Procesando y subiendo a la nube...";
+    errorLog.innerHTML=""; let successCount=0;
     
     setTimeout(async () => {
         for(let i=0;i<validFiles.length;i++){ 
@@ -703,8 +733,18 @@ async function iniciarProcesamiento(files){
             remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
         });
         
-        try { localStorage.setItem('zarate_db_v92', JSON.stringify(db)); } catch (e) { console.warn("Límite de memoria superado. Modo temporal activo."); }
-        statusLabel.classList.remove('text-brand-accent','animate-pulse'); statusLabel.innerText=`Base de Datos Lista (${db.remates.length} matrices)`;
+        // GURDADO EN LA NUBE
+        try { 
+            await supabaseClient.from('app_state').update({ payload: db }).eq('id', 1);
+            statusLabel.classList.replace('text-brand-accent', 'text-brand-success'); 
+            statusLabel.innerText=`🟢 Base Cloud Actualizada (${db.remates.length} matrices)`;
+        } catch (e) { 
+            console.warn("Error de guardado en la nube.", e); 
+            statusLabel.classList.replace('text-brand-accent', 'text-brand-danger'); 
+            statusLabel.innerText=`🔴 Error guardando nube`;
+        }
+        
+        statusLabel.classList.remove('animate-pulse');
         document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
         
         if(successCount>0){ actualizarSidebar(); procesarDatosClientes(); actualizarVistaActual(); }
@@ -919,7 +959,21 @@ function actualizarVistaActual() {
         }
     } catch(e) { console.error("Error actualizando vista:", e); }
 }
-function limpiarBase(){ localStorage.removeItem('zarate_db_v92'); db={remates:[]}; checkedNodes=[]; clientDB=[]; document.getElementById('empty-state').classList.remove('hidden'); actualizarSidebar(); location.reload(); }
+
+async function limpiarBase(){ 
+    db = {remates:[]}; 
+    checkedNodes = []; 
+    clientDB = []; 
+    document.getElementById('empty-state').classList.remove('hidden'); 
+    try {
+        await supabaseClient.from('app_state').update({ payload: db }).eq('id', 1);
+    } catch (e) {
+        console.error("Error vaciando nube:", e);
+    }
+    actualizarSidebar(); 
+    location.reload(); 
+}
+
 function toggleAccordion(e,targetId,iconId){ e.stopPropagation(); const target=document.getElementById(targetId); const icon=document.getElementById(iconId); if(target.classList.contains('hidden')){ target.classList.remove('hidden'); icon.style.transform='rotate(0deg)'; } else { target.classList.add('hidden'); icon.style.transform='rotate(-90deg)'; } }
 
 function buildTreeNodeHTML(id,label,level,hasChildren,childHtml,forceOpen=false){ const ml=level*10; return `<div class="flex flex-col mt-0.5"><div class="nav-tree-item nav-inactive" style="margin-left:${ml}px;"><label class="flex items-center gap-2 cursor-pointer flex-1 min-w-0 pr-2"><input type="checkbox" id="chk-${id}" class="shrink-0" onchange="toggleNode('${id}')" ${checkedNodes.includes(id)?'checked':''}><span class="truncate ${level===0?'font-bold text-slate-800':''}" title="${label}">${label}</span></label>${hasChildren?`<div class="chevron text-[10px]" id="icon-${id}" onclick="toggleAccordion(event,'child-${id}','icon-${id}')" style="transform: rotate(${forceOpen?'0deg':'-90deg'})">▼</div>`:''}</div>${hasChildren?`<div id="child-${id}" class="flex flex-col border-l border-slate-200 ml-[${ml+6}px] transition-all ${forceOpen?'':'hidden'}">${childHtml}</div>`:''}</div>`; }
@@ -994,7 +1048,7 @@ function renderSingleView(nodeId){
         let deltaSigno = agg.deltaPujaTotal >= 0 ? '+' : '';
         let deltaColor = agg.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger';
         if(document.getElementById('sv-kpi-delta-resumen')) {
-            document.getElementById('sv-kpi-delta-resumen').innerHTML = `<span class="${deltaColor}">${deltaSigno}${formatMoney(agg.deltaPujaTotal)}</span>`;
+            document.getElementById('sv-kpi-delta-resumen').innerHTML = `<span class="${deltaColor}">${deltaSigno}${formatMoney(agg.deltaPujaTotal)} <span class="text-xs font-semibold">(${deltaSigno}${agg.sobreprecioReal.toFixed(1)}%)</span></span>`;
         }
         
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
@@ -1047,7 +1101,7 @@ function renderCompareView(nodesList){
                     <td class="p-3 text-center font-bold text-slate-700">${d.garantias}</td>
                     <td class="p-3 text-center text-slate-600">${d.nuevos}</td>
                     <td class="p-3 text-center font-bold text-brand-success">${d.ganadoresNuevos}</td>
-                    <td class="p-3 text-center font-bold ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)}</td>
+                    <td class="p-3 text-center font-bold ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)} <span class="text-xs">(${dSign}${d.sobreprecioReal.toFixed(1)}%)</span></td>
                 </tr>`;
             }).join(''); 
         }
@@ -1077,7 +1131,6 @@ function abrirModalMultiLote() {
 }
 function cerrarModalMulti() { document.getElementById('modal-multilote').classList.add('hidden'); }
 
-// === MÓDULO 🧠 CONCLUSIONES ===
 function renderConclusiones() {
     try {
         if(currentModule !== 'conclusiones') return;
@@ -1233,23 +1286,23 @@ function abrirModalFuga() {
         let html = '';
         if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
             globalAgg.fugaList.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+            
+            let hoy = Date.now();
             globalAgg.fugaList.forEach(f => {
-                const clienteBD = clientDB.find(c => c.nombre === f.nombreNorm);
-                const ultima = clienteBD && clienteBD.ultimaCompra ? formatExcelDate(clienteBD.ultimaCompra) : 'Sin Registro / Nunca';
-                let fechaRemate = f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-';
+                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0;
+                let textoDias = f.fechaRemate ? `Hace ${diasFuga} días` : 'Desconocido';
                 let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` : '-';
                 
                 html += `<tr class="border-b border-slate-200 hover:bg-slate-50">
                     <td class="p-3 pl-6 font-bold text-slate-800">${nombreRemate}</td>
-                    <td class="p-3 text-xs text-slate-500">${fechaRemate}</td>
+                    <td class="p-3 text-xs font-bold text-brand-danger">${textoDias}</td>
                     <td class="p-3 text-sm font-semibold text-slate-800">${f.nombre}</td>
                     <td class="p-3 font-mono text-xs text-slate-600">${f.rut||'-'}</td>
                     <td class="p-3 font-mono text-xs text-brand-info">${f.email||'-'}</td>
-                    <td class="p-3 text-center pr-6 text-xs font-bold text-slate-700">${ultima}</td>
                 </tr>`;
             });
         } else {
-            html = '<tr><td colspan="6" class="p-8 text-center text-slate-500">No hay registros de fuga en esta selección.</td></tr>';
+            html = '<tr><td colspan="5" class="p-8 text-center text-slate-500">No hay registros de fuga en esta selección.</td></tr>';
         }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html;
         if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
@@ -1260,15 +1313,17 @@ function cerrarModalFuga() { document.getElementById('modal-fuga').classList.add
 function exportarFugaExcel() {
     try {
         if(!globalAgg || !globalAgg.fugaList) return;
+        
+        let hoy = Date.now();
         const wsData = globalAgg.fugaList.map(f => {
-            const clienteBD = clientDB.find(c => c.nombre === f.nombreNorm);
+            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0;
             return {
                 "N° Remate de Fuga": f.numRemate || '-',
-                "Fecha del Remate": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-',
+                "Días de Inactividad (Fuga)": diasFuga,
+                "Fecha de Participación": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-',
                 "Cliente / Razón Social": f.nombre,
                 "RUT": f.rut || 'No Registrado',
-                "Email de Contacto": f.email || 'No Registrado',
-                "Última Compra Exitosa (Histórico)": (clienteBD && clienteBD.ultimaCompra) ? formatExcelDate(clienteBD.ultimaCompra) : 'Nunca / Sin Registro Previo'
+                "Email de Contacto": f.email || 'No Registrado'
             };
         });
         const ws = XLSX.utils.json_to_sheet(wsData);
@@ -1313,12 +1368,21 @@ function renderModalTabla(){
     } catch(e) { console.error("Error rendering modal tabla", e); }
 }
 
+function filtrarModal(tipo){ 
+    currentFiltroModal=tipo; 
+    if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-full bg-brand-accent text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
+    if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-full bg-brand-success text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
+    if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded-full bg-brand-danger text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
+    renderModalTabla(); 
+}
+function cerrarModal(){ if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.add('hidden'); }
+
 function procesarDatosClientes(){ 
     try {
         let allRemates = getSelectedRemates();
         if(!allRemates.length) { clientDB=[]; return; }
         
-        const mapBI={}; 
+        const mapBI={}; const MAX_TIMESTAMP=Math.max(...allRemates.map(r=>r.fechaData.timestamp)); 
         allRemates.forEach(r=>{ 
             r.adjudicaciones.forEach(adj=>{ 
                 if(adj.esFalso) return; const c=adj.clienteReal; 
@@ -1332,7 +1396,7 @@ function procesarDatosClientes(){
             c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null; 
             c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null; 
             c.frecuencia=c.compras.length; 
-            c.recencyDias = c.ultimaCompra ? Math.floor((Date.now()-c.ultimaCompra)/(1000*60*60*24)) : 0; 
+            c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP-c.ultimaCompra)/(1000*60*60*24)) : 0; 
             c.isHibrido=c.tipos.size>1; 
             if(c.frecuencia>3 && c.recencyDias<=60){ c.segmento="Excelente"; c.color="text-brand-accent"; } 
             else if(c.frecuencia>1 && c.recencyDias<=60){ c.segmento="Recurrente"; c.color="text-brand-info"; } 
@@ -1361,15 +1425,6 @@ function renderPanelClientesData(filtered,isFiltered=false){
         } 
     } catch(e) { console.error("Error renderizando clientes", e); }
 }
-
-function filtrarModal(tipo){ 
-    currentFiltroModal=tipo; 
-    if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-full bg-brand-accent text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
-    if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-full bg-brand-success text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
-    if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded-full bg-brand-danger text-white font-bold':'px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
-    renderModalTabla(); 
-}
-function cerrarModal(){ if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.add('hidden'); }
 
 function filtrarClientes(){ 
     try {
@@ -1424,9 +1479,6 @@ function buscarPatente(){
         tbody.innerHTML=resultados.map(res=>`<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 text-xs text-slate-500">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="p-4 font-semibold text-xs truncate max-w-[200px] text-slate-800">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="p-4 text-center font-bold text-slate-800">Lote ${res.numeroLote||'-'}</td><td class="p-4 font-mono text-[11px] text-slate-500 max-w-[300px] truncate">${res.lote}</td><td class="p-4 text-xs truncate max-w-[200px]">${res.cliente}</td><td class="p-4 text-right font-mono text-xs font-bold text-brand-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) { console.error("Error en buscador", e); }
 }
-
-if(db.remates.length>0) actualizarSidebar();
-
 </script>
 </body>
 </html>
