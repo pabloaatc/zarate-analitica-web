@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V10 (Cloud)</title>
+    <title>Panel de Control Directivo | Zárate Remates V10.2 (Cloud)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -117,8 +117,8 @@
                             <div class="space-y-4">
                                 <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-slate-500 font-medium">Lotes Disponibles (Catálogo Base)</span><span class="font-bold text-lg text-slate-800" id="sv-kpi-lotes-disp">0</span></div>
                                 <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-slate-500 font-medium">Lotes Vendidos (Efectivos)</span><span class="font-bold text-lg text-brand-info" id="sv-kpi-lotes">0</span></div>
-                                <div class="flex justify-between items-center border-b border-slate-100 pb-3"><span class="text-xs text-slate-500 font-medium">Eficacia / Rotación Global</span><span class="font-bold text-lg text-brand-success" id="sv-kpi-eficacia-resumen">0%</span></div>
-                                <div class="flex justify-between items-center pb-1"><span class="text-xs text-slate-500 font-medium">Delta de Puja Ponderado</span><span class="font-bold text-lg text-brand-info" id="sv-kpi-delta-resumen">$0</span></div>
+                                <!-- Cambio aplicado: Efectividad del Remate y se eliminó el Delta inferior -->
+                                <div class="flex justify-between items-center pb-1"><span class="text-xs text-slate-500 font-bold uppercase">Efectividad del Remate</span><span class="font-bold text-lg text-brand-success" id="sv-kpi-eficacia-resumen">0%</span></div>
                             </div>
                         </div>
 
@@ -178,7 +178,7 @@
                                     <th class="p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Comisiones ↕️</th>
                                     <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">L.Vend. ↕️</th>
                                     <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">L.Disp. ↕️</th>
-                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'percent')">Rotación % ↕️</th>
+                                    <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'percent')">Efectividad % ↕️</th>
                                     <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Gar. Reales ↕️</th>
                                     <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Nuevos(G) ↕️</th>
                                     <th class="p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">1ra Compra ↕️</th>
@@ -310,7 +310,7 @@
                         <div class="space-y-3 text-sm text-slate-700" id="custom-checkboxes">
                             <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-disp" checked> Lotes Disponibles (Catálogo)</label>
                             <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-vend" checked> Lotes Vendidos</label>
-                            <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-efi" checked> Eficacia / Rotación (%)</label>
+                            <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-efi" checked> Efectividad / Rotación (%)</label>
                             <div class="my-2 border-b border-slate-200"></div>
                             <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-venta" checked> Venta Total Adjudicada</label>
                             <label class="flex items-center gap-3 cursor-pointer hover:bg-slate-200 p-1 rounded"><input type="checkbox" id="chk-kpi-comision" checked> Comisión Generada (12%+IVA)</label>
@@ -489,7 +489,6 @@ let globalAgg = null;
 
 if(typeof Chart !== 'undefined') { Chart.defaults.color = '#64748b'; Chart.defaults.font.family = 'Inter'; }
 
-// INICIALIZACIÓN DESDE LA NUBE
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
     const esTitle = document.getElementById('es-title');
@@ -518,14 +517,10 @@ async function initApp() {
     }
     
     statusLabel.classList.remove('animate-pulse');
-    
-    if(db.remates && db.remates.length > 0) {
-        actualizarSidebar();
-    }
+    if(db.remates && db.remates.length > 0) { actualizarSidebar(); }
 }
 window.onload = initApp;
 
-// FUNCION MAESTRA DE ORDENAMIENTO DE TABLAS
 function sortTable(thElement, type) {
     const table = thElement.closest('table');
     const tbody = table.querySelector('tbody');
@@ -733,7 +728,6 @@ async function iniciarProcesamiento(files){
             remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
         });
         
-        // GURDADO EN LA NUBE
         try { 
             await supabaseClient.from('app_state').update({ payload: db }).eq('id', 1);
             statusLabel.classList.replace('text-brand-accent', 'text-brand-success'); 
@@ -991,7 +985,9 @@ function actualizarSidebar(){
             if(!tree[t].children[y].children[s].children[q].children[m]) tree[t].children[y].children[s].children[q].children[m]={id:`M-${t}-${m}`,label:fd.mesStr,remates:[]}; 
             tree[t].children[y].children[s].children[q].children[m].remates.push(r); 
             const addMap=(id,label)=>{ if(!nodeRematesMap[id]) nodeRematesMap[id]={label,remates:[]}; nodeRematesMap[id].remates.push(r); }; 
-            addMap(`T-${t}`,`Total ${t}`); addMap(`Y-${t}-${y}`,`${t} ${y}`); addMap(`S-${t}-${y}-${s}`,`${t} Semestre ${s} ${y}`); addMap(`Q-${t}-${y}-${q}`,`${t} Q${q} ${y}`); addMap(`M-${t}-${m}`,`${t} ${fd.mesStr.substring(0,3)} ${y}`); addMap(`R-${r.id}`,r.fileName.substring(0,25)); 
+            addMap(`T-${t}`,`Total ${t}`); addMap(`Y-${t}-${y}`,`${t} ${y}`); addMap(`S-${t}-${y}-${s}`,`${t} Semestre ${s} ${y}`); addMap(`Q-${t}-${y}-${q}`,`${t} Q${q} ${y}`); 
+            // INYECCIÓN DE AÑO PARA EL MES:
+            addMap(`M-${t}-${m}`,`${t} ${fd.mesStr.substring(0,3)} ${y}`); 
         }); 
         const getRemates=(node)=>{ if(node.remates) return node.remates; let arr=[]; Object.values(node.children).forEach(c=>{ arr=arr.concat(getRemates(c)); }); return arr; }; 
         let html=''; 
@@ -1004,10 +1000,13 @@ function actualizarSidebar(){
                     Object.keys(nodeS.children).sort((a,b)=>b-a).forEach(q=>{ 
                         const nodeQ=nodeS.children[q]; nodeRematesMap[nodeQ.id]={label:`${t} Q${q} ${y}`,remates:getRemates(nodeQ)}; let htmlM=''; 
                         Object.keys(nodeQ.children).sort((a,b)=>b-a).forEach(m=>{ 
-                            const nodeM=nodeQ.children[m]; nodeRematesMap[nodeM.id]={label:`${t} ${nodeM.label}`,remates:getRemates(nodeM)}; let htmlR=''; 
+                            const nodeM=nodeQ.children[m]; 
+                            // INYECCIÓN DE AÑO PARA LA SEMANA/ARCHIVO:
+                            let htmlR=''; 
                             nodeM.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp).forEach((r,idx)=>{ 
                                 const semanaNum=idx+1; const labelR=`Sem ${semanaNum} - ${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,10)}`; 
-                                htmlR+=buildTreeNodeHTML(`R-${r.id}`,labelR,5,false,''); nodeRematesMap[`R-${r.id}`]={label:`${t} S${semanaNum} ${nodeM.label.substring(0,3)}`,remates:[r]}; 
+                                htmlR+=buildTreeNodeHTML(`R-${r.id}`,labelR,5,false,''); 
+                                nodeRematesMap[`R-${r.id}`]={label:`${t} S${semanaNum} ${nodeM.label.substring(0,3)} ${r.fechaData.year}`,remates:[r]}; 
                             }); htmlM+=buildTreeNodeHTML(nodeM.id,nodeM.label,4,true,htmlR,false); 
                         }); htmlQ+=buildTreeNodeHTML(nodeQ.id,nodeQ.label,3,true,htmlM,false); 
                     }); htmlS+=buildTreeNodeHTML(nodeS.id,nodeS.label,2,true,htmlQ,true); 
@@ -1044,12 +1043,6 @@ function renderSingleView(nodeId){
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
-        
-        let deltaSigno = agg.deltaPujaTotal >= 0 ? '+' : '';
-        let deltaColor = agg.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger';
-        if(document.getElementById('sv-kpi-delta-resumen')) {
-            document.getElementById('sv-kpi-delta-resumen').innerHTML = `<span class="${deltaColor}">${deltaSigno}${formatMoney(agg.deltaPujaTotal)} <span class="text-xs font-semibold">(${deltaSigno}${agg.sobreprecioReal.toFixed(1)}%)</span></span>`;
-        }
         
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
@@ -1092,7 +1085,7 @@ function renderCompareView(nodesList){
                 let dSign = d.deltaPujaTotal >= 0 ? '+' : '';
                 let dColor = d.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger';
                 return `<tr class="border-b border-slate-100 hover:bg-slate-50">
-                    <td class="p-3 font-bold max-w-[150px] truncate text-slate-800">${d.label}</td>
+                    <td class="p-3 font-bold max-w-[150px] truncate text-slate-800" title="${d.label}">${d.label}</td>
                     <td class="p-3 text-right font-mono font-bold text-brand-success">${formatMoney(d.venta)}</td>
                     <td class="p-3 text-right font-mono font-bold text-brand-info">${formatMoney(d.comisionTotal)}</td>
                     <td class="p-3 text-center text-slate-800 font-semibold">${d.lotes}</td>
@@ -1238,7 +1231,7 @@ function generarInformePersonalizado() {
         out += `<div class="grid grid-cols-2 gap-4 mt-6">`;
         if(document.getElementById('chk-kpi-disp') && document.getElementById('chk-kpi-disp').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Lotes Disponibles</p><p class="text-xl font-bold text-slate-800">${agg.lotesDisponibles}</p></div>`;
         if(document.getElementById('chk-kpi-vend') && document.getElementById('chk-kpi-vend').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Lotes Vendidos (Efectivos)</p><p class="text-xl font-bold text-brand-info">${agg.lotes}</p></div>`;
-        if(document.getElementById('chk-kpi-efi') && document.getElementById('chk-kpi-efi').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Eficacia / Rotación</p><p class="text-xl font-bold text-brand-success">${agg.eficaciaLotes.toFixed(1)}%</p></div>`;
+        if(document.getElementById('chk-kpi-efi') && document.getElementById('chk-kpi-efi').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Efectividad del Remate</p><p class="text-xl font-bold text-brand-success">${agg.eficaciaLotes.toFixed(1)}%</p></div>`;
         if(document.getElementById('chk-kpi-venta') && document.getElementById('chk-kpi-venta').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Venta Total Adjudicada</p><p class="text-xl font-bold text-brand-success">${formatMoney(agg.venta)}</p></div>`;
         if(document.getElementById('chk-kpi-comision') && document.getElementById('chk-kpi-comision').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Comisión Generada (12%+IVA)</p><p class="text-xl font-bold text-brand-accent">${formatMoney(agg.comisionTotal)}</p></div>`;
         if(document.getElementById('chk-kpi-ticket') && document.getElementById('chk-kpi-ticket').checked) out += `<div class="p-4 border border-slate-200 rounded-lg"><p class="text-xs text-slate-400 uppercase font-bold">Ticket Promedio</p><p class="text-xl font-bold text-slate-800">${formatMoney(agg.ticketPromedio)}</p></div>`;
@@ -1347,8 +1340,8 @@ function abrirModalPujadores(loteEncoded, nodeId){
         if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
         currentFiltroModal='todos'; 
         if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-full bg-brand-accent text-white font-bold'; 
-        if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; 
-        if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300';
+        if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400'; 
+        if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400';
         renderModalTabla();
         if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.remove('hidden');
     } catch(e) { console.error("Error abriendo pujadores", e); }
