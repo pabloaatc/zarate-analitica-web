@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V11.0 (Secure)</title>
+    <title>Panel de Control Directivo | Zárate Remates V11.2 (Secure)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -72,7 +72,7 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Contraseña</label>
                     <input type="password" id="password" class="input-field" required placeholder="••••••••">
                 </div>
-                <div id="login-error" class="hidden text-brand-danger text-sm font-semibold mb-4 text-center bg-red-50 p-2 rounded-lg border border-red-200"></div>
+                <div id="login-error" class="hidden text-brand-danger text-sm font-semibold mb-4 text-center bg-red-50 p-3 rounded-lg border border-red-200"></div>
                 <button type="submit" id="btn-login" class="w-full bg-brand-accent hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl transition shadow-md flex justify-center items-center">
                     Ingresar al Sistema
                 </button>
@@ -80,7 +80,7 @@
         </div>
     </div>
     
-    <!-- CONTENIDO PRINCIPAL (Oculto inicialmente por CSS/JS) -->
+    <!-- CONTENIDO PRINCIPAL (Oculto inicialmente) -->
     <div id="app-content" class="hidden flex-col h-screen">
         <header class="border-b border-slate-200 bg-white z-20 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm no-print">
             <div class="flex items-center gap-4">
@@ -95,7 +95,6 @@
                     <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="iniciarProcesamiento(this.files)">
                 </div>
                 <div class="h-6 w-px bg-slate-300 mx-1"></div>
-                <!-- BOTÓN CERRAR SESIÓN -->
                 <button onclick="handleLogout()" class="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
                     <span id="user-display-email" class="text-xs bg-slate-100 px-2 py-1 rounded-md border border-slate-200"></span> Salir
                 </button>
@@ -506,43 +505,82 @@ const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 // ===========================================
-// SISTEMA DE SEGURIDAD Y LOGIN
+// SISTEMA DE SEGURIDAD Y LOGIN (ANTI-CUELGUE)
 // ===========================================
 let sessionUser = null;
 
 async function checkSession() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session) {
-        sessionUser = session.user;
-        document.getElementById('user-display-email').innerText = sessionUser.email;
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('app-content').classList.remove('hidden');
-        document.getElementById('app-content').classList.add('flex');
-        initApp(); // Iniciar la carga de datos solo si está logueado
-    } else {
+    try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        
+        if (session) {
+            sessionUser = session.user;
+            const displayEl = document.getElementById('user-display-email');
+            if(displayEl) displayEl.innerText = sessionUser.email;
+            
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('app-content').classList.add('flex');
+            initApp();
+        } else {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-content').classList.add('hidden');
+            document.getElementById('app-content').classList.remove('flex');
+            const btn = document.getElementById('btn-login');
+            if(btn) { btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false; }
+        }
+    } catch(e) {
+        console.error("Error validando sesión:", e);
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('app-content').classList.add('hidden');
         document.getElementById('app-content').classList.remove('flex');
+        const err = document.getElementById('login-error');
+        if(err) { err.innerText = "Error cargando la sesión. Refresca la página."; err.classList.remove('hidden'); }
+        const btn = document.getElementById('btn-login');
+        if(btn) { btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false; }
     }
 }
 
 async function handleLogin(e) {
     e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
     const btn = document.getElementById('btn-login');
     const err = document.getElementById('login-error');
     
     btn.innerHTML = "Verificando..."; btn.disabled = true; err.classList.add('hidden');
     
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    
-    if (error) {
-        err.innerText = "Credenciales incorrectas.";
+    try {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // TIMEOUT ANTI-CUELGUE: Si Supabase se demora más de 8 segundos, forzamos un error.
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout: El servidor tardó demasiado en responder.")), 8000));
+        const loginPromise = supabaseClient.auth.signInWithPassword({ email, password });
+
+        const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
+
+        if (error) {
+            throw error;
+        } else if (data && !data.session) {
+            throw new Error("Cuenta inactiva. Asegúrate de haber apagado 'Confirm email' en Supabase.");
+        } else {
+            checkSession();
+        }
+    } catch (ex) {
+        console.error("Error capturado en Login:", ex);
+        let msj = ex.message || "Error desconocido al iniciar sesión.";
+        
+        // Traducción de errores comunes para hacerlos amigables
+        if(msj.includes("Email not confirmed")) {
+            msj = "Tu cuenta está bloqueada porque pide confirmación de correo. Ve a Supabase, apaga 'Confirm email' y vuelve a crear tu cuenta.";
+        }
+        if(msj.includes("Invalid login")) {
+            msj = "Correo o contraseña incorrectos.";
+        }
+        
+        err.innerText = msj;
         err.classList.remove('hidden');
         btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false;
-    } else {
-        checkSession();
     }
 }
 
@@ -551,7 +589,6 @@ async function handleLogout() {
     window.location.reload();
 }
 
-// Ejecutar check de sesión al cargar la página
 window.onload = checkSession;
 
 
