@@ -46,12 +46,6 @@
             .glass-panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
         }
         th.cursor-pointer:hover { background-color: #e2e8f0; }
-        
-        /* Estilos para el Login Reducido */
-        #login-screen { position: fixed; inset: 0; background-color: #f8fafc; z-index: 100; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 2rem; border-radius: 1.25rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); width: 90%; max-w: 320px; }
-        .input-field { width: 100%; padding: 0.6rem 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; margin-top: 0.5rem; outline: none; transition: all 0.2s; font-size: 0.875rem; }
-        .input-field:focus { border-color: #FF6B35; box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1); }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
@@ -59,23 +53,26 @@
     <!-- ETIQUETA DE VERSIÓN -->
     <div class="fixed bottom-2 right-3 text-[10px] text-slate-400 font-mono z-50 pointer-events-none no-print">Versión 1.0</div>
 
-    <!-- PANTALLA DE LOGIN -->
-    <div id="login-screen">
-        <div class="login-box text-center">
-            <div class="w-12 h-12 rounded-xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-2xl shadow-md mx-auto mb-4">Z</div>
+    <!-- PANTALLA DE LOGIN (MODERNA Y ANGOSTA) -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-50 z-[100] flex items-center justify-center px-4">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-[360px] text-center relative overflow-hidden">
+            <!-- Adorno superior -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
+            
+            <div class="w-14 h-14 rounded-2xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-2xl shadow-lg mx-auto mb-5">Z</div>
             <h2 class="text-xl font-extrabold text-slate-800 mb-6">Analítica Cloud</h2>
             
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Correo Electrónico</label>
-                    <input type="email" id="email" class="input-field" required placeholder="tu@correo.com">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Correo Electrónico</label>
+                    <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all" required placeholder="tu@correo.com">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Contraseña</label>
-                    <input type="password" id="password" class="input-field" required placeholder="••••••••">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Contraseña</label>
+                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all" required placeholder="••••••••">
                 </div>
-                <div id="login-error" class="hidden text-brand-danger text-xs font-semibold mb-4 text-center bg-red-50 p-2 rounded-lg border border-red-200"></div>
-                <button type="submit" id="btn-login" class="w-full bg-brand-accent hover:bg-orange-600 text-white font-bold py-2.5 px-4 text-sm rounded-lg transition shadow-md flex justify-center items-center">
+                <div id="login-error" class="hidden text-brand-danger text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
+                <button type="submit" id="btn-login" class="w-full bg-brand-accent hover:bg-orange-600 text-white font-bold py-3 px-4 text-sm rounded-xl transition-all shadow-md hover:shadow-lg flex justify-center items-center">
                     Ingresar al Sistema
                 </button>
             </form>
@@ -987,7 +984,7 @@ function renderModalTabla(){
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
             let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded text-[8px] md:text-[9px] font-bold badge-falso">FALSO</span>' : '<span class="px-2 py-0.5 rounded text-[8px] md:text-[9px] font-bold badge-real">REAL</span>'; if(esAdj) badge+=' <span class="ml-1 md:ml-2 px-2 py-0.5 rounded bg-brand-success text-white text-[8px] md:text-[9px] font-bold">ADJ</span>';
-            return `<tr class="border-b border-slate-200 ${esAdj?'row-adjudicado':''} ${p.esFalso?'opacity-60 bg-red-50/50':''}"><td class="p-2 md:p-3 pl-4 md:pl-6 text-[10px] md:text-xs text-slate-400">${i+1}</td><td class="p-2 md:p-3 text-[10px] md:text-xs font-mono hidden sm:table-cell">${p.fecha||'-'}</td><td class="p-2 md:p-3 text-[10px] md:text-xs max-w-[120px] md:max-w-[200px] truncate" title="${p.nombre}">${p.nombre}</td><td class="p-2 md:p-3 text-right font-mono font-bold text-[10px] md:text-xs ${esAdj?'text-brand-success':'text-slate-700'}">${formatMoney(p.monto)}</td><td class="p-2 md:p-3 text-center pr-4 md:pr-6">${badge}</td></tr>`;
+            return `<tr class="border-b border-slate-200 ${esAdj?'row-adjudicado':''} ${p.esFalso?'opacity-60 bg-red-50/50':''}"><td class="p-2 md:p-3 pl-4 md:pl-6 text-[10px] md:text-xs text-slate-400">${i+1}</td><td class="p-2 md:p-3 text-[10px] md:text-xs font-mono hidden sm:table-cell">${p.fecha||'-'}</td><td class="p-2 md:p-3 text-[10px] md:text-xs font-mono">${p.rut}</td><td class="p-2 md:p-3 text-[10px] md:text-xs max-w-[120px] md:max-w-[200px] truncate" title="${p.nombre}">${p.nombre}</td><td class="p-2 md:p-3 text-right font-mono font-bold text-[10px] md:text-xs ${esAdj?'text-brand-success':'text-slate-700'}">${formatMoney(p.monto)}</td><td class="p-2 md:p-3 text-center pr-4 md:pr-6">${badge}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-500">Sin pujas registradas</td></tr>';
     } catch(e) {}
 }
