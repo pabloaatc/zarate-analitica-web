@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V11.4 (Secure)</title>
+    <title>Panel de Control Directivo | Zárate Remates V11.5 (Secure)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -47,8 +47,8 @@
         }
         th.cursor-pointer:hover { background-color: #e2e8f0; }
         
-        /* Estilos para el Login */
-        #login-screen { position: fixed; inset: 0; background-color: #f8fafc; z-index: 100; display: flex; align-items: center; justify-content: center; }
+        /* Estilos para el Login sin conflicto de CSS */
+        #login-screen { position: fixed; inset: 0; background-color: #f8fafc; z-index: 100; }
         .login-box { background: white; padding: 2.5rem; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); width: 100%; max-w: 400px; }
         .input-field { width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; margin-top: 0.5rem; outline: none; transition: all 0.2s; }
         .input-field:focus { border-color: #FF6B35; box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1); }
@@ -57,11 +57,11 @@
 <body class="h-screen flex flex-col overflow-hidden">
 
     <!-- PANTALLA DE LOGIN -->
-    <div id="login-screen">
+    <div id="login-screen" style="display: flex; align-items: center; justify-content: center;">
         <div class="login-box text-center">
             <div class="w-16 h-16 rounded-2xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-3xl shadow-md mx-auto mb-6">Z</div>
             <h2 class="text-2xl font-extrabold text-slate-800 mb-1">Zárate Analítica Cloud</h2>
-            <div class="mb-6 inline-block bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full border border-slate-200">Versión 11.4 (Anti-Cuelgues)</div>
+            <div class="mb-6 inline-block bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full border border-slate-200">Versión 11.5</div>
             
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
@@ -522,12 +522,13 @@ async function checkSession() {
             const displayEl = document.getElementById('user-display-email');
             if(displayEl) displayEl.innerText = sessionUser.email;
             
-            document.getElementById('login-screen').classList.add('hidden');
+            // LA CORRECCIÓN MÁGICA: Control directo por JS puro
+            document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').classList.remove('hidden');
             document.getElementById('app-content').classList.add('flex');
             initApp();
         } else {
-            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('app-content').classList.add('hidden');
             document.getElementById('app-content').classList.remove('flex');
             const btn = document.getElementById('btn-login');
@@ -535,7 +536,7 @@ async function checkSession() {
         }
     } catch(e) {
         console.error("Error validando sesión:", e);
-        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('app-content').classList.add('hidden');
         document.getElementById('app-content').classList.remove('flex');
         const err = document.getElementById('login-error');
@@ -558,7 +559,7 @@ async function handleLogin(e) {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("El servidor de seguridad (Supabase) no responde. Revisa tu internet o adblocker.")), 7000));
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("El servidor de seguridad no responde.")), 7000));
         const loginPromise = supabaseClient.auth.signInWithPassword({ email, password });
         
         const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
@@ -575,9 +576,9 @@ async function handleLogin(e) {
     } catch (ex) {
         console.error("Fallo Login:", ex);
         let msj = ex.message || "Error desconocido";
-        if(msj.includes("Email not confirmed")) msj = "Tu cuenta está bloqueada porque pide confirmación de correo. Ve a Supabase, apaga 'Confirm email' y vuelve a crear la cuenta.";
+        if(msj.includes("Email not confirmed")) msj = "Cuenta bloqueada por correo.";
         if(msj.includes("Invalid login")) msj = "Correo o contraseña incorrectos.";
-        if(msj.includes("Failed to fetch")) msj = "Tu navegador está bloqueando la conexión. Apaga el AdBlocker o intenta en otra red.";
+        if(msj.includes("Failed to fetch")) msj = "Navegador bloqueando conexión.";
         
         err.innerText = "Error: " + msj;
         err.classList.remove('hidden');
