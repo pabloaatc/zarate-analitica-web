@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V11.2 (Secure)</title>
+    <title>Panel de Control Directivo | Zárate Remates V11.3 (Secure)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -60,8 +60,8 @@
     <div id="login-screen">
         <div class="login-box text-center">
             <div class="w-16 h-16 rounded-2xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-3xl shadow-md mx-auto mb-6">Z</div>
-            <h2 class="text-2xl font-extrabold text-slate-800 mb-2">Zárate Analítica Cloud</h2>
-            <p class="text-sm text-slate-500 mb-8">Ingresa tus credenciales de acceso</p>
+            <h2 class="text-2xl font-extrabold text-slate-800 mb-1">Zárate Analítica Cloud</h2>
+            <div class="mb-6 inline-block bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full border border-slate-200">Versión 11.3</div>
             
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
@@ -505,14 +505,13 @@ const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 // ===========================================
-// SISTEMA DE SEGURIDAD Y LOGIN (ANTI-CUELGUE)
+// SISTEMA DE SEGURIDAD Y LOGIN (ROBUSTO)
 // ===========================================
 let sessionUser = null;
 
 async function checkSession() {
     try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
-        if (error) throw error;
         
         if (session) {
             sessionUser = session.user;
@@ -527,18 +526,9 @@ async function checkSession() {
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('app-content').classList.add('hidden');
             document.getElementById('app-content').classList.remove('flex');
-            const btn = document.getElementById('btn-login');
-            if(btn) { btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false; }
         }
     } catch(e) {
         console.error("Error validando sesión:", e);
-        document.getElementById('login-screen').classList.remove('hidden');
-        document.getElementById('app-content').classList.add('hidden');
-        document.getElementById('app-content').classList.remove('flex');
-        const err = document.getElementById('login-error');
-        if(err) { err.innerText = "Error cargando la sesión. Refresca la página."; err.classList.remove('hidden'); }
-        const btn = document.getElementById('btn-login');
-        if(btn) { btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false; }
     }
 }
 
@@ -547,40 +537,33 @@ async function handleLogin(e) {
     const btn = document.getElementById('btn-login');
     const err = document.getElementById('login-error');
     
-    btn.innerHTML = "Verificando..."; btn.disabled = true; err.classList.add('hidden');
+    btn.innerHTML = "Verificando..."; 
+    btn.disabled = true; 
+    err.classList.add('hidden');
     
     try {
-        const email = document.getElementById('email').value;
+        const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-
-        // TIMEOUT ANTI-CUELGUE: Si Supabase se demora más de 8 segundos, forzamos un error.
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout: El servidor tardó demasiado en responder.")), 8000));
-        const loginPromise = supabaseClient.auth.signInWithPassword({ email, password });
-
-        const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
-
+        
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        
         if (error) {
-            throw error;
-        } else if (data && !data.session) {
-            throw new Error("Cuenta inactiva. Asegúrate de haber apagado 'Confirm email' en Supabase.");
+            let msj = error.message;
+            if(msj.includes("Email not confirmed")) msj = "Tu cuenta está bloqueada porque pide confirmación de correo. Ve a Supabase, apaga 'Confirm email' y vuelve a crear la cuenta.";
+            if(msj.includes("Invalid login")) msj = "Correo o contraseña incorrectos.";
+            
+            err.innerText = msj;
+            err.classList.remove('hidden');
+            btn.innerHTML = "Ingresar al Sistema"; 
+            btn.disabled = false;
         } else {
             checkSession();
         }
     } catch (ex) {
-        console.error("Error capturado en Login:", ex);
-        let msj = ex.message || "Error desconocido al iniciar sesión.";
-        
-        // Traducción de errores comunes para hacerlos amigables
-        if(msj.includes("Email not confirmed")) {
-            msj = "Tu cuenta está bloqueada porque pide confirmación de correo. Ve a Supabase, apaga 'Confirm email' y vuelve a crear tu cuenta.";
-        }
-        if(msj.includes("Invalid login")) {
-            msj = "Correo o contraseña incorrectos.";
-        }
-        
-        err.innerText = msj;
+        err.innerText = "Error de conexión con el servidor.";
         err.classList.remove('hidden');
-        btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false;
+        btn.innerHTML = "Ingresar al Sistema"; 
+        btn.disabled = false;
     }
 }
 
