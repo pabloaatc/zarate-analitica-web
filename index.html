@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V11.3 (Secure)</title>
+    <title>Panel de Control Directivo | Zárate Remates V11.4 (Secure)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -61,7 +61,7 @@
         <div class="login-box text-center">
             <div class="w-16 h-16 rounded-2xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-3xl shadow-md mx-auto mb-6">Z</div>
             <h2 class="text-2xl font-extrabold text-slate-800 mb-1">Zárate Analítica Cloud</h2>
-            <div class="mb-6 inline-block bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full border border-slate-200">Versión 11.3</div>
+            <div class="mb-6 inline-block bg-slate-100 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full border border-slate-200">Versión 11.4 (Anti-Cuelgues)</div>
             
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
@@ -505,16 +505,20 @@ const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 // ===========================================
-// SISTEMA DE SEGURIDAD Y LOGIN (ROBUSTO)
+// SISTEMA DE SEGURIDAD Y LOGIN (ANTI-CUELGUE ESTRICTO)
 // ===========================================
 let sessionUser = null;
 
 async function checkSession() {
     try {
-        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        const timeoutP = new Promise((_, r) => setTimeout(() => r(new Error("Timeout al verificar sesión de Supabase")), 7000));
+        const sessionP = supabaseClient.auth.getSession();
         
-        if (session) {
-            sessionUser = session.user;
+        const { data, error } = await Promise.race([sessionP, timeoutP]);
+        if (error) throw error;
+        
+        if (data && data.session) {
+            sessionUser = data.session.user;
             const displayEl = document.getElementById('user-display-email');
             if(displayEl) displayEl.innerText = sessionUser.email;
             
@@ -526,9 +530,18 @@ async function checkSession() {
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('app-content').classList.add('hidden');
             document.getElementById('app-content').classList.remove('flex');
+            const btn = document.getElementById('btn-login');
+            if(btn) { btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false; }
         }
     } catch(e) {
         console.error("Error validando sesión:", e);
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('app-content').classList.add('hidden');
+        document.getElementById('app-content').classList.remove('flex');
+        const err = document.getElementById('login-error');
+        if(err) { err.innerText = "Error cargando la sesión. " + e.message; err.classList.remove('hidden'); }
+        const btn = document.getElementById('btn-login');
+        if(btn) { btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false; }
     }
 }
 
@@ -537,7 +550,7 @@ async function handleLogin(e) {
     const btn = document.getElementById('btn-login');
     const err = document.getElementById('login-error');
     
-    btn.innerHTML = "Verificando..."; 
+    btn.innerHTML = "Contactando servidor..."; 
     btn.disabled = true; 
     err.classList.add('hidden');
     
@@ -545,22 +558,28 @@ async function handleLogin(e) {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("El servidor de seguridad (Supabase) no responde. Revisa tu internet o adblocker.")), 7000));
+        const loginPromise = supabaseClient.auth.signInWithPassword({ email, password });
         
-        if (error) {
-            let msj = error.message;
-            if(msj.includes("Email not confirmed")) msj = "Tu cuenta está bloqueada porque pide confirmación de correo. Ve a Supabase, apaga 'Confirm email' y vuelve a crear la cuenta.";
-            if(msj.includes("Invalid login")) msj = "Correo o contraseña incorrectos.";
-            
-            err.innerText = msj;
-            err.classList.remove('hidden');
-            btn.innerHTML = "Ingresar al Sistema"; 
-            btn.disabled = false;
-        } else {
-            checkSession();
+        const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
+        
+        if (error) throw error;
+        
+        if (data && !data.session) {
+            throw new Error("Cuenta inactiva. Verifica la configuración de Supabase.");
         }
+        
+        btn.innerHTML = "Abriendo panel...";
+        await checkSession();
+        
     } catch (ex) {
-        err.innerText = "Error de conexión con el servidor.";
+        console.error("Fallo Login:", ex);
+        let msj = ex.message || "Error desconocido";
+        if(msj.includes("Email not confirmed")) msj = "Tu cuenta está bloqueada porque pide confirmación de correo. Ve a Supabase, apaga 'Confirm email' y vuelve a crear la cuenta.";
+        if(msj.includes("Invalid login")) msj = "Correo o contraseña incorrectos.";
+        if(msj.includes("Failed to fetch")) msj = "Tu navegador está bloqueando la conexión. Apaga el AdBlocker o intenta en otra red.";
+        
+        err.innerText = "Error: " + msj;
         err.classList.remove('hidden');
         btn.innerHTML = "Ingresar al Sistema"; 
         btn.disabled = false;
