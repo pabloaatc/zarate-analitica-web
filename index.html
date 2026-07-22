@@ -3,83 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control Directivo | Zárate Remates V1.0</title>
+    <title>Zárate Analítica | Control de Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { 
-            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { panel: '#ffffff', accent: '#FF6B35', success: '#10B981', info: '#0284c7', danger: '#EF4444', slate: '#64748b' } } } } 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
+                    colors: { 
+                        premium: { 
+                            bg: '#F5F5F7', 
+                            panel: '#FFFFFF', 
+                            text: '#1D1D1F', 
+                            muted: '#86868B', 
+                            border: '#E5E5EA', 
+                            highlight: '#0066CC', 
+                            success: '#1B8233', 
+                            danger: '#E30000',
+                            accent: '#000000'
+                        } 
+                    } 
+                } 
+            } 
         }
     </script>
     <style>
-        body { background-color: #f8fafc; color: #1e293b; }
-        .glass-panel { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .upload-area { border: 2px dashed #cbd5e1; transition: all 0.3s; background-color: #f8fafc; cursor: pointer; }
-        .upload-area:hover, .upload-area.dragover { border-color: #FF6B35; background: rgba(255, 107, 53, 0.05); }
-        .nav-item { padding: 0.6rem 1rem; border-radius: 0.5rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 500; color: #64748b;}
-        .nav-item:hover { background-color: #f1f5f9; color: #0f172a; }
-        .nav-active { background-color: #FF6B35 !important; color: white !important; font-weight: 700; box-shadow: 0 4px 6px -1px rgba(255, 107, 53, 0.3); }
-        .nav-tree-item { padding: 0.25rem 0.5rem; border-radius: 0.375rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .nav-tree-item:hover { background-color: #f1f5f9; }
-        .chevron { cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 0.25rem; color: #94a3b8; }
-        .chevron:hover { background-color: #e2e8f0; color: #0f172a; }
-        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; color: currentColor; width: 1.15em; height: 1.15em; border: 2px solid #cbd5e1; border-radius: 0.25em; display: grid; place-content: center; cursor: pointer; }
-        input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
-        input[type="checkbox"]:checked { background-color: #FF6B35; border-color: #FF6B35; }
+        body { background-color: #F5F5F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
+        .glass-panel { background: #FFFFFF; border: 1px solid #E5E5EA; border-radius: 1.25rem; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02); transition: all 0.3s ease; }
+        .glass-panel:hover { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04); }
+        .upload-area { border: 1.5px dashed #D1D1D6; background-color: #FAFAFA; border-radius: 999px; transition: all 0.2s; cursor: pointer; }
+        .upload-area:hover, .upload-area.dragover { border-color: #000000; background-color: #F0F0F0; }
+        
+        .nav-item { padding: 0.5rem 0.8rem; border-radius: 0.5rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #86868B;}
+        .nav-item:hover { background-color: #EAEAEB; color: #1D1D1F; }
+        .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; font-weight: 600; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        
+        .nav-tree-item { padding: 0.2rem 0.5rem; border-radius: 0.375rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .nav-tree-item:hover { background-color: #EAEAEB; }
+        .chevron { cursor: pointer; padding: 0.1rem 0.4rem; border-radius: 0.25rem; color: #86868B; }
+        .chevron:hover { background-color: #D1D1D6; color: #1D1D1F; }
+        
+        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; cursor: pointer; transition: all 0.2s;}
+        input[type="checkbox"]::before { content: ""; width: 0.6em; height: 0.6em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
+        input[type="checkbox"]:checked { background-color: #1D1D1F; border-color: #1D1D1F; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
-        ::-webkit-scrollbar { width: 6px; height: 6px; } 
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; } 
         ::-webkit-scrollbar-track { background: transparent; } 
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .modal-bg { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
-        .badge-falso { background: rgba(239,68,68,0.1); color: #EF4444; border: 1px solid rgba(239,68,68,0.2); }
-        .badge-real { background: rgba(16,185,129,0.1); color: #10B981; border: 1px solid rgba(16,185,129,0.2); }
-        .row-adjudicado { background: rgba(16,185,129,0.05) !important; border-left: 3px solid #10B981; }
-        thead th { background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600; }
-        tbody tr { border-bottom: 1px solid #f1f5f9; }
-        tbody tr:hover { background-color: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #D1D1D6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #86868B; }
+
+        .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); }
+        
+        /* Tablas minimalistas */
+        thead th { background-color: #FFFFFF; border-bottom: 1px solid #E5E5EA; color: #86868B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; padding-bottom: 0.75rem; }
+        tbody tr { border-bottom: 1px solid #F5F5F7; transition: background-color 0.2s; }
+        tbody tr:hover { background-color: #FAFAFA; }
+        tbody td { font-size: 0.8rem; color: #1D1D1F; padding: 0.75rem 0.5rem; }
+        
         @media print {
             aside, header, .no-print { display: none !important; }
             main { padding: 0 !important; background: white !important; }
             .glass-panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
         }
-        th.cursor-pointer:hover { background-color: #e2e8f0; }
         
-        /* Estilos para el Login Reducido */
-        #login-screen { position: fixed; inset: 0; background-color: #f8fafc; z-index: 100; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 2rem; border-radius: 1.25rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); width: 90%; max-w: 320px; }
-        .input-field { width: 100%; padding: 0.6rem 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; margin-top: 0.5rem; outline: none; transition: all 0.2s; font-size: 0.875rem; }
-        .input-field:focus { border-color: #FF6B35; box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1); }
+        /* Login Ultra Premium */
+        #login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #F5F5F7 0%, #EAEAEB 100%); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .login-box { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 2.5rem 2rem; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgba(255, 255, 255, 0.5); width: 100%; max-w: 340px; }
+        .input-field { width: 100%; padding: 0.75rem 1rem; border: 1px solid #E5E5EA; background: #FFFFFF; border-radius: 0.75rem; margin-top: 0.5rem; outline: none; transition: all 0.2s; font-size: 0.85rem; color: #1D1D1F; }
+        .input-field:focus { border-color: #1D1D1F; box-shadow: 0 0 0 3px rgba(29, 29, 31, 0.1); }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <!-- ETIQUETA DE VERSIÓN -->
-    <div class="fixed bottom-2 right-3 text-[10px] text-slate-400 font-mono z-50 pointer-events-none no-print">Versión 1.0</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.0</div>
 
-    <!-- PANTALLA DE LOGIN (MODERNA Y ANGOSTA) -->
-    <div id="login-screen" class="fixed inset-0 bg-slate-50 z-[100] flex items-center justify-center px-4">
-        <div class="bg-white p-8 rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-[360px] text-center relative overflow-hidden">
-            <!-- Adorno superior -->
-            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
-            
-            <div class="w-14 h-14 rounded-2xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-2xl shadow-lg mx-auto mb-5">Z</div>
-            <h2 class="text-xl font-extrabold text-slate-800 mb-6">Analítica Cloud</h2>
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-screen">
+        <div class="login-box text-center">
+            <div class="w-12 h-12 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-xl mx-auto mb-4 shadow-lg">Z</div>
+            <h2 class="text-xl font-semibold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
+            <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6">Control Directivo</p>
             
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Correo Electrónico</label>
-                    <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all" required placeholder="tu@correo.com">
+                    <input type="email" id="email" class="input-field" required placeholder="Correo Electrónico">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Contraseña</label>
-                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all" required placeholder="••••••••">
+                    <input type="password" id="password" class="input-field" required placeholder="Contraseña">
                 </div>
-                <div id="login-error" class="hidden text-brand-danger text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
-                <button type="submit" id="btn-login" class="w-full bg-brand-accent hover:bg-orange-600 text-white font-bold py-3 px-4 text-sm rounded-xl transition-all shadow-md hover:shadow-lg flex justify-center items-center">
-                    Ingresar al Sistema
+                <div id="login-error" class="hidden text-premium-danger text-[10px] font-medium mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
+                <button type="submit" id="btn-login" class="w-full bg-premium-accent hover:bg-gray-800 text-white font-medium py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
+                    Iniciar Sesión
                 </button>
             </form>
         </div>
@@ -87,124 +106,130 @@
     
     <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
-        <!-- HEADER RESPONSIVO -->
-        <header class="border-b border-slate-200 bg-white z-20 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shrink-0 shadow-sm no-print">
-            <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="md:hidden text-slate-600 hover:text-brand-accent transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        <!-- HEADER MINIMALISTA -->
+        <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
-                <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-brand-accent flex items-center justify-center font-extrabold text-white text-lg md:text-xl shadow-md">Z</div>
-                <div><h1 class="font-extrabold text-sm md:text-lg text-slate-800 truncate max-w-[130px] md:max-w-full">Control de Gestión</h1><p class="text-[9px] md:text-xs text-brand-info font-semibold" id="db-status">Sincronizando nube...</p></div>
+                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-lg">Z</div>
+                <div><h1 class="font-semibold text-sm text-premium-text tracking-tight">Control de Gestión</h1><p class="text-[9px] text-premium-muted uppercase tracking-wider" id="db-status">Conectando...</p></div>
             </div>
-            <div class="flex items-center gap-2 md:gap-4">
-                <button onclick="limpiarBase()" class="hidden md:block text-[10px] md:text-xs text-brand-danger font-semibold border border-brand-danger/30 px-3 py-1.5 rounded-full bg-red-50 hover:bg-red-100 transition shadow-sm" title="Borrará los datos de la nube">Vaciar Base</button>
-                <div id="drop-zone" class="upload-area rounded-full px-3 md:px-6 py-1.5 md:py-2 flex items-center gap-2">
-                    <label for="file-input" class="font-bold text-[10px] md:text-sm text-brand-accent cursor-pointer">📄 Cargar</label>
-                    <span class="text-slate-300 hidden md:inline">|</span>
-                    <label for="folder-input" class="font-bold text-[10px] md:text-sm text-brand-info cursor-pointer hidden md:inline">📁 Carpeta</label>
+            <div class="flex items-center gap-4">
+                <button onclick="limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-medium px-3 py-1.5 rounded-full hover:bg-red-50 transition" title="Vaciar datos de la nube">Vaciar Base</button>
+                <div id="drop-zone" class="upload-area px-4 py-1.5 flex items-center gap-3">
+                    <label for="file-input" class="font-medium text-[11px] text-premium-text cursor-pointer">📄 Archivos</label>
+                    <span class="text-premium-border hidden md:inline">|</span>
+                    <label for="folder-input" class="font-medium text-[11px] text-premium-text cursor-pointer hidden md:inline">📁 Carpeta</label>
                     <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="iniciarProcesamiento(this.files)">
                     <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="iniciarProcesamiento(this.files)">
                 </div>
-                <div class="h-5 md:h-6 w-px bg-slate-300 mx-1 hidden md:block"></div>
-                <button onclick="handleLogout()" class="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
-                    <span id="user-display-email" class="text-[9px] md:text-xs bg-slate-100 px-2 py-1 rounded-md border border-slate-200 hidden md:inline"></span> 
-                    <span class="text-xs">Salir</span>
+                <div class="h-4 w-px bg-premium-border hidden md:block"></div>
+                <button onclick="handleLogout()" class="flex items-center gap-2 text-xs font-medium text-premium-muted hover:text-premium-text transition">
+                    <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline"></span> 
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
         </header>
 
         <div class="flex-1 flex overflow-hidden relative">
-            
-            <!-- OVERLAY MÓVIL PARA SIDEBAR -->
-            <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/50 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
+            <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
 
-            <!-- SIDEBAR RESPONSIVO -->
-            <aside id="sidebar" class="absolute md:relative z-40 w-[280px] md:w-[320px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-slate-200 bg-white overflow-y-auto p-5 flex flex-col shrink-0 no-print">
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estructura Corporativa</div>
-                    <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-slate-800">✕</button>
+            <!-- SIDEBAR COMPACTO -->
+            <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print">
+                <div class="flex justify-between items-center mb-6 px-2 mt-2">
+                    <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest">Módulos</div>
+                    <button onclick="toggleSidebar()" class="md:hidden text-premium-muted">✕</button>
                 </div>
-                <div id="nav-mod-remates" class="nav-item nav-active mb-2" onclick="cambiarSeccion('remates')"><span class="text-sm">📊 Informe de Remates</span></div>
-                <div id="nav-mod-autos" class="nav-item nav-inactive mb-2" onclick="cambiarSeccion('autos')"><span class="text-sm">🚗 Modelos y Vehículos</span></div>
-                <div id="nav-mod-clientes" class="nav-item nav-inactive mb-2" onclick="cambiarSeccion('clientes')"><span class="text-sm">👥 Fichas de Clientes</span></div>
-                <div id="nav-mod-custom" class="nav-item nav-inactive mb-2" onclick="cambiarSeccion('custom')"><span class="text-sm">📋 Informe Personalizado</span></div>
-                <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-2" onclick="cambiarSeccion('conclusiones')"><span class="text-sm">🧠 Conclusiones MKT/SAC</span></div>
-                <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="cambiarSeccion('buscador')"><span class="text-sm">🔍 Buscador Global</span></div>
+                <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="cambiarSeccion('remates')">Resumen de Remates</div>
+                <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('autos')">Análisis de Vehículos</div>
+                <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('clientes')">Inteligencia de Clientes</div>
+                <div id="nav-mod-custom" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('custom')">Generador de Informes</div>
+                <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('conclusiones')">Directorio Ejecutivo</div>
+                <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="cambiarSeccion('buscador')">Buscador Global</div>
                 
                 <div id="tree-container">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
-                        <span>Navegación Temporal</span><button onclick="limpiarSeleccion()" class="hover:text-brand-accent text-slate-500">Desmarcar todo</button>
+                    <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
+                        <span>Periodos</span><button onclick="limpiarSeleccion()" class="hover:text-premium-text text-[9px] lowercase text-premium-highlight">desmarcar</button>
                     </div>
-                    <div id="nav-tree" class="flex flex-col text-[13px] text-slate-700"></div>
+                    <div id="nav-tree" class="flex flex-col text-xs text-premium-text"></div>
                 </div>
             </aside>
 
-            <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-slate-50 w-full">
-                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-slate-50/90 backdrop-blur-sm no-print p-6">
-                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-brand-accent/10 flex items-center justify-center mb-4 md:mb-6 border border-brand-accent/20">
-                        <svg class="w-8 h-8 md:w-10 md:h-10 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
+                <!-- EMPTY STATE ELEGANTE -->
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/90 backdrop-blur-md no-print p-6">
+                    <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-4 border border-premium-border shadow-sm">
+                        <svg class="w-6 h-6 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
-                    <p class="font-bold text-xl md:text-2xl text-slate-800 text-center" id="es-title">Zárate Analítica Cloud</p>
-                    <p class="text-xs md:text-sm text-slate-500 mt-2 text-center max-w-md" id="es-desc">Por favor, seleccione un periodo en el panel lateral o cargue sus reportes matrices.</p>
-                    <div id="error-log" class="mt-4 text-brand-danger font-semibold text-xs text-center max-w-md"></div>
+                    <p class="font-medium text-lg text-premium-text tracking-tight" id="es-title">Área de Trabajo Principal</p>
+                    <p class="text-xs text-premium-muted mt-2 text-center max-w-sm" id="es-desc">Seleccione una matriz en el panel lateral o arrastre nuevos archivos para comenzar el análisis.</p>
+                    <div id="error-log" class="mt-4 text-premium-danger font-medium text-[10px] text-center max-w-md"></div>
                 </div>
 
                 <!-- MODULE: REMATES -->
-                <div id="module-remates" class="hidden space-y-6 md:space-y-8 max-w-[1500px] mx-auto pb-10">
+                <div id="module-remates" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div id="single-view" class="space-y-6 hidden">
-                        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 md:gap-6 mb-2">
-                            <div class="min-w-0 flex-1">
-                                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight truncate text-slate-900" id="sv-titulo">-</h2>
-                                <p class="text-xs md:text-sm text-slate-500 font-medium mt-1" id="sv-subtitulo">-</p>
+                        <!-- Header Single View -->
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4">
+                            <div>
+                                <h2 class="text-2xl font-semibold tracking-tight text-premium-text" id="sv-titulo">-</h2>
+                                <p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1" id="sv-subtitulo">-</p>
                             </div>
-                            <div class="flex flex-wrap gap-4 md:gap-6 text-left md:text-right glass-panel p-4 md:p-5 shrink-0 overflow-x-auto no-print w-full xl:w-auto">
-                                <div class="flex-1 min-w-[120px]"><p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold" title="Comisión 12% + IVA">Comisión Estimada</p><p class="text-xl md:text-2xl font-extrabold text-brand-accent mt-1" id="sv-kpi-comision-top">$0</p></div>
-                                <div class="px-0 md:px-6 border-l-0 md:border-l border-slate-200 flex-1 min-w-[120px]"><p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold">Ticket Promedio</p><p class="text-xl md:text-2xl font-extrabold text-slate-800 mt-1" id="sv-kpi-ticket-promedio">$0</p></div>
-                                <div class="pl-0 md:pl-6 border-l-0 md:border-l border-slate-200 flex-1 min-w-[120px]"><p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold">Venta Total Efectiva</p><p class="text-xl md:text-2xl font-extrabold text-brand-success mt-1" id="sv-kpi-venta">$0</p></div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-6">
-                            <div class="glass-panel p-5 md:p-6 border-t-4 border-t-brand-info">
-                                <h4 class="font-bold text-sm mb-4 md:mb-5 text-slate-800">Efectividad del Remate</h4>
-                                <div class="space-y-3 md:space-y-4">
-                                    <div class="flex justify-between items-center border-b border-slate-100 pb-2 md:pb-3"><span class="text-xs text-slate-500 font-medium">Lotes Disponibles (Base)</span><span class="font-bold text-base md:text-lg text-slate-800" id="sv-kpi-lotes-disp">0</span></div>
-                                    <div class="flex justify-between items-center border-b border-slate-100 pb-2 md:pb-3"><span class="text-xs text-slate-500 font-medium">Lotes Vendidos (Efectivos)</span><span class="font-bold text-base md:text-lg text-brand-info" id="sv-kpi-lotes">0</span></div>
-                                    <div class="flex justify-between items-center pb-1"><span class="text-xs text-slate-500 font-bold uppercase">Efectividad</span><span class="font-bold text-base md:text-lg text-brand-success" id="sv-kpi-eficacia-resumen">0%</span></div>
-                                </div>
-                            </div>
-
-                            <div class="glass-panel p-5 md:p-6 border-t-4 border-t-brand-accent">
-                                <h4 class="font-bold text-sm mb-4 md:mb-5 text-slate-800">Comportamiento de Clientes</h4>
-                                <div class="space-y-3 md:space-y-4">
-                                    <div class="flex justify-between items-center border-b border-slate-100 pb-2 md:pb-3"><span class="text-xs text-slate-500 font-medium">Clientes c/Garantía</span><span class="font-bold text-base md:text-lg text-slate-800" id="sv-kpi-garantias">0</span></div>
-                                    <div class="flex justify-between items-center border-b border-slate-100 pb-2 md:pb-3"><span class="text-xs text-slate-500 font-medium">Clientes que adjudicaron</span><span class="font-bold text-base md:text-lg text-brand-success" id="sv-kpi-ganadores">0</span></div>
-                                    <div class="flex justify-between items-center border-b border-slate-100 pb-2 md:pb-3"><span class="text-xs text-red-500 font-medium">Clientes que NO adjudicaron</span><span class="font-bold text-base md:text-lg text-brand-danger" id="sv-kpi-perdedores">0</span></div>
-                                    <div class="flex justify-between items-center border-b border-slate-100 pb-2 md:pb-3">
-                                        <span class="text-xs text-slate-500 font-medium">Clientes nuevos que adjudicaron</span>
-                                        <div><span class="font-bold text-base md:text-lg text-brand-info" id="sv-kpi-1racompra">0</span><span class="text-[10px] md:text-xs text-slate-400 ml-1" id="sv-kpi-1racompra-pct"></span></div>
-                                    </div>
-                                    <div class="flex justify-between items-center pb-1">
-                                        <span class="text-xs text-slate-500 font-medium">Clientes que adjudicaron > 1 lote</span>
-                                        <div class="flex items-center gap-2"><span class="font-bold text-base md:text-lg text-slate-800" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[10px] text-brand-info hover:text-brand-accent underline font-semibold no-print">(Lista)</button></div>
-                                    </div>
-                                </div>
+                            <div class="flex gap-6 text-right">
+                                <div><p class="text-[9px] text-premium-muted uppercase font-semibold">Comisión Estimada</p><p class="text-xl font-semibold text-premium-highlight mt-0.5" id="sv-kpi-comision-top">$0</p></div>
+                                <div><p class="text-[9px] text-premium-muted uppercase font-semibold">Venta Adjudicada</p><p class="text-xl font-semibold text-premium-success mt-0.5" id="sv-kpi-venta">$0</p></div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
-                            <div class="xl:col-span-2 glass-panel p-4 md:p-6 w-full overflow-hidden">
-                                <h4 class="font-bold text-sm mb-4 text-slate-800">Lotes de Mayor Tracción</h4>
-                                <div class="overflow-x-auto overflow-y-auto max-h-[400px]">
-                                    <table class="w-full text-xs md:text-sm text-left whitespace-nowrap">
+                        <!-- KPIs Principales -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                            <div class="glass-panel p-5">
+                                <h4 class="font-semibold text-sm mb-4 text-premium-text">Efectividad del Remate</h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Lotes Disponibles (Base)</span><span class="font-medium text-sm text-premium-text" id="sv-kpi-lotes-disp">0</span></div>
+                                    <div class="w-full h-px bg-premium-border/50"></div>
+                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Lotes Vendidos</span><span class="font-medium text-sm text-premium-text" id="sv-kpi-lotes">0</span></div>
+                                    <div class="w-full h-px bg-premium-border/50"></div>
+                                    <div class="flex justify-between items-center pt-1"><span class="text-[10px] text-premium-muted uppercase font-bold tracking-wider">Efectividad</span><span class="font-semibold text-lg text-premium-success" id="sv-kpi-eficacia-resumen">0%</span></div>
+                                </div>
+                            </div>
+
+                            <div class="glass-panel p-5">
+                                <h4 class="font-semibold text-sm mb-4 text-premium-text">Comportamiento de Clientes</h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Clientes c/Garantía</span><span class="font-medium text-sm text-premium-text" id="sv-kpi-garantias">0</span></div>
+                                    <div class="w-full h-px bg-premium-border/50"></div>
+                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Clientes que adjudicaron</span><span class="font-medium text-sm text-premium-success" id="sv-kpi-ganadores">0</span></div>
+                                    <div class="w-full h-px bg-premium-border/50"></div>
+                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Clientes que NO adjudicaron</span><span class="font-medium text-sm text-premium-danger" id="sv-kpi-perdedores">0</span></div>
+                                    <div class="w-full h-px bg-premium-border/50"></div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-premium-muted">Clientes nuevos que adjudicaron</span>
+                                        <div><span class="font-medium text-sm text-premium-highlight" id="sv-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted ml-1" id="sv-kpi-1racompra-pct"></span></div>
+                                    </div>
+                                    <div class="w-full h-px bg-premium-border/50"></div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-premium-muted">Clientes que adjudicaron > 1 lote</span>
+                                        <div class="flex items-center gap-2"><span class="font-medium text-sm text-premium-text" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[9px] text-premium-highlight hover:underline font-medium no-print">Ver lista</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
+                            <div class="xl:col-span-2 glass-panel p-5 overflow-hidden">
+                                <h4 class="font-semibold text-sm mb-3 text-premium-text">Lotes de Mayor Demanda</h4>
+                                <div class="overflow-x-auto overflow-y-auto max-h-[300px]">
+                                    <table class="w-full text-left">
                                         <thead>
                                             <tr>
-                                                <th class="p-2 md:p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Lote ↕️</th>
-                                                <th class="p-2 md:p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Detalle ↕️</th>
-                                                <th class="p-2 md:p-3 text-center text-brand-accent cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Pujas Reales ↕️</th>
-                                                <th class="p-2 md:p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
-                                                <th class="p-2 md:p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
-                                                <th class="p-2 md:p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Delta ($) ↕️</th>
+                                                <th>Lote</th>
+                                                <th>Detalle</th>
+                                                <th class="text-center">Pujas Reales</th>
+                                                <th class="text-right">Mínimo</th>
+                                                <th class="text-right">Adjudicado</th>
+                                                <th class="text-right hidden sm:table-cell">Delta</th>
                                             </tr>
                                         </thead>
                                         <tbody id="sv-tabla-top-lotes"></tbody>
@@ -212,58 +237,61 @@
                                 </div>
                             </div>
                             <div class="space-y-4 md:space-y-6 no-print">
-                                <div class="glass-panel p-4 md:p-6"><h4 class="font-bold text-sm mb-1 text-slate-800">Composición Volumen</h4><div class="relative h-48 md:h-56"><canvas id="sv-chartVentas"></canvas></div></div>
-                                <div class="glass-panel p-4 md:p-6"><h4 class="font-bold text-sm mb-1 text-slate-800">Participación Audiencia</h4><div class="relative h-48 md:h-56"><canvas id="sv-chartRetencion"></canvas></div></div>
+                                <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-2">Ticket Promedio</h4><p class="text-2xl font-semibold text-premium-text mb-4" id="sv-kpi-ticket-promedio-side">$0</p><div class="relative h-32"><canvas id="sv-chartVentas"></canvas></div></div>
+                                <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-2">Retención</h4><div class="relative h-32"><canvas id="sv-chartRetencion"></canvas></div></div>
                             </div>
                         </div>
                     </div>
 
                     <div id="compare-view" class="space-y-6 hidden">
-                        <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-4 font-sans">Consolidación Estratégica</h2>
-                        <div class="glass-panel overflow-x-auto w-full">
-                            <table class="w-full text-[11px] md:text-[13px] text-left whitespace-nowrap">
+                        <div class="border-b border-premium-border pb-4">
+                            <h2 class="text-2xl font-semibold tracking-tight text-premium-text">Análisis Comparativo</h2>
+                            <p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Consolidación de múltiples periodos</p>
+                        </div>
+                        <div class="glass-panel overflow-x-auto w-full p-2">
+                            <table class="w-full text-left whitespace-nowrap">
                                 <thead>
                                     <tr>
-                                        <th class="p-2 md:p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Selección ↕️</th>
-                                        <th class="p-2 md:p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Venta Efectiva ↕️</th>
-                                        <th class="p-2 md:p-3 text-right text-brand-info cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Comisiones ↕️</th>
-                                        <th class="p-2 md:p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Vend. ↕️</th>
-                                        <th class="p-2 md:p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'percent')">Eficacia ↕️</th>
-                                        <th class="p-2 md:p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Garantías ↕️</th>
-                                        <th class="p-2 md:p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Nuevos ↕️</th>
-                                        <th class="p-2 md:p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Delta ($) ↕️</th>
+                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Periodo ↕️</th>
+                                        <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Venta ↕️</th>
+                                        <th class="text-right cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'money')">Comisión ↕️</th>
+                                        <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">L. Vend. ↕️</th>
+                                        <th class="text-center cursor-pointer" onclick="sortTable(this, 'percent')">Efectividad ↕️</th>
+                                        <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">Garantías ↕️</th>
+                                        <th class="text-center cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'number')">Nuevos ↕️</th>
+                                        <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Sobreprecio ↕️</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cv-tabla-comparativa"></tbody>
                             </table>
                         </div>
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 mt-4 md:mt-6 no-print">
-                            <div class="glass-panel p-4 md:p-6"><canvas id="cv-chartVentas" class="h-48 md:h-64 w-full"></canvas></div>
-                            <div class="glass-panel p-4 md:p-6"><canvas id="cv-chartGarantias" class="h-48 md:h-64 w-full"></canvas></div>
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 mt-4 no-print">
+                            <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4">Composición de Ventas</h4><canvas id="cv-chartVentas" class="h-48 md:h-64 w-full"></canvas></div>
+                            <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4">Evolución de Clientes</h4><canvas id="cv-chartGarantias" class="h-48 md:h-64 w-full"></canvas></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- MODULE: MODELOS Y VEHICULOS -->
-                <div id="module-autos" class="hidden space-y-6 max-w-[1500px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 mb-4 no-print">
-                        <div><h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">Análisis de Vehículos</h2><p class="text-xs md:text-sm text-slate-500 mt-1">Estructura del catálogo adjudicado.</p></div>
-                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-slate-300 rounded-full px-4 md:px-6 py-2 md:py-3 text-xs md:text-sm text-slate-800 w-full md:w-80 shadow-sm focus:outline-none focus:border-brand-accent" onkeyup="renderPanelAutos()">
+                <div id="module-autos" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
+                        <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Estructura del catálogo adjudicado</p></div>
+                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-premium-border rounded-xl px-4 py-2 text-sm text-premium-text w-full md:w-64 focus:outline-none focus:border-premium-text transition" onkeyup="renderPanelAutos()">
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
-                        <div class="glass-panel p-4 md:p-6"><h4 class="font-bold text-sm text-center mb-4 text-slate-800">Top Marcas</h4><div class="relative h-48 md:h-64"><canvas id="flota-marcas-chart"></canvas></div></div>
-                        <div class="glass-panel p-4 md:p-6"><h4 class="font-bold text-sm text-center mb-4 text-slate-800">Top Modelos</h4><div class="relative h-48 md:h-64"><canvas id="flota-modelos-chart"></canvas></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-48 md:h-64"><canvas id="flota-marcas-chart"></canvas></div></div>
+                        <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Modelos Específicos</h4><div class="relative h-48 md:h-64"><canvas id="flota-modelos-chart"></canvas></div></div>
                     </div>
-                    <div class="glass-panel p-4 md:p-6">
-                        <div class="overflow-x-auto max-h-[700px]">
-                            <table class="w-full text-xs md:text-sm text-left whitespace-nowrap">
+                    <div class="glass-panel p-2">
+                        <div class="overflow-x-auto max-h-[600px] px-2">
+                            <table class="w-full text-left whitespace-nowrap">
                                 <thead>
                                     <tr>
-                                        <th class="p-3 md:p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Matriz ↕️</th>
-                                        <th class="p-3 md:p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Lote ↕️</th>
-                                        <th class="p-3 md:p-4 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Vehículo Extraído ↕️</th>
-                                        <th class="p-3 md:p-4 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
-                                        <th class="p-3 md:p-4 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
+                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Matriz ↕️</th>
+                                        <th class="cursor-pointer text-center" onclick="sortTable(this, 'string')">Lote ↕️</th>
+                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Vehículo Extraído ↕️</th>
+                                        <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
+                                        <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
                                     </tr>
                                 </thead>
                                 <tbody id="flota-tabla-resultados"></tbody>
@@ -273,122 +301,125 @@
                 </div>
 
                 <!-- MODULE: CLIENTES -->
-                <div id="module-clientes" class="hidden space-y-6 max-w-[1500px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 mb-4 no-print">
-                        <div><h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">Fichas de Clientes</h2></div>
-                        <div class="flex flex-col sm:flex-row gap-2 md:gap-4 w-full md:w-auto">
-                            <select id="filter-client-type" class="bg-white border border-slate-300 rounded-full px-4 py-2 text-xs md:text-sm text-slate-700 outline-none w-full sm:w-auto" onchange="filtrarClientes()"><option value="todos">Todos los segmentos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Híbridos</option></select>
-                            <input type="text" id="search-client" placeholder="Buscar cliente..." class="bg-white border border-slate-300 rounded-full px-4 py-2 text-xs md:text-sm text-slate-700 outline-none w-full sm:w-64" onkeyup="filtrarClientes()">
+                <div id="module-clientes" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
+                        <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Inteligencia de Clientes</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
+                        <div class="flex flex-col sm:flex-row gap-2 md:gap-3 w-full md:w-auto">
+                            <select id="filter-client-type" class="bg-white border border-premium-border rounded-xl px-3 py-2 text-sm text-premium-text outline-none w-full sm:w-auto focus:border-premium-text transition" onchange="filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
+                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-premium-border rounded-xl px-4 py-2 text-sm text-premium-text outline-none w-full sm:w-64 focus:border-premium-text transition" onkeyup="filtrarClientes()">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-                        <div class="glass-panel p-3 md:p-5 border-l-4 border-l-brand-info"><p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold">Total Clientes</p><p class="text-xl md:text-3xl font-extrabold mt-1 text-slate-800" id="bi-kpi-total">0</p></div>
-                        <div class="glass-panel p-3 md:p-5 border-l-4 border-l-brand-success"><p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold">Inversión Prom.</p><p class="text-xl md:text-3xl font-extrabold text-brand-success mt-1" id="bi-kpi-ltv">$0</p></div>
-                        <div class="glass-panel p-3 md:p-5 border-l-4 border-l-brand-accent"><p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold">Cruzados</p><p class="text-xl md:text-3xl font-extrabold text-brand-accent mt-1" id="bi-kpi-hibridos">0</p></div>
-                        <div class="glass-panel p-3 md:p-5 border-l-4 border-l-slate-300"><p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-bold">Inactivos</p><p class="text-xl md:text-3xl font-extrabold text-slate-600 mt-1" id="bi-kpi-inactivos">0</p></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Total Clientes</p><p class="text-2xl font-semibold mt-1 text-premium-text" id="bi-kpi-total">0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Inversión Prom.</p><p class="text-2xl font-semibold text-premium-success mt-1" id="bi-kpi-ltv">$0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Compradores Cruzados</p><p class="text-2xl font-semibold text-premium-highlight mt-1" id="bi-kpi-hibridos">0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">En Riesgo (Inactivos)</p><p class="text-2xl font-semibold text-premium-danger mt-1" id="bi-kpi-inactivos">0</p></div>
                     </div>
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-                        <div id="bi-ficha-cliente" class="glass-panel p-4 md:p-6 xl:col-span-3 hidden border border-brand-accent/30 bg-orange-50/30">
+                        <div id="bi-ficha-cliente" class="glass-panel p-5 xl:col-span-3 hidden border-l-4 border-l-premium-highlight">
                             <div class="flex flex-col md:flex-row justify-between items-start mb-4 gap-2">
                                 <div>
-                                    <h3 class="text-xl md:text-2xl font-bold text-slate-900" id="ficha-nombre">-</h3>
-                                    <div class="flex flex-wrap gap-2 md:gap-4 mt-2 text-[10px] md:text-xs font-mono text-slate-600 bg-white/50 px-2 md:px-3 py-1 rounded inline-block">
-                                        <span class="font-semibold">RUT:</span> <span id="ficha-rut" class="text-slate-800 mr-2 md:mr-4"></span>
-                                        <span class="font-semibold">Email:</span> <span id="ficha-email" class="text-slate-800"></span>
+                                    <h3 class="text-xl font-semibold text-premium-text tracking-tight" id="ficha-nombre">-</h3>
+                                    <div class="flex flex-wrap gap-3 mt-1 text-[10px] text-premium-muted uppercase tracking-wider">
+                                        <span>RUT: <span id="ficha-rut" class="font-medium text-premium-text"></span></span>
+                                        <span>Email: <span id="ficha-email" class="font-medium text-premium-text lowercase"></span></span>
                                     </div>
                                 </div>
-                                <button onclick="cerrarFicha()" class="text-slate-500 hover:text-slate-800 bg-slate-200 px-3 py-1 rounded-full text-xs font-semibold no-print self-end md:self-auto">✕ Cerrar</button>
+                                <button onclick="cerrarFicha()" class="text-premium-muted hover:text-premium-text text-xs font-medium no-print transition">✕ Cerrar Ficha</button>
                             </div>
-                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mt-4 mb-6">
-                                <div><p class="text-[10px] md:text-xs text-slate-500">1ra Compra</p><p class="font-bold text-xs md:text-sm text-slate-800" id="ficha-primera">-</p></div>
-                                <div><p class="text-[10px] md:text-xs text-slate-500">Última Compra</p><p class="font-bold text-xs md:text-sm text-slate-800" id="ficha-ultima">-</p></div>
-                                <div><p class="text-[10px] md:text-xs text-slate-500">Lotes Adj.</p><p class="font-bold text-xs md:text-sm text-slate-800" id="ficha-lotes">0</p></div>
-                                <div><p class="text-[10px] md:text-xs text-brand-info">Vol. Siniestros</p><p class="font-bold text-xs md:text-sm text-brand-info" id="ficha-monto-sin">$0</p></div>
-                                <div><p class="text-[10px] md:text-xs text-[#8B5CF6]">Vol. Retail</p><p class="font-bold text-xs md:text-sm text-[#8B5CF6]" id="ficha-monto-ret">$0</p></div>
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-y border-premium-border mb-4">
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">1ra Compra</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-primera">-</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Última Compra</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-ultima">-</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Lotes Adj.</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-lotes">0</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Vol. Siniestros</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-monto-sin">$0</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Vol. Retail</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-monto-ret">$0</p></div>
                             </div>
-                            <div class="overflow-x-auto max-h-[300px] bg-white rounded-lg border border-slate-200">
-                                <table class="w-full text-left text-xs md:text-sm whitespace-nowrap">
-                                    <thead class="text-[9px] md:text-[10px] uppercase text-slate-500 bg-slate-100 sticky top-0 border-b border-slate-200">
-                                        <tr><th class="p-2 md:p-3 pl-4">Fecha</th><th class="p-2 md:p-3">Remate</th><th class="p-2 md:p-3">Seg</th><th class="p-2 md:p-3">Lote</th><th class="p-2 md:p-3 text-right pr-4">Monto</th></tr>
-                                    </thead>
+                            <div class="overflow-x-auto max-h-[250px]">
+                                <table class="w-full text-left">
+                                    <thead><tr><th>Fecha</th><th>Remate</th><th>Segmento</th><th>Lote</th><th class="text-right">Monto</th></tr></thead>
                                     <tbody id="ficha-historial-tabla"></tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="glass-panel p-4 md:p-6 xl:col-span-2 overflow-hidden">
-                            <h4 class="font-bold text-sm mb-4 text-slate-800">Directorio de Clientes</h4>
-                            <div class="overflow-x-auto max-h-[400px] md:max-h-[500px]">
-                                <table class="w-full text-xs md:text-sm text-left whitespace-nowrap">
+                        
+                        <div class="glass-panel p-2 xl:col-span-2 overflow-hidden">
+                            <div class="p-3 pb-0"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider">Directorio General</h4></div>
+                            <div class="overflow-x-auto max-h-[400px] px-2">
+                                <table class="w-full text-left whitespace-nowrap">
                                     <thead>
                                         <tr>
-                                            <th class="p-2 md:p-3 cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Nombre ↕️</th>
-                                            <th class="p-2 md:p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'number')">Freq ↕️</th>
-                                            <th class="p-2 md:p-3 text-right cursor-pointer select-none transition" onclick="sortTable(this, 'money')">Inversión ↕️</th>
-                                            <th class="p-2 md:p-3 text-center cursor-pointer select-none transition" onclick="sortTable(this, 'string')">Segmento ↕️</th>
+                                            <th class="cursor-pointer" onclick="sortTable(this, 'string')">Razón Social ↕️</th>
+                                            <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">Frec. ↕️</th>
+                                            <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Inversión ↕️</th>
+                                            <th class="text-center cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'string')">Segmento ↕️</th>
                                         </tr>
                                     </thead>
                                     <tbody id="bi-tabla-clientes"></tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="glass-panel p-4 md:p-6"><h4 class="font-bold text-sm mb-4 text-slate-800">Distribución Cartera</h4><div class="relative h-48 md:h-64"><canvas id="bi-chartSegments"></canvas></div></div>
+                        <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Salud de Cartera</h4><div class="relative h-48 md:h-64"><canvas id="bi-chartSegments"></canvas></div></div>
                     </div>
                 </div>
 
                 <!-- MODULE: INFORME PERSONALIZADO -->
-                <div id="module-custom" class="hidden space-y-6 max-w-[1500px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 mb-4 no-print">
-                        <div><h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">Informe Personalizado</h2></div>
+                <div id="module-custom" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="border-b border-premium-border pb-4 no-print">
+                        <h2 class="text-2xl font-semibold tracking-tight text-premium-text">Generador de Informes</h2>
+                        <p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Seleccione KPIs para construir reporte</p>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-                        <div class="glass-panel p-4 md:p-6 bg-slate-50 border-dashed no-print">
-                            <h3 class="font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">1. Seleccionar Métricas</h3>
-                            <div class="space-y-2 md:space-y-3 text-xs md:text-sm text-slate-700" id="custom-checkboxes">
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-disp" checked> Lotes Disponibles</label>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-vend" checked> Lotes Vendidos</label>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-efi" checked> Efectividad (%)</label>
-                                <div class="my-2 border-b border-slate-200"></div>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-venta" checked> Venta Total</label>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-comision" checked> Comisión (12%+IVA)</label>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-ticket" checked> Ticket Promedio</label>
-                                <div class="my-2 border-b border-slate-200"></div>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-participan" checked> Clientes c/Garantía</label>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-ganadores" checked> Clientes que adjudicaron</label>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-fuga" checked> Clientes que NO adjudicaron</label>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-nuevos" checked> Clientes nuevos que adjudicaron</label>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-multi" checked> Clientes que adjudicaron > 1 lote</label>
-                                <div class="my-2 border-b border-slate-200"></div>
-                                <label class="flex items-center gap-2 md:gap-3 cursor-pointer"><input type="checkbox" id="chk-kpi-lotesestrella" checked> Top 5 Lotes Estrella (Demanda)</label>
+                        <div class="glass-panel p-5 bg-white no-print">
+                            <h3 class="font-semibold text-sm text-premium-text mb-4">1. Configuración de Métricas</h3>
+                            <div class="space-y-3 text-xs text-premium-text font-medium" id="custom-checkboxes">
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-disp" checked> <span class="group-hover:text-premium-highlight transition">Lotes Disponibles</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-vend" checked> <span class="group-hover:text-premium-highlight transition">Lotes Vendidos</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-efi" checked> <span class="group-hover:text-premium-highlight transition">Efectividad (%)</span></label>
+                                <div class="my-3 border-b border-premium-border/50"></div>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-venta" checked> <span class="group-hover:text-premium-highlight transition">Venta Total</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-comision" checked> <span class="group-hover:text-premium-highlight transition">Comisión Generada</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-ticket" checked> <span class="group-hover:text-premium-highlight transition">Ticket Promedio</span></label>
+                                <div class="my-3 border-b border-premium-border/50"></div>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-participan" checked> <span class="group-hover:text-premium-highlight transition">Clientes c/Garantía</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-ganadores" checked> <span class="group-hover:text-premium-highlight transition">Clientes que adjudicaron</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-fuga" checked> <span class="group-hover:text-premium-highlight transition">Clientes que NO adjudicaron</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-nuevos" checked> <span class="group-hover:text-premium-highlight transition">Clientes nuevos (1ra compra)</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-multi" checked> <span class="group-hover:text-premium-highlight transition">Clientes que adjudicaron > 1 lote</span></label>
+                                <div class="my-3 border-b border-premium-border/50"></div>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-lotesestrella" checked> <span class="group-hover:text-premium-highlight transition">Top 5 Lotes (Tabla)</span></label>
                             </div>
-                            <button onclick="generarInformePersonalizado()" class="w-full mt-6 py-2 bg-brand-accent hover:bg-orange-600 text-white font-bold rounded-lg transition shadow-md">Generar Previa</button>
+                            <button onclick="generarInformePersonalizado()" class="w-full mt-6 py-2.5 bg-premium-text hover:bg-black text-white font-medium rounded-xl transition shadow-sm text-sm">Generar Vista Previa</button>
                         </div>
                         <div class="lg:col-span-2 space-y-4">
-                            <div class="flex justify-between items-center no-print"><h3 class="font-bold text-slate-800">2. Previa PDF</h3><button onclick="window.print()" class="px-3 py-1.5 bg-slate-800 text-white text-xs font-semibold rounded hover:bg-slate-700">🖨️ Imprimir</button></div>
-                            <div id="custom-report-output" class="glass-panel p-4 md:p-8 bg-white min-h-[300px] md:min-h-[500px]"></div>
+                            <div class="flex justify-between items-center no-print">
+                                <h3 class="font-semibold text-sm text-premium-text">2. Previa del Documento</h3>
+                                <button onclick="window.print()" class="px-4 py-1.5 bg-premium-highlight text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center gap-2">🖨️ Exportar PDF</button>
+                            </div>
+                            <div id="custom-report-output" class="glass-panel p-6 md:p-10 bg-white min-h-[400px]"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- MODULE: CONCLUSIONES IA -->
-                <div id="module-conclusiones" class="hidden space-y-6 max-w-[1400px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 mb-4 no-print">
-                        <div><h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">🧠 Resumen Ejecutivo</h2></div>
-                        <button onclick="window.print()" class="px-3 py-1.5 md:px-4 md:py-2 bg-white border border-slate-300 rounded-lg text-xs md:text-sm font-semibold shadow-sm hover:bg-slate-50 text-slate-700 w-full md:w-auto">Exportar Informe</button>
+                <div id="module-conclusiones" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
+                        <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Directorio Ejecutivo</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
+                        <button onclick="window.print()" class="px-4 py-2 bg-white border border-premium-border rounded-xl text-xs font-medium hover:bg-slate-50 transition w-full md:w-auto">Imprimir Resumen</button>
                     </div>
-                    <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-slate-700"></div>
+                    <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 text-premium-text"></div>
                 </div>
 
                 <!-- MODULE: BUSCADOR -->
-                <div id="module-buscador" class="hidden space-y-6 max-w-[1500px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6 mb-4 no-print">
-                        <div><h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">Buscador Global</h2></div>
-                        <input type="text" id="search-patente" placeholder="Buscar lote, rut o nombre..." class="bg-white border border-slate-300 rounded-full px-4 md:px-6 py-2 md:py-3 text-xs md:text-sm text-slate-800 w-full md:w-80 shadow-sm focus:outline-none focus:border-brand-accent" onkeyup="buscarPatente()">
+                <div id="module-buscador" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
+                        <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Buscador Global</h2></div>
+                        <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-premium-border rounded-xl px-4 py-2.5 text-sm text-premium-text w-full md:w-80 shadow-sm focus:outline-none focus:border-premium-text transition" onkeyup="buscarPatente()">
                     </div>
-                    <div class="glass-panel p-4 md:p-6 overflow-hidden">
-                        <div class="overflow-x-auto max-h-[400px] md:max-h-[600px]">
-                            <table class="w-full text-xs md:text-sm text-left whitespace-nowrap">
-                                <thead><tr><th class="p-2 md:p-4">Fecha</th><th class="p-2 md:p-4">Remate</th><th class="p-2 md:p-4">N° Lote</th><th class="p-2 md:p-4">Detalle</th><th class="p-2 md:p-4">Adjudicatario</th><th class="p-2 md:p-4 text-right">Monto</th></tr></thead>
-                                <tbody id="buscador-tabla-resultados"><tr><td colspan="6" class="p-4 md:p-8 text-center text-slate-500">Ingrese un parámetro mínimo de 3 caracteres.</td></tr></tbody>
+                    <div class="glass-panel p-2 overflow-hidden">
+                        <div class="overflow-x-auto max-h-[600px] px-2">
+                            <table class="w-full text-left whitespace-nowrap">
+                                <thead><tr><th>Fecha</th><th>Remate Orig.</th><th class="text-center">N° Lote</th><th>Detalle Ext.</th><th>Adjudicatario</th><th class="text-right">Monto</th></tr></thead>
+                                <tbody id="buscador-tabla-resultados"><tr><td colspan="6" class="p-8 text-center text-premium-muted text-xs">Ingrese un parámetro mínimo de 3 caracteres.</td></tr></tbody>
                             </table>
                         </div>
                     </div>
@@ -399,42 +430,42 @@
     </div> <!-- FIN APP CONTENT -->
 
     <!-- MODALES -->
-    <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-2 md:p-6">
-        <div class="bg-white max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl m-2">
-            <div class="p-4 md:p-6 border-b border-slate-200 flex justify-between items-start bg-slate-50">
-                <div><h3 class="text-lg md:text-xl font-extrabold text-slate-800" id="modal-titulo">Pujas</h3><p class="text-[10px] md:text-xs text-slate-500 mt-1" id="modal-subtitulo"></p></div>
-                <button onclick="cerrarModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button>
+    <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+        <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
+            <div class="p-5 border-b border-premium-border flex justify-between items-start">
+                <div><h3 class="text-lg font-semibold tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase tracking-wider mt-1" id="modal-subtitulo"></p></div>
+                <button onclick="cerrarModal()" class="text-premium-muted hover:text-premium-text transition">✕</button>
             </div>
-            <div class="p-3 md:p-4 bg-slate-100 flex flex-wrap gap-2 md:gap-4 text-[10px] md:text-xs border-b border-slate-200">
-                <div><span class="text-slate-500">Total:</span> <span class="font-bold text-slate-800" id="modal-total-pujas">0</span></div>
-                <div><span class="text-slate-500">Únicos:</span> <span class="font-bold text-brand-accent" id="modal-unicos-reales">0</span></div>
-                <div class="ml-auto flex gap-1 md:gap-2 w-full md:w-auto justify-end"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-2 py-1 rounded-full bg-brand-accent text-white font-bold">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-2 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold">Reales</button></div>
+            <div class="px-5 py-3 bg-premium-bg flex flex-wrap gap-4 text-[10px] border-b border-premium-border uppercase tracking-wider font-semibold">
+                <div><span class="text-premium-muted">Total:</span> <span class="text-premium-text" id="modal-total-pujas">0</span></div>
+                <div><span class="text-premium-muted">Únicos:</span> <span class="text-premium-highlight" id="modal-unicos-reales">0</span></div>
+                <div class="ml-auto flex gap-2"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-2 py-0.5 rounded text-premium-text hover:bg-white transition">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-2 py-0.5 rounded text-premium-muted hover:text-premium-text transition">Solo Reales</button></div>
             </div>
-            <div class="flex-1 overflow-x-auto overflow-y-auto p-0">
-                <table class="w-full text-xs md:text-sm text-left whitespace-nowrap">
-                    <thead><tr><th class="p-2 md:p-3 pl-4 md:pl-6">#</th><th class="p-2 md:p-3">Fecha</th><th class="p-2 md:p-3">Nombre</th><th class="p-2 md:p-3 text-right">Monto</th><th class="p-2 md:p-3 text-center pr-4 md:pr-6">Estado</th></tr></thead>
+            <div class="flex-1 overflow-x-auto overflow-y-auto p-2">
+                <table class="w-full text-left">
+                    <thead><tr><th class="pl-3">#</th><th>Fecha</th><th>Nombre</th><th class="text-right">Monto</th><th class="text-center pr-3">Status</th></tr></thead>
                     <tbody id="modal-tabla-pujas"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div id="modal-fuga" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-2 md:p-6">
-        <div class="bg-white max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl m-2">
-            <div class="p-4 md:p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50 gap-3">
-                <div><h3 class="text-lg md:text-xl font-extrabold text-brand-danger flex items-center gap-2">🚨 Fuga Comercial</h3></div>
-                <div class="flex items-center gap-2 md:gap-4 w-full sm:w-auto"><button onclick="exportarFugaExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-3 md:px-4 rounded-lg shadow-sm text-xs md:text-sm w-full sm:w-auto flex-1">⬇️ Excel</button><button onclick="cerrarModalFuga()" class="w-8 h-8 shrink-0 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button></div>
+    <div id="modal-fuga" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+        <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
+            <div class="p-5 border-b border-premium-border flex justify-between items-center gap-3">
+                <div><h3 class="text-lg font-semibold tracking-tight text-premium-danger">Clientes que NO adjudicaron (Fuga)</h3></div>
+                <div class="flex items-center gap-3"><button onclick="exportarFugaExcel()" class="text-[10px] font-medium bg-premium-bg border border-premium-border px-3 py-1.5 rounded-lg hover:bg-white transition">⬇️ Exportar Excel</button><button onclick="cerrarModalFuga()" class="text-premium-muted hover:text-premium-text transition">✕</button></div>
             </div>
-            <div class="flex-1 overflow-x-auto overflow-y-auto p-0">
-                <table class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead class="bg-slate-100 sticky top-0"><tr><th class="p-2 md:p-3 pl-4 md:pl-6">Remate</th><th class="p-2 md:p-3">Inactividad</th><th class="p-2 md:p-3">Cliente</th><th class="p-2 md:p-3">Email</th></tr></thead><tbody id="modal-tabla-fuga"></tbody></table>
+            <div class="flex-1 overflow-x-auto overflow-y-auto p-2">
+                <table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white"><tr><th class="pl-3">Matriz Origen</th><th>Inactivo por</th><th>Razón Social</th><th>Contacto</th></tr></thead><tbody id="modal-tabla-fuga"></tbody></table>
             </div>
         </div>
     </div>
 
-    <div id="modal-multilote" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-2 md:p-6">
-        <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl m-2">
-            <div class="p-4 md:p-6 border-b border-slate-200 flex justify-between items-start bg-slate-50"><div><h3 class="text-lg md:text-xl font-extrabold text-slate-800">Compradores Múltiples</h3></div><button onclick="cerrarModalMulti()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold">✕</button></div>
-            <div class="p-0 flex-1 overflow-y-auto overflow-x-auto"><table class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead><tr><th class="p-2 md:p-3 pl-4 md:pl-6">Cliente</th><th class="p-2 md:p-3 text-center">Unidades</th><th class="p-2 md:p-3 text-right pr-4 md:pr-6">Monto Total</th></tr></thead><tbody id="modal-tabla-multilote"></tbody></table></div>
+    <div id="modal-multilote" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+        <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
+            <div class="p-5 border-b border-premium-border flex justify-between items-center"><div><h3 class="text-lg font-semibold tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="cerrarModalMulti()" class="text-premium-muted hover:text-premium-text transition">✕</button></div>
+            <div class="flex-1 overflow-y-auto overflow-x-auto p-2"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white"><tr><th class="pl-3">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-3">Inversión</th></tr></thead><tbody id="modal-tabla-multilote"></tbody></table></div>
         </div>
     </div>
 
@@ -446,7 +477,7 @@ const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 // ===========================================
-// SISTEMA DE SEGURIDAD
+// SISTEMA DE SEGURIDAD (ANTI-CUELGUE)
 // ===========================================
 let sessionUser = null;
 
@@ -464,7 +495,7 @@ function toggleSidebar() {
 
 async function checkSession() {
     try {
-        const timeoutP = new Promise((_, r) => setTimeout(() => r(new Error("Timeout al verificar sesión de Supabase")), 7000));
+        const timeoutP = new Promise((_, r) => setTimeout(() => r(new Error("Timeout Supabase")), 7000));
         const sessionP = supabaseClient.auth.getSession();
         
         const { data, error } = await Promise.race([sessionP, timeoutP]);
@@ -473,7 +504,7 @@ async function checkSession() {
         if (data && data.session) {
             sessionUser = data.session.user;
             const displayEl = document.getElementById('user-display-email');
-            if(displayEl) displayEl.innerText = sessionUser.email.substring(0,10)+"...";
+            if(displayEl) displayEl.innerText = sessionUser.email.substring(0,12)+"...";
             
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').classList.remove('hidden');
@@ -484,17 +515,16 @@ async function checkSession() {
             document.getElementById('app-content').classList.add('hidden');
             document.getElementById('app-content').classList.remove('flex');
             const btn = document.getElementById('btn-login');
-            if(btn) { btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false; }
+            if(btn) { btn.innerHTML = "Iniciar Sesión"; btn.disabled = false; }
         }
     } catch(e) {
-        console.error("Error validando sesión:", e);
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('app-content').classList.add('hidden');
         document.getElementById('app-content').classList.remove('flex');
         const err = document.getElementById('login-error');
-        if(err) { err.innerText = "Error cargando la sesión. " + e.message; err.classList.remove('hidden'); }
+        if(err) { err.innerText = "Error: " + e.message; err.classList.remove('hidden'); }
         const btn = document.getElementById('btn-login');
-        if(btn) { btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false; }
+        if(btn) { btn.innerHTML = "Iniciar Sesión"; btn.disabled = false; }
     }
 }
 
@@ -503,28 +533,28 @@ async function handleLogin(e) {
     const btn = document.getElementById('btn-login');
     const err = document.getElementById('login-error');
     
-    btn.innerHTML = "Contactando..."; btn.disabled = true; err.classList.add('hidden');
+    btn.innerHTML = "Validando..."; btn.disabled = true; err.classList.add('hidden');
     
     try {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("El servidor no responde.")), 7000));
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Servidor no responde.")), 7000));
         const loginPromise = supabaseClient.auth.signInWithPassword({ email, password });
         
         const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
         if (error) throw error;
         if (data && !data.session) throw new Error("Cuenta inactiva.");
         
-        btn.innerHTML = "Entrando...";
+        btn.innerHTML = "Abriendo...";
         await checkSession();
     } catch (ex) {
         let msj = ex.message || "Error desconocido";
-        if(msj.includes("Email not confirmed")) msj = "Cuenta bloqueada. Apaga 'Confirm email' en Supabase.";
+        if(msj.includes("Email not confirmed")) msj = "Cuenta requiere confirmación en BD.";
         if(msj.includes("Invalid login")) msj = "Credenciales incorrectas.";
-        if(msj.includes("Failed to fetch")) msj = "Conexión bloqueada por red o adblocker.";
+        if(msj.includes("Failed to fetch")) msj = "Conexión bloqueada por red.";
         
         err.innerText = msj; err.classList.remove('hidden');
-        btn.innerHTML = "Ingresar al Sistema"; btn.disabled = false;
+        btn.innerHTML = "Iniciar Sesión"; btn.disabled = false;
     }
 }
 
@@ -533,12 +563,12 @@ window.onload = checkSession;
 
 
 // ===========================================
-// LÓGICA PRINCIPAL (CON GUARDADO CORRECTO)
+// LÓGICA PRINCIPAL (PREMIUM UI + FIX FECHAS)
 // ===========================================
 
 window.addEventListener('error', function(e) {
-    console.error("Error global: ", e); const log = document.getElementById('error-log');
-    if(log) log.innerHTML += `<div class="text-red-500 mt-1 text-[10px] bg-red-50 p-2 rounded">El sistema evitó un colapso. Presiona Vaciar Base.</div>`;
+    const log = document.getElementById('error-log');
+    if(log) log.innerHTML += `<div class="text-premium-danger mt-1">Colapso evitado. Por favor Vaciar Base.</div>`;
 });
 
 let db = { remates: [] };
@@ -546,29 +576,32 @@ let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentMo
 let svChartRetencionInst=null, svChartVentasInst=null, cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
 
-if(typeof Chart !== 'undefined') { Chart.defaults.color = '#64748b'; Chart.defaults.font.family = 'Inter'; }
+if(typeof Chart !== 'undefined') { 
+    Chart.defaults.color = '#86868B'; 
+    Chart.defaults.font.family = 'Inter'; 
+    Chart.defaults.font.size = 10;
+}
 
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
     try {
-        statusLabel.innerText = "Sincronizando nube..."; statusLabel.classList.add('animate-pulse');
+        statusLabel.innerText = "Sincronizando...";
         
         const { data, error } = await supabaseClient.from('app_state').select('*');
         if (data && data.length > 0) {
             if (data.length === 1 && data[0].payload && data[0].payload.remates) { db = data[0].payload; } 
             else { db.remates = data.map(row => { let r = row.payload; r._dbId = row.id; return r; }); }
             
-            // FIX ANTICUELGUE DE FECHAS: Asegurar que todos los remates antiguos tengan un ID único
-            db.remates.forEach(r => { if (!r.id) r.id = Math.random().toString(36).substr(2, 9) + Date.now().toString(36); });
+            // CAMBIO 3: FIX DE ID PARA FECHAS ANTIGUAS
+            db.remates.forEach(r => { if (!r.id) r.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); });
 
-            statusLabel.innerText = `🟢 Cloud Conectada (${db.remates.length})`; statusLabel.classList.replace('text-brand-info', 'text-brand-success');
+            statusLabel.innerText = `En Línea (${db.remates.length})`; statusLabel.classList.replace('text-premium-muted', 'text-premium-success');
         } else {
-            statusLabel.innerText = "🟠 Base Vacía"; statusLabel.classList.replace('text-brand-info', 'text-orange-500');
+            statusLabel.innerText = "Base Vacía";
         }
     } catch (e) {
-        statusLabel.innerText = "🔴 Error nube"; statusLabel.classList.replace('text-brand-info', 'text-red-500');
+        statusLabel.innerText = "Error BD"; statusLabel.classList.replace('text-premium-muted', 'text-premium-danger');
     }
-    statusLabel.classList.remove('animate-pulse');
     if(db.remates && db.remates.length > 0) { actualizarSidebar(); }
 }
 
@@ -636,7 +669,7 @@ function extraerMarcaModelo(loteStr) {
 }
 
 const normalizarCliente = (nombre)=>{ if(!nombre) return 'DESCONOCIDO'; let n=String(nombre).toUpperCase().trim(); if(n.includes('CROVETTO')) return 'CROVETTO (GRUPO)'; n=n.replace(/\b\d{1,2}\.?\d{3}\.?\d{3}-?[0-9Kk]\b/g,''); n=n.replace(/\b(SPA|LTDA|LIMITADA|EIRL|E\.I\.R\.L|S\.A\.?|SOCIEDAD|COMERCIAL)\b/g,''); return n.replace(/\s+/g,' ').replace(/[-_.,]+$/, '').trim() || 'DESCONOCIDO'; };
-const formatMoney = (num)=>{ if(!num || isNaN(num)) return '$0'; if(Math.abs(num) >= 1e6) { let val = Math.round(num/1e6); return `$${val.toLocaleString('es-CL')} MM`; } return `$${Math.round(num).toLocaleString('es-CL')}`; };
+const formatMoney = (num)=>{ if(!num || isNaN(num)) return '$0'; if(Math.abs(num) >= 1e6) { let val = Math.round(num/1e6); return `$${val.toLocaleString('es-CL')} M`; } return `$${Math.round(num).toLocaleString('es-CL')}`; };
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
 const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
@@ -645,9 +678,9 @@ function getSelectedRemates() { let uniqueMap = new Map(); checkedNodes.forEach(
 async function iniciarProcesamiento(files){
     const validFiles=Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
-    const statusLabel=document.getElementById('db-status'); const errorLog=document.getElementById('error-log'); 
-    statusLabel.classList.add('text-brand-accent','animate-pulse'); statusLabel.classList.remove('text-brand-success', 'text-brand-info');
-    statusLabel.innerText = "Subiendo archivo por archivo..."; errorLog.innerHTML=""; let successCount=0;
+    const statusLabel=document.getElementById('db-status'); 
+    statusLabel.innerText = "Subiendo..."; statusLabel.classList.replace('text-premium-success', 'text-premium-highlight');
+    let successCount=0;
     
     setTimeout(async () => {
         for(let i=0;i<validFiles.length;i++){ 
@@ -659,7 +692,7 @@ async function iniciarProcesamiento(files){
                     if(existsIdx>=0) db.remates[existsIdx]=data; else db.remates.push(data); 
                     successCount++; 
                 }
-            } catch(err){ errorLog.innerHTML+=`<div class="text-orange-500">${validFiles[i].name}: ${err.message}</div>`; } 
+            } catch(err){} 
         }
         db.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp);
         let clientesGlobales=[]; let adjudicatariosGlobales=[];
@@ -673,9 +706,9 @@ async function iniciarProcesamiento(files){
         
         try { 
             for(let remate of db.remates) { await supabaseClient.from('app_state').upsert({ id: remate._dbId, payload: remate }); }
-            statusLabel.classList.replace('text-brand-accent', 'text-brand-success'); statusLabel.innerText=`🟢 Carga lista (${db.remates.length})`;
-        } catch (e) { statusLabel.classList.replace('text-brand-accent', 'text-brand-danger'); statusLabel.innerText=`🔴 Error guardando nube`; }
-        statusLabel.classList.remove('animate-pulse'); document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
+            statusLabel.classList.replace('text-premium-highlight', 'text-premium-success'); statusLabel.innerText=`En Línea (${db.remates.length})`;
+        } catch (e) { statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); statusLabel.innerText=`Error DB`; }
+        document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
         if(successCount>0){ actualizarSidebar(); procesarDatosClientes(); actualizarVistaActual(); }
     }, 50);
 }
@@ -742,7 +775,7 @@ async function parseExcel(file){
         return { ...r, pujas, pujadoresRealesCount: pujadoresUnicosReales.length, pujadoresTotales: pujas.length, categoria, modeloStr, añoStr, kmStr:"" };
     });
 
-    return { id: Math.random().toString(36).substr(2, 9) + Date.now().toString(36), fileName:file.name, tipo, fechaData:fechaInfo, inscritos, garantias:correosReales.length, garantiasEmailsReales:correosReales, garantiasListaDetallada, ventaTotal, minimoTotal, comisionTotal, lotesCount, lotesDisponibles: lotesCount + lotesFalsosCount, adjudicaciones, posturasPorLote, ganadoresNuevos:0, ventaNuevos:0, ventaAntiguos:0, ganadoresUnicosCount:0 };
+    return { id: 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36), fileName:file.name, tipo, fechaData:fechaInfo, inscritos, garantias:correosReales.length, garantiasEmailsReales:correosReales, garantiasListaDetallada, ventaTotal, minimoTotal, comisionTotal, lotesCount, lotesDisponibles: lotesCount + lotesFalsosCount, adjudicaciones, posturasPorLote, ganadoresNuevos:0, ventaNuevos:0, ventaAntiguos:0, ganadoresUnicosCount:0 };
 }
 
 function buildAgg(rematesList,id,label){
@@ -761,7 +794,7 @@ function buildAgg(rematesList,id,label){
 
 function cambiarSeccion(mod){ 
     try {
-        currentModule=mod; document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-2':'nav-item nav-inactive mb-2'; document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-2 border border-brand-accent':'nav-item nav-inactive mb-2 border border-slate-200'; document.getElementById('nav-mod-custom').className=mod==='custom'?'nav-item nav-active mb-2 border border-brand-accent':'nav-item nav-inactive mb-2 border border-slate-200'; document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mb-8':'nav-item nav-inactive mb-8'; 
+        currentModule=mod; document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-custom').className=mod==='custom'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mb-8':'nav-item nav-inactive mb-8'; 
         ['module-remates', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-custom', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
         const tree = document.getElementById('tree-container'); const empty = document.getElementById('empty-state');
         if(mod==='remates'){ tree.classList.remove('hidden'); document.getElementById('module-remates').classList.remove('hidden'); renderDashboard(); } 
@@ -792,7 +825,7 @@ async function limpiarBase(){
 
 function toggleAccordion(e,targetId,iconId){ e.stopPropagation(); const target=document.getElementById(targetId); const icon=document.getElementById(iconId); if(target.classList.contains('hidden')){ target.classList.remove('hidden'); icon.style.transform='rotate(0deg)'; } else { target.classList.add('hidden'); icon.style.transform='rotate(-90deg)'; } }
 
-function buildTreeNodeHTML(id,label,level,hasChildren,childHtml,forceOpen=false){ const ml=level*10; return `<div class="flex flex-col mt-0.5"><div class="nav-tree-item nav-inactive" style="margin-left:${ml}px;"><label class="flex items-center gap-2 cursor-pointer flex-1 min-w-0 pr-2"><input type="checkbox" id="chk-${id}" class="shrink-0" onchange="toggleNode('${id}')" ${checkedNodes.includes(id)?'checked':''}><span class="truncate ${level===0?'font-bold text-slate-800':''}" title="${label}">${label}</span></label>${hasChildren?`<div class="chevron text-[10px]" id="icon-${id}" onclick="toggleAccordion(event,'child-${id}','icon-${id}')" style="transform: rotate(${forceOpen?'0deg':'-90deg'})">▼</div>`:''}</div>${hasChildren?`<div id="child-${id}" class="flex flex-col border-l border-slate-200 ml-[${ml+6}px] transition-all ${forceOpen?'':'hidden'}">${childHtml}</div>`:''}</div>`; }
+function buildTreeNodeHTML(id,label,level,hasChildren,childHtml,forceOpen=false){ const ml=level*8; return `<div class="flex flex-col mt-0.5"><div class="nav-tree-item nav-inactive" style="margin-left:${ml}px;"><label class="flex items-center gap-2 cursor-pointer flex-1 min-w-0 pr-2"><input type="checkbox" id="chk-${id}" class="shrink-0" onchange="toggleNode('${id}')" ${checkedNodes.includes(id)?'checked':''}><span class="truncate ${level===0?'font-semibold text-premium-text':''}" title="${label}">${label}</span></label>${hasChildren?`<div class="chevron text-[9px]" id="icon-${id}" onclick="toggleAccordion(event,'child-${id}','icon-${id}')" style="transform: rotate(${forceOpen?'0deg':'-90deg'})">▼</div>`:''}</div>${hasChildren?`<div id="child-${id}" class="flex flex-col border-l border-premium-border/50 ml-[${ml+6}px] transition-all ${forceOpen?'':'hidden'}">${childHtml}</div>`:''}</div>`; }
 
 function actualizarSidebar(){ 
     try {
@@ -835,20 +868,29 @@ function renderSingleView(nodeId){
     try {
         const node=nodeRematesMap[nodeId]; const agg=buildAgg(node.remates,nodeId,node.label);
         if(document.getElementById('sv-titulo')) document.getElementById('sv-titulo').innerText=agg.label; if(document.getElementById('sv-subtitulo')) document.getElementById('sv-subtitulo').innerText=`${node.remates.length} matrices consolidadas`;
-        if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-ticket-promedio')) document.getElementById('sv-kpi-ticket-promedio').innerText=formatMoney(agg.ticketPromedio); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta);
+        if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); if(document.getElementById('sv-kpi-ticket-promedio-side')) document.getElementById('sv-kpi-ticket-promedio-side').innerText=formatMoney(agg.ticketPromedio); 
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
-        if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-1racompra')) document.getElementById('sv-kpi-1racompra').innerText=agg.ganadoresNuevos.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-1racompra-pct')) document.getElementById('sv-kpi-1racompra-pct').innerText=`(${agg.pctVentaNuevos.toFixed(1)}% de venta)`;
+        
+        // CAMBIOS DE NOMENCLATURA 2:
+        if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
+        if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
+        if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
+        if(document.getElementById('sv-kpi-1racompra')) document.getElementById('sv-kpi-1racompra').innerText=agg.ganadoresNuevos.toLocaleString('es-CL'); 
+        if(document.getElementById('sv-kpi-1racompra-pct')) document.getElementById('sv-kpi-1racompra-pct').innerText=`(${agg.pctVentaNuevos.toFixed(1)}% de venta)`;
+        
         const mapC={}; agg.adjudicaciones.forEach(a=>{ if(a.esFalso) return; if(!mapC[a.clienteReal]) mapC[a.clienteReal]={lotes:0,total:0}; mapC[a.clienteReal].lotes++; mapC[a.clienteReal].total+=a.monto; }); let multi=0; Object.values(mapC).forEach(c=>{ if(c.lotes>1) multi++; }); 
         if(document.getElementById('sv-kpi-multilote')) document.getElementById('sv-kpi-multilote').innerText=multi; globalMapCMulti = mapC;
+        
         const topLotes=[...agg.adjudicaciones].filter(a=>!a.esFalso).sort((a,b)=>b.pujadoresRealesCount-a.pujadoresRealesCount).slice(0,10);
         if(document.getElementById('sv-tabla-top-lotes')) document.getElementById('sv-tabla-top-lotes').innerHTML=topLotes.map(l=>{
-            let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let deltaPct = l.minimo > 0 ? ((l.monto - l.minimo) / l.minimo * 100) : 0; let dSignL = deltaLote >= 0 ? '+' : ''; let dColorL = deltaLote >= 0 ? 'text-brand-info' : 'text-brand-danger';
-            return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')"><td class="py-2 font-semibold text-[10px] md:text-xs text-slate-500 w-16 text-center">N° ${l.numeroLote||'-'}</td><td class="py-2 font-mono text-[9px] md:text-[11px] max-w-[200px] truncate text-slate-800" title="${l.loteStr}">${l.loteStr}</td><td class="py-2 text-center"><span class="bg-orange-50 text-brand-accent px-2 py-1 rounded-full font-bold hover:bg-brand-accent hover:text-white transition">${l.pujadoresRealesCount}</span></td><td class="py-2 text-right font-mono text-[10px] md:text-xs text-slate-500">${formatMoney(l.minimo)}</td><td class="py-2 text-right font-mono text-[10px] md:text-xs font-bold text-brand-success">${formatMoney(l.monto)}</td><td class="py-2 text-right font-mono text-[10px] md:text-xs font-bold ${dColorL}">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td><td class="py-2 text-right font-mono text-[10px] md:text-xs font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+deltaPct.toFixed(1)+'%'):'-'}</td></tr>`;
+            let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let dSignL = deltaLote >= 0 ? '+' : ''; let dColorL = deltaLote >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
+            return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')"><td class="font-medium text-premium-muted w-16">N° ${l.numeroLote||'-'}</td><td class="font-medium max-w-[200px] truncate text-premium-text" title="${l.loteStr}">${l.loteStr}</td><td class="text-center"><span class="bg-premium-bg border border-premium-border text-premium-text px-2 py-0.5 rounded font-semibold">${l.pujadoresRealesCount}</span></td><td class="text-right text-premium-muted">${formatMoney(l.minimo)}</td><td class="text-right font-medium text-premium-success">${formatMoney(l.monto)}</td><td class="text-right font-medium ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td></tr>`;
         }).join('');
+        
         const sortedRems=[...node.remates].sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp); const labels=sortedRems.map((r,idx)=>`S${idx+1}`); let showRetencion = sortedRems.some(r => r.nuevos > 0 || r.antiguos > 0); let showVentas = sortedRems.some(r => r.ventaTotal > 0);
         try {
-            if(svChartRetencionInst) svChartRetencionInst.destroy(); if(showRetencion && document.getElementById('sv-chartRetencion')) { svChartRetencionInst=new Chart(document.getElementById('sv-chartRetencion').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Nuevos',data:sortedRems.map(r=>r.nuevos),backgroundColor:'#FF6B35',borderRadius:4},{label:'Recurrentes',data:sortedRems.map(r=>r.antiguos),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f1f5f9'}}}}}); }
-            if(svChartVentasInst) svChartVentasInst.destroy(); if(showVentas && document.getElementById('sv-chartVentas')) { svChartVentasInst=new Chart(document.getElementById('sv-chartVentas').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Venta Siniestrados',data:sortedRems.map(r=>r.tipo==='Siniestrados'?r.ventaTotal:0),backgroundColor:'#0ea5e9',borderRadius:4},{label:'Venta Retail',data:sortedRems.map(r=>r.tipo==='Retail'?r.ventaTotal:0),backgroundColor:'#8B5CF6',borderRadius:4}] }}); }
+            if(svChartRetencionInst) svChartRetencionInst.destroy(); if(showRetencion && document.getElementById('sv-chartRetencion')) { svChartRetencionInst=new Chart(document.getElementById('sv-chartRetencion').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Nuevos',data:sortedRems.map(r=>r.nuevos),backgroundColor:'#1D1D1F',borderRadius:2},{label:'Recurrentes',data:sortedRems.map(r=>r.antiguos),backgroundColor:'#D1D1D6',borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#F5F5F7'}}}}}); }
+            if(svChartVentasInst) svChartVentasInst.destroy(); if(showVentas && document.getElementById('sv-chartVentas')) { svChartVentasInst=new Chart(document.getElementById('sv-chartVentas').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Venta Siniestrados',data:sortedRems.map(r=>r.tipo==='Siniestrados'?r.ventaTotal:0),backgroundColor:'#0066CC',borderRadius:2},{label:'Venta Retail',data:sortedRems.map(r=>r.tipo==='Retail'?r.ventaTotal:0),backgroundColor:'#1D1D1F',borderRadius:2}] }}); }
         } catch(ec) {}
     } catch (e) {}
 }
@@ -858,19 +900,19 @@ function renderCompareView(nodesList){
         const compareData=nodesList.map(id=>buildAgg(nodeRematesMap[id].remates,id,nodeRematesMap[id].label)); 
         if(document.getElementById('cv-tabla-comparativa')) {
             document.getElementById('cv-tabla-comparativa').innerHTML=compareData.map(d=>{
-                let dSign = d.deltaPujaTotal >= 0 ? '+' : ''; let dColor = d.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger';
-                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-2 md:p-3 font-bold max-w-[120px] md:max-w-[150px] truncate text-slate-800" title="${d.label}">${d.label}</td><td class="p-2 md:p-3 text-right font-mono font-bold text-brand-success">${formatMoney(d.venta)}</td><td class="p-2 md:p-3 text-right font-mono font-bold text-brand-info hidden sm:table-cell">${formatMoney(d.comisionTotal)}</td><td class="p-2 md:p-3 text-center text-slate-800 font-semibold">${d.lotes}</td><td class="p-2 md:p-3 text-center text-brand-success">${d.eficaciaLotes.toFixed(1)}%</td><td class="p-2 md:p-3 text-center font-bold text-slate-700">${d.garantias}</td><td class="p-2 md:p-3 text-center text-slate-600 hidden sm:table-cell">${d.nuevos}</td><td class="p-2 md:p-3 text-center font-bold ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)}</td></tr>`;
+                let dSign = d.deltaPujaTotal >= 0 ? '+' : ''; let dColor = d.deltaPujaTotal >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
+                return `<tr><td class="font-medium text-premium-text max-w-[150px] truncate" title="${d.label}">${d.label}</td><td class="text-right font-medium text-premium-success">${formatMoney(d.venta)}</td><td class="text-right text-premium-muted hidden sm:table-cell">${formatMoney(d.comisionTotal)}</td><td class="text-center text-premium-text">${d.lotes}</td><td class="text-center font-medium text-premium-success">${d.eficaciaLotes.toFixed(1)}%</td><td class="text-center text-premium-text">${d.garantias}</td><td class="text-center text-premium-muted hidden sm:table-cell">${d.nuevos}</td><td class="text-center font-medium ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)}</td></tr>`;
             }).join(''); 
         }
         const labels=compareData.map(d=>d.label); 
         try {
-            if(cvChartVentasInst) cvChartVentasInst.destroy(); if(document.getElementById('cv-chartVentas')) { cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0ea5e9',borderRadius:4},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#8B5CF6',borderRadius:4}] }}); }
-            if(cvChartGarantiasInst) cvChartGarantiasInst.destroy(); if(document.getElementById('cv-chartGarantias')) { cvChartGarantiasInst=new Chart(document.getElementById('cv-chartGarantias').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Nuevos',data:compareData.map(d=>d.nuevos),backgroundColor:'#FF6B35',borderRadius:4},{label:'Recurrentes',data:compareData.map(d=>d.antiguos),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#f1f5f9'}}}}}); }
+            if(cvChartVentasInst) cvChartVentasInst.destroy(); if(document.getElementById('cv-chartVentas')) { cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0066CC',borderRadius:2},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#1D1D1F',borderRadius:2}] }}); }
+            if(cvChartGarantiasInst) cvChartGarantiasInst.destroy(); if(document.getElementById('cv-chartGarantias')) { cvChartGarantiasInst=new Chart(document.getElementById('cv-chartGarantias').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Nuevos',data:compareData.map(d=>d.nuevos),backgroundColor:'#1D1D1F',borderRadius:2},{label:'Recurrentes',data:compareData.map(d=>d.antiguos),backgroundColor:'#D1D1D6',borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#F5F5F7'}}}}}); }
         } catch(ec) {}
     } catch (e) {}
 }
 
-function abrirModalMultiLote() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-2 md:p-3 pl-4 md:pl-6 text-xs md:text-sm font-semibold text-slate-800">${nombre}</td><td class="p-2 md:p-3 text-center font-bold text-brand-accent">${data.lotes}</td><td class="p-2 md:p-3 text-right pr-4 md:pr-6 font-mono font-bold text-brand-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-slate-500">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); }
+function abrirModalMultiLote() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-medium text-premium-text">${nombre}</td><td class="text-center font-medium text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-medium text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); }
 function cerrarModalMulti() { document.getElementById('modal-multilote').classList.add('hidden'); }
 
 function renderConclusiones() {
@@ -884,25 +926,25 @@ function renderConclusiones() {
         if(checkedNodes.length > 1) {
             let ref1 = buildAgg(nodeRematesMap[checkedNodes[0]].remates, 'R1', nodeRematesMap[checkedNodes[0]].label); let ref2 = buildAgg(nodeRematesMap[checkedNodes[1]].remates, 'R2', nodeRematesMap[checkedNodes[1]].label);
             let varVenta = ref1.venta > 0 ? ((ref2.venta - ref1.venta) / ref1.venta * 100) : 0; let signoVar = varVenta >= 0 ? '+' : '';
-            html += `<div class="glass-panel p-4 md:p-6 border-l-4 border-l-orange-500 md:col-span-2 shadow-sm mb-2"><h3 class="text-base md:text-lg font-bold text-slate-800 mb-2">📋 Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-xs md:text-sm text-slate-600 leading-relaxed">Al comparar <b>${nodeRematesMap[checkedNodes[0]].label}</b> con <b>${nodeRematesMap[checkedNodes[1]].label}</b>, se observa una variación en la venta total del <b>${signoVar}${varVenta.toFixed(1)}%</b>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
+            html += `<div class="glass-panel p-5 border-l-4 border-l-premium-highlight md:col-span-2"><h3 class="text-sm font-semibold text-premium-text mb-2">Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-xs text-premium-muted leading-relaxed">Al comparar <b>${nodeRematesMap[checkedNodes[0]].label}</b> con <b>${nodeRematesMap[checkedNodes[1]].label}</b>, se observa una variación en la venta total del <b>${signoVar}${varVenta.toFixed(1)}%</b>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
         }
 
-        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-brand-success' : 'text-brand-danger';
+        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-premium-success' : 'text-premium-danger';
 
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-brand-info"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">1. Venta Total</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">Las operaciones válidas sumaron una venta adjudicada de <b>${formatMoney(agg.venta)}</b>.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-brand-info"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">2. Comisiones Estimadas (12% + IVA)</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">El remate generó un ingreso por comisiones de <b>${formatMoney(agg.comisionTotal)}</b>.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-brand-accent"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">3. Efectividad del Remate</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">Se logró vender el <b>${agg.eficaciaLotes.toFixed(1)}%</b> de todos los lotes disponibles en el catálogo.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-brand-accent"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">4. Incremento sobre el Mínimo (Delta)</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">Las pujas incrementaron el valor de salida en <b>${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</b>, lo que representa un margen positivo del <b class="${sobreColor}">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</b> sobre los mínimos propuestos.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-brand-success"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">5. Ticket Promedio</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">El valor promedio de venta por cada lote adjudicado fue de <b>${formatMoney(agg.ticketPromedio)}</b>.</p></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">1. Venta Total</h4><p class="text-xs text-premium-muted leading-relaxed">Las operaciones válidas sumaron una venta adjudicada de <b>${formatMoney(agg.venta)}</b>.</p></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">2. Comisiones Estimadas (12% + IVA)</h4><p class="text-xs text-premium-muted leading-relaxed">El remate generó un ingreso por comisiones de <b>${formatMoney(agg.comisionTotal)}</b>.</p></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">3. Efectividad del Remate</h4><p class="text-xs text-premium-muted leading-relaxed">Se logró vender el <b>${agg.eficaciaLotes.toFixed(1)}%</b> de todos los lotes disponibles en el catálogo.</p></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">4. Incremento sobre el Mínimo (Delta)</h4><p class="text-xs text-premium-muted leading-relaxed">Las pujas incrementaron el valor de salida en <b>${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</b>, lo que representa un margen positivo del <b class="${sobreColor}">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</b> sobre los mínimos propuestos.</p></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">5. Ticket Promedio</h4><p class="text-xs text-premium-muted leading-relaxed">El valor promedio de venta por cada lote adjudicado fue de <b>${formatMoney(agg.ticketPromedio)}</b>.</p></div>`;
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-brand-success"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">6. Tasa de Cierre de Clientes</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">El <b>${tasaExito.toFixed(1)}%</b> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-brand-danger flex flex-col justify-between"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">7. Clientes sin Compras</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">Hubo <b>${agg.perdedoresCount} clientes</b> que pagaron garantía pero no lograron comprar nada.</p><button onclick="abrirModalFuga()" class="mt-3 px-3 py-1.5 bg-red-100 text-red-700 font-bold rounded-lg hover:bg-red-200 text-[10px] md:text-xs text-center border border-red-200 transition no-print">🔍 Ver Fuga y Exportar</button></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">6. Tasa de Cierre de Clientes</h4><p class="text-xs text-premium-muted leading-relaxed">El <b>${tasaExito.toFixed(1)}%</b> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
+        html += `<div class="glass-panel p-5 flex flex-col justify-between"><h4 class="font-semibold text-xs text-premium-text mb-2">7. Clientes que NO adjudicaron</h4><p class="text-xs text-premium-muted leading-relaxed">Hubo <b>${agg.perdedoresCount} clientes</b> que pagaron garantía pero no lograron comprar nada.</p><button onclick="abrirModalFuga()" class="mt-3 px-3 py-1.5 bg-premium-bg border border-premium-border text-premium-text font-medium rounded text-xs text-center hover:bg-white transition no-print">Ver listado</button></div>`;
         let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-purple-500"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">8. Clientes Nuevos</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">El <b>${agg.pctVentaNuevos.toFixed(1)}%</b> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">8. Clientes Nuevos</h4><p class="text-xs text-premium-muted leading-relaxed">El <b>${agg.pctVentaNuevos.toFixed(1)}%</b> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-purple-500"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">9. Compradores de Volumen</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">Un total de <b>${multi} clientes</b> operaron en volumen y compraron más de un lote.</p></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">9. Compradores de Volumen</h4><p class="text-xs text-premium-muted leading-relaxed">Un total de <b>${multi} clientes</b> operaron en volumen y compraron más de un lote.</p></div>`;
         let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
-        html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-slate-400"><h4 class="font-bold text-xs md:text-sm text-slate-800 mb-2">10. Limpieza de Datos</h4><p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">Se aislaron automáticamente <b>${falsos} pujas internas o pruebas de sistema</b>.</p></div>`;
+        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">10. Limpieza de Datos</h4><p class="text-xs text-premium-muted leading-relaxed">Se aislaron automáticamente <b>${falsos} pujas internas o pruebas de sistema</b>.</p></div>`;
 
         if(document.getElementById('conclusiones-content')) document.getElementById('conclusiones-content').innerHTML = html;
     } catch (e) {}
@@ -917,15 +959,14 @@ function renderPanelAutos(){
         let marcasMap = {}; let modelosMap = {}; autos.forEach(a => { if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') marcasMap[a.categoria] = (marcasMap[a.categoria]||0) + 1; if(a.modeloStr && a.modeloStr.trim() !== '') modelosMap[a.modeloStr] = (modelosMap[a.modeloStr]||0) + 1; });
         const marcasSorted = Object.entries(marcasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
         try {
-            if(flotaMarcasInst) flotaMarcasInst.destroy(); if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { flotaMarcasInst=new Chart(document.getElementById('flota-marcas-chart').getContext('2d'),{type:'doughnut',data:{labels:marcasSorted.map(m=>m[0]),datasets:[{data:marcasSorted.map(m=>m[1]),backgroundColor:['#FF6B35','#0ea5e9','#10B981','#8B5CF6','#f59e0b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'right'}}}}); }
+            if(flotaMarcasInst) flotaMarcasInst.destroy(); if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { flotaMarcasInst=new Chart(document.getElementById('flota-marcas-chart').getContext('2d'),{type:'doughnut',data:{labels:marcasSorted.map(m=>m[0]),datasets:[{data:marcasSorted.map(m=>m[1]),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#86868B','#E5E5EA'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); }
             const modelosSorted = Object.entries(modelosMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
-            if(flotaAniosInst) flotaAniosInst.destroy(); if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades Adjudicadas',data:modelosSorted.map(a=>a[1]),backgroundColor:'#0ea5e9',borderRadius:4}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#f1f5f9'}},y:{grid:{display:false}}}}}); }
+            if(flotaAniosInst) flotaAniosInst.destroy(); if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades Adjudicadas',data:modelosSorted.map(a=>a[1]),backgroundColor:'#0066CC',borderRadius:2}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#F5F5F7'}},y:{grid:{display:false}}}}}); }
         } catch(ec) {}
         const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term));
         if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
-            let delta = a.minimo > 0 ? (a.monto - a.minimo) : 0; let dSign = delta >= 0 ? '+' : ''; let dColor = delta >= 0 ? 'text-brand-info' : 'text-brand-danger';
-            return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-2 md:p-4 text-[10px] md:text-xs font-semibold text-slate-500 max-w-[120px] md:max-w-[150px] truncate" title="${a.remate}">${a.remate.substring(0,20)}</td><td class="p-2 md:p-4 text-center font-bold text-slate-800 text-xs">Lote ${a.numeroLote||'-'}</td><td class="p-2 md:p-4 text-[10px] md:text-xs max-w-[150px] md:max-w-[200px] truncate"><span class="font-bold text-slate-800">${a.categoria}</span> ${a.modeloStr}</td><td class="p-2 md:p-4 text-right font-mono text-[10px] md:text-xs text-slate-500">${formatMoney(a.minimo)}</td><td class="p-2 md:p-4 text-right font-mono text-[10px] md:text-xs font-bold text-slate-800">${formatMoney(a.monto)}</td></tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-500">Sin vehículos en la selección actual.</td></tr>';
+            return `<tr><td class="font-medium text-premium-muted max-w-[120px] truncate" title="${a.remate}">${a.remate.substring(0,20)}</td><td class="text-center font-medium text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-medium text-premium-text">${a.categoria}</span> <span class="text-premium-muted">${a.modeloStr}</span></td><td class="text-right text-premium-muted">${formatMoney(a.minimo)}</td><td class="text-right font-medium text-premium-success">${formatMoney(a.monto)}</td></tr>`;
+        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted">Sin vehículos en la selección actual.</td></tr>';
     } catch (e) {}
 }
 
@@ -935,24 +976,24 @@ function generarInformePersonalizado() {
         if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
         emptyState.classList.add('hidden'); container.classList.remove('hidden');
         let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates, 'G', 'Selección Global'); 
-        let out = `<div class="space-y-4 md:space-y-6"><div><h1 class="text-xl md:text-3xl font-extrabold text-slate-900 border-b border-slate-300 pb-2">Reporte de Gestión Comercial</h1><p class="text-xs md:text-sm text-slate-500 mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mt-4 md:mt-6">`;
-        if(document.getElementById('chk-kpi-disp') && document.getElementById('chk-kpi-disp').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Lotes Disponibles</p><p class="text-lg md:text-xl font-bold text-slate-800">${agg.lotesDisponibles}</p></div>`;
-        if(document.getElementById('chk-kpi-vend') && document.getElementById('chk-kpi-vend').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Lotes Vendidos</p><p class="text-lg md:text-xl font-bold text-brand-info">${agg.lotes}</p></div>`;
-        if(document.getElementById('chk-kpi-efi') && document.getElementById('chk-kpi-efi').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Efectividad del Remate</p><p class="text-lg md:text-xl font-bold text-brand-success">${agg.eficaciaLotes.toFixed(1)}%</p></div>`;
-        if(document.getElementById('chk-kpi-venta') && document.getElementById('chk-kpi-venta').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Venta Total Adjudicada</p><p class="text-lg md:text-xl font-bold text-brand-success">${formatMoney(agg.venta)}</p></div>`;
-        if(document.getElementById('chk-kpi-comision') && document.getElementById('chk-kpi-comision').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Comisión Generada</p><p class="text-lg md:text-xl font-bold text-brand-accent">${formatMoney(agg.comisionTotal)}</p></div>`;
-        if(document.getElementById('chk-kpi-ticket') && document.getElementById('chk-kpi-ticket').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Ticket Promedio</p><p class="text-lg md:text-xl font-bold text-slate-800">${formatMoney(agg.ticketPromedio)}</p></div>`;
-        if(document.getElementById('chk-kpi-sobreprecio') && document.getElementById('chk-kpi-sobreprecio').checked) { let dSign = agg.deltaPujaTotal >= 0 ? '+' : ''; let dColor = agg.deltaPujaTotal >= 0 ? 'text-brand-info' : 'text-brand-danger'; out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Delta Puja</p><p class="text-lg md:text-xl font-bold ${dColor}">${dSign}${formatMoney(agg.deltaPujaTotal)} <span class="text-xs">(${dSign}${agg.sobreprecioReal.toFixed(1)}%)</span></p></div>`; }
-        if(document.getElementById('chk-kpi-participan') && document.getElementById('chk-kpi-participan').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Clientes c/Garantía</p><p class="text-lg md:text-xl font-bold text-slate-800">${agg.garantias}</p></div>`;
-        if(document.getElementById('chk-kpi-ganadores') && document.getElementById('chk-kpi-ganadores').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Clientes que adjudicaron</p><p class="text-lg md:text-xl font-bold text-brand-success">${agg.ganadoresUnicosCount}</p></div>`;
-        if(document.getElementById('chk-kpi-fuga') && document.getElementById('chk-kpi-fuga').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Clientes que NO adjudicaron</p><p class="text-lg md:text-xl font-bold text-brand-danger">${agg.perdedoresCount}</p></div>`;
-        if(document.getElementById('chk-kpi-nuevos') && document.getElementById('chk-kpi-nuevos').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Clientes nuevos que adjudicaron</p><p class="text-lg md:text-xl font-bold text-brand-info">${agg.ganadoresNuevos}</p></div>`;
+        let out = `<div class="space-y-6"><div><h1 class="text-2xl font-semibold text-premium-text border-b border-premium-border pb-3">Reporte de Gestión Comercial</h1><p class="text-xs text-premium-muted mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">`;
+        if(document.getElementById('chk-kpi-disp') && document.getElementById('chk-kpi-disp').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Lotes Disponibles</p><p class="text-xl font-medium text-premium-text mt-1">${agg.lotesDisponibles}</p></div>`;
+        if(document.getElementById('chk-kpi-vend') && document.getElementById('chk-kpi-vend').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Lotes Vendidos</p><p class="text-xl font-medium text-premium-highlight mt-1">${agg.lotes}</p></div>`;
+        if(document.getElementById('chk-kpi-efi') && document.getElementById('chk-kpi-efi').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Efectividad del Remate</p><p class="text-xl font-medium text-premium-success mt-1">${agg.eficaciaLotes.toFixed(1)}%</p></div>`;
+        if(document.getElementById('chk-kpi-venta') && document.getElementById('chk-kpi-venta').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Venta Total Adjudicada</p><p class="text-xl font-medium text-premium-success mt-1">${formatMoney(agg.venta)}</p></div>`;
+        if(document.getElementById('chk-kpi-comision') && document.getElementById('chk-kpi-comision').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Comisión Generada</p><p class="text-xl font-medium text-premium-text mt-1">${formatMoney(agg.comisionTotal)}</p></div>`;
+        if(document.getElementById('chk-kpi-ticket') && document.getElementById('chk-kpi-ticket').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Ticket Promedio</p><p class="text-xl font-medium text-premium-text mt-1">${formatMoney(agg.ticketPromedio)}</p></div>`;
+        if(document.getElementById('chk-kpi-sobreprecio') && document.getElementById('chk-kpi-sobreprecio').checked) { let dSign = agg.deltaPujaTotal >= 0 ? '+' : ''; let dColor = agg.deltaPujaTotal >= 0 ? 'text-premium-highlight' : 'text-premium-danger'; out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Delta Puja</p><p class="text-xl font-medium ${dColor} mt-1">${dSign}${formatMoney(agg.deltaPujaTotal)} <span class="text-xs">(${dSign}${agg.sobreprecioReal.toFixed(1)}%)</span></p></div>`; }
+        if(document.getElementById('chk-kpi-participan') && document.getElementById('chk-kpi-participan').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes c/Garantía</p><p class="text-xl font-medium text-premium-text mt-1">${agg.garantias}</p></div>`;
+        if(document.getElementById('chk-kpi-ganadores') && document.getElementById('chk-kpi-ganadores').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes que adjudicaron</p><p class="text-xl font-medium text-premium-success mt-1">${agg.ganadoresUnicosCount}</p></div>`;
+        if(document.getElementById('chk-kpi-fuga') && document.getElementById('chk-kpi-fuga').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes que NO adjudicaron</p><p class="text-xl font-medium text-premium-danger mt-1">${agg.perdedoresCount}</p></div>`;
+        if(document.getElementById('chk-kpi-nuevos') && document.getElementById('chk-kpi-nuevos').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes nuevos que adjudicaron</p><p class="text-xl font-medium text-premium-highlight mt-1">${agg.ganadoresNuevos}</p></div>`;
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        if(document.getElementById('chk-kpi-multi') && document.getElementById('chk-kpi-multi').checked) out += `<div class="p-3 md:p-4 border border-slate-200 rounded-lg"><p class="text-[10px] md:text-xs text-slate-400 uppercase font-bold">Clientes que adjudicaron > 1 lote</p><p class="text-lg md:text-xl font-bold text-slate-800">${multi}</p></div>`;
+        if(document.getElementById('chk-kpi-multi') && document.getElementById('chk-kpi-multi').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes que adjudicaron > 1 lote</p><p class="text-xl font-medium text-premium-text mt-1">${multi}</p></div>`;
         out += `</div>`;
         if(document.getElementById('chk-kpi-lotesestrella') && document.getElementById('chk-kpi-lotesestrella').checked) {
             const topLotes=[...agg.adjudicaciones].filter(a=>!a.esFalso).sort((a,b)=>b.pujadoresRealesCount-a.pujadoresRealesCount).slice(0,5);
-            if(topLotes.length > 0) { out += `<div class="mt-6 md:mt-8 border border-slate-200 rounded-lg overflow-hidden overflow-x-auto"><div class="bg-slate-50 px-4 py-2 border-b border-slate-200 font-bold text-xs md:text-sm text-slate-700">Top 5 Lotes Estrella (Demanda)</div><table class="w-full text-[10px] md:text-xs text-left"><thead class="bg-white border-b border-slate-100 text-slate-400"><tr><th class="p-2">Detalle</th><th class="p-2 text-center">Pujadores</th><th class="p-2 text-right">Adjudicado</th><th class="p-2 text-right">Delta ($)</th></tr></thead><tbody>`; topLotes.forEach(l => { let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let dSign = deltaLote >= 0 ? '+' : ''; out += `<tr class="border-b border-slate-50"><td class="p-2 font-mono text-slate-600 truncate max-w-[150px]">${l.loteStr}</td><td class="p-2 text-center font-bold text-brand-accent">${l.pujadoresRealesCount}</td><td class="p-2 text-right font-bold text-brand-success">${formatMoney(l.monto)}</td><td class="p-2 text-right">${l.minimo>0?(dSign+formatMoney(deltaLote)):'-'}</td></tr>`; }); out += `</tbody></table></div>`; }
+            if(topLotes.length > 0) { out += `<div class="mt-8 border border-premium-border rounded-xl overflow-hidden"><div class="bg-premium-bg px-5 py-3 border-b border-premium-border font-semibold text-xs text-premium-text">Top 5 Lotes (Demanda)</div><table class="w-full text-left"><thead><tr><th class="pl-4">Detalle</th><th class="text-center">Pujadores</th><th class="text-right">Adjudicado</th><th class="text-right pr-4">Delta</th></tr></thead><tbody>`; topLotes.forEach(l => { let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let dSign = deltaLote >= 0 ? '+' : ''; out += `<tr><td class="pl-4 text-premium-muted truncate max-w-[200px]">${l.loteStr}</td><td class="text-center font-medium text-premium-text">${l.pujadoresRealesCount}</td><td class="text-right font-medium text-premium-success">${formatMoney(l.monto)}</td><td class="text-right pr-4 text-premium-muted">${l.minimo>0?(dSign+formatMoney(deltaLote)):'-'}</td></tr>`; }); out += `</tbody></table></div>`; }
         } out += `</div>`;
         if(document.getElementById('custom-report-output')) document.getElementById('custom-report-output').innerHTML = out;
     } catch (e) {}
@@ -963,8 +1004,8 @@ function abrirModalFuga() {
         if(!globalAgg) return; let html = '';
         if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
             globalAgg.fugaList.sort((a,b)=>a.nombre.localeCompare(b.nombre)); let hoy = Date.now();
-            globalAgg.fugaList.forEach(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; let nombreRemate = f.numRemate ? `${f.numRemate}` : '-'; html += `<tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-2 md:p-3 pl-4 md:pl-6 font-bold text-[10px] md:text-xs text-slate-800">${nombreRemate}</td><td class="p-2 md:p-3 text-[10px] md:text-xs font-bold text-brand-danger">${textoDias}</td><td class="p-2 md:p-3 text-[10px] md:text-sm font-semibold text-slate-800 truncate max-w-[120px]">${f.nombre}</td><td class="p-2 md:p-3 font-mono text-[10px] md:text-xs text-brand-info truncate max-w-[120px]">${f.email||'-'}</td></tr>`; });
-        } else { html = '<tr><td colspan="4" class="p-8 text-center text-slate-500">No hay registros de fuga.</td></tr>'; }
+            globalAgg.fugaList.forEach(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; let nombreRemate = f.numRemate ? `${f.numRemate}` : '-'; html += `<tr><td class="pl-4 font-medium text-premium-text">${nombreRemate}</td><td class="text-premium-danger font-medium">${textoDias}</td><td class="font-medium text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-premium-muted truncate max-w-[150px]">${f.email||'-'}</td></tr>`; });
+        } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted">No hay registros.</td></tr>'; }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
     } catch (e) {}
 }
@@ -973,8 +1014,8 @@ function cerrarModalFuga() { document.getElementById('modal-fuga').classList.add
 function exportarFugaExcel() {
     try {
         if(!globalAgg || !globalAgg.fugaList) return; let hoy = Date.now();
-        const wsData = globalAgg.fugaList.map(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; return { "N° Remate": f.numRemate || '-', "Días Fuga": diasFuga, "Fecha": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-', "Cliente": f.nombre, "RUT": f.rut || 'No Registrado', "Email": f.email || 'No Registrado' }; });
-        const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Fuga"); XLSX.writeFile(wb, `Fuga_${new Date().getTime()}.xlsx`);
+        const wsData = globalAgg.fugaList.map(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; return { "N° Remate": f.numRemate || '-', "Días Inactivo": diasFuga, "Fecha": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-', "Cliente": f.nombre, "RUT": f.rut || 'No Registrado', "Email": f.email || 'No Registrado' }; });
+        const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
     } catch (e) {}
 }
 
@@ -982,9 +1023,9 @@ function abrirModalPujadores(loteEncoded, nodeId){
     try {
         const loteStr=decodeURIComponent(loteEncoded); const node=nodeRematesMap[nodeId]; let todasPujas=[]; node.remates.forEach(r=>{ if(r.posturasPorLote && r.posturasPorLote[loteStr]) todasPujas=todasPujas.concat(r.posturasPorLote[loteStr]); });
         let adjudicado=null; node.remates.forEach(r=>{ let adj=r.adjudicaciones.find(a=>a.loteStr===loteStr); if(adj) adjudicado=adj; }); currentAdjudicadoModal = adjudicado; currentModalPujas=todasPujas.sort((a,b)=>b.monto-a.monto);
-        if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').innerText="Lote"; if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adj: ${adjudicado && !adjudicado.esFalso?formatMoney(adjudicado.monto):'FALSO'} | Min: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
+        if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').innerText="Lote Seleccionado"; if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adj: ${adjudicado && !adjudicado.esFalso?formatMoney(adjudicado.monto):'FALSO'} | Min: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
         if(document.getElementById('modal-total-pujas')) document.getElementById('modal-total-pujas').innerText=todasPujas.length; if(document.getElementById('modal-unicos-reales')) document.getElementById('modal-unicos-reales').innerText=[...new Set(todasPujas.filter(p=>!p.esFalso).map(p=>p.nombreNorm))].length; if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
-        currentFiltroModal='todos'; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-2 py-1 rounded-full bg-brand-accent text-white font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-2 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-2 py-1 rounded-full bg-slate-300 text-slate-700 font-semibold hover:bg-slate-400';
+        currentFiltroModal='todos'; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-medium'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium';
         renderModalTabla(); if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.remove('hidden');
     } catch(e) {}
 }
@@ -995,13 +1036,13 @@ function renderModalTabla(){
         if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso); if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
-            let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded text-[8px] md:text-[9px] font-bold badge-falso">FALSO</span>' : '<span class="px-2 py-0.5 rounded text-[8px] md:text-[9px] font-bold badge-real">REAL</span>'; if(esAdj) badge+=' <span class="ml-1 md:ml-2 px-2 py-0.5 rounded bg-brand-success text-white text-[8px] md:text-[9px] font-bold">ADJ</span>';
-            return `<tr class="border-b border-slate-200 ${esAdj?'row-adjudicado':''} ${p.esFalso?'opacity-60 bg-red-50/50':''}"><td class="p-2 md:p-3 pl-4 md:pl-6 text-[10px] md:text-xs text-slate-400">${i+1}</td><td class="p-2 md:p-3 text-[10px] md:text-xs font-mono hidden sm:table-cell">${p.fecha||'-'}</td><td class="p-2 md:p-3 text-[10px] md:text-xs font-mono">${p.rut}</td><td class="p-2 md:p-3 text-[10px] md:text-xs max-w-[120px] md:max-w-[200px] truncate" title="${p.nombre}">${p.nombre}</td><td class="p-2 md:p-3 text-right font-mono font-bold text-[10px] md:text-xs ${esAdj?'text-brand-success':'text-slate-700'}">${formatMoney(p.monto)}</td><td class="p-2 md:p-3 text-center pr-4 md:pr-6">${badge}</td></tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-500">Sin pujas registradas</td></tr>';
+            let badge = p.esFalso ? '<span class="text-[9px] font-bold text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
+            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-premium-muted">${i+1}</td><td class="text-premium-muted hidden sm:table-cell">${p.fecha||'-'}</td><td class="font-medium text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right font-medium ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
+        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted">Sin pujas registradas</td></tr>';
     } catch(e) {}
 }
 
-function filtrarModal(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-2 py-1 rounded-full bg-brand-accent text-white font-bold':'px-2 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-2 py-1 rounded-full bg-brand-success text-white font-bold':'px-2 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-2 py-1 rounded-full bg-brand-danger text-white font-bold':'px-2 py-1 rounded-full bg-slate-200 text-slate-600 font-semibold hover:bg-slate-300'; renderModalTabla(); }
+function filtrarModal(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-medium':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-medium':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-medium':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium'; renderModalTabla(); }
 function cerrarModal(){ if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.add('hidden'); }
 
 function procesarDatosClientes(){ 
@@ -1018,7 +1059,7 @@ function procesarDatosClientes(){
         }); 
         clientDB=Object.values(mapBI).map(c=>{ 
             c.compras.sort((a,b)=>b.fecha-a.fecha); c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null; c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null; c.frecuencia=c.compras.length; c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP-c.ultimaCompra)/(1000*60*60*24)) : 0; c.isHibrido=c.tipos.size>1; 
-            if(c.frecuencia>3 && c.recencyDias<=60){ c.segmento="Excelente"; c.color="text-brand-accent"; } else if(c.frecuencia>1 && c.recencyDias<=60){ c.segmento="Recurrente"; c.color="text-brand-info"; } else if(c.frecuencia===1 && c.recencyDias<=60){ c.segmento="Nuevo"; c.color="text-brand-success"; } else { c.segmento="En Riesgo"; c.color="text-slate-400"; } return c; 
+            if(c.frecuencia>3 && c.recencyDias<=60){ c.segmento="Excelente"; c.color="text-premium-text"; } else if(c.frecuencia>1 && c.recencyDias<=60){ c.segmento="Recurrente"; c.color="text-premium-highlight"; } else if(c.frecuencia===1 && c.recencyDias<=60){ c.segmento="Nuevo"; c.color="text-premium-success"; } else { c.segmento="En Riesgo"; c.color="text-premium-danger"; } return c; 
         }).sort((a,b)=>b.totalGastado-a.totalGastado); 
     } catch(e) {}
 }
@@ -1026,8 +1067,8 @@ function procesarDatosClientes(){
 function renderPanelClientesData(filtered,isFiltered=false){ 
     try {
         if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-slate-100"><td class="p-2 md:p-3 font-semibold text-[10px] md:text-xs text-slate-800 max-w-[120px] truncate">${c.nombre}</td><td class="p-2 md:p-3 text-center text-[10px] md:text-xs">${c.frecuencia}</td><td class="p-2 md:p-3 text-right font-mono text-[10px] md:text-xs font-bold text-brand-success">${formatMoney(c.totalGastado)}</td><td class="p-2 md:p-3 text-center text-[11px] font-bold ${c.color} hidden sm:table-cell">${c.segmento}</td></tr>`).join(''); }
-        if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#FF6B35','#0ea5e9','#10B981','#94a3b8'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
+        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="font-medium text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-premium-muted">${c.frecuencia}</td><td class="text-right font-medium text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center font-medium ${c.color} hidden sm:table-cell">${c.segmento}</td></tr>`).join(''); }
+        if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#E30000'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
     } catch(e) {}
 }
 
@@ -1038,7 +1079,7 @@ function abrirFichaCliente(nombreStr){
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
         if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+b.monto,0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+b.monto,0)); 
-        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-2 md:p-3 pl-2 md:pl-4 text-[9px] md:text-xs text-slate-500">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="p-2 md:p-3 text-[9px] md:text-xs truncate max-w-[100px] md:max-w-[200px] text-slate-800 font-semibold">${h.remate?h.remate.substring(0,25):'-'}</td><td class="p-2 md:p-3 text-center text-[9px] md:text-xs font-mono font-bold text-brand-info">${h.lote}</td><td class="p-2 md:p-3 pr-2 md:pr-4 text-right text-[9px] md:text-xs font-mono font-bold text-brand-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
+        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="text-premium-muted">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="truncate max-w-[150px] font-medium text-premium-text">${h.remate?h.remate.substring(0,25):'-'}</td><td class="text-premium-muted">${h.tipo}</td><td class="font-medium text-premium-highlight">${h.lote}</td><td class="text-right font-medium text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
 }
@@ -1048,10 +1089,10 @@ function cerrarFicha(){ if(document.getElementById('bi-ficha-cliente')) document
 function buscarPatente(){ 
     try {
         const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); const tbody=document.getElementById('buscador-tabla-resultados'); 
-        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-4 md:p-8 text-center text-slate-500 text-xs md:text-sm">Ingrese 3 caracteres.</td></tr>'; return; } 
+        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-8 text-center text-premium-muted">Ingrese 3 caracteres.</td></tr>'; return; } 
         let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData.timestamp,remate:r.fileName,lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
-        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-4 md:p-8 text-center text-brand-danger font-bold text-xs md:text-sm">Sin resultados</td></tr>`; return; } 
-        tbody.innerHTML=resultados.map(res=>`<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-2 md:p-4 text-[10px] md:text-xs text-slate-500">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="p-2 md:p-4 font-semibold text-[10px] md:text-xs truncate max-w-[100px] text-slate-800">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="p-2 md:p-4 font-mono text-[9px] md:text-[11px] text-slate-500 max-w-[150px] truncate hidden sm:table-cell">${res.lote}</td><td class="p-2 md:p-4 text-[10px] md:text-xs truncate max-w-[120px]">${res.cliente}</td><td class="p-2 md:p-4 text-right font-mono text-[10px] md:text-xs font-bold text-brand-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
+        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-8 text-center font-medium text-premium-danger">Sin resultados</td></tr>`; return; } 
+        tbody.innerHTML=resultados.map(res=>`<tr><td class="text-premium-muted">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="font-medium truncate max-w-[120px] text-premium-text">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="text-center font-medium text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted max-w-[150px] truncate hidden sm:table-cell">${res.lote}</td><td class="font-medium truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right font-medium text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) {}
 }
 </script>
