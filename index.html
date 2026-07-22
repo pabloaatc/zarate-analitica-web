@@ -42,11 +42,6 @@
         .nav-item:hover { background-color: #EAEAEB; color: #1D1D1F; }
         .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; font-weight: 600; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         
-        .nav-tree-item { padding: 0.2rem 0.5rem; border-radius: 0.375rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .nav-tree-item:hover { background-color: #EAEAEB; }
-        .chevron { cursor: pointer; padding: 0.1rem 0.4rem; border-radius: 0.25rem; color: #86868B; }
-        .chevron:hover { background-color: #D1D1D6; color: #1D1D1F; }
-        
         input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; cursor: pointer; transition: all 0.2s;}
         input[type="checkbox"]::before { content: ""; width: 0.6em; height: 0.6em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
         input[type="checkbox"]:checked { background-color: #1D1D1F; border-color: #1D1D1F; }
@@ -135,7 +130,7 @@
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
 
-            <!-- SIDEBAR COMPACTO -->
+            <!-- SIDEBAR COMPACTO Y MATRIZ CALENDARIO -->
             <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print">
                 <div class="flex justify-between items-center mb-6 px-2 mt-2">
                     <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest">Módulos</div>
@@ -148,11 +143,27 @@
                 <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('conclusiones')">Directorio Ejecutivo</div>
                 <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="cambiarSeccion('buscador')">Buscador Global</div>
                 
-                <div id="tree-container">
+                <!-- NUEVA MATRIZ DE CALENDARIO -->
+                <div id="calendar-container" class="mt-2">
                     <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
-                        <span>Periodos</span><button onclick="limpiarSeleccion()" class="hover:text-premium-text text-[9px] lowercase text-premium-highlight">desmarcar</button>
+                        <span>Filtro de Periodos</span>
+                        <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-[9px] lowercase text-premium-highlight transition">Limpiar</button>
                     </div>
-                    <div id="nav-tree" class="flex flex-col text-xs text-premium-text"></div>
+                    
+                    <div class="px-2 space-y-3">
+                        <div class="flex gap-2">
+                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-[10px] text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalSegmentChange(this.value)"></select>
+                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-[10px] text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalYearChange(this.value)"></select>
+                        </div>
+                        
+                        <div id="cal-months" class="grid grid-cols-4 gap-1.5">
+                            <!-- JS Inyecta Calendario -->
+                        </div>
+                        
+                        <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50">
+                            <!-- JS Inyecta Lista de Remates Activos -->
+                        </div>
+                    </div>
                 </div>
             </aside>
 
@@ -252,7 +263,7 @@
                             <table class="w-full text-left whitespace-nowrap">
                                 <thead>
                                     <tr>
-                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Periodo ↕️</th>
+                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Matriz Analizada ↕️</th>
                                         <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Venta ↕️</th>
                                         <th class="text-right cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'money')">Comisión ↕️</th>
                                         <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">L. Vend. ↕️</th>
@@ -563,7 +574,7 @@ window.onload = checkSession;
 
 
 // ===========================================
-// LÓGICA PRINCIPAL (PREMIUM UI + FIX FECHAS)
+// LÓGICA PRINCIPAL (PREMIUM UI + CALENDARIO)
 // ===========================================
 
 window.addEventListener('error', function(e) {
@@ -575,6 +586,11 @@ let db = { remates: [] };
 let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
 let svChartRetencionInst=null, svChartVentasInst=null, cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
+
+// Variables de Estado del Calendario
+let calSegment = 'Siniestrados';
+let calYear = new Date().getFullYear();
+let calSelectedMonths = new Set();
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#86868B'; 
@@ -592,7 +608,7 @@ async function initApp() {
             if (data.length === 1 && data[0].payload && data[0].payload.remates) { db = data[0].payload; } 
             else { db.remates = data.map(row => { let r = row.payload; r._dbId = row.id; return r; }); }
             
-            // CAMBIO 3: FIX DE ID PARA FECHAS ANTIGUAS
+            // FIX ANTICUELGUE DE FECHAS: Asegurar que todos los remates antiguos tengan un ID único
             db.remates.forEach(r => { if (!r.id) r.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); });
 
             statusLabel.innerText = `En Línea (${db.remates.length})`; statusLabel.classList.replace('text-premium-muted', 'text-premium-success');
@@ -673,7 +689,7 @@ const formatMoney = (num)=>{ if(!num || isNaN(num)) return '$0'; if(Math.abs(num
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
 const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
-function getSelectedRemates() { let uniqueMap = new Map(); checkedNodes.forEach(id => { if(nodeRematesMap[id] && nodeRematesMap[id].remates) { nodeRematesMap[id].remates.forEach(r => uniqueMap.set(r.id, r)); } }); return Array.from(uniqueMap.values()); }
+function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
 
 async function iniciarProcesamiento(files){
     const validFiles=Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
@@ -796,19 +812,100 @@ function cambiarSeccion(mod){
     try {
         currentModule=mod; document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-custom').className=mod==='custom'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mb-8':'nav-item nav-inactive mb-8'; 
         ['module-remates', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-custom', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
-        const tree = document.getElementById('tree-container'); const empty = document.getElementById('empty-state');
-        if(mod==='remates'){ tree.classList.remove('hidden'); document.getElementById('module-remates').classList.remove('hidden'); renderDashboard(); } 
-        else if(mod==='conclusiones'){ tree.classList.remove('hidden'); document.getElementById('module-conclusiones').classList.remove('hidden'); renderConclusiones(); }
-        else if(mod==='autos'){ tree.classList.remove('hidden'); document.getElementById('module-autos').classList.remove('hidden'); renderPanelAutos(); }
-        else if(mod==='custom'){ tree.classList.remove('hidden'); document.getElementById('module-custom').classList.remove('hidden'); generarInformePersonalizado(); }
-        else if(mod==='clientes'){ tree.classList.remove('hidden'); if(checkedNodes.length===0){ empty.classList.remove('hidden'); } else { empty.classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); renderPanelClientesData(clientDB,false); } } 
-        else { tree.classList.add('hidden'); document.getElementById('module-buscador').classList.remove('hidden'); empty.classList.add('hidden'); buscarPatente(); } 
+        if(mod==='remates'){ document.getElementById('module-remates').classList.remove('hidden'); renderDashboard(); } 
+        else if(mod==='conclusiones'){ document.getElementById('module-conclusiones').classList.remove('hidden'); renderConclusiones(); }
+        else if(mod==='autos'){ document.getElementById('module-autos').classList.remove('hidden'); renderPanelAutos(); }
+        else if(mod==='custom'){ document.getElementById('module-custom').classList.remove('hidden'); generarInformePersonalizado(); }
+        else if(mod==='clientes'){ if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); renderPanelClientesData(clientDB,false); } } 
+        else { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); buscarPatente(); } 
         if(window.innerWidth < 768) { toggleSidebar(); }
     } catch(e) {}
 }
 
-function toggleNode(id){ if(checkedNodes.includes(id)) checkedNodes=checkedNodes.filter(n=>n!==id); else checkedNodes.push(id); actualizarVistaActual(); }
-function limpiarSeleccion(){ checkedNodes=[]; document.querySelectorAll('input[type="checkbox"]').forEach(chk=>chk.checked=false); actualizarVistaActual(); }
+// === NUEVO SISTEMA DE CALENDARIO ===
+function actualizarSidebar(){ 
+    try {
+        if(!db.remates.length) return;
+        let segments = new Set(); let years = new Set(); nodeRematesMap = {}; 
+        db.remates.forEach(r => { segments.add(r.tipo); years.add(r.fechaData.year); nodeRematesMap[r.id] = { label: r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,18), remates: [r] }; });
+        if(segments.size > 0 && !segments.has(calSegment) && calSegment !== 'Todos') calSegment = Array.from(segments)[0];
+        if(years.size > 0 && !years.has(calYear)) calYear = Math.max(...Array.from(years));
+        const segHtml = `<option value="Todos" ${'Todos'===calSegment?'selected':''}>📊 Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===calSegment?'selected':''}>🚗 ${s}</option>`).join('');
+        const yearHtml = Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==calYear?'selected':''}>Año ${y}</option>`).join('');
+        document.getElementById('cal-segment').innerHTML = segHtml; document.getElementById('cal-year').innerHTML = yearHtml;
+        renderCalendar();
+    } catch(e) {}
+}
+
+function onCalSegmentChange(val) { calSegment = val; renderCalendar(); }
+function onCalYearChange(val) { calYear = parseInt(val); renderCalendar(); }
+
+function toggleCalMonth(m) {
+    if(calSelectedMonths.has(m)) {
+        calSelectedMonths.delete(m);
+        const toRemove = getRematesForMonth(m).map(r => r.id);
+        checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
+    } else {
+        calSelectedMonths.add(m);
+        const toAdd = getRematesForMonth(m).map(r => r.id);
+        toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
+    }
+    renderCalendar(); actualizarVistaActual();
+}
+
+function getRematesForMonth(m) {
+    return db.remates.filter(r => {
+        let matchSeg = calSegment === 'Todos' || r.tipo === calSegment;
+        let matchYear = r.fechaData.year === calYear;
+        let monthIndex = new Date(r.fechaData.timestamp).getMonth(); 
+        return matchSeg && matchYear && monthIndex === m;
+    });
+}
+
+function renderCalendar() {
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    let monthsWithData = new Set();
+    db.remates.forEach(r => { if((calSegment === 'Todos' || r.tipo === calSegment) && r.fechaData.year === calYear) { monthsWithData.add(new Date(r.fechaData.timestamp).getMonth()); } });
+    
+    let gridHtml = '';
+    for(let i=0; i<12; i++) {
+        let hasData = monthsWithData.has(i); let isSelected = calSelectedMonths.has(i);
+        let baseClasses = "py-1.5 text-center text-[10px] rounded-md font-semibold transition select-none ";
+        if(!hasData && !isSelected) { baseClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
+        else if (isSelected) { baseClasses += "bg-premium-highlight text-white shadow-sm cursor-pointer"; } 
+        else { baseClasses += "bg-white border border-premium-border text-premium-text hover:border-premium-highlight hover:text-premium-highlight cursor-pointer shadow-sm"; }
+        gridHtml += `<div class="${baseClasses}" ${hasData || isSelected ? `onclick="toggleCalMonth(${i})"` : ''}>${monthNames[i]}</div>`;
+    }
+    document.getElementById('cal-months').innerHTML = gridHtml;
+    
+    let rematesToShow = []; calSelectedMonths.forEach(m => { rematesToShow = rematesToShow.concat(getRematesForMonth(m)); });
+    rematesToShow.sort((a,b) => a.fechaData.timestamp - b.fechaData.timestamp);
+    
+    let listHtml = '';
+    if(rematesToShow.length > 0) {
+        listHtml += `<div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
+        rematesToShow.forEach(r => {
+            let isChecked = checkedNodes.includes(r.id);
+            listHtml += `
+            <label class="flex items-start gap-2.5 cursor-pointer mb-2.5 group hover:bg-premium-bg p-1.5 rounded-lg transition -ml-1.5">
+                <input type="checkbox" class="mt-0.5 shrink-0" onchange="toggleNode('${r.id}')" ${isChecked?'checked':''}>
+                <div class="flex flex-col min-w-0">
+                    <span class="text-[11px] font-semibold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight">${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,25)}</span>
+                    <span class="text-[9px] text-premium-muted font-medium">${r.tipo} • ${new Date(r.fechaData.timestamp).toLocaleDateString('es-CL')}</span>
+                </div>
+            </label>`;
+        });
+    }
+    document.getElementById('cal-matrices').innerHTML = listHtml;
+}
+
+function toggleNode(id){ 
+    if(checkedNodes.includes(id)) checkedNodes=checkedNodes.filter(n=>n!==id); else checkedNodes.push(id); 
+    renderCalendar(); actualizarVistaActual(); 
+}
+
+function limpiarSeleccion(){ checkedNodes=[]; calSelectedMonths.clear(); renderCalendar(); actualizarVistaActual(); }
+
 function actualizarVistaActual() { 
     try {
         if (currentModule === 'remates') renderDashboard(); else if (currentModule === 'autos') renderPanelAutos(); else if (currentModule === 'conclusiones') renderConclusiones(); else if (currentModule === 'custom') generarInformePersonalizado(); 
@@ -818,40 +915,9 @@ function actualizarVistaActual() {
 
 async function limpiarBase(){ 
     if(!confirm("¿Borrar todos los datos de la nube?")) return;
-    db = {remates:[]}; checkedNodes = []; clientDB = []; document.getElementById('empty-state').classList.remove('hidden'); 
+    db = {remates:[]}; checkedNodes = []; clientDB = []; calSelectedMonths.clear(); document.getElementById('empty-state').classList.remove('hidden'); 
     try { await supabaseClient.from('app_state').delete().gte('id', 0); } catch (e) { }
     actualizarSidebar(); location.reload(); 
-}
-
-function toggleAccordion(e,targetId,iconId){ e.stopPropagation(); const target=document.getElementById(targetId); const icon=document.getElementById(iconId); if(target.classList.contains('hidden')){ target.classList.remove('hidden'); icon.style.transform='rotate(0deg)'; } else { target.classList.add('hidden'); icon.style.transform='rotate(-90deg)'; } }
-
-function buildTreeNodeHTML(id,label,level,hasChildren,childHtml,forceOpen=false){ const ml=level*8; return `<div class="flex flex-col mt-0.5"><div class="nav-tree-item nav-inactive" style="margin-left:${ml}px;"><label class="flex items-center gap-2 cursor-pointer flex-1 min-w-0 pr-2"><input type="checkbox" id="chk-${id}" class="shrink-0" onchange="toggleNode('${id}')" ${checkedNodes.includes(id)?'checked':''}><span class="truncate ${level===0?'font-semibold text-premium-text':''}" title="${label}">${label}</span></label>${hasChildren?`<div class="chevron text-[9px]" id="icon-${id}" onclick="toggleAccordion(event,'child-${id}','icon-${id}')" style="transform: rotate(${forceOpen?'0deg':'-90deg'})">▼</div>`:''}</div>${hasChildren?`<div id="child-${id}" class="flex flex-col border-l border-premium-border/50 ml-[${ml+6}px] transition-all ${forceOpen?'':'hidden'}">${childHtml}</div>`:''}</div>`; }
-
-function actualizarSidebar(){ 
-    try {
-        const container=document.getElementById('nav-tree'); container.innerHTML=''; nodeRematesMap={}; if(!db.remates.length) return; const tree={}; 
-        db.remates.forEach(r=>{ 
-            const fd=r.fechaData; const t=r.tipo; const y=fd.year; const s=fd.semester; const q=fd.quarter; const m=fd.yearMonth; 
-            if(!tree[t]) tree[t]={id:`T-${t}`,label:t==='Retail'?'🛍 Retail':'🚗 Siniestrados',children:{}}; if(!tree[t].children[y]) tree[t].children[y]={id:`Y-${t}-${y}`,label:`Año ${y}`,children:{}}; if(!tree[t].children[y].children[s]) tree[t].children[y].children[s]={id:`S-${t}-${y}-${s}`,label:`Semestre ${s}`,children:{}}; if(!tree[t].children[y].children[s].children[q]) tree[t].children[y].children[s].children[q]={id:`Q-${t}-${y}-${q}`,label:`Trimestre ${q}`,children:{}}; if(!tree[t].children[y].children[s].children[q].children[m]) tree[t].children[y].children[s].children[q].children[m]={id:`M-${t}-${m}`,label:fd.mesStr,remates:[]}; tree[t].children[y].children[s].children[q].children[m].remates.push(r); 
-            const addMap=(id,label)=>{ if(!nodeRematesMap[id]) nodeRematesMap[id]={label,remates:[]}; nodeRematesMap[id].remates.push(r); }; addMap(`T-${t}`,`Total ${t}`); addMap(`Y-${t}-${y}`,`${t} ${y}`); addMap(`S-${t}-${y}-${s}`,`${t} Sem ${s} ${y}`); addMap(`Q-${t}-${y}-${q}`,`${t} Q${q} ${y}`); addMap(`M-${t}-${m}`,`${t} ${fd.mesStr.substring(0,3)} ${y}`); 
-        }); 
-        const getRemates=(node)=>{ if(node.remates) return node.remates; let arr=[]; Object.values(node.children).forEach(c=>{ arr=arr.concat(getRemates(c)); }); return arr; }; let html=''; 
-        Object.keys(tree).sort().reverse().forEach(t=>{ 
-            const nodeT=tree[t]; nodeRematesMap[nodeT.id]={label:`Total ${t}`,remates:getRemates(nodeT)}; let htmlY=''; 
-            Object.keys(nodeT.children).sort((a,b)=>b-a).forEach(y=>{ 
-                const nodeY=nodeT.children[y]; nodeRematesMap[nodeY.id]={label:`${t} ${y}`,remates:getRemates(nodeY)}; let htmlS=''; 
-                Object.keys(nodeY.children).sort((a,b)=>b-a).forEach(s=>{ 
-                    const nodeS=nodeY.children[s]; nodeRematesMap[nodeS.id]={label:`${t} Sem ${s} ${y}`,remates:getRemates(nodeS)}; let htmlQ=''; 
-                    Object.keys(nodeS.children).sort((a,b)=>b-a).forEach(q=>{ 
-                        const nodeQ=nodeS.children[q]; nodeRematesMap[nodeQ.id]={label:`${t} Q${q} ${y}`,remates:getRemates(nodeQ)}; let htmlM=''; 
-                        Object.keys(nodeQ.children).sort((a,b)=>b-a).forEach(m=>{ 
-                            const nodeM=nodeQ.children[m]; let htmlR=''; nodeM.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp).forEach((r,idx)=>{ const semanaNum=idx+1; const labelR=`Sem ${semanaNum} - ${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,10)}`; htmlR+=buildTreeNodeHTML(`R-${r.id}`,labelR,5,false,''); nodeRematesMap[`R-${r.id}`]={label:`${t} S${semanaNum} ${nodeM.label.substring(0,3)} ${r.fechaData.year}`,remates:[r]}; }); htmlM+=buildTreeNodeHTML(nodeM.id,nodeM.label,4,true,htmlR,false); 
-                        }); htmlQ+=buildTreeNodeHTML(nodeQ.id,nodeQ.label,3,true,htmlM,false); 
-                    }); htmlS+=buildTreeNodeHTML(nodeS.id,nodeS.label,2,true,htmlQ,true); 
-                }); htmlY+=buildTreeNodeHTML(nodeY.id,nodeY.label,1,true,htmlS,true); 
-            }); if(Object.keys(nodeT.children).length>0) html+=buildTreeNodeHTML(nodeT.id,nodeT.label,0,true,htmlY,true); 
-        }); container.innerHTML=html; 
-    } catch(e) {}
 }
 
 function renderDashboard(){ 
@@ -871,7 +937,6 @@ function renderSingleView(nodeId){
         if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); if(document.getElementById('sv-kpi-ticket-promedio-side')) document.getElementById('sv-kpi-ticket-promedio-side').innerText=formatMoney(agg.ticketPromedio); 
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
         
-        // CAMBIOS DE NOMENCLATURA 2:
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
