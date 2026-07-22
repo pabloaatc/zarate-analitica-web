@@ -65,31 +65,26 @@
             main { padding: 0 !important; background: white !important; }
             .glass-panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
         }
-        
-        /* Login Ultra Premium */
-        #login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #F5F5F7 0%, #EAEAEB 100%); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-        .login-box { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 2.5rem 2rem; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgba(255, 255, 255, 0.5); width: 100%; max-w: 340px; }
-        .input-field { width: 100%; padding: 0.75rem 1rem; border: 1px solid #E5E5EA; background: #FFFFFF; border-radius: 0.75rem; margin-top: 0.5rem; outline: none; transition: all 0.2s; font-size: 0.85rem; color: #1D1D1F; }
-        .input-field:focus { border-color: #1D1D1F; box-shadow: 0 0 0 3px rgba(29, 29, 31, 0.1); }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
     <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.0</div>
 
-    <!-- PANTALLA DE LOGIN -->
-    <div id="login-screen">
-        <div class="login-box text-center">
-            <div class="w-12 h-12 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-xl mx-auto mb-4 shadow-lg">Z</div>
+    <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl border border-white w-full max-w-[360px] text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
+            
+            <div class="w-14 h-14 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-2xl mx-auto mb-4 shadow-lg">Z</div>
             <h2 class="text-xl font-semibold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
             <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6">Control Directivo</p>
             
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
-                    <input type="email" id="email" class="input-field" required placeholder="Correo Electrónico">
+                    <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all" required placeholder="Correo Electrónico">
                 </div>
                 <div class="mb-6">
-                    <input type="password" id="password" class="input-field" required placeholder="Contraseña">
+                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all" required placeholder="Contraseña">
                 </div>
                 <div id="login-error" class="hidden text-premium-danger text-[10px] font-medium mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
                 <button type="submit" id="btn-login" class="w-full bg-premium-accent hover:bg-gray-800 text-white font-medium py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
@@ -99,9 +94,7 @@
         </div>
     </div>
     
-    <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
-        <!-- HEADER MINIMALISTA -->
         <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0">
             <div class="flex items-center gap-4">
                 <button onclick="toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
@@ -130,7 +123,6 @@
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
 
-            <!-- SIDEBAR COMPACTO Y MATRIZ CALENDARIO -->
             <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print">
                 <div class="flex justify-between items-center mb-6 px-2 mt-2">
                     <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest">Módulos</div>
@@ -143,32 +135,33 @@
                 <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('conclusiones')">Directorio Ejecutivo</div>
                 <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="cambiarSeccion('buscador')">Buscador Global</div>
                 
-                <!-- NUEVA MATRIZ DE CALENDARIO -->
                 <div id="calendar-container" class="mt-2">
-                    <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
+                    <div class="text-[10px] font-bold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                         <span>Filtro de Periodos</span>
-                        <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-[9px] lowercase text-premium-highlight transition">Limpiar</button>
+                        <div class="flex gap-3">
+                            <button onclick="seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1" title="Ir al remate más reciente">
+                                <span>⚡Reciente</span>
+                            </button>
+                            <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition">Limpiar</button>
+                        </div>
                     </div>
                     
                     <div class="px-2 space-y-3">
                         <div class="flex gap-2">
-                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-[10px] text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalSegmentChange(this.value)"></select>
-                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-[10px] text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalYearChange(this.value)"></select>
+                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalSegmentChange(this.value)"></select>
+                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalYearChange(this.value)"></select>
                         </div>
                         
                         <div id="cal-months" class="grid grid-cols-4 gap-1.5">
-                            <!-- JS Inyecta Calendario -->
-                        </div>
+                            </div>
                         
                         <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50">
-                            <!-- JS Inyecta Lista de Remates Activos -->
-                        </div>
+                            </div>
                     </div>
                 </div>
             </aside>
 
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
-                <!-- EMPTY STATE ELEGANTE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/90 backdrop-blur-md no-print p-6">
                     <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-4 border border-premium-border shadow-sm">
                         <svg class="w-6 h-6 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -178,10 +171,8 @@
                     <div id="error-log" class="mt-4 text-premium-danger font-medium text-[10px] text-center max-w-md"></div>
                 </div>
 
-                <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div id="single-view" class="space-y-6 hidden">
-                        <!-- Header Single View -->
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4">
                             <div>
                                 <h2 class="text-2xl font-semibold tracking-tight text-premium-text" id="sv-titulo">-</h2>
@@ -193,7 +184,6 @@
                             </div>
                         </div>
 
-                        <!-- KPIs Principales -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div class="glass-panel p-5">
                                 <h4 class="font-semibold text-sm mb-4 text-premium-text">Efectividad del Remate</h4>
@@ -263,7 +253,7 @@
                             <table class="w-full text-left whitespace-nowrap">
                                 <thead>
                                     <tr>
-                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Matriz Analizada ↕️</th>
+                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Periodo ↕️</th>
                                         <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Venta ↕️</th>
                                         <th class="text-right cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'money')">Comisión ↕️</th>
                                         <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">L. Vend. ↕️</th>
@@ -283,7 +273,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: MODELOS Y VEHICULOS -->
                 <div id="module-autos" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Estructura del catálogo adjudicado</p></div>
@@ -311,7 +300,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: CLIENTES -->
                 <div id="module-clientes" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Inteligencia de Clientes</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
@@ -373,7 +361,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: INFORME PERSONALIZADO -->
                 <div id="module-custom" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="border-b border-premium-border pb-4 no-print">
                         <h2 class="text-2xl font-semibold tracking-tight text-premium-text">Generador de Informes</h2>
@@ -411,7 +398,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: CONCLUSIONES IA -->
                 <div id="module-conclusiones" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Directorio Ejecutivo</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
@@ -420,7 +406,6 @@
                     <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 text-premium-text"></div>
                 </div>
 
-                <!-- MODULE: BUSCADOR -->
                 <div id="module-buscador" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Buscador Global</h2></div>
@@ -438,10 +423,7 @@
 
             </main>
         </div>
-    </div> <!-- FIN APP CONTENT -->
-
-    <!-- MODALES -->
-    <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+    </div> <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
             <div class="p-5 border-b border-premium-border flex justify-between items-start">
                 <div><h3 class="text-lg font-semibold tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase tracking-wider mt-1" id="modal-subtitulo"></p></div>
@@ -574,7 +556,7 @@ window.onload = checkSession;
 
 
 // ===========================================
-// LÓGICA PRINCIPAL (PREMIUM UI + CALENDARIO)
+// LÓGICA PRINCIPAL (PREMIUM UI + FIX FECHAS)
 // ===========================================
 
 window.addEventListener('error', function(e) {
@@ -608,7 +590,6 @@ async function initApp() {
             if (data.length === 1 && data[0].payload && data[0].payload.remates) { db = data[0].payload; } 
             else { db.remates = data.map(row => { let r = row.payload; r._dbId = row.id; return r; }); }
             
-            // FIX ANTICUELGUE DE FECHAS: Asegurar que todos los remates antiguos tengan un ID único
             db.remates.forEach(r => { if (!r.id) r.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); });
 
             statusLabel.innerText = `En Línea (${db.remates.length})`; statusLabel.classList.replace('text-premium-muted', 'text-premium-success');
@@ -685,7 +666,7 @@ function extraerMarcaModelo(loteStr) {
 }
 
 const normalizarCliente = (nombre)=>{ if(!nombre) return 'DESCONOCIDO'; let n=String(nombre).toUpperCase().trim(); if(n.includes('CROVETTO')) return 'CROVETTO (GRUPO)'; n=n.replace(/\b\d{1,2}\.?\d{3}\.?\d{3}-?[0-9Kk]\b/g,''); n=n.replace(/\b(SPA|LTDA|LIMITADA|EIRL|E\.I\.R\.L|S\.A\.?|SOCIEDAD|COMERCIAL)\b/g,''); return n.replace(/\s+/g,' ').replace(/[-_.,]+$/, '').trim() || 'DESCONOCIDO'; };
-const formatMoney = (num)=>{ if(!num || isNaN(num)) return '$0'; if(Math.abs(num) >= 1e6) { let val = Math.round(num/1e6); return `$${val.toLocaleString('es-CL')} M`; } return `$${Math.round(num).toLocaleString('es-CL')}`; };
+const formatMoney = (num)=>{ if(!num || isNaN(num)) return '$0'; if(Math.abs(num) >= 1e6) { let val = Math.round(num/1e6); return `$${val.toLocaleString('es-CL')} MM`; } return `$${Math.round(num).toLocaleString('es-CL')}`; };
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
 const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
@@ -870,7 +851,7 @@ function renderCalendar() {
     let gridHtml = '';
     for(let i=0; i<12; i++) {
         let hasData = monthsWithData.has(i); let isSelected = calSelectedMonths.has(i);
-        let baseClasses = "py-1.5 text-center text-[10px] rounded-md font-semibold transition select-none ";
+        let baseClasses = "py-1.5 text-center text-xs rounded-md font-semibold transition select-none ";
         if(!hasData && !isSelected) { baseClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
         else if (isSelected) { baseClasses += "bg-premium-highlight text-white shadow-sm cursor-pointer"; } 
         else { baseClasses += "bg-white border border-premium-border text-premium-text hover:border-premium-highlight hover:text-premium-highlight cursor-pointer shadow-sm"; }
@@ -883,7 +864,7 @@ function renderCalendar() {
     
     let listHtml = '';
     if(rematesToShow.length > 0) {
-        listHtml += `<div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
+        listHtml += `<div class="text-[10px] font-bold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
         rematesToShow.forEach(r => {
             let isChecked = checkedNodes.includes(r.id);
             listHtml += `
@@ -905,6 +886,37 @@ function toggleNode(id){
 }
 
 function limpiarSeleccion(){ checkedNodes=[]; calSelectedMonths.clear(); renderCalendar(); actualizarVistaActual(); }
+
+window.seleccionarUltimoRemate = function() {
+    if (!db.remates || db.remates.length === 0) return;
+    
+    // Buscar el remate más nuevo por fecha
+    const rematesOrdenados = [...db.remates].sort((a,b) => b.fechaData.timestamp - a.fechaData.timestamp);
+    const ultimo = rematesOrdenados[0];
+
+    // Limpiar y seleccionar solo este remate
+    checkedNodes = [ultimo.id];
+    
+    // Ajustar los filtros visuales para que coincidan
+    calSegment = ultimo.tipo;
+    calYear = ultimo.fechaData.year;
+    
+    const monthIndex = new Date(ultimo.fechaData.timestamp).getMonth();
+    calSelectedMonths.clear();
+    calSelectedMonths.add(monthIndex);
+    
+    // Refrescar los <select> del HTML
+    const segSelect = document.getElementById('cal-segment');
+    if(segSelect) segSelect.value = calSegment;
+    const yearSelect = document.getElementById('cal-year');
+    if(yearSelect) yearSelect.value = calYear;
+    
+    renderCalendar();
+    cambiarSeccion('remates'); // Forzar la vista principal de remates
+    actualizarVistaActual();
+    
+    if(window.innerWidth < 768) { toggleSidebar(); }
+};
 
 function actualizarVistaActual() { 
     try {
