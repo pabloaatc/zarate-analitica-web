@@ -91,6 +91,21 @@
                     Iniciar Sesión
                 </button>
             </form>
+
+            <form id="invite-form" onsubmit="handleSetPassword(event)" class="text-left hidden">
+                <div class="mb-2 text-center">
+                    <span class="bg-premium-success/10 text-premium-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Invitación Aceptada</span>
+                </div>
+                <p class="text-xs text-premium-muted mb-6 text-center leading-relaxed">¡Bienvenido! Crea tu contraseña definitiva para ingresar a Zárate Analítica.</p>
+                <div class="mb-6">
+                    <input type="password" id="new-password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-success focus:ring-2 focus:ring-premium-success/20 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6">
+                </div>
+                <div id="invite-error" class="hidden text-premium-danger text-[10px] font-medium mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
+                <button type="submit" id="btn-invite" class="w-full bg-premium-success hover:bg-green-700 text-white font-medium py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
+                    Guardar y Entrar
+                </button>
+            </form>
+
         </div>
     </div>
     
@@ -381,7 +396,7 @@
                                 <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-participan" checked> <span class="group-hover:text-premium-highlight transition">Clientes c/Garantía</span></label>
                                 <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-ganadores" checked> <span class="group-hover:text-premium-highlight transition">Clientes que adjudicaron</span></label>
                                 <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-fuga" checked> <span class="group-hover:text-premium-highlight transition">Clientes que NO adjudicaron</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-nuevos" checked> <span class="group-hover:text-premium-highlight transition">Clientes nuevos (1ra compra)</span></label>
+                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-nuevos" checked> <span class="group-hover:text-premium-highlight transition">Clientes nuevos que adjudicaron</span></label>
                                 <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-multi" checked> <span class="group-hover:text-premium-highlight transition">Clientes que adjudicaron > 1 lote</span></label>
                                 <div class="my-3 border-b border-premium-border/50"></div>
                                 <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-lotesestrella" checked> <span class="group-hover:text-premium-highlight transition">Top 5 Lotes (Tabla)</span></label>
@@ -470,7 +485,7 @@ const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 // ===========================================
-// SISTEMA DE SEGURIDAD (ANTI-CUELGUE)
+// SISTEMA DE SEGURIDAD Y MANEJO DE INVITACIONES (CAMBIO 4)
 // ===========================================
 let sessionUser = null;
 
@@ -551,12 +566,49 @@ async function handleLogin(e) {
     }
 }
 
+// LOGICA DE PANTALLA DE INVITACIÓN (CAMBIO 4)
+async function handleSetPassword(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-invite');
+    const err = document.getElementById('invite-error');
+    const newPassword = document.getElementById('new-password').value;
+    
+    btn.innerHTML = "Guardando..."; btn.disabled = true; err.classList.add('hidden');
+    
+    try {
+        const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+        
+        // Limpiamos el hash de la URL para que no se quede pegado si recarga
+        window.history.replaceState(null, null, ' ');
+        
+        btn.innerHTML = "¡Listo!";
+        await checkSession(); 
+    } catch (ex) {
+        err.innerText = "Error: " + (ex.message || "No se pudo guardar la contraseña.");
+        err.classList.remove('hidden');
+        btn.innerHTML = "Guardar y Entrar"; btn.disabled = false;
+    }
+}
+
+window.onload = () => {
+    // Si viene de un correo de invitación de Supabase, la URL trae un hash especial
+    const hash = window.location.hash;
+    if (hash && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('invite-form').classList.remove('hidden');
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app-content').classList.add('hidden');
+    } else {
+        checkSession();
+    }
+};
+
 async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
-window.onload = checkSession;
 
 
 // ===========================================
-// LÓGICA PRINCIPAL (PREMIUM UI + FIX FECHAS)
+// LÓGICA PRINCIPAL (PREMIUM UI + FIX FECHAS + NOMENCLATURA)
 // ===========================================
 
 window.addEventListener('error', function(e) {
@@ -890,14 +942,11 @@ function limpiarSeleccion(){ checkedNodes=[]; calSelectedMonths.clear(); renderC
 window.seleccionarUltimoRemate = function() {
     if (!db.remates || db.remates.length === 0) return;
     
-    // Buscar el remate más nuevo por fecha
     const rematesOrdenados = [...db.remates].sort((a,b) => b.fechaData.timestamp - a.fechaData.timestamp);
     const ultimo = rematesOrdenados[0];
 
-    // Limpiar y seleccionar solo este remate
     checkedNodes = [ultimo.id];
     
-    // Ajustar los filtros visuales para que coincidan
     calSegment = ultimo.tipo;
     calYear = ultimo.fechaData.year;
     
@@ -905,14 +954,13 @@ window.seleccionarUltimoRemate = function() {
     calSelectedMonths.clear();
     calSelectedMonths.add(monthIndex);
     
-    // Refrescar los <select> del HTML
     const segSelect = document.getElementById('cal-segment');
     if(segSelect) segSelect.value = calSegment;
     const yearSelect = document.getElementById('cal-year');
     if(yearSelect) yearSelect.value = calYear;
     
     renderCalendar();
-    cambiarSeccion('remates'); // Forzar la vista principal de remates
+    cambiarSeccion('remates');
     actualizarVistaActual();
     
     if(window.innerWidth < 768) { toggleSidebar(); }
@@ -949,6 +997,7 @@ function renderSingleView(nodeId){
         if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); if(document.getElementById('sv-kpi-ticket-promedio-side')) document.getElementById('sv-kpi-ticket-promedio-side').innerText=formatMoney(agg.ticketPromedio); 
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
         
+        // Cambio de Textos
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
