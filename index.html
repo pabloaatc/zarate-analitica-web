@@ -54,7 +54,6 @@
 
         .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); }
         
-        /* Tablas minimalistas */
         thead th { background-color: #FFFFFF; border-bottom: 1px solid #E5E5EA; color: #86868B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; padding-bottom: 0.75rem; }
         tbody tr { border-bottom: 1px solid #F5F5F7; transition: background-color 0.2s; }
         tbody tr:hover { background-color: #FAFAFA; }
@@ -69,19 +68,17 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.1</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.2</div>
 
-    <!-- PANTALLA DE LOGIN Y CONFIGURACIÓN DE CONTRASEÑA -->
+    <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl border border-white w-full max-w-[360px] text-center relative overflow-hidden">
-            <!-- Adorno superior -->
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
             
             <div class="w-14 h-14 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-2xl mx-auto mb-4 shadow-lg">Z</div>
             <h2 class="text-xl font-semibold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
             <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6">Control Directivo</p>
             
-            <!-- FORMULARIO DE LOGIN NORMAL -->
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
                     <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all" required placeholder="Correo Electrónico">
@@ -95,7 +92,6 @@
                 </button>
             </form>
 
-            <!-- FORMULARIO DE CONFIGURACIÓN DE CONTRASEÑA (INVITACIÓN) -->
             <form id="invite-form" onsubmit="handleSetPassword(event)" class="text-left hidden">
                 <div class="mb-2 text-center">
                     <span class="bg-premium-success/10 text-premium-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Invitación Aceptada</span>
@@ -114,30 +110,36 @@
     
     <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
-        <!-- HEADER MINIMALISTA -->
-        <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0">
-            <div class="flex items-center gap-4">
+        <!-- HEADER RESPONSIVO Y SEGURO -->
+        <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0">
+            <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
-                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-lg">Z</div>
-                <div><h1 class="font-semibold text-sm text-premium-text tracking-tight">Control de Gestión</h1><p class="text-[9px] text-premium-muted uppercase tracking-wider" id="db-status">Conectando...</p></div>
+                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base md:text-lg">Z</div>
+                <div class="hidden sm:block">
+                    <h1 class="font-semibold text-sm text-premium-text tracking-tight">Control de Gestión</h1>
+                    <p class="text-[9px] text-premium-muted uppercase tracking-wider" id="db-status">Conectando...</p>
+                </div>
             </div>
-            <div class="flex items-center gap-4">
-                <!-- BOTONES DE EDICIÓN CON ID PARA EL CANDADO VISUAL -->
-                <button id="btn-vaciar" onclick="limpiarBase()" class="hidden text-[10px] text-premium-danger font-medium px-3 py-1.5 rounded-full hover:bg-red-50 transition" title="Vaciar datos de la nube">Vaciar Base</button>
-                <div id="drop-zone" class="upload-area px-4 py-1.5 hidden items-center gap-3">
-                    <label for="file-input" class="font-medium text-[11px] text-premium-text cursor-pointer">📄 Archivos</label>
-                    <span class="text-premium-border hidden md:inline">|</span>
-                    <label for="folder-input" class="font-medium text-[11px] text-premium-text cursor-pointer hidden md:inline">📁 Carpeta</label>
-                    <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="iniciarProcesamiento(this.files)">
-                    <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="iniciarProcesamiento(this.files)">
+            
+            <div class="flex items-center gap-3 md:gap-4">
+                <!-- CONTROLES ADMIN (Ocultos por defecto) -->
+                <div id="admin-controls" class="hidden items-center gap-2 md:gap-4">
+                    <button onclick="limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-medium px-3 py-1.5 rounded-full hover:bg-red-50 transition border border-red-100" title="Vaciar datos de la nube">Vaciar Base</button>
+                    <div class="upload-area px-3 md:px-4 py-1.5 flex items-center gap-2 md:gap-3">
+                        <label for="file-input" class="font-medium text-[12px] md:text-[11px] text-premium-text cursor-pointer"><span class="md:hidden">📄</span><span class="hidden md:inline">📄 Archivos</span></label>
+                        <span class="text-premium-border hidden md:inline">|</span>
+                        <label for="folder-input" class="font-medium text-[11px] text-premium-text cursor-pointer hidden md:inline">📁 Carpeta</label>
+                        <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="iniciarProcesamiento(this.files)">
+                        <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="iniciarProcesamiento(this.files)">
+                    </div>
                 </div>
                 
-                <div class="h-4 w-px bg-premium-border hidden md:block"></div>
-                <button onclick="handleLogout()" class="flex items-center gap-2 text-xs font-medium text-premium-muted hover:text-premium-text transition">
-                    <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline"></span> 
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <div class="h-4 w-px bg-premium-border hidden sm:block"></div>
+                <button onclick="handleLogout()" class="flex items-center gap-2 text-xs font-medium text-premium-muted hover:text-premium-text transition" title="Cerrar Sesión">
+                    <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline border border-premium-border"></span> 
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
         </header>
@@ -145,7 +147,6 @@
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
 
-            <!-- SIDEBAR COMPACTO Y MATRIZ CALENDARIO -->
             <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print">
                 <div class="flex justify-between items-center mb-6 px-2 mt-2">
                     <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest">Módulos</div>
@@ -175,47 +176,42 @@
                             <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalYearChange(this.value)"></select>
                         </div>
                         
-                        <div id="cal-months" class="grid grid-cols-4 gap-1.5">
-                            <!-- JS Inyecta Calendario -->
-                        </div>
+                        <div id="cal-months" class="grid grid-cols-4 gap-1.5"></div>
                         
-                        <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50">
-                            <!-- JS Inyecta Lista de Remates Activos -->
-                        </div>
+                        <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50"></div>
                     </div>
                 </div>
             </aside>
 
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
-                <!-- EMPTY STATE ELEGANTE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/90 backdrop-blur-md no-print p-6">
                     <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-4 border border-premium-border shadow-sm">
                         <svg class="w-6 h-6 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
-                    <p class="font-medium text-lg text-premium-text tracking-tight" id="es-title">Área de Trabajo Principal</p>
-                    <p class="text-xs text-premium-muted mt-2 text-center max-w-sm" id="es-desc">Seleccione una matriz en el panel lateral o arrastre nuevos archivos para comenzar el análisis.</p>
+                    <p class="font-medium text-lg text-premium-text tracking-tight text-center">Área de Trabajo Principal</p>
+                    <p class="text-xs text-premium-muted mt-2 text-center max-w-sm">Seleccione una matriz en el panel lateral o arrastre nuevos archivos para comenzar el análisis.</p>
                     <div id="error-log" class="mt-4 text-premium-danger font-medium text-[10px] text-center max-w-md"></div>
                 </div>
 
                 <!-- MODULE: REMATES -->
-                <div id="module-remates" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div id="single-view" class="space-y-6 hidden">
+                <div id="module-remates" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div id="single-view" class="space-y-4 md:space-y-6 hidden">
                         <!-- Header Single View -->
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4">
-                            <div>
-                                <h2 class="text-2xl font-semibold tracking-tight text-premium-text" id="sv-titulo">-</h2>
-                                <p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1" id="sv-subtitulo">-</p>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-premium-border pb-4">
+                            <div class="w-full sm:w-auto overflow-hidden">
+                                <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text truncate" id="sv-titulo">-</h2>
+                                <p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1" id="sv-subtitulo">-</p>
                             </div>
-                            <div class="flex gap-6 text-right">
-                                <div><p class="text-[9px] text-premium-muted uppercase font-semibold">Comisión Estimada</p><p class="text-xl font-semibold text-premium-highlight mt-0.5" id="sv-kpi-comision-top">$0</p></div>
-                                <div><p class="text-[9px] text-premium-muted uppercase font-semibold">Venta Adjudicada</p><p class="text-xl font-semibold text-premium-success mt-0.5" id="sv-kpi-venta">$0</p></div>
+                            <div class="flex gap-4 md:gap-6 text-right shrink-0">
+                                <div><p class="text-[8px] md:text-[9px] text-premium-muted uppercase font-semibold">Comisión Estimada</p><p class="text-lg md:text-xl font-semibold text-premium-highlight mt-0.5" id="sv-kpi-comision-top">$0</p></div>
+                                <div><p class="text-[8px] md:text-[9px] text-premium-muted uppercase font-semibold">Venta Adjudicada</p><p class="text-lg md:text-xl font-semibold text-premium-success mt-0.5" id="sv-kpi-venta">$0</p></div>
                             </div>
                         </div>
 
                         <!-- KPIs Principales -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div class="glass-panel p-5">
-                                <h4 class="font-semibold text-sm mb-4 text-premium-text">Efectividad del Remate</h4>
+                            <div class="glass-panel p-4 md:p-5">
+                                <h4 class="font-semibold text-sm mb-3 md:mb-4 text-premium-text">Efectividad del Remate</h4>
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Lotes Disponibles (Base)</span><span class="font-medium text-sm text-premium-text" id="sv-kpi-lotes-disp">0</span></div>
                                     <div class="w-full h-px bg-premium-border/50"></div>
@@ -225,8 +221,8 @@
                                 </div>
                             </div>
 
-                            <div class="glass-panel p-5">
-                                <h4 class="font-semibold text-sm mb-4 text-premium-text">Comportamiento de Clientes</h4>
+                            <div class="glass-panel p-4 md:p-5">
+                                <h4 class="font-semibold text-sm mb-3 md:mb-4 text-premium-text">Comportamiento de Clientes</h4>
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Clientes c/Garantía</span><span class="font-medium text-sm text-premium-text" id="sv-kpi-garantias">0</span></div>
                                     <div class="w-full h-px bg-premium-border/50"></div>
@@ -235,20 +231,20 @@
                                     <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Clientes que NO adjudicaron</span><span class="font-medium text-sm text-premium-danger" id="sv-kpi-perdedores">0</span></div>
                                     <div class="w-full h-px bg-premium-border/50"></div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-xs text-premium-muted">Clientes nuevos que adjudicaron</span>
-                                        <div><span class="font-medium text-sm text-premium-highlight" id="sv-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted ml-1" id="sv-kpi-1racompra-pct"></span></div>
+                                        <span class="text-xs text-premium-muted truncate pr-2">Clientes nuevos que adjudicaron</span>
+                                        <div class="shrink-0"><span class="font-medium text-sm text-premium-highlight" id="sv-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted ml-1" id="sv-kpi-1racompra-pct"></span></div>
                                     </div>
                                     <div class="w-full h-px bg-premium-border/50"></div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-xs text-premium-muted">Clientes que adjudicaron > 1 lote</span>
-                                        <div class="flex items-center gap-2"><span class="font-medium text-sm text-premium-text" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[9px] text-premium-highlight hover:underline font-medium no-print">Ver lista</button></div>
+                                        <span class="text-xs text-premium-muted truncate pr-2">Clientes que adjudicaron > 1 lote</span>
+                                        <div class="flex items-center gap-2 shrink-0"><span class="font-medium text-sm text-premium-text" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[9px] text-premium-highlight hover:underline font-medium no-print">Ver lista</button></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-                            <div class="xl:col-span-2 glass-panel p-5 overflow-hidden">
+                            <div class="xl:col-span-2 glass-panel p-4 md:p-5 overflow-hidden">
                                 <h4 class="font-semibold text-sm mb-3 text-premium-text">Lotes de Mayor Demanda</h4>
                                 <div class="overflow-x-auto overflow-y-auto max-h-[300px]">
                                     <table class="w-full text-left">
@@ -267,16 +263,16 @@
                                 </div>
                             </div>
                             <div class="space-y-4 md:space-y-6 no-print">
-                                <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-2">Ticket Promedio</h4><p class="text-2xl font-semibold text-premium-text mb-4" id="sv-kpi-ticket-promedio-side">$0</p><div class="relative h-32"><canvas id="sv-chartVentas"></canvas></div></div>
-                                <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-2">Retención</h4><div class="relative h-32"><canvas id="sv-chartRetencion"></canvas></div></div>
+                                <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-2">Ticket Promedio</h4><p class="text-xl md:text-2xl font-semibold text-premium-text mb-4" id="sv-kpi-ticket-promedio-side">$0</p><div class="relative h-32"><canvas id="sv-chartVentas"></canvas></div></div>
+                                <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-2">Retención</h4><div class="relative h-32"><canvas id="sv-chartRetencion"></canvas></div></div>
                             </div>
                         </div>
                     </div>
 
-                    <div id="compare-view" class="space-y-6 hidden">
+                    <div id="compare-view" class="space-y-4 md:space-y-6 hidden">
                         <div class="border-b border-premium-border pb-4">
-                            <h2 class="text-2xl font-semibold tracking-tight text-premium-text">Análisis Comparativo</h2>
-                            <p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Consolidación de múltiples periodos</p>
+                            <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Análisis Comparativo</h2>
+                            <p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Consolidación de múltiples periodos</p>
                         </div>
                         <div class="glass-panel overflow-x-auto w-full p-2">
                             <table class="w-full text-left whitespace-nowrap">
@@ -296,21 +292,21 @@
                             </table>
                         </div>
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 mt-4 no-print">
-                            <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4">Composición de Ventas</h4><canvas id="cv-chartVentas" class="h-48 md:h-64 w-full"></canvas></div>
-                            <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4">Evolución de Clientes</h4><canvas id="cv-chartGarantias" class="h-48 md:h-64 w-full"></canvas></div>
+                            <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4">Composición de Ventas</h4><canvas id="cv-chartVentas" class="h-48 md:h-64 w-full"></canvas></div>
+                            <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4">Evolución de Clientes</h4><canvas id="cv-chartGarantias" class="h-48 md:h-64 w-full"></canvas></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- MODULE: MODELOS Y VEHICULOS -->
-                <div id="module-autos" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Estructura del catálogo adjudicado</p></div>
+                <div id="module-autos" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
+                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Estructura del catálogo adjudicado</p></div>
                         <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-premium-border rounded-xl px-4 py-2 text-sm text-premium-text w-full md:w-64 focus:outline-none focus:border-premium-text transition" onkeyup="renderPanelAutos()">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-48 md:h-64"><canvas id="flota-marcas-chart"></canvas></div></div>
-                        <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Modelos Específicos</h4><div class="relative h-48 md:h-64"><canvas id="flota-modelos-chart"></canvas></div></div>
+                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-48 md:h-64"><canvas id="flota-marcas-chart"></canvas></div></div>
+                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Modelos Específicos</h4><div class="relative h-48 md:h-64"><canvas id="flota-modelos-chart"></canvas></div></div>
                     </div>
                     <div class="glass-panel p-2">
                         <div class="overflow-x-auto max-h-[600px] px-2">
@@ -331,25 +327,25 @@
                 </div>
 
                 <!-- MODULE: CLIENTES -->
-                <div id="module-clientes" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
+                <div id="module-clientes" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Inteligencia de Clientes</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
+                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Inteligencia de Clientes</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
                         <div class="flex flex-col sm:flex-row gap-2 md:gap-3 w-full md:w-auto">
                             <select id="filter-client-type" class="bg-white border border-premium-border rounded-xl px-3 py-2 text-sm text-premium-text outline-none w-full sm:w-auto focus:border-premium-text transition" onchange="filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
                             <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-premium-border rounded-xl px-4 py-2 text-sm text-premium-text outline-none w-full sm:w-64 focus:border-premium-text transition" onkeyup="filtrarClientes()">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Total Clientes</p><p class="text-2xl font-semibold mt-1 text-premium-text" id="bi-kpi-total">0</p></div>
-                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Inversión Prom.</p><p class="text-2xl font-semibold text-premium-success mt-1" id="bi-kpi-ltv">$0</p></div>
-                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Compradores Cruzados</p><p class="text-2xl font-semibold text-premium-highlight mt-1" id="bi-kpi-hibridos">0</p></div>
-                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">En Riesgo (Inactivos)</p><p class="text-2xl font-semibold text-premium-danger mt-1" id="bi-kpi-inactivos">0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Total Clientes</p><p class="text-xl md:text-2xl font-semibold mt-1 text-premium-text" id="bi-kpi-total">0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Inversión Prom.</p><p class="text-xl md:text-2xl font-semibold text-premium-success mt-1" id="bi-kpi-ltv">$0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Cruces</p><p class="text-xl md:text-2xl font-semibold text-premium-highlight mt-1" id="bi-kpi-hibridos">0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">En Riesgo</p><p class="text-xl md:text-2xl font-semibold text-premium-danger mt-1" id="bi-kpi-inactivos">0</p></div>
                     </div>
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-                        <div id="bi-ficha-cliente" class="glass-panel p-5 xl:col-span-3 hidden border-l-4 border-l-premium-highlight">
+                        <div id="bi-ficha-cliente" class="glass-panel p-4 md:p-5 xl:col-span-3 hidden border-l-4 border-l-premium-highlight">
                             <div class="flex flex-col md:flex-row justify-between items-start mb-4 gap-2">
                                 <div>
-                                    <h3 class="text-xl font-semibold text-premium-text tracking-tight" id="ficha-nombre">-</h3>
+                                    <h3 class="text-lg md:text-xl font-semibold text-premium-text tracking-tight" id="ficha-nombre">-</h3>
                                     <div class="flex flex-wrap gap-3 mt-1 text-[10px] text-premium-muted uppercase tracking-wider">
                                         <span>RUT: <span id="ficha-rut" class="font-medium text-premium-text"></span></span>
                                         <span>Email: <span id="ficha-email" class="font-medium text-premium-text lowercase"></span></span>
@@ -358,11 +354,11 @@
                                 <button onclick="cerrarFicha()" class="text-premium-muted hover:text-premium-text text-xs font-medium no-print transition">✕ Cerrar Ficha</button>
                             </div>
                             <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-y border-premium-border mb-4">
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">1ra Compra</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-primera">-</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Última Compra</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-ultima">-</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Lotes Adj.</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-lotes">0</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Vol. Siniestros</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-monto-sin">$0</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Vol. Retail</p><p class="font-medium text-sm text-premium-text mt-0.5" id="ficha-monto-ret">$0</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">1ra Compra</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-primera">-</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Última Compra</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-ultima">-</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Lotes Adj.</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-lotes">0</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Vol. Siniestros</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-monto-sin">$0</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Vol. Retail</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-monto-ret">$0</p></div>
                             </div>
                             <div class="overflow-x-auto max-h-[250px]">
                                 <table class="w-full text-left">
@@ -388,18 +384,18 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Salud de Cartera</h4><div class="relative h-48 md:h-64"><canvas id="bi-chartSegments"></canvas></div></div>
+                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Salud de Cartera</h4><div class="relative h-48 md:h-64"><canvas id="bi-chartSegments"></canvas></div></div>
                     </div>
                 </div>
 
                 <!-- MODULE: INFORME PERSONALIZADO -->
-                <div id="module-custom" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
+                <div id="module-custom" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="border-b border-premium-border pb-4 no-print">
-                        <h2 class="text-2xl font-semibold tracking-tight text-premium-text">Generador de Informes</h2>
-                        <p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Seleccione KPIs para construir reporte</p>
+                        <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Generador de Informes</h2>
+                        <p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Seleccione KPIs para construir reporte</p>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-                        <div class="glass-panel p-5 bg-white no-print">
+                        <div class="glass-panel p-4 md:p-5 bg-white no-print">
                             <h3 class="font-semibold text-sm text-premium-text mb-4">1. Configuración de Métricas</h3>
                             <div class="space-y-3 text-xs text-premium-text font-medium" id="custom-checkboxes">
                                 <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-disp" checked> <span class="group-hover:text-premium-highlight transition">Lotes Disponibles</span></label>
@@ -425,24 +421,24 @@
                                 <h3 class="font-semibold text-sm text-premium-text">2. Previa del Documento</h3>
                                 <button onclick="window.print()" class="px-4 py-1.5 bg-premium-highlight text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center gap-2">🖨️ Exportar PDF</button>
                             </div>
-                            <div id="custom-report-output" class="glass-panel p-6 md:p-10 bg-white min-h-[400px]"></div>
+                            <div id="custom-report-output" class="glass-panel p-4 md:p-10 bg-white min-h-[400px]"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- MODULE: CONCLUSIONES IA -->
-                <div id="module-conclusiones" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Directorio Ejecutivo</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
+                <div id="module-conclusiones" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
+                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Directorio Ejecutivo</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
                         <button onclick="window.print()" class="px-4 py-2 bg-white border border-premium-border rounded-xl text-xs font-medium hover:bg-slate-50 transition w-full md:w-auto">Imprimir Resumen</button>
                     </div>
                     <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 text-premium-text"></div>
                 </div>
 
                 <!-- MODULE: BUSCADOR -->
-                <div id="module-buscador" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Buscador Global</h2></div>
+                <div id="module-buscador" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
+                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Buscador Global</h2></div>
                         <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-premium-border rounded-xl px-4 py-2.5 text-sm text-premium-text w-full md:w-80 shadow-sm focus:outline-none focus:border-premium-text transition" onkeyup="buscarPatente()">
                     </div>
                     <div class="glass-panel p-2 overflow-hidden">
@@ -462,18 +458,18 @@
     <!-- MODALES -->
     <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-5 border-b border-premium-border flex justify-between items-start">
+            <div class="p-4 md:p-5 border-b border-premium-border flex justify-between items-start">
                 <div><h3 class="text-lg font-semibold tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase tracking-wider mt-1" id="modal-subtitulo"></p></div>
                 <button onclick="cerrarModal()" class="text-premium-muted hover:text-premium-text transition">✕</button>
             </div>
-            <div class="px-5 py-3 bg-premium-bg flex flex-wrap gap-4 text-[10px] border-b border-premium-border uppercase tracking-wider font-semibold">
+            <div class="px-4 md:px-5 py-3 bg-premium-bg flex flex-wrap gap-4 text-[10px] border-b border-premium-border uppercase tracking-wider font-semibold">
                 <div><span class="text-premium-muted">Total:</span> <span class="text-premium-text" id="modal-total-pujas">0</span></div>
                 <div><span class="text-premium-muted">Únicos:</span> <span class="text-premium-highlight" id="modal-unicos-reales">0</span></div>
-                <div class="ml-auto flex gap-2"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-2 py-0.5 rounded text-premium-text hover:bg-white transition">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-2 py-0.5 rounded text-premium-muted hover:text-premium-text transition">Solo Reales</button></div>
+                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-2 py-0.5 rounded text-premium-text hover:bg-white transition">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-2 py-0.5 rounded text-premium-muted hover:text-premium-text transition">Solo Reales</button></div>
             </div>
             <div class="flex-1 overflow-x-auto overflow-y-auto p-2">
                 <table class="w-full text-left">
-                    <thead><tr><th class="pl-3">#</th><th>Fecha</th><th>Nombre</th><th class="text-right">Monto</th><th class="text-center pr-3">Status</th></tr></thead>
+                    <thead><tr><th class="pl-3">#</th><th class="hidden sm:table-cell">Fecha</th><th>Nombre</th><th class="text-right">Monto</th><th class="text-center pr-3">Status</th></tr></thead>
                     <tbody id="modal-tabla-pujas"></tbody>
                 </table>
             </div>
@@ -482,9 +478,9 @@
 
     <div id="modal-fuga" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-5 border-b border-premium-border flex justify-between items-center gap-3">
-                <div><h3 class="text-lg font-semibold tracking-tight text-premium-danger">Clientes que NO adjudicaron (Fuga)</h3></div>
-                <div class="flex items-center gap-3"><button onclick="exportarFugaExcel()" class="text-[10px] font-medium bg-premium-bg border border-premium-border px-3 py-1.5 rounded-lg hover:bg-white transition">⬇️ Exportar Excel</button><button onclick="cerrarModalFuga()" class="text-premium-muted hover:text-premium-text transition">✕</button></div>
+            <div class="p-4 md:p-5 border-b border-premium-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div><h3 class="text-lg font-semibold tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
+                <div class="flex items-center gap-3 w-full sm:w-auto"><button onclick="exportarFugaExcel()" class="text-[10px] font-medium bg-premium-bg border border-premium-border px-3 py-1.5 rounded-lg hover:bg-white transition flex-1 sm:flex-none">⬇️ Exportar Excel</button><button onclick="cerrarModalFuga()" class="text-premium-muted hover:text-premium-text transition">✕</button></div>
             </div>
             <div class="flex-1 overflow-x-auto overflow-y-auto p-2">
                 <table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white"><tr><th class="pl-3">Matriz Origen</th><th>Inactivo por</th><th>Razón Social</th><th>Contacto</th></tr></thead><tbody id="modal-tabla-fuga"></tbody></table>
@@ -494,7 +490,7 @@
 
     <div id="modal-multilote" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-5 border-b border-premium-border flex justify-between items-center"><div><h3 class="text-lg font-semibold tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="cerrarModalMulti()" class="text-premium-muted hover:text-premium-text transition">✕</button></div>
+            <div class="p-4 md:p-5 border-b border-premium-border flex justify-between items-center"><div><h3 class="text-lg font-semibold tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="cerrarModalMulti()" class="text-premium-muted hover:text-premium-text transition">✕</button></div>
             <div class="flex-1 overflow-y-auto overflow-x-auto p-2"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white"><tr><th class="pl-3">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-3">Inversión</th></tr></thead><tbody id="modal-tabla-multilote"></tbody></table></div>
         </div>
     </div>
@@ -538,11 +534,17 @@ async function checkSession() {
             
             // --- CANDADO VISUAL: ADMIN VS LECTURA ---
             const esAdmin = sessionUser.email.toLowerCase() === 'pabloaat@gmail.com';
-            const btnVaciar = document.getElementById('btn-vaciar');
-            const dropZone = document.getElementById('drop-zone');
+            const adminControls = document.getElementById('admin-controls');
             
-            if(btnVaciar) btnVaciar.style.display = esAdmin ? 'block' : 'none';
-            if(dropZone) dropZone.style.display = esAdmin ? 'flex' : 'none';
+            if (adminControls) {
+                if (esAdmin) {
+                    adminControls.classList.remove('hidden');
+                    adminControls.classList.add('flex');
+                } else {
+                    adminControls.classList.add('hidden');
+                    adminControls.classList.remove('flex');
+                }
+            }
             
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').classList.remove('hidden');
@@ -634,7 +636,7 @@ window.onload = () => {
 async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
 
 // ===========================================
-// LÓGICA PRINCIPAL (PREMIUM UI + FIX FECHAS + NOMENCLATURA)
+// LÓGICA PRINCIPAL
 // ===========================================
 
 window.addEventListener('error', function(e) {
@@ -880,7 +882,6 @@ function cambiarSeccion(mod){
     } catch(e) {}
 }
 
-// === NUEVO SISTEMA DE CALENDARIO ===
 function actualizarSidebar(){ 
     try {
         if(!db.remates.length) return;
@@ -1022,7 +1023,6 @@ function renderSingleView(nodeId){
         if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); if(document.getElementById('sv-kpi-ticket-promedio-side')) document.getElementById('sv-kpi-ticket-promedio-side').innerText=formatMoney(agg.ticketPromedio); 
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
         
-        // Cambio de Textos
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
@@ -1077,25 +1077,25 @@ function renderConclusiones() {
         if(checkedNodes.length > 1) {
             let ref1 = buildAgg(nodeRematesMap[checkedNodes[0]].remates, 'R1', nodeRematesMap[checkedNodes[0]].label); let ref2 = buildAgg(nodeRematesMap[checkedNodes[1]].remates, 'R2', nodeRematesMap[checkedNodes[1]].label);
             let varVenta = ref1.venta > 0 ? ((ref2.venta - ref1.venta) / ref1.venta * 100) : 0; let signoVar = varVenta >= 0 ? '+' : '';
-            html += `<div class="glass-panel p-5 border-l-4 border-l-premium-highlight md:col-span-2"><h3 class="text-sm font-semibold text-premium-text mb-2">Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-xs text-premium-muted leading-relaxed">Al comparar <b>${nodeRematesMap[checkedNodes[0]].label}</b> con <b>${nodeRematesMap[checkedNodes[1]].label}</b>, se observa una variación en la venta total del <b>${signoVar}${varVenta.toFixed(1)}%</b>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
+            html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-premium-highlight md:col-span-2"><h3 class="text-sm font-semibold text-premium-text mb-2">Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-xs text-premium-muted leading-relaxed">Al comparar <b>${nodeRematesMap[checkedNodes[0]].label}</b> con <b>${nodeRematesMap[checkedNodes[1]].label}</b>, se observa una variación en la venta total del <b>${signoVar}${varVenta.toFixed(1)}%</b>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
         }
 
         let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-premium-success' : 'text-premium-danger';
 
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">1. Venta Total</h4><p class="text-xs text-premium-muted leading-relaxed">Las operaciones válidas sumaron una venta adjudicada de <b>${formatMoney(agg.venta)}</b>.</p></div>`;
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">2. Comisiones Estimadas (12% + IVA)</h4><p class="text-xs text-premium-muted leading-relaxed">El remate generó un ingreso por comisiones de <b>${formatMoney(agg.comisionTotal)}</b>.</p></div>`;
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">3. Efectividad del Remate</h4><p class="text-xs text-premium-muted leading-relaxed">Se logró vender el <b>${agg.eficaciaLotes.toFixed(1)}%</b> de todos los lotes disponibles en el catálogo.</p></div>`;
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">4. Incremento sobre el Mínimo (Delta)</h4><p class="text-xs text-premium-muted leading-relaxed">Las pujas incrementaron el valor de salida en <b>${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</b>, lo que representa un margen positivo del <b class="${sobreColor}">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</b> sobre los mínimos propuestos.</p></div>`;
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">5. Ticket Promedio</h4><p class="text-xs text-premium-muted leading-relaxed">El valor promedio de venta por cada lote adjudicado fue de <b>${formatMoney(agg.ticketPromedio)}</b>.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">1. Venta Total</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Las operaciones válidas sumaron una venta adjudicada de <b>${formatMoney(agg.venta)}</b>.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">2. Comisiones Estimadas (12% + IVA)</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">El remate generó un ingreso por comisiones de <b>${formatMoney(agg.comisionTotal)}</b>.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">3. Efectividad del Remate</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Se logró vender el <b>${agg.eficaciaLotes.toFixed(1)}%</b> de todos los lotes disponibles en el catálogo.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">4. Incremento sobre el Mínimo (Delta)</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Las pujas incrementaron el valor de salida en <b>${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</b>, lo que representa un margen positivo del <b class="${sobreColor}">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</b> sobre los mínimos propuestos.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">5. Ticket Promedio</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">El valor promedio de venta por cada lote adjudicado fue de <b>${formatMoney(agg.ticketPromedio)}</b>.</p></div>`;
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">6. Tasa de Cierre de Clientes</h4><p class="text-xs text-premium-muted leading-relaxed">El <b>${tasaExito.toFixed(1)}%</b> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
-        html += `<div class="glass-panel p-5 flex flex-col justify-between"><h4 class="font-semibold text-xs text-premium-text mb-2">7. Clientes que NO adjudicaron</h4><p class="text-xs text-premium-muted leading-relaxed">Hubo <b>${agg.perdedoresCount} clientes</b> que pagaron garantía pero no lograron comprar nada.</p><button onclick="abrirModalFuga()" class="mt-3 px-3 py-1.5 bg-premium-bg border border-premium-border text-premium-text font-medium rounded text-xs text-center hover:bg-white transition no-print">Ver listado</button></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">6. Tasa de Cierre de Clientes</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">El <b>${tasaExito.toFixed(1)}%</b> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5 flex flex-col justify-between"><h4 class="font-semibold text-xs text-premium-text mb-2">7. Clientes que NO adjudicaron</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Hubo <b>${agg.perdedoresCount} clientes</b> que pagaron garantía pero no lograron comprar nada.</p><button onclick="abrirModalFuga()" class="mt-3 px-3 py-1.5 bg-premium-bg border border-premium-border text-premium-text font-medium rounded text-xs text-center hover:bg-white transition no-print">Ver listado</button></div>`;
         let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">8. Clientes Nuevos</h4><p class="text-xs text-premium-muted leading-relaxed">El <b>${agg.pctVentaNuevos.toFixed(1)}%</b> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">8. Clientes Nuevos</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">El <b>${agg.pctVentaNuevos.toFixed(1)}%</b> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">9. Compradores de Volumen</h4><p class="text-xs text-premium-muted leading-relaxed">Un total de <b>${multi} clientes</b> operaron en volumen y compraron más de un lote.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">9. Compradores de Volumen</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Un total de <b>${multi} clientes</b> operaron en volumen y compraron más de un lote.</p></div>`;
         let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
-        html += `<div class="glass-panel p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">10. Limpieza de Datos</h4><p class="text-xs text-premium-muted leading-relaxed">Se aislaron automáticamente <b>${falsos} pujas internas o pruebas de sistema</b>.</p></div>`;
+        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">10. Limpieza de Datos</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Se aislaron automáticamente <b>${falsos} pujas internas o pruebas de sistema</b>.</p></div>`;
 
         if(document.getElementById('conclusiones-content')) document.getElementById('conclusiones-content').innerHTML = html;
     } catch (e) {}
@@ -1127,7 +1127,7 @@ function generarInformePersonalizado() {
         if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
         emptyState.classList.add('hidden'); container.classList.remove('hidden');
         let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates, 'G', 'Selección Global'); 
-        let out = `<div class="space-y-6"><div><h1 class="text-2xl font-semibold text-premium-text border-b border-premium-border pb-3">Reporte de Gestión Comercial</h1><p class="text-xs text-premium-muted mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">`;
+        let out = `<div class="space-y-6"><div><h1 class="text-xl md:text-2xl font-semibold text-premium-text border-b border-premium-border pb-3">Reporte de Gestión Comercial</h1><p class="text-xs text-premium-muted mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">`;
         if(document.getElementById('chk-kpi-disp') && document.getElementById('chk-kpi-disp').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Lotes Disponibles</p><p class="text-xl font-medium text-premium-text mt-1">${agg.lotesDisponibles}</p></div>`;
         if(document.getElementById('chk-kpi-vend') && document.getElementById('chk-kpi-vend').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Lotes Vendidos</p><p class="text-xl font-medium text-premium-highlight mt-1">${agg.lotes}</p></div>`;
         if(document.getElementById('chk-kpi-efi') && document.getElementById('chk-kpi-efi').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Efectividad del Remate</p><p class="text-xl font-medium text-premium-success mt-1">${agg.eficaciaLotes.toFixed(1)}%</p></div>`;
