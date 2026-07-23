@@ -68,7 +68,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.2</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.3</div>
 
     <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
@@ -263,8 +263,8 @@
                                 </div>
                             </div>
                             <div class="space-y-4 md:space-y-6 no-print">
-                                <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-2">Ticket Promedio</h4><p class="text-xl md:text-2xl font-semibold text-premium-text mb-4" id="sv-kpi-ticket-promedio-side">$0</p><div class="relative h-32"><canvas id="sv-chartVentas"></canvas></div></div>
-                                <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-2">Retención</h4><div class="relative h-32"><canvas id="sv-chartRetencion"></canvas></div></div>
+                                <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-2">Ticket Promedio</h4><p class="text-xl md:text-2xl font-semibold text-premium-text mb-4" id="sv-kpi-ticket-promedio-side">$0</p><div class="relative h-32 w-full"><canvas id="sv-chartVentas"></canvas></div></div>
+                                <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-2">Retención</h4><div class="relative h-32 w-full"><canvas id="sv-chartRetencion"></canvas></div></div>
                             </div>
                         </div>
                     </div>
@@ -292,8 +292,8 @@
                             </table>
                         </div>
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 mt-4 no-print">
-                            <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4">Composición de Ventas</h4><canvas id="cv-chartVentas" class="h-48 md:h-64 w-full"></canvas></div>
-                            <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4">Evolución de Clientes</h4><canvas id="cv-chartGarantias" class="h-48 md:h-64 w-full"></canvas></div>
+                            <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4">Composición de Ventas</h4><div class="relative h-48 md:h-64 w-full"><canvas id="cv-chartVentas"></canvas></div></div>
+                            <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4">Evolución de Clientes</h4><div class="relative h-48 md:h-64 w-full"><canvas id="cv-chartGarantias"></canvas></div></div>
                         </div>
                     </div>
                 </div>
@@ -305,8 +305,8 @@
                         <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-premium-border rounded-xl px-4 py-2 text-sm text-premium-text w-full md:w-64 focus:outline-none focus:border-premium-text transition" onkeyup="renderPanelAutos()">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-48 md:h-64"><canvas id="flota-marcas-chart"></canvas></div></div>
-                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Modelos Específicos</h4><div class="relative h-48 md:h-64"><canvas id="flota-modelos-chart"></canvas></div></div>
+                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-48 md:h-64 w-full"><canvas id="flota-marcas-chart"></canvas></div></div>
+                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Modelos Específicos</h4><div class="relative h-48 md:h-64 w-full"><canvas id="flota-modelos-chart"></canvas></div></div>
                     </div>
                     <div class="glass-panel p-2">
                         <div class="overflow-x-auto max-h-[600px] px-2">
@@ -384,7 +384,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Salud de Cartera</h4><div class="relative h-48 md:h-64"><canvas id="bi-chartSegments"></canvas></div></div>
+                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Salud de Cartera</h4><div class="relative h-48 md:h-64 w-full"><canvas id="bi-chartSegments"></canvas></div></div>
                     </div>
                 </div>
 
@@ -1057,7 +1057,7 @@ function renderCompareView(nodesList){
         }
         const labels=compareData.map(d=>d.label); 
         try {
-            if(cvChartVentasInst) cvChartVentasInst.destroy(); if(document.getElementById('cv-chartVentas')) { cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0066CC',borderRadius:2},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#1D1D1F',borderRadius:2}] }}); }
+            if(cvChartVentasInst) cvChartVentasInst.destroy(); if(document.getElementById('cv-chartVentas')) { cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0066CC',borderRadius:2},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#1D1D1F',borderRadius:2}] },options:{responsive:true,maintainAspectRatio:false}}); }
             if(cvChartGarantiasInst) cvChartGarantiasInst.destroy(); if(document.getElementById('cv-chartGarantias')) { cvChartGarantiasInst=new Chart(document.getElementById('cv-chartGarantias').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Nuevos',data:compareData.map(d=>d.nuevos),backgroundColor:'#1D1D1F',borderRadius:2},{label:'Recurrentes',data:compareData.map(d=>d.antiguos),backgroundColor:'#D1D1D6',borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#F5F5F7'}}}}}); }
         } catch(ec) {}
     } catch (e) {}
@@ -1127,7 +1127,7 @@ function generarInformePersonalizado() {
         if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
         emptyState.classList.add('hidden'); container.classList.remove('hidden');
         let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates, 'G', 'Selección Global'); 
-        let out = `<div class="space-y-6"><div><h1 class="text-xl md:text-2xl font-semibold text-premium-text border-b border-premium-border pb-3">Reporte de Gestión Comercial</h1><p class="text-xs text-premium-muted mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">`;
+        let out = `<div class="space-y-6"><div><h1 class="text-xl md:text-2xl font-semibold text-premium-text border-b border-premium-border pb-3">Reporte de Gestión Comercial</h1><p class="text-[10px] md:text-[11px] text-premium-muted mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">`;
         if(document.getElementById('chk-kpi-disp') && document.getElementById('chk-kpi-disp').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Lotes Disponibles</p><p class="text-xl font-medium text-premium-text mt-1">${agg.lotesDisponibles}</p></div>`;
         if(document.getElementById('chk-kpi-vend') && document.getElementById('chk-kpi-vend').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Lotes Vendidos</p><p class="text-xl font-medium text-premium-highlight mt-1">${agg.lotes}</p></div>`;
         if(document.getElementById('chk-kpi-efi') && document.getElementById('chk-kpi-efi').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Efectividad del Remate</p><p class="text-xl font-medium text-premium-success mt-1">${agg.eficaciaLotes.toFixed(1)}%</p></div>`;
@@ -1144,7 +1144,7 @@ function generarInformePersonalizado() {
         out += `</div>`;
         if(document.getElementById('chk-kpi-lotesestrella') && document.getElementById('chk-kpi-lotesestrella').checked) {
             const topLotes=[...agg.adjudicaciones].filter(a=>!a.esFalso).sort((a,b)=>b.pujadoresRealesCount-a.pujadoresRealesCount).slice(0,5);
-            if(topLotes.length > 0) { out += `<div class="mt-8 border border-premium-border rounded-xl overflow-hidden"><div class="bg-premium-bg px-5 py-3 border-b border-premium-border font-semibold text-xs text-premium-text">Top 5 Lotes (Demanda)</div><table class="w-full text-left"><thead><tr><th class="pl-4">Detalle</th><th class="text-center">Pujadores</th><th class="text-right">Adjudicado</th><th class="text-right pr-4">Delta</th></tr></thead><tbody>`; topLotes.forEach(l => { let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let dSign = deltaLote >= 0 ? '+' : ''; out += `<tr><td class="pl-4 text-premium-muted truncate max-w-[200px]">${l.loteStr}</td><td class="text-center font-medium text-premium-text">${l.pujadoresRealesCount}</td><td class="text-right font-medium text-premium-success">${formatMoney(l.monto)}</td><td class="text-right pr-4 text-premium-muted">${l.minimo>0?(dSign+formatMoney(deltaLote)):'-'}</td></tr>`; }); out += `</tbody></table></div>`; }
+            if(topLotes.length > 0) { out += `<div class="mt-8 border border-premium-border rounded-xl overflow-hidden"><div class="bg-premium-bg px-4 md:px-5 py-3 border-b border-premium-border font-semibold text-[10px] md:text-xs text-premium-text">Top 5 Lotes (Demanda)</div><table class="w-full text-left"><thead><tr><th class="pl-4">Detalle</th><th class="text-center">Pujadores</th><th class="text-right">Adjudicado</th><th class="text-right pr-4">Delta</th></tr></thead><tbody>`; topLotes.forEach(l => { let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let dSign = deltaLote >= 0 ? '+' : ''; out += `<tr><td class="pl-4 text-[10px] md:text-xs text-premium-muted truncate max-w-[200px]">${l.loteStr}</td><td class="text-[10px] md:text-xs text-center font-medium text-premium-text">${l.pujadoresRealesCount}</td><td class="text-[10px] md:text-xs text-right font-medium text-premium-success">${formatMoney(l.monto)}</td><td class="text-[10px] md:text-xs text-right pr-4 text-premium-muted">${l.minimo>0?(dSign+formatMoney(deltaLote)):'-'}</td></tr>`; }); out += `</tbody></table></div>`; }
         } out += `</div>`;
         if(document.getElementById('custom-report-output')) document.getElementById('custom-report-output').innerHTML = out;
     } catch (e) {}
@@ -1155,7 +1155,7 @@ function abrirModalFuga() {
         if(!globalAgg) return; let html = '';
         if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
             globalAgg.fugaList.sort((a,b)=>a.nombre.localeCompare(b.nombre)); let hoy = Date.now();
-            globalAgg.fugaList.forEach(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; let nombreRemate = f.numRemate ? `${f.numRemate}` : '-'; html += `<tr><td class="pl-4 font-medium text-premium-text">${nombreRemate}</td><td class="text-premium-danger font-medium">${textoDias}</td><td class="font-medium text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-premium-muted truncate max-w-[150px]">${f.email||'-'}</td></tr>`; });
+            globalAgg.fugaList.forEach(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; let nombreRemate = f.numRemate ? `${f.numRemate}` : '-'; html += `<tr><td class="pl-4 font-medium text-[10px] md:text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-[10px] md:text-xs font-medium">${textoDias}</td><td class="font-medium text-[10px] md:text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-[10px] md:text-xs text-premium-muted truncate max-w-[150px]">${f.email||'-'}</td></tr>`; });
         } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted">No hay registros.</td></tr>'; }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
     } catch (e) {}
@@ -1188,7 +1188,7 @@ function renderModalTabla(){
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
             let badge = p.esFalso ? '<span class="text-[9px] font-bold text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
-            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-premium-muted">${i+1}</td><td class="text-premium-muted hidden sm:table-cell">${p.fecha||'-'}</td><td class="font-medium text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right font-medium ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
+            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs text-premium-muted hidden sm:table-cell">${p.fecha||'-'}</td><td class="font-medium text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-medium ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted">Sin pujas registradas</td></tr>';
     } catch(e) {}
 }
@@ -1218,7 +1218,7 @@ function procesarDatosClientes(){
 function renderPanelClientesData(filtered,isFiltered=false){ 
     try {
         if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="font-medium text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-premium-muted">${c.frecuencia}</td><td class="text-right font-medium text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center font-medium ${c.color} hidden sm:table-cell">${c.segmento}</td></tr>`).join(''); }
+        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="font-medium text-[10px] md:text-xs text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-[10px] md:text-xs text-premium-muted">${c.frecuencia}</td><td class="text-right text-[10px] md:text-xs font-medium text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-[10px] md:text-xs font-medium ${c.color} hidden sm:table-cell">${c.segmento}</td></tr>`).join(''); }
         if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#E30000'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
     } catch(e) {}
 }
@@ -1230,7 +1230,7 @@ function abrirFichaCliente(nombreStr){
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
         if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+b.monto,0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+b.monto,0)); 
-        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="text-premium-muted">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="truncate max-w-[150px] font-medium text-premium-text">${h.remate?h.remate.substring(0,25):'-'}</td><td class="text-premium-muted">${h.tipo}</td><td class="font-medium text-premium-highlight">${h.lote}</td><td class="text-right font-medium text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
+        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="text-[10px] md:text-xs text-premium-muted">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-medium text-premium-text">${h.remate?h.remate.substring(0,25):'-'}</td><td class="text-[10px] md:text-xs text-premium-muted">${h.tipo}</td><td class="font-medium text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right text-[10px] md:text-xs font-medium text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
 }
@@ -1240,10 +1240,10 @@ function cerrarFicha(){ if(document.getElementById('bi-ficha-cliente')) document
 function buscarPatente(){ 
     try {
         const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); const tbody=document.getElementById('buscador-tabla-resultados'); 
-        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-8 text-center text-premium-muted">Ingrese 3 caracteres.</td></tr>'; return; } 
+        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-8 text-center text-premium-muted text-[10px] md:text-xs">Ingrese 3 caracteres.</td></tr>'; return; } 
         let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData.timestamp,remate:r.fileName,lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
-        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-8 text-center font-medium text-premium-danger">Sin resultados</td></tr>`; return; } 
-        tbody.innerHTML=resultados.map(res=>`<tr><td class="text-premium-muted">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="font-medium truncate max-w-[120px] text-premium-text">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="text-center font-medium text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted max-w-[150px] truncate hidden sm:table-cell">${res.lote}</td><td class="font-medium truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right font-medium text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
+        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-8 text-center font-medium text-[10px] md:text-xs text-premium-danger">Sin resultados</td></tr>`; return; } 
+        tbody.innerHTML=resultados.map(res=>`<tr><td class="text-[10px] md:text-xs text-premium-muted">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="font-medium text-[10px] md:text-xs truncate max-w-[120px] text-premium-text">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="text-center text-[10px] md:text-xs font-medium text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell">${res.lote}</td><td class="font-medium text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right text-[10px] md:text-xs font-medium text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) {}
 }
 </script>
