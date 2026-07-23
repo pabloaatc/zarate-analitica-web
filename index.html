@@ -69,16 +69,19 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.0</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.1</div>
 
+    <!-- PANTALLA DE LOGIN Y CONFIGURACIÓN DE CONTRASEÑA -->
     <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl border border-white w-full max-w-[360px] text-center relative overflow-hidden">
+            <!-- Adorno superior -->
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
             
             <div class="w-14 h-14 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-2xl mx-auto mb-4 shadow-lg">Z</div>
             <h2 class="text-xl font-semibold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
             <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6">Control Directivo</p>
             
+            <!-- FORMULARIO DE LOGIN NORMAL -->
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
                     <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all" required placeholder="Correo Electrónico">
@@ -92,6 +95,7 @@
                 </button>
             </form>
 
+            <!-- FORMULARIO DE CONFIGURACIÓN DE CONTRASEÑA (INVITACIÓN) -->
             <form id="invite-form" onsubmit="handleSetPassword(event)" class="text-left hidden">
                 <div class="mb-2 text-center">
                     <span class="bg-premium-success/10 text-premium-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Invitación Aceptada</span>
@@ -105,11 +109,12 @@
                     Guardar y Entrar
                 </button>
             </form>
-
         </div>
     </div>
     
+    <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
+        <!-- HEADER MINIMALISTA -->
         <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0">
             <div class="flex items-center gap-4">
                 <button onclick="toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
@@ -119,14 +124,16 @@
                 <div><h1 class="font-semibold text-sm text-premium-text tracking-tight">Control de Gestión</h1><p class="text-[9px] text-premium-muted uppercase tracking-wider" id="db-status">Conectando...</p></div>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-medium px-3 py-1.5 rounded-full hover:bg-red-50 transition" title="Vaciar datos de la nube">Vaciar Base</button>
-                <div id="drop-zone" class="upload-area px-4 py-1.5 flex items-center gap-3">
+                <!-- BOTONES DE EDICIÓN CON ID PARA EL CANDADO VISUAL -->
+                <button id="btn-vaciar" onclick="limpiarBase()" class="hidden text-[10px] text-premium-danger font-medium px-3 py-1.5 rounded-full hover:bg-red-50 transition" title="Vaciar datos de la nube">Vaciar Base</button>
+                <div id="drop-zone" class="upload-area px-4 py-1.5 hidden items-center gap-3">
                     <label for="file-input" class="font-medium text-[11px] text-premium-text cursor-pointer">📄 Archivos</label>
                     <span class="text-premium-border hidden md:inline">|</span>
                     <label for="folder-input" class="font-medium text-[11px] text-premium-text cursor-pointer hidden md:inline">📁 Carpeta</label>
                     <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="iniciarProcesamiento(this.files)">
                     <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="iniciarProcesamiento(this.files)">
                 </div>
+                
                 <div class="h-4 w-px bg-premium-border hidden md:block"></div>
                 <button onclick="handleLogout()" class="flex items-center gap-2 text-xs font-medium text-premium-muted hover:text-premium-text transition">
                     <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline"></span> 
@@ -138,6 +145,7 @@
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
 
+            <!-- SIDEBAR COMPACTO Y MATRIZ CALENDARIO -->
             <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print">
                 <div class="flex justify-between items-center mb-6 px-2 mt-2">
                     <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest">Módulos</div>
@@ -168,15 +176,18 @@
                         </div>
                         
                         <div id="cal-months" class="grid grid-cols-4 gap-1.5">
-                            </div>
+                            <!-- JS Inyecta Calendario -->
+                        </div>
                         
                         <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50">
-                            </div>
+                            <!-- JS Inyecta Lista de Remates Activos -->
+                        </div>
                     </div>
                 </div>
             </aside>
 
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
+                <!-- EMPTY STATE ELEGANTE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/90 backdrop-blur-md no-print p-6">
                     <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-4 border border-premium-border shadow-sm">
                         <svg class="w-6 h-6 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -186,8 +197,10 @@
                     <div id="error-log" class="mt-4 text-premium-danger font-medium text-[10px] text-center max-w-md"></div>
                 </div>
 
+                <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div id="single-view" class="space-y-6 hidden">
+                        <!-- Header Single View -->
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4">
                             <div>
                                 <h2 class="text-2xl font-semibold tracking-tight text-premium-text" id="sv-titulo">-</h2>
@@ -199,6 +212,7 @@
                             </div>
                         </div>
 
+                        <!-- KPIs Principales -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div class="glass-panel p-5">
                                 <h4 class="font-semibold text-sm mb-4 text-premium-text">Efectividad del Remate</h4>
@@ -268,7 +282,7 @@
                             <table class="w-full text-left whitespace-nowrap">
                                 <thead>
                                     <tr>
-                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Periodo ↕️</th>
+                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Matriz Analizada ↕️</th>
                                         <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Venta ↕️</th>
                                         <th class="text-right cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'money')">Comisión ↕️</th>
                                         <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">L. Vend. ↕️</th>
@@ -288,6 +302,7 @@
                     </div>
                 </div>
 
+                <!-- MODULE: MODELOS Y VEHICULOS -->
                 <div id="module-autos" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Estructura del catálogo adjudicado</p></div>
@@ -315,6 +330,7 @@
                     </div>
                 </div>
 
+                <!-- MODULE: CLIENTES -->
                 <div id="module-clientes" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Inteligencia de Clientes</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
@@ -376,6 +392,7 @@
                     </div>
                 </div>
 
+                <!-- MODULE: INFORME PERSONALIZADO -->
                 <div id="module-custom" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="border-b border-premium-border pb-4 no-print">
                         <h2 class="text-2xl font-semibold tracking-tight text-premium-text">Generador de Informes</h2>
@@ -413,6 +430,7 @@
                     </div>
                 </div>
 
+                <!-- MODULE: CONCLUSIONES IA -->
                 <div id="module-conclusiones" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Directorio Ejecutivo</h2><p class="text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
@@ -421,6 +439,7 @@
                     <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 text-premium-text"></div>
                 </div>
 
+                <!-- MODULE: BUSCADOR -->
                 <div id="module-buscador" class="hidden space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-2xl font-semibold tracking-tight text-premium-text">Buscador Global</h2></div>
@@ -438,7 +457,10 @@
 
             </main>
         </div>
-    </div> <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+    </div> <!-- FIN APP CONTENT -->
+
+    <!-- MODALES -->
+    <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
             <div class="p-5 border-b border-premium-border flex justify-between items-start">
                 <div><h3 class="text-lg font-semibold tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase tracking-wider mt-1" id="modal-subtitulo"></p></div>
@@ -485,7 +507,7 @@ const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 // ===========================================
-// SISTEMA DE SEGURIDAD Y MANEJO DE INVITACIONES (CAMBIO 4)
+// SISTEMA DE SEGURIDAD Y MANEJO DE INVITACIONES
 // ===========================================
 let sessionUser = null;
 
@@ -513,6 +535,14 @@ async function checkSession() {
             sessionUser = data.session.user;
             const displayEl = document.getElementById('user-display-email');
             if(displayEl) displayEl.innerText = sessionUser.email.substring(0,12)+"...";
+            
+            // --- CANDADO VISUAL: ADMIN VS LECTURA ---
+            const esAdmin = sessionUser.email.toLowerCase() === 'pabloaat@gmail.com';
+            const btnVaciar = document.getElementById('btn-vaciar');
+            const dropZone = document.getElementById('drop-zone');
+            
+            if(btnVaciar) btnVaciar.style.display = esAdmin ? 'block' : 'none';
+            if(dropZone) dropZone.style.display = esAdmin ? 'flex' : 'none';
             
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').classList.remove('hidden');
@@ -566,7 +596,6 @@ async function handleLogin(e) {
     }
 }
 
-// LOGICA DE PANTALLA DE INVITACIÓN (CAMBIO 4)
 async function handleSetPassword(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-invite');
@@ -579,7 +608,6 @@ async function handleSetPassword(e) {
         const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
         if (error) throw error;
         
-        // Limpiamos el hash de la URL para que no se quede pegado si recarga
         window.history.replaceState(null, null, ' ');
         
         btn.innerHTML = "¡Listo!";
@@ -592,7 +620,6 @@ async function handleSetPassword(e) {
 }
 
 window.onload = () => {
-    // Si viene de un correo de invitación de Supabase, la URL trae un hash especial
     const hash = window.location.hash;
     if (hash && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
         document.getElementById('login-form').classList.add('hidden');
@@ -605,7 +632,6 @@ window.onload = () => {
 };
 
 async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
-
 
 // ===========================================
 // LÓGICA PRINCIPAL (PREMIUM UI + FIX FECHAS + NOMENCLATURA)
@@ -621,7 +647,6 @@ let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentMo
 let svChartRetencionInst=null, svChartVentasInst=null, cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
 
-// Variables de Estado del Calendario
 let calSegment = 'Siniestrados';
 let calYear = new Date().getFullYear();
 let calSelectedMonths = new Set();
