@@ -16,15 +16,9 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'] }, 
                     colors: { 
                         premium: { 
-                            bg: '#F5F5F7', 
-                            panel: '#FFFFFF', 
-                            text: '#1D1D1F', 
-                            muted: '#86868B', 
-                            border: '#E5E5EA', 
-                            highlight: '#0066CC', 
-                            success: '#1B8233', 
-                            danger: '#E30000',
-                            accent: '#000000'
+                            bg: '#F5F5F7', panel: '#FFFFFF', text: '#1D1D1F', muted: '#86868B', 
+                            border: '#E5E5EA', highlight: '#0066CC', success: '#1B8233', 
+                            danger: '#E30000', accent: '#000000'
                         } 
                     } 
                 } 
@@ -42,7 +36,7 @@
         .nav-item:hover { background-color: #EAEAEB; color: #1D1D1F; }
         .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; font-weight: 600; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         
-        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; cursor: pointer; transition: all 0.2s;}
+        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; transition: all 0.2s;}
         input[type="checkbox"]::before { content: ""; width: 0.6em; height: 0.6em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
         input[type="checkbox"]:checked { background-color: #1D1D1F; border-color: #1D1D1F; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
@@ -68,13 +62,19 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.7</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v2.0 (Stable)</div>
 
-    <!-- PANTALLA DE LOGIN -->
+    <!-- OVERLAY DE CARGA EN VIVO (BLOQUEA LA PANTALLA) -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
+        <div class="w-14 h-14 border-4 border-premium-highlight border-t-transparent rounded-full animate-spin shadow-lg"></div>
+        <p id="loading-text" class="mt-6 font-semibold text-premium-text text-sm tracking-wide text-center max-w-xs">Procesando...</p>
+        <p class="text-[10px] text-premium-muted uppercase tracking-widest mt-2 font-medium">No cierre esta ventana</p>
+    </div>
+
+    <!-- PANTALLA DE LOGIN Y CONFIGURACIÓN -->
     <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl border border-white w-full max-w-[360px] text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
-            
             <div class="w-14 h-14 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-2xl mx-auto mb-4 shadow-lg">Z</div>
             <h2 class="text-xl font-semibold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
             <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6">Control Directivo</p>
@@ -110,13 +110,13 @@
     
     <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
-        <!-- HEADER RESPONSIVO Y SEGURO -->
+        <!-- HEADER -->
         <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
-                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base md:text-lg">Z</div>
+                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base md:text-lg shadow-sm">Z</div>
                 <div class="hidden sm:block">
                     <h1 class="font-semibold text-sm text-premium-text tracking-tight">Control de Gestión</h1>
                     <p class="text-[9px] text-premium-muted uppercase tracking-wider" id="db-status">Conectando...</p>
@@ -124,7 +124,7 @@
             </div>
             
             <div class="flex items-center gap-3 md:gap-4">
-                <!-- CONTROLES ADMIN (Ocultos por defecto) -->
+                <!-- CONTROLES ADMIN -->
                 <div id="admin-controls" class="hidden items-center gap-2 md:gap-4">
                     <button onclick="limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-medium px-3 py-1.5 rounded-full hover:bg-red-50 transition border border-red-100" title="Vaciar datos de la nube">Vaciar Base</button>
                     <div class="upload-area px-3 md:px-4 py-1.5 flex items-center gap-2 md:gap-3">
@@ -138,7 +138,7 @@
                 
                 <div class="h-4 w-px bg-premium-border hidden sm:block"></div>
                 <button onclick="handleLogout()" class="flex items-center gap-2 text-xs font-medium text-premium-muted hover:text-premium-text transition" title="Cerrar Sesión">
-                    <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline border border-premium-border"></span> 
+                    <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline border border-premium-border font-medium"></span> 
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
@@ -147,10 +147,10 @@
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
 
-            <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print">
+            <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print shadow-2xl md:shadow-none">
                 <div class="flex justify-between items-center mb-6 px-2 mt-2">
                     <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest">Módulos</div>
-                    <button onclick="toggleSidebar()" class="md:hidden text-premium-muted">✕</button>
+                    <button onclick="toggleSidebar()" class="md:hidden text-premium-muted p-1 hover:bg-slate-100 rounded">✕</button>
                 </div>
                 <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="cambiarSeccion('remates')">Resumen de Remates</div>
                 <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('autos')">Análisis de Vehículos</div>
@@ -163,40 +163,35 @@
                     <div class="text-[10px] font-bold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                         <span>Filtro de Periodos</span>
                         <div class="flex gap-3">
-                            <button onclick="seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1" title="Ir al remate más reciente">
-                                <span>⚡Reciente</span>
-                            </button>
-                            <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition">Limpiar</button>
+                            <button onclick="seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1 font-medium" title="Ir al remate más reciente">⚡Reciente</button>
+                            <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition font-medium">Limpiar</button>
                         </div>
                     </div>
                     
                     <div class="px-2 space-y-3">
                         <div class="flex gap-2">
-                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalSegmentChange(this.value)"></select>
-                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalYearChange(this.value)"></select>
+                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-medium rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalSegmentChange(this.value)"></select>
+                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-medium rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalYearChange(this.value)"></select>
                         </div>
-                        
                         <div id="cal-months" class="grid grid-cols-4 gap-1.5"></div>
-                        
                         <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50"></div>
                     </div>
                 </div>
             </aside>
 
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
+                <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/90 backdrop-blur-md no-print p-6">
                     <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-4 border border-premium-border shadow-sm">
                         <svg class="w-6 h-6 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
                     <p class="font-medium text-lg text-premium-text tracking-tight text-center">Área de Trabajo Principal</p>
                     <p class="text-xs text-premium-muted mt-2 text-center max-w-sm">Seleccione una matriz en el panel lateral o arrastre nuevos archivos para comenzar el análisis.</p>
-                    <div id="error-log" class="mt-4 text-premium-danger font-medium text-[10px] text-center max-w-md"></div>
                 </div>
 
                 <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div id="single-view" class="space-y-4 md:space-y-6 hidden">
-                        <!-- Header Single View -->
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-premium-border pb-4">
                             <div class="w-full sm:w-auto overflow-hidden">
                                 <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text truncate" id="sv-titulo">-</h2>
@@ -208,7 +203,6 @@
                             </div>
                         </div>
 
-                        <!-- KPIs Principales -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div class="glass-panel p-4 md:p-5">
                                 <h4 class="font-semibold text-sm mb-3 md:mb-4 text-premium-text">Efectividad del Remate</h4>
@@ -532,7 +526,6 @@ async function checkSession() {
             const displayEl = document.getElementById('user-display-email');
             if(displayEl) displayEl.innerText = sessionUser.email.substring(0,12)+"...";
             
-            // --- CANDADO VISUAL: ADMIN VS LECTURA ---
             const esAdmin = sessionUser.email.toLowerCase() === 'pabloaat@gmail.com';
             const adminControls = document.getElementById('admin-controls');
             
@@ -636,13 +629,8 @@ window.onload = () => {
 async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
 
 // ===========================================
-// LÓGICA PRINCIPAL (MOTOR TURBO v1.7 CINTA TRANSPORTADORA)
+// LÓGICA PRINCIPAL v2.0 (MOTOR 1x1 ULTRA ESTABLE Y BLOQUEO UI)
 // ===========================================
-
-window.addEventListener('error', function(e) {
-    const log = document.getElementById('error-log');
-    if(log) log.innerHTML += `<div class="text-premium-danger mt-1">Colapso evitado. Por favor Vaciar Base.</div>`;
-});
 
 let db = { remates: [] };
 let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
@@ -745,52 +733,71 @@ function extraerMarcaModelo(loteStr) {
 }
 
 const normalizarCliente = (nombre)=>{ if(!nombre) return 'DESCONOCIDO'; let n=String(nombre).toUpperCase().trim(); if(n.includes('CROVETTO')) return 'CROVETTO (GRUPO)'; n=n.replace(/\b\d{1,2}\.?\d{3}\.?\d{3}-?[0-9Kk]\b/g,''); n=n.replace(/\b(SPA|LTDA|LIMITADA|EIRL|E\.I\.R\.L|S\.A\.?|SOCIEDAD|COMERCIAL)\b/g,''); return n.replace(/\s+/g,' ').replace(/[-_.,]+$/, '').trim() || 'DESCONOCIDO'; };
-const formatMoney = (num)=>{ if(!num || isNaN(num)) return '$0'; if(Math.abs(num) >= 1e6) { let val = Math.round(num/1e6); return `$${val.toLocaleString('es-CL')} MM`; } return `$${Math.round(num).toLocaleString('es-CL')}`; };
+const formatMoney = (num) => { 
+    if(!num || isNaN(num)) return '$0'; 
+    if(Math.abs(num) >= 1e6) { 
+        return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num / 1e6)) + ' MM'; 
+    } 
+    return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num)); 
+};
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
 const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
 function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
 
+
 // ===========================================
-// MOTOR DE PROCESAMIENTO TURBO (v1.7)
+// MOTOR DE PROCESAMIENTO v2.0 (BLOQUEO Y LISTA INDIVIDUAL)
 // ===========================================
 async function iniciarProcesamiento(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
     
-    const statusLabel = document.getElementById('db-status'); 
-    statusLabel.classList.replace('text-premium-success', 'text-premium-highlight');
-    statusLabel.classList.replace('text-premium-danger', 'text-premium-highlight');
+    // Activa la pantalla de carga que bloquea clics accidentales
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.classList.add('flex');
     
     let successCount = 0;
+    let upsertQueue = [];
     
-    // FASE 1: EXTRACCIÓN EN VIVO
+    // FASE 1: Análisis y Extracción Local
     for(let i = 0; i < validFiles.length; i++){ 
-        statusLabel.innerText = `Extrayendo ${i+1}/${validFiles.length}...`;
-        await new Promise(r => setTimeout(r, 50)); 
+        loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
+        await new Promise(r => setTimeout(r, 20)); // Micro pausa obligatoria para refrescar UI
         
-        try{ 
+        try { 
             const data = await parseExcel(validFiles[i]); 
             if(data) { 
                 const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
-                data._dbId = (existsIdx >= 0 && db.remates[existsIdx]._dbId) ? db.remates[existsIdx]._dbId : Math.floor(Math.random() * 2000000000);
-                if(existsIdx >= 0) db.remates[existsIdx] = data; else db.remates.push(data); 
+                if (existsIdx >= 0) {
+                    // Mantener el ID antiguo para no desmarcar checkboxes activos
+                    data._dbId = db.remates[existsIdx]._dbId;
+                    data.id = db.remates[existsIdx].id;
+                    db.remates[existsIdx] = data; 
+                } else {
+                    data._dbId = Math.floor(Math.random() * 2000000000);
+                    db.remates.push(data);
+                }
+                upsertQueue.push({ id: data._dbId, payload: data });
                 successCount++; 
             }
-        } catch(err){
+        } catch(err) {
             console.error("Error leyendo archivo:", validFiles[i].name, err);
         } 
     }
     
     if(successCount === 0) {
-        statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); 
-        statusLabel.innerText = `Error de formato`;
+        loadingOverlay.classList.remove('flex');
+        loadingOverlay.classList.add('hidden');
+        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`;
         return;
     }
 
-    // FASE 2: CRUCE DE CLIENTES
-    statusLabel.innerText = "Cruzando datos...";
-    await new Promise(r => setTimeout(r, 50));
+    // FASE 2: Cruces Globales Rápidos
+    loadingText.innerText = "Sincronizando Cruces de Clientes...";
+    await new Promise(r => setTimeout(r, 20));
 
     db.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp);
     let clientesGlobales=[]; let adjudicatariosGlobales=[];
@@ -809,36 +816,40 @@ async function iniciarProcesamiento(files){
         remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
     });
     
-    // FASE 3: GUARDADO EN LA NUBE (CINTA TRANSPORTADORA INDIVIDUAL)
+    // FASE 3: Subida en Cinta Transportadora 
     try { 
-        const bulkData = db.remates.map(remate => ({ id: remate._dbId, payload: remate }));
-        
-        for (let i = 0; i < bulkData.length; i++) {
-            statusLabel.innerText = `Guardando ${i+1}/${bulkData.length}...`;
-            await new Promise(r => setTimeout(r, 10)); // Pausa mínima visual
+        for (let i = 0; i < upsertQueue.length; i++) {
+            loadingText.innerText = `Subiendo a la Nube (${i+1}/${upsertQueue.length})...`;
             
-            const { error } = await supabaseClient.from('app_state').upsert(bulkData[i]);
+            const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
             if (error) throw error;
+            
+            // Pausa obligatoria para evitar el bloqueo del servidor
+            await new Promise(r => setTimeout(r, 50)); 
         }
         
-        statusLabel.classList.replace('text-premium-highlight', 'text-premium-success'); 
-        statusLabel.innerText = `En Línea (${db.remates.length})`;
+        document.getElementById('db-status').classList.replace('text-premium-highlight', 'text-premium-success'); 
+        document.getElementById('db-status').innerText = `En Línea (${db.remates.length})`;
     } catch (e) { 
-        statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); 
+        document.getElementById('db-status').classList.replace('text-premium-success', 'text-premium-danger'); 
         let errorMsg = e.message || "Desconocido";
         if (errorMsg.includes("row-level security")) errorMsg = "Bloqueado (Revisar Correo)";
         if (errorMsg.includes("Failed to fetch")) errorMsg = "Conexión interrumpida";
-        statusLabel.innerText = `Error: ${errorMsg.substring(0, 22)}`; 
-        console.error("Error al guardar en Supabase:", e);
+        document.getElementById('db-status').innerText = `Error: ${errorMsg.substring(0, 22)}`; 
     }
     
     document.getElementById('file-input').value = ""; 
     document.getElementById('folder-input').value = "";
     
+    // Finalizamos y retiramos el bloqueo
     actualizarSidebar(); 
     procesarDatosClientes(); 
     actualizarVistaActual(); 
+    
+    loadingOverlay.classList.remove('flex');
+    loadingOverlay.classList.add('hidden');
 }
+
 
 async function parseExcel(file){
     const buffer=await file.arrayBuffer(); const wb=XLSX.read(buffer,{type:'array'}); const sheets={}; wb.SheetNames.forEach(n=>sheets[n.toLowerCase()]=n);
@@ -996,14 +1007,15 @@ function renderCalendar() {
         listHtml += `<div class="text-[10px] font-bold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
         rematesToShow.forEach(r => {
             let isChecked = checkedNodes.includes(r.id);
+            // ESTRUCTURA CORREGIDA PARA QUE EL CHECKBOX FUNCIONE PERFECTO
             listHtml += `
-            <label class="flex items-start gap-2.5 cursor-pointer mb-2.5 group hover:bg-premium-bg p-1.5 rounded-lg transition -ml-1.5">
-                <input type="checkbox" class="mt-0.5 shrink-0" onchange="toggleNode('${r.id}')" ${isChecked?'checked':''}>
-                <div class="flex flex-col min-w-0">
+            <div class="flex items-start gap-2.5 cursor-pointer mb-2.5 group hover:bg-premium-bg p-1.5 rounded-lg transition -ml-1.5" onclick="toggleNode('${r.id}')">
+                <input type="checkbox" class="mt-0.5 shrink-0 pointer-events-none" ${isChecked?'checked':''}>
+                <div class="flex flex-col min-w-0 pointer-events-none">
                     <span class="text-[11px] font-semibold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight">${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,25)}</span>
                     <span class="text-[9px] text-premium-muted font-medium">${r.tipo} • ${new Date(r.fechaData.timestamp).toLocaleDateString('es-CL')}</span>
                 </div>
-            </label>`;
+            </div>`;
         });
     }
     document.getElementById('cal-matrices').innerHTML = listHtml;
@@ -1074,7 +1086,6 @@ function renderSingleView(nodeId){
         if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); if(document.getElementById('sv-kpi-ticket-promedio-side')) document.getElementById('sv-kpi-ticket-promedio-side').innerText=formatMoney(agg.ticketPromedio); 
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
         
-        // Cambio de Textos
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
