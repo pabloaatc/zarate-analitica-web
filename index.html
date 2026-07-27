@@ -68,9 +68,8 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.3</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.4</div>
 
-    <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl border border-white w-full max-w-[360px] text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
@@ -108,9 +107,7 @@
         </div>
     </div>
     
-    <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
-        <!-- HEADER RESPONSIVO Y SEGURO -->
         <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
@@ -124,7 +121,6 @@
             </div>
             
             <div class="flex items-center gap-3 md:gap-4">
-                <!-- CONTROLES ADMIN (Ocultos por defecto) -->
                 <div id="admin-controls" class="hidden items-center gap-2 md:gap-4">
                     <button onclick="limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-medium px-3 py-1.5 rounded-full hover:bg-red-50 transition border border-red-100" title="Vaciar datos de la nube">Vaciar Base</button>
                     <div class="upload-area px-3 md:px-4 py-1.5 flex items-center gap-2 md:gap-3">
@@ -193,10 +189,8 @@
                     <div id="error-log" class="mt-4 text-premium-danger font-medium text-[10px] text-center max-w-md"></div>
                 </div>
 
-                <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div id="single-view" class="space-y-4 md:space-y-6 hidden">
-                        <!-- Header Single View -->
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-premium-border pb-4">
                             <div class="w-full sm:w-auto overflow-hidden">
                                 <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text truncate" id="sv-titulo">-</h2>
@@ -208,7 +202,6 @@
                             </div>
                         </div>
 
-                        <!-- KPIs Principales -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div class="glass-panel p-4 md:p-5">
                                 <h4 class="font-semibold text-sm mb-3 md:mb-4 text-premium-text">Efectividad del Remate</h4>
@@ -298,7 +291,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: MODELOS Y VEHICULOS -->
                 <div id="module-autos" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Estructura del catálogo adjudicado</p></div>
@@ -326,7 +318,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: CLIENTES -->
                 <div id="module-clientes" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Inteligencia de Clientes</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
@@ -388,7 +379,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: INFORME PERSONALIZADO -->
                 <div id="module-custom" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="border-b border-premium-border pb-4 no-print">
                         <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Generador de Informes</h2>
@@ -426,7 +416,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: CONCLUSIONES IA -->
                 <div id="module-conclusiones" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Directorio Ejecutivo</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
@@ -435,7 +424,6 @@
                     <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 text-premium-text"></div>
                 </div>
 
-                <!-- MODULE: BUSCADOR -->
                 <div id="module-buscador" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
                         <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Buscador Global</h2></div>
@@ -453,10 +441,7 @@
 
             </main>
         </div>
-    </div> <!-- FIN APP CONTENT -->
-
-    <!-- MODALES -->
-    <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+    </div> <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
             <div class="p-4 md:p-5 border-b border-premium-border flex justify-between items-start">
                 <div><h3 class="text-lg font-semibold tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase tracking-wider mt-1" id="modal-subtitulo"></p></div>
@@ -751,42 +736,82 @@ const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20)
 
 function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
 
+// === FUNCIÓN INICIAR PROCESAMIENTO ACTUALIZADA (CONTADOR EN VIVO) ===
 async function iniciarProcesamiento(files){
     const validFiles=Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
-    const statusLabel=document.getElementById('db-status'); 
-    statusLabel.innerText = "Subiendo..."; statusLabel.classList.replace('text-premium-success', 'text-premium-highlight');
-    let successCount=0;
     
-    setTimeout(async () => {
-        for(let i=0;i<validFiles.length;i++){ 
-            try{ 
-                const data=await parseExcel(validFiles[i]); 
-                if(data) { 
-                    const existsIdx=db.remates.findIndex(r=>r.fileName===data.fileName); 
-                    data._dbId = (existsIdx >= 0 && db.remates[existsIdx]._dbId) ? db.remates[existsIdx]._dbId : Math.floor(Math.random() * 2000000000);
-                    if(existsIdx>=0) db.remates[existsIdx]=data; else db.remates.push(data); 
-                    successCount++; 
-                }
-            } catch(err){} 
-        }
-        db.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp);
-        let clientesGlobales=[]; let adjudicatariosGlobales=[];
-        db.remates.forEach(remate=>{ 
-            let nuevos=0, antiguos=0; remate.garantiasEmailsReales.forEach(email=>{ if(clientesGlobales.includes(email)) antiguos++; else { nuevos++; clientesGlobales.push(email); } }); remate.nuevos=nuevos; remate.antiguos=antiguos; 
-            let ganadoresNuevos=0, ventaNuevos=0, ventaAntiguos=0; let statusCliente={}; const ganadoresUnicos=[...new Set(remate.adjudicaciones.filter(a=>!a.esFalso).map(a=>a.clienteReal))]; 
-            ganadoresUnicos.forEach(cliente=>{ if(adjudicatariosGlobales.includes(cliente)){ statusCliente[cliente]='antiguo'; } else { ganadoresNuevos++; adjudicatariosGlobales.push(cliente); statusCliente[cliente]='nuevo'; } }); 
-            remate.adjudicaciones.forEach(a=>{ if(!a.esFalso) { if(statusCliente[a.clienteReal]==='nuevo') ventaNuevos+=a.monto; else ventaAntiguos+=a.monto; }}); 
-            remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
-        });
+    const statusLabel = document.getElementById('db-status'); 
+    statusLabel.classList.replace('text-premium-success', 'text-premium-highlight');
+    statusLabel.classList.replace('text-premium-danger', 'text-premium-highlight');
+    
+    let successCount = 0;
+    
+    // 1. FASE DE EXTRACCIÓN (Con contador en vivo)
+    for(let i = 0; i < validFiles.length; i++){ 
+        statusLabel.innerText = `Extrayendo ${i+1}/${validFiles.length}...`;
+        // Micro-pausa para forzar a la pantalla a actualizar el texto
+        await new Promise(r => setTimeout(r, 50)); 
         
-        try { 
-            for(let remate of db.remates) { await supabaseClient.from('app_state').upsert({ id: remate._dbId, payload: remate }); }
-            statusLabel.classList.replace('text-premium-highlight', 'text-premium-success'); statusLabel.innerText=`En Línea (${db.remates.length})`;
-        } catch (e) { statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); statusLabel.innerText=`Error DB`; }
-        document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
-        if(successCount>0){ actualizarSidebar(); procesarDatosClientes(); actualizarVistaActual(); }
-    }, 50);
+        try{ 
+            const data = await parseExcel(validFiles[i]); 
+            if(data) { 
+                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
+                data._dbId = (existsIdx >= 0 && db.remates[existsIdx]._dbId) ? db.remates[existsIdx]._dbId : Math.floor(Math.random() * 2000000000);
+                if(existsIdx >= 0) db.remates[existsIdx] = data; else db.remates.push(data); 
+                successCount++; 
+            }
+        } catch(err){
+            console.error("Error leyendo archivo:", validFiles[i].name, err);
+        } 
+    }
+    
+    if(successCount === 0) {
+        statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); 
+        statusLabel.innerText = `Error: Sin datos válidos`;
+        return;
+    }
+
+    // 2. FASE DE CRUCE DE CLIENTES
+    statusLabel.innerText = "Cruzando clientes...";
+    await new Promise(r => setTimeout(r, 50));
+
+    db.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp);
+    let clientesGlobales=[]; let adjudicatariosGlobales=[];
+    
+    db.remates.forEach(remate=>{ 
+        let nuevos=0, antiguos=0; 
+        remate.garantiasEmailsReales.forEach(email=>{ if(clientesGlobales.includes(email)) antiguos++; else { nuevos++; clientesGlobales.push(email); } }); 
+        remate.nuevos=nuevos; remate.antiguos=antiguos; 
+        
+        let ganadoresNuevos=0, ventaNuevos=0, ventaAntiguos=0; let statusCliente={}; 
+        const ganadoresUnicos=[...new Set(remate.adjudicaciones.filter(a=>!a.esFalso).map(a=>a.clienteReal))]; 
+        
+        ganadoresUnicos.forEach(cliente=>{ if(adjudicatariosGlobales.includes(cliente)){ statusCliente[cliente]='antiguo'; } else { ganadoresNuevos++; adjudicatariosGlobales.push(cliente); statusCliente[cliente]='nuevo'; } }); 
+        remate.adjudicaciones.forEach(a=>{ if(!a.esFalso) { if(statusCliente[a.clienteReal]==='nuevo') ventaNuevos+=a.monto; else ventaAntiguos+=a.monto; }}); 
+        
+        remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
+    });
+    
+    // 3. FASE DE GUARDADO EN LA NUBE
+    statusLabel.innerText = "Guardando en la Nube...";
+    await new Promise(r => setTimeout(r, 50));
+
+    try { 
+        for(let remate of db.remates) { await supabaseClient.from('app_state').upsert({ id: remate._dbId, payload: remate }); }
+        statusLabel.classList.replace('text-premium-highlight', 'text-premium-success'); 
+        statusLabel.innerText = `En Línea (${db.remates.length})`;
+    } catch (e) { 
+        statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); 
+        statusLabel.innerText = `Error DB`; 
+    }
+    
+    document.getElementById('file-input').value = ""; 
+    document.getElementById('folder-input').value = "";
+    
+    actualizarSidebar(); 
+    procesarDatosClientes(); 
+    actualizarVistaActual(); 
 }
 
 async function parseExcel(file){
@@ -1023,6 +1048,7 @@ function renderSingleView(nodeId){
         if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); if(document.getElementById('sv-kpi-ticket-promedio-side')) document.getElementById('sv-kpi-ticket-promedio-side').innerText=formatMoney(agg.ticketPromedio); 
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
         
+        // Cambio de Textos
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
