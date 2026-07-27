@@ -73,7 +73,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.4 (Stable)</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.5 (Quarters)</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -182,6 +182,7 @@
                             <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="window.onCalSegmentChange(this.value)"></select>
                             <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="window.onCalYearChange(this.value)"></select>
                         </div>
+                        <!-- NUEVA GRILLA DE TRIMESTRES Y MESES -->
                         <div id="cal-months" class="grid grid-cols-4 gap-1.5"></div>
                         <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50"></div>
                     </div>
@@ -636,6 +637,7 @@ if(typeof Chart !== 'undefined') {
     Chart.defaults.font.size = 10;
 }
 
+// FORMATEADOR ESTRICTO CON TRY/CATCH Y PARÉNTESIS
 window.formatearNombreRemate = function(fileName, timestamp) {
     try {
         if(!fileName || typeof fileName !== 'string') fileName = "Matriz Desconocida";
@@ -679,18 +681,20 @@ async function initApp() {
 }
 
 window.sortTable = function(thElement, type) {
-    const table = thElement.closest('table'); const tbody = table.querySelector('tbody'); if(!tbody) return;
-    const rows = Array.from(tbody.querySelectorAll('tr')); if(rows.length === 0 || (rows.length === 1 && rows[0].innerText.includes('Sin'))) return;
-    const colIndex = Array.from(thElement.parentNode.children).indexOf(thElement);
-    let asc = thElement.getAttribute('data-asc') === 'true'; asc = !asc; thElement.setAttribute('data-asc', asc);
-    Array.from(thElement.parentNode.children).forEach(th => { th.innerHTML = th.innerHTML.replace(' 🔼', '').replace(' 🔽', '').replace(' ↕️', ' ↕️'); if(!th.innerHTML.includes('↕️')) th.innerHTML += ' ↕️'; });
-    thElement.innerHTML = thElement.innerHTML.replace(' ↕️', asc ? ' 🔼' : ' 🔽');
-    rows.sort((a, b) => {
-        let valA = parseValueForSort(a.children[colIndex].innerText || a.children[colIndex].textContent, type);
-        let valB = parseValueForSort(b.children[colIndex].innerText || b.children[colIndex].textContent, type);
-        if (valA < valB) return asc ? -1 : 1; if (valA > valB) return asc ? 1 : -1; return 0;
-    });
-    tbody.innerHTML = ''; rows.forEach(row => tbody.appendChild(row));
+    try {
+        const table = thElement.closest('table'); const tbody = table.querySelector('tbody'); if(!tbody) return;
+        const rows = Array.from(tbody.querySelectorAll('tr')); if(rows.length === 0 || (rows.length === 1 && rows[0].innerText.includes('Sin'))) return;
+        const colIndex = Array.from(thElement.parentNode.children).indexOf(thElement);
+        let asc = thElement.getAttribute('data-asc') === 'true'; asc = !asc; thElement.setAttribute('data-asc', asc);
+        Array.from(thElement.parentNode.children).forEach(th => { th.innerHTML = th.innerHTML.replace(' 🔼', '').replace(' 🔽', '').replace(' ↕️', ' ↕️'); if(!th.innerHTML.includes('↕️')) th.innerHTML += ' ↕️'; });
+        thElement.innerHTML = thElement.innerHTML.replace(' ↕️', asc ? ' 🔼' : ' 🔽');
+        rows.sort((a, b) => {
+            let valA = parseValueForSort(a.children[colIndex].innerText || a.children[colIndex].textContent, type);
+            let valB = parseValueForSort(b.children[colIndex].innerText || b.children[colIndex].textContent, type);
+            if (valA < valB) return asc ? -1 : 1; if (valA > valB) return asc ? 1 : -1; return 0;
+        });
+        tbody.innerHTML = ''; rows.forEach(row => tbody.appendChild(row));
+    } catch(e) {}
 };
 
 function parseValueForSort(str, type) {
@@ -722,23 +726,25 @@ function traverseFileTree(item, filesArray){
 window.formatExcelDate = function(excelDate) {
     if(!excelDate) return '-';
     let d;
-    if(typeof excelDate === 'number') { 
-        if(excelDate > 1000000) { d = new Date(excelDate); } 
-        else { d = new Date(Math.round((excelDate - 25569) * 86400 * 1000)); d.setMinutes(d.getMinutes() + d.getTimezoneOffset()); }
-    } else if(typeof excelDate === 'string') { 
-        let parts = excelDate.trim().split(' ')[0].split(/[-/]/);
-        if (parts.length === 3) {
-            if (parts[0].length === 4) return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`;
-            else return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].padStart(4,'20')}`; 
-        }
-        return excelDate.replace(/-/g, '/');
-    } else { return String(excelDate); }
-    
-    if (isNaN(d.getTime())) return '-';
-    let dd = String(d.getDate()).padStart(2, '0');
-    let mm = String(d.getMonth() + 1).padStart(2, '0');
-    let yyyy = d.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
+    try {
+        if(typeof excelDate === 'number') { 
+            if(excelDate > 1000000) { d = new Date(excelDate); } 
+            else { d = new Date(Math.round((excelDate - 25569) * 86400 * 1000)); d.setMinutes(d.getMinutes() + d.getTimezoneOffset()); }
+        } else if(typeof excelDate === 'string') { 
+            let parts = excelDate.trim().split(' ')[0].split(/[-/]/);
+            if (parts.length === 3) {
+                if (parts[0].length === 4) return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`;
+                else return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].padStart(4,'20')}`; 
+            }
+            return excelDate.replace(/-/g, '/');
+        } else { return String(excelDate); }
+        
+        if (isNaN(d.getTime())) return '-';
+        let dd = String(d.getDate()).padStart(2, '0');
+        let mm = String(d.getMonth() + 1).padStart(2, '0');
+        let yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    } catch(e) { return '-'; }
 };
 
 function esClienteFalso(nombre, email=''){
@@ -856,7 +862,7 @@ window.iniciarProcesamiento = async function(files){
     
     window.actualizarSidebar(); 
     procesarDatosClientes(); 
-    actualizarVistaActual(); 
+    window.actualizarVistaActual(); 
     
     loadingOverlay.classList.remove('flex');
     loadingOverlay.classList.add('hidden');
@@ -910,7 +916,7 @@ async function parseExcel(file){
             for(let i=headerIdx+1;i<dataPostRaw.length;i++){
                 let rowRaw=dataPostRaw[i]; if(!rowRaw||!rowRaw.length) continue;
                 let loteStr=String(rowRaw[iLote]||'').toUpperCase().trim(); if(!loteStr) continue;
-                let rut=String(rowRaw[iRut]||'').trim(); let nombre=String(rowRaw[iNombre]||'').trim(); let monto=Number(String(rowRaw[iPostura]||'').replace(/[^0-9]/g,""))||0; let fecha = window.formatExcelDate(rowRaw[iFecha]); let esFalso=esClienteFalso(nombre, rut);
+                let rut=String(rowRaw[iRut]||'').trim(); let nombre=String(rowRaw[iNombre]||'').trim(); let monto=Number(String(rowRaw[iPostura]||'').replace(/[^0-9]/g,""))||0; let fecha = formatExcelDate(rowRaw[iFecha]); let esFalso=esClienteFalso(nombre, rut);
                 if(!posturasPorLote[loteStr]) posturasPorLote[loteStr]=[]; posturasPorLote[loteStr].push({ rut, nombre, nombreNorm: normalizarCliente(nombre), monto, fecha, esFalso });
             }
         }
@@ -996,7 +1002,9 @@ window.onCalYearChange = function(val) { calYear = Number(val); window.renderCal
 
 window.renderCalendar = function() {
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
     let monthsWithData = new Set();
+    
     db.remates.forEach(r => { 
         let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         if((calSegment === 'Todos' || r.tipo === calSegment) && y === Number(calYear)) { 
@@ -1005,13 +1013,32 @@ window.renderCalendar = function() {
     });
     
     let gridHtml = '';
-    for(let i=0; i<12; i++) {
-        let hasData = monthsWithData.has(i); let isSelected = calSelectedMonths.has(i);
-        let baseClasses = "py-1.5 text-center text-xs rounded-md font-bold transition select-none ";
-        if(!hasData && !isSelected) { baseClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
-        else if (isSelected) { baseClasses += "bg-premium-text text-white shadow-sm cursor-pointer hover:bg-black"; } 
-        else { baseClasses += "bg-white border border-slate-200 text-premium-text hover:border-premium-text cursor-pointer shadow-sm"; }
-        gridHtml += `<div class="${baseClasses}" ${hasData || isSelected ? `onclick="window.toggleCalMonth(${i})"` : ''}>${monthNames[i]}</div>`;
+    for(let q = 0; q < 4; q++) {
+        let qHasData = monthsWithData.has(q*3) || monthsWithData.has(q*3 + 1) || monthsWithData.has(q*3 + 2);
+        let qIsFullySelected = qHasData && 
+            (!monthsWithData.has(q*3) || calSelectedMonths.has(q*3)) &&
+            (!monthsWithData.has(q*3+1) || calSelectedMonths.has(q*3+1)) &&
+            (!monthsWithData.has(q*3+2) || calSelectedMonths.has(q*3+2));
+
+        let qClasses = "py-1.5 text-center text-[10px] uppercase tracking-widest rounded-md font-black transition select-none flex items-center justify-center ";
+        if (!qHasData) { qClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
+        else if (qIsFullySelected) { qClasses += "bg-premium-highlight text-white shadow-sm cursor-pointer hover:bg-blue-700"; } 
+        else { qClasses += "bg-slate-200 text-premium-text hover:bg-slate-300 cursor-pointer shadow-sm"; }
+        
+        gridHtml += `<div class="${qClasses}" ${qHasData ? `onclick="window.toggleQuarter(${q})"` : ''}>${quarters[q]}</div>`;
+
+        for (let m = 0; m < 3; m++) {
+            let monthIdx = q * 3 + m;
+            let hasData = monthsWithData.has(monthIdx);
+            let isSelected = calSelectedMonths.has(monthIdx);
+            let mClasses = "py-1.5 text-center text-xs rounded-md font-bold transition select-none ";
+            
+            if(!hasData && !isSelected) { mClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
+            else if (isSelected) { mClasses += "bg-premium-text text-white shadow-sm cursor-pointer hover:bg-black"; } 
+            else { mClasses += "bg-white border border-slate-200 text-premium-text hover:border-premium-text cursor-pointer shadow-sm"; }
+            
+            gridHtml += `<div class="${mClasses}" ${hasData || isSelected ? `onclick="window.toggleCalMonth(${monthIdx})"` : ''}>${monthNames[monthIdx]}</div>`;
+        }
     }
     document.getElementById('cal-months').innerHTML = gridHtml;
     
@@ -1047,6 +1074,37 @@ function getRematesForMonth(m) {
     });
 }
 
+window.toggleQuarter = function(q) {
+    let monthsWithData = new Set();
+    db.remates.forEach(r => { 
+        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        if((calSegment === 'Todos' || r.tipo === calSegment) && y === Number(calYear)) { 
+            monthsWithData.add(new Date(r.fechaData.timestamp).getMonth()); 
+        } 
+    });
+
+    let qMonths = [q*3, q*3+1, q*3+2].filter(m => monthsWithData.has(m));
+    if (qMonths.length === 0) return;
+
+    let allSelected = qMonths.every(m => calSelectedMonths.has(m));
+
+    if (allSelected) {
+        qMonths.forEach(m => {
+            calSelectedMonths.delete(m);
+            const toRemove = getRematesForMonth(m).map(r => r.id);
+            checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
+        });
+    } else {
+        qMonths.forEach(m => {
+            calSelectedMonths.add(m);
+            const toAdd = getRematesForMonth(m).map(r => r.id);
+            toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
+        });
+    }
+    window.renderCalendar(); 
+    window.actualizarVistaActual();
+};
+
 window.toggleCalMonth = function(m) {
     if(calSelectedMonths.has(m)) {
         calSelectedMonths.delete(m);
@@ -1057,16 +1115,16 @@ window.toggleCalMonth = function(m) {
         const toAdd = getRematesForMonth(m).map(r => r.id);
         toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
     }
-    window.renderCalendar(); actualizarVistaActual();
+    window.renderCalendar(); window.actualizarVistaActual();
 };
 
 window.toggleNode = function(id){ 
     if(checkedNodes.includes(id)) checkedNodes=checkedNodes.filter(n=>n!==id); else checkedNodes.push(id); 
-    window.renderCalendar(); actualizarVistaActual(); 
+    window.renderCalendar(); window.actualizarVistaActual(); 
 };
 
 window.limpiarSeleccion = function(){ 
-    checkedNodes=[]; calSelectedMonths.clear(); window.renderCalendar(); actualizarVistaActual(); 
+    checkedNodes=[]; calSelectedMonths.clear(); window.renderCalendar(); window.actualizarVistaActual(); 
 };
 
 window.seleccionarUltimoRemate = function() {
@@ -1088,19 +1146,19 @@ window.seleccionarUltimoRemate = function() {
     
     window.renderCalendar();
     window.cambiarSeccion('remates');
-    actualizarVistaActual();
+    window.actualizarVistaActual();
     
     if(window.innerWidth < 768) { window.toggleSidebar(); }
 };
 
-function actualizarVistaActual() { 
+window.actualizarVistaActual = function() { 
     try {
         if (currentModule === 'remates') window.renderDashboard(); 
         else if (currentModule === 'autos') window.renderPanelAutos(); 
         else if (currentModule === 'conclusiones') window.renderConclusiones(); 
         else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); } }
     } catch(e) { console.error(e); }
-}
+};
 
 window.limpiarBase = async function(){ 
     if(!confirm("¿Borrar todos los datos de la nube?")) return;
