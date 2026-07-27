@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { 
             theme: { 
@@ -16,7 +16,7 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'] }, 
                     colors: { 
                         premium: { 
-                            bg: '#F5F5F7', panel: '#FFFFFF', text: '#1D1D1F', muted: '#86868B', 
+                            bg: '#F2F2F7', panel: '#FFFFFF', text: '#1D1D1F', muted: '#86868B', 
                             border: '#E5E5EA', highlight: '#0066CC', success: '#1B8233', 
                             danger: '#E30000', accent: '#000000'
                         } 
@@ -26,15 +26,27 @@
         }
     </script>
     <style>
-        body { background-color: #F5F5F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
-        .glass-panel { background: #FFFFFF; border: 1px solid #E5E5EA; border-radius: 1.25rem; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02); transition: all 0.3s ease; }
-        .glass-panel:hover { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04); }
+        body { background-color: #F2F2F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
+        
+        /* Modern Glass Panel with Deep Shadows */
+        .glass-panel { 
+            background: #FFFFFF; 
+            border: 1px solid rgba(229, 229, 234, 0.8); 
+            border-radius: 1.5rem; 
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .glass-panel:hover { 
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); 
+            transform: translateY(-2px);
+        }
+
         .upload-area { border: 1.5px dashed #D1D1D6; background-color: #FAFAFA; border-radius: 999px; transition: all 0.2s; cursor: pointer; }
         .upload-area:hover, .upload-area.dragover { border-color: #000000; background-color: #F0F0F0; }
         
-        .nav-item { padding: 0.5rem 0.8rem; border-radius: 0.5rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #86868B;}
+        .nav-item { padding: 0.6rem 0.8rem; border-radius: 0.75rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #86868B;}
         .nav-item:hover { background-color: #EAEAEB; color: #1D1D1F; }
-        .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; font-weight: 600; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         
         input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; transition: all 0.2s;}
         input[type="checkbox"]::before { content: ""; width: 0.6em; height: 0.6em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
@@ -48,46 +60,46 @@
 
         .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); }
         
-        thead th { background-color: #FFFFFF; border-bottom: 1px solid #E5E5EA; color: #86868B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; padding-bottom: 0.75rem; }
+        thead th { background-color: #FFFFFF; border-bottom: 1px solid #E5E5EA; color: #86868B; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; padding-bottom: 0.75rem; }
         tbody tr { border-bottom: 1px solid #F5F5F7; transition: background-color 0.2s; }
         tbody tr:hover { background-color: #FAFAFA; }
-        tbody td { font-size: 0.8rem; color: #1D1D1F; padding: 0.75rem 0.5rem; }
+        tbody td { font-size: 0.8rem; color: #1D1D1F; padding: 0.85rem 0.5rem; }
         
         @media print {
             aside, header, .no-print { display: none !important; }
             main { padding: 0 !important; background: white !important; }
-            .glass-panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+            .glass-panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; transform: none !important; }
         }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v2.2</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.0</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
         <div class="w-14 h-14 border-4 border-premium-highlight border-t-transparent rounded-full animate-spin shadow-lg"></div>
-        <p id="loading-text" class="mt-6 font-semibold text-premium-text text-sm tracking-wide text-center max-w-xs">Procesando...</p>
-        <p class="text-[10px] text-premium-muted uppercase tracking-widest mt-2 font-medium">No cierre esta ventana</p>
+        <p id="loading-text" class="mt-6 font-bold text-premium-text text-lg tracking-tight text-center max-w-xs">Procesando...</p>
+        <p class="text-[10px] text-premium-muted uppercase tracking-widest mt-2 font-semibold">No cierre esta ventana</p>
     </div>
 
-    <!-- PANTALLA DE LOGIN Y CONFIGURACIÓN -->
+    <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl border border-white w-full max-w-[360px] text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
             <div class="w-14 h-14 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-2xl mx-auto mb-4 shadow-lg">Z</div>
-            <h2 class="text-xl font-semibold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
-            <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6">Control Directivo</p>
+            <h2 class="text-xl font-bold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
+            <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6 font-semibold">Control Directivo</p>
             
             <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
                 <div class="mb-4">
-                    <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all" required placeholder="Correo Electrónico">
+                    <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all font-medium" required placeholder="Correo Electrónico">
                 </div>
                 <div class="mb-6">
-                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all" required placeholder="Contraseña">
+                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all font-medium" required placeholder="Contraseña">
                 </div>
-                <div id="login-error" class="hidden text-premium-danger text-[10px] font-medium mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
-                <button type="submit" id="btn-login" class="w-full bg-premium-accent hover:bg-gray-800 text-white font-medium py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
+                <div id="login-error" class="hidden text-premium-danger text-[10px] font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
+                <button type="submit" id="btn-login" class="w-full bg-premium-accent hover:bg-gray-800 text-white font-semibold py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
                     Iniciar Sesión
                 </button>
             </form>
@@ -96,12 +108,12 @@
                 <div class="mb-2 text-center">
                     <span class="bg-premium-success/10 text-premium-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Invitación Aceptada</span>
                 </div>
-                <p class="text-xs text-premium-muted mb-6 text-center leading-relaxed">¡Bienvenido! Crea tu contraseña definitiva para ingresar a Zárate Analítica.</p>
+                <p class="text-xs text-premium-muted mb-6 text-center leading-relaxed font-medium">¡Bienvenido! Crea tu contraseña definitiva para ingresar a Zárate Analítica.</p>
                 <div class="mb-6">
-                    <input type="password" id="new-password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-success focus:ring-2 focus:ring-premium-success/20 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6">
+                    <input type="password" id="new-password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-success focus:ring-2 focus:ring-premium-success/20 transition-all font-medium" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6">
                 </div>
-                <div id="invite-error" class="hidden text-premium-danger text-[10px] font-medium mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
-                <button type="submit" id="btn-invite" class="w-full bg-premium-success hover:bg-green-700 text-white font-medium py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
+                <div id="invite-error" class="hidden text-premium-danger text-[10px] font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
+                <button type="submit" id="btn-invite" class="w-full bg-premium-success hover:bg-green-700 text-white font-semibold py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
                     Guardar y Entrar
                 </button>
             </form>
@@ -111,34 +123,33 @@
     <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
         <!-- HEADER -->
-        <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0">
+        <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0 shadow-sm">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
-                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base md:text-lg shadow-sm">Z</div>
+                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base md:text-lg shadow-md">Z</div>
                 <div class="hidden sm:block">
-                    <h1 class="font-semibold text-sm text-premium-text tracking-tight">Control de Gestión</h1>
-                    <p class="text-[9px] text-premium-muted uppercase tracking-wider" id="db-status">Conectando...</p>
+                    <h1 class="font-bold text-sm text-premium-text tracking-tight">Control de Gestión</h1>
+                    <p class="text-[9px] text-premium-muted uppercase tracking-wider font-semibold" id="db-status">Conectando...</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3 md:gap-4">
-                <!-- CONTROLES ADMIN -->
                 <div id="admin-controls" class="hidden items-center gap-2 md:gap-4">
-                    <button onclick="limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-medium px-3 py-1.5 rounded-full hover:bg-red-50 transition border border-red-100" title="Vaciar datos de la nube">Vaciar Base</button>
-                    <div class="upload-area px-3 md:px-4 py-1.5 flex items-center gap-2 md:gap-3">
-                        <label for="file-input" class="font-medium text-[12px] md:text-[11px] text-premium-text cursor-pointer"><span class="md:hidden">📄</span><span class="hidden md:inline">📄 Archivos</span></label>
+                    <button onclick="limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-bold px-3 py-1.5 rounded-full hover:bg-red-50 transition border border-red-100 shadow-sm" title="Vaciar datos de la nube">Vaciar Base</button>
+                    <div class="upload-area px-3 md:px-4 py-1.5 flex items-center gap-2 md:gap-3 shadow-sm">
+                        <label for="file-input" class="font-bold text-[12px] md:text-[11px] text-premium-text cursor-pointer"><span class="md:hidden">📄</span><span class="hidden md:inline">📄 Archivos</span></label>
                         <span class="text-premium-border hidden md:inline">|</span>
-                        <label for="folder-input" class="font-medium text-[11px] text-premium-text cursor-pointer hidden md:inline">📁 Carpeta</label>
+                        <label for="folder-input" class="font-bold text-[11px] text-premium-text cursor-pointer hidden md:inline">📁 Carpeta</label>
                         <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="iniciarProcesamiento(this.files)">
                         <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="iniciarProcesamiento(this.files)">
                     </div>
                 </div>
                 
                 <div class="h-4 w-px bg-premium-border hidden sm:block"></div>
-                <button onclick="handleLogout()" class="flex items-center gap-2 text-xs font-medium text-premium-muted hover:text-premium-text transition" title="Cerrar Sesión">
-                    <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline border border-premium-border font-medium"></span> 
+                <button onclick="handleLogout()" class="flex items-center gap-2 text-xs font-semibold text-premium-muted hover:text-premium-text transition" title="Cerrar Sesión">
+                    <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline border border-premium-border"></span> 
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
@@ -149,8 +160,8 @@
 
             <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print shadow-2xl md:shadow-none">
                 <div class="flex justify-between items-center mb-6 px-2 mt-2">
-                    <div class="text-[9px] font-bold text-premium-muted uppercase tracking-widest">Módulos</div>
-                    <button onclick="toggleSidebar()" class="md:hidden text-premium-muted p-1 hover:bg-slate-100 rounded">✕</button>
+                    <div class="text-[9px] font-extrabold text-premium-muted uppercase tracking-widest">Módulos</div>
+                    <button onclick="toggleSidebar()" class="md:hidden text-premium-muted p-1 hover:bg-slate-100 rounded font-bold">✕</button>
                 </div>
                 <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="cambiarSeccion('remates')">Resumen de Remates</div>
                 <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('autos')">Análisis de Vehículos</div>
@@ -159,18 +170,18 @@
                 <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="cambiarSeccion('buscador')">Buscador Global</div>
                 
                 <div id="calendar-container" class="mt-2">
-                    <div class="text-[10px] font-bold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
+                    <div class="text-[10px] font-extrabold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                         <span>Filtro de Periodos</span>
                         <div class="flex gap-3">
-                            <button onclick="seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1 font-medium" title="Ir al remate más reciente">⚡Reciente</button>
-                            <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition font-medium">Limpiar</button>
+                            <button onclick="seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1 font-bold" title="Ir al remate más reciente">⚡Reciente</button>
+                            <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition font-bold">Limpiar</button>
                         </div>
                     </div>
                     
                     <div class="px-2 space-y-3">
                         <div class="flex gap-2">
-                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-medium rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalSegmentChange(this.value)"></select>
-                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-medium rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition" onchange="onCalYearChange(this.value)"></select>
+                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="onCalSegmentChange(this.value)"></select>
+                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="onCalYearChange(this.value)"></select>
                         </div>
                         <div id="cal-months" class="grid grid-cols-4 gap-1.5"></div>
                         <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50"></div>
@@ -181,224 +192,251 @@
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
                 <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/90 backdrop-blur-md no-print p-6">
-                    <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-4 border border-premium-border shadow-sm">
-                        <svg class="w-6 h-6 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <div class="w-20 h-20 rounded-[2rem] bg-white flex items-center justify-center mb-5 border border-premium-border shadow-xl shadow-slate-200/50">
+                        <svg class="w-8 h-8 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
-                    <p class="font-medium text-lg text-premium-text tracking-tight text-center">Área de Trabajo Principal</p>
-                    <p class="text-xs text-premium-muted mt-2 text-center max-w-sm">Seleccione una matriz en el panel lateral o arrastre nuevos archivos para comenzar el análisis.</p>
+                    <p class="font-bold text-xl text-premium-text tracking-tight text-center">Área de Trabajo Principal</p>
+                    <p class="text-sm text-premium-muted mt-2 text-center max-w-sm font-medium">Seleccione una matriz en el panel lateral o arrastre nuevos archivos para comenzar el análisis.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
-                <div id="module-remates" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div id="single-view" class="space-y-4 md:space-y-6 hidden">
-                        <!-- Header Single View -->
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-premium-border pb-4">
-                            <div class="w-full sm:w-auto overflow-hidden">
-                                <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text truncate" id="sv-titulo">-</h2>
-                                <p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1" id="sv-subtitulo">-</p>
+                <div id="module-remates" class="hidden space-y-6 md:space-y-8 max-w-[1400px] mx-auto pb-10">
+                    <div id="single-view" class="space-y-6 md:space-y-8 hidden">
+                        <!-- HEADER DE MÓDULO CON MINI-CARDS -->
+                        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 border-b border-premium-border pb-5">
+                            <div class="w-full xl:w-auto overflow-hidden">
+                                <h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text truncate" id="sv-titulo">-</h2>
+                                <p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2" id="sv-subtitulo">-</p>
                             </div>
-                            <div class="flex gap-4 md:gap-6 text-right shrink-0">
-                                <div><p class="text-[8px] md:text-[9px] text-premium-muted uppercase font-semibold">Ticket Promedio</p><p class="text-lg md:text-xl font-semibold text-premium-text mt-0.5" id="sv-kpi-ticket-top">$0</p></div>
-                                <div><p class="text-[8px] md:text-[9px] text-premium-muted uppercase font-semibold">Comisión Estimada</p><p class="text-lg md:text-xl font-semibold text-premium-highlight mt-0.5" id="sv-kpi-comision-top">$0</p></div>
-                                <div><p class="text-[8px] md:text-[9px] text-premium-muted uppercase font-semibold">Venta Adjudicada</p><p class="text-lg md:text-xl font-semibold text-premium-success mt-0.5" id="sv-kpi-venta">$0</p></div>
-                            </div>
-                        </div>
-
-                        <!-- KPIs Principales -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div class="glass-panel p-4 md:p-5">
-                                <h4 class="font-semibold text-sm mb-3 md:mb-4 text-premium-text">Efectividad del Remate</h4>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Lotes Disponibles (Base)</span><span class="font-medium text-sm text-premium-text" id="sv-kpi-lotes-disp">0</span></div>
-                                    <div class="w-full h-px bg-premium-border/50"></div>
-                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Lotes Vendidos</span><span class="font-medium text-sm text-premium-text" id="sv-kpi-lotes">0</span></div>
-                                    <div class="w-full h-px bg-premium-border/50"></div>
-                                    <div class="flex justify-between items-center pt-1"><span class="text-[10px] text-premium-muted uppercase font-bold tracking-wider">Efectividad</span><span class="font-semibold text-lg text-premium-success" id="sv-kpi-eficacia-resumen">0%</span></div>
+                            
+                            <!-- TARJETAS SUPERIORES ELEGANTES -->
+                            <div class="flex gap-2 md:gap-3 flex-wrap justify-end shrink-0 w-full xl:w-auto">
+                                <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
+                                    <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Ticket Promedio</p>
+                                    <p class="text-xl md:text-2xl font-black text-premium-text tracking-tight" id="sv-kpi-ticket-top">$0</p>
                                 </div>
-                            </div>
-
-                            <div class="glass-panel p-4 md:p-5">
-                                <h4 class="font-semibold text-sm mb-3 md:mb-4 text-premium-text">Comportamiento de Clientes</h4>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Clientes c/Garantía</span><span class="font-medium text-sm text-premium-text" id="sv-kpi-garantias">0</span></div>
-                                    <div class="w-full h-px bg-premium-border/50"></div>
-                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Clientes que adjudicaron</span><span class="font-medium text-sm text-premium-success" id="sv-kpi-ganadores">0</span></div>
-                                    <div class="w-full h-px bg-premium-border/50"></div>
-                                    <div class="flex justify-between items-center"><span class="text-xs text-premium-muted">Clientes que NO adjudicaron</span><span class="font-medium text-sm text-premium-danger" id="sv-kpi-perdedores">0</span></div>
-                                    <div class="w-full h-px bg-premium-border/50"></div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-xs text-premium-muted truncate pr-2">Clientes nuevos que adjudicaron</span>
-                                        <div class="shrink-0"><span class="font-medium text-sm text-premium-highlight" id="sv-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted ml-1" id="sv-kpi-1racompra-pct"></span></div>
-                                    </div>
-                                    <div class="w-full h-px bg-premium-border/50"></div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-xs text-premium-muted truncate pr-2">Clientes que adjudicaron > 1 lote</span>
-                                        <div class="flex items-center gap-2 shrink-0"><span class="font-medium text-sm text-premium-text" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[9px] text-premium-highlight hover:underline font-medium no-print">Ver lista</button></div>
-                                    </div>
+                                <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
+                                    <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Comisión Est.</p>
+                                    <p class="text-xl md:text-2xl font-black text-premium-highlight tracking-tight" id="sv-kpi-comision-top">$0</p>
+                                </div>
+                                <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center border-b-4 border-b-premium-success min-w-[150px] hover:shadow-md transition">
+                                    <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Venta Adjudicada</p>
+                                    <p class="text-xl md:text-2xl font-black text-premium-success tracking-tight" id="sv-kpi-venta">$0</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- TABLA COMPLETA DE LOTES (FULL WIDTH) -->
-                        <div class="glass-panel p-4 md:p-5 overflow-hidden w-full">
-                            <h4 class="font-semibold text-sm mb-3 text-premium-text">Detalle de Lotes Adjudicados</h4>
-                            <div class="overflow-x-auto overflow-y-auto max-h-[600px] border border-premium-border rounded-xl">
-                                <table class="w-full text-left">
-                                    <thead class="sticky top-0 bg-white shadow-sm z-10">
+                        <!-- CARDS PRINCIPALES (ALTO UNIFORME, FONDOS DEGRADADOS) -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
+                            <!-- CARD 1 -->
+                            <div class="glass-panel p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-40 h-40 bg-premium-success/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                                <h4 class="font-extrabold text-lg mb-6 text-premium-text tracking-tight flex items-center gap-2">
+                                    <span class="bg-premium-bg px-2 py-1 rounded border border-slate-200 text-xs">📊</span> Efectividad del Remate
+                                </h4>
+                                <div class="space-y-4 flex-1">
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Disponibles (Base)</span><span class="font-black text-lg text-premium-text" id="sv-kpi-lotes-disp">0</span></div>
+                                    <div class="w-full h-px bg-slate-200/60"></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Vendidos</span><span class="font-black text-lg text-premium-text" id="sv-kpi-lotes">0</span></div>
+                                </div>
+                                <div class="mt-8 pt-5 border-t border-slate-200 flex justify-between items-end">
+                                    <span class="text-[10px] text-premium-muted uppercase font-black tracking-widest">Tasa Final</span>
+                                    <span class="font-black text-5xl text-premium-success tracking-tighter" id="sv-kpi-eficacia-resumen">0%</span>
+                                </div>
+                            </div>
+
+                            <!-- CARD 2 -->
+                            <div class="glass-panel p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-40 h-40 bg-premium-highlight/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                                <h4 class="font-extrabold text-lg mb-6 text-premium-text tracking-tight flex items-center gap-2">
+                                    <span class="bg-premium-bg px-2 py-1 rounded border border-slate-200 text-xs">👥</span> Comportamiento de Clientes
+                                </h4>
+                                <div class="space-y-4 flex-1">
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Garantías Pagadas</span><span class="font-black text-lg text-premium-text" id="sv-kpi-garantias">0</span></div>
+                                    <div class="w-full h-px bg-slate-200/60"></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Adjudicatarios (Ganadores)</span><span class="font-black text-lg text-premium-success" id="sv-kpi-ganadores">0</span></div>
+                                    <div class="w-full h-px bg-slate-200/60"></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Fuga (No adjudicaron)</span><span class="font-black text-lg text-premium-danger" id="sv-kpi-perdedores">0</span></div>
+                                    <div class="w-full h-px bg-slate-200/60"></div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-premium-muted font-semibold truncate pr-2">Nuevos Adjudicatarios</span>
+                                        <div class="shrink-0 flex items-center gap-2"><span class="font-black text-lg text-premium-highlight" id="sv-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted font-bold tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200" id="sv-kpi-1racompra-pct"></span></div>
+                                    </div>
+                                    <div class="w-full h-px bg-slate-200/60"></div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-premium-muted font-semibold truncate pr-2">Compras Volumen (>1 lote)</span>
+                                        <div class="flex items-center gap-3 shrink-0"><span class="font-black text-lg text-premium-text" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[9px] text-white bg-premium-text hover:bg-black px-2 py-1 rounded font-bold transition no-print shadow-sm uppercase tracking-wider">Ver lista</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TABLA COMPLETA CON BUSCADOR -->
+                        <div class="glass-panel p-6 md:p-8 overflow-hidden w-full bg-white">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 pb-4">
+                                <h4 class="font-extrabold text-lg text-premium-text tracking-tight flex items-center gap-2">
+                                    <span class="bg-premium-bg px-2 py-1 rounded border border-slate-200 text-xs">🚗</span> Detalle de Lotes Adjudicados
+                                </h4>
+                                <input type="text" id="search-lotes-main" placeholder="Buscar lote, modelo o cliente..." class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all w-full sm:w-72 shadow-inner font-medium text-premium-text placeholder:text-slate-400" onkeyup="window.filtrarLotesMain()">
+                            </div>
+                            
+                            <div class="overflow-x-auto overflow-y-auto max-h-[600px] border border-slate-200 rounded-xl shadow-sm">
+                                <table class="w-full text-left bg-white">
+                                    <thead class="sticky top-0 bg-slate-50 shadow-sm z-10 border-b border-slate-200">
                                         <tr>
-                                            <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Lote ↕️</th>
-                                            <th class="cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Detalle ↕️</th>
-                                            <th class="text-center cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Pujas Reales ↕️</th>
-                                            <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
-                                            <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
-                                            <th class="text-right pr-4 hidden sm:table-cell cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Delta ↕️</th>
+                                            <th class="pl-6 py-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Lote ↕️</th>
+                                            <th class="py-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Detalle del Vehículo ↕️</th>
+                                            <th class="py-4 text-center cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Pujas ↕️</th>
+                                            <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
+                                            <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
+                                            <th class="py-4 text-right pr-6 hidden sm:table-cell cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Delta ↕️</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="sv-tabla-top-lotes"></tbody>
+                                    <tbody id="sv-tabla-top-lotes" class="divide-y divide-slate-100"></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                    <div id="compare-view" class="space-y-4 md:space-y-6 hidden">
-                        <div class="border-b border-premium-border pb-4">
-                            <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Análisis Comparativo</h2>
-                            <p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Consolidación de múltiples periodos</p>
+                    <div id="compare-view" class="space-y-6 md:space-y-8 hidden">
+                        <div class="border-b border-premium-border pb-5">
+                            <h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Análisis Comparativo</h2>
+                            <p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Consolidación de múltiples periodos</p>
                         </div>
-                        <div class="glass-panel overflow-x-auto w-full p-2">
+                        <div class="glass-panel overflow-x-auto w-full p-4">
                             <table class="w-full text-left whitespace-nowrap">
                                 <thead>
                                     <tr>
-                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Matriz Analizada ↕️</th>
+                                        <th class="pl-4 cursor-pointer" onclick="sortTable(this, 'string')">Matriz Analizada ↕️</th>
                                         <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Venta ↕️</th>
                                         <th class="text-right cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'money')">Comisión ↕️</th>
                                         <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">L. Vend. ↕️</th>
                                         <th class="text-center cursor-pointer" onclick="sortTable(this, 'percent')">Efectividad ↕️</th>
                                         <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">Garantías ↕️</th>
                                         <th class="text-center cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'number')">Nuevos ↕️</th>
-                                        <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Sobreprecio ↕️</th>
+                                        <th class="text-right pr-4 cursor-pointer" onclick="sortTable(this, 'money')">Sobreprecio ↕️</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cv-tabla-comparativa"></tbody>
                             </table>
                         </div>
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 mt-4 no-print">
-                            <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4">Composición de Ventas</h4><div class="relative h-48 md:h-64 w-full"><canvas id="cv-chartVentas"></canvas></div></div>
-                            <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4">Evolución de Clientes</h4><div class="relative h-48 md:h-64 w-full"><canvas id="cv-chartGarantias"></canvas></div></div>
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-4 no-print">
+                            <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6">Composición de Ventas</h4><div class="relative h-56 md:h-72 w-full"><canvas id="cv-chartVentas"></canvas></div></div>
+                            <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6">Evolución de Clientes</h4><div class="relative h-56 md:h-72 w-full"><canvas id="cv-chartGarantias"></canvas></div></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- MODULE: MODELOS Y VEHICULOS -->
-                <div id="module-autos" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Estructura del catálogo adjudicado</p></div>
-                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-premium-border rounded-xl px-4 py-2 text-sm text-premium-text w-full md:w-64 focus:outline-none focus:border-premium-text transition" onkeyup="renderPanelAutos()">
+                <div id="module-autos" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
+                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Estructura del catálogo adjudicado</p></div>
+                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text w-full md:w-72 focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="renderPanelAutos()">
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-48 md:h-64 w-full"><canvas id="flota-marcas-chart"></canvas></div></div>
-                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Top Modelos Específicos</h4><div class="relative h-48 md:h-64 w-full"><canvas id="flota-modelos-chart"></canvas></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6 text-center">Top Marcas Adjudicadas</h4><div class="relative h-56 md:h-72 w-full"><canvas id="flota-marcas-chart"></canvas></div></div>
+                        <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6 text-center">Top Modelos Específicos</h4><div class="relative h-56 md:h-72 w-full"><canvas id="flota-modelos-chart"></canvas></div></div>
                     </div>
-                    <div class="glass-panel p-2">
-                        <div class="overflow-x-auto max-h-[600px] px-2">
-                            <table class="w-full text-left whitespace-nowrap">
-                                <thead>
+                    <div class="glass-panel p-4">
+                        <div class="overflow-x-auto max-h-[600px] rounded-lg border border-slate-100">
+                            <table class="w-full text-left whitespace-nowrap bg-white">
+                                <thead class="sticky top-0 bg-slate-50">
                                     <tr>
-                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Matriz ↕️</th>
-                                        <th class="cursor-pointer text-center" onclick="sortTable(this, 'string')">Lote ↕️</th>
-                                        <th class="cursor-pointer" onclick="sortTable(this, 'string')">Vehículo Extraído ↕️</th>
-                                        <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
-                                        <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
+                                        <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Matriz ↕️</th>
+                                        <th class="cursor-pointer text-center hover:text-premium-text transition" onclick="sortTable(this, 'string')">Lote ↕️</th>
+                                        <th class="cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Vehículo Extraído ↕️</th>
+                                        <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
+                                        <th class="text-right pr-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
                                     </tr>
                                 </thead>
-                                <tbody id="flota-tabla-resultados"></tbody>
+                                <tbody id="flota-tabla-resultados" class="divide-y divide-slate-50"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
                 <!-- MODULE: CLIENTES -->
-                <div id="module-clientes" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Clientes</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
-                        <div class="flex flex-col sm:flex-row gap-2 md:gap-3 w-full md:w-auto">
-                            <select id="filter-client-type" class="bg-white border border-premium-border rounded-xl px-3 py-2 text-sm text-premium-text outline-none w-full sm:w-auto focus:border-premium-text transition" onchange="filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
-                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-premium-border rounded-xl px-4 py-2 text-sm text-premium-text outline-none w-full sm:w-64 focus:border-premium-text transition" onkeyup="filtrarClientes()">
+                <div id="module-clientes" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
+                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Clientes</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Directorio y comportamiento de cartera</p></div>
+                        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <select id="filter-client-type" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-auto focus:border-premium-highlight shadow-sm transition" onchange="filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
+                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-72 focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="filtrarClientes()">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Total Clientes</p><p class="text-xl md:text-2xl font-semibold mt-1 text-premium-text" id="bi-kpi-total">0</p></div>
-                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Inversión Prom.</p><p class="text-xl md:text-2xl font-semibold text-premium-success mt-1" id="bi-kpi-ltv">$0</p></div>
-                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">Cruces</p><p class="text-xl md:text-2xl font-semibold text-premium-highlight mt-1" id="bi-kpi-hibridos">0</p></div>
-                        <div class="glass-panel p-4"><p class="text-[9px] text-premium-muted uppercase font-bold tracking-wider">En Riesgo</p><p class="text-xl md:text-2xl font-semibold text-premium-danger mt-1" id="bi-kpi-inactivos">0</p></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Total Clientes</p><p class="text-2xl md:text-3xl font-black mt-2 text-premium-text" id="bi-kpi-total">0</p></div>
+                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Inversión Prom.</p><p class="text-2xl md:text-3xl font-black text-premium-success mt-2" id="bi-kpi-ltv">$0</p></div>
+                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Cruces</p><p class="text-2xl md:text-3xl font-black text-premium-highlight mt-2" id="bi-kpi-hibridos">0</p></div>
+                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">En Riesgo</p><p class="text-2xl md:text-3xl font-black text-premium-danger mt-2" id="bi-kpi-inactivos">0</p></div>
                     </div>
-                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-                        <div id="bi-ficha-cliente" class="glass-panel p-4 md:p-5 xl:col-span-3 hidden border-l-4 border-l-premium-highlight">
-                            <div class="flex flex-col md:flex-row justify-between items-start mb-4 gap-2">
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        <div id="bi-ficha-cliente" class="glass-panel p-6 xl:col-span-3 hidden border-l-8 border-l-premium-highlight">
+                            <div class="flex flex-col md:flex-row justify-between items-start mb-5 gap-3">
                                 <div>
-                                    <h3 class="text-lg md:text-xl font-semibold text-premium-text tracking-tight" id="ficha-nombre">-</h3>
-                                    <div class="flex flex-wrap gap-3 mt-1 text-[10px] text-premium-muted uppercase tracking-wider">
-                                        <span>RUT: <span id="ficha-rut" class="font-medium text-premium-text"></span></span>
-                                        <span>Email: <span id="ficha-email" class="font-medium text-premium-text lowercase"></span></span>
+                                    <h3 class="text-xl md:text-2xl font-black text-premium-text tracking-tight" id="ficha-nombre">-</h3>
+                                    <div class="flex flex-wrap gap-4 mt-2 text-[10px] text-premium-muted uppercase tracking-widest font-bold">
+                                        <span>RUT: <span id="ficha-rut" class="text-premium-text"></span></span>
+                                        <span>Email: <span id="ficha-email" class="text-premium-text lowercase"></span></span>
                                     </div>
                                 </div>
-                                <button onclick="cerrarFicha()" class="text-premium-muted hover:text-premium-text text-xs font-medium no-print transition">✕ Cerrar Ficha</button>
+                                <button onclick="cerrarFicha()" class="text-premium-muted hover:text-premium-danger bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold no-print transition border border-slate-200">✕ Cerrar Ficha</button>
                             </div>
-                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-y border-premium-border mb-4">
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">1ra Compra</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-primera">-</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Última Compra</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-ultima">-</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Lotes Adj.</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-lotes">0</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Vol. Siniestros</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-monto-sin">$0</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-semibold">Vol. Retail</p><p class="font-medium text-xs md:text-sm text-premium-text mt-0.5" id="ficha-monto-ret">$0</p></div>
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-5 border-y border-slate-100 mb-5 bg-slate-50/50 rounded-xl px-4">
+                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">1ra Compra</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-primera">-</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Última Compra</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-ultima">-</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Lotes Adj.</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-lotes">0</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Vol. Siniestros</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-monto-sin">$0</p></div>
+                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Vol. Retail</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-monto-ret">$0</p></div>
                             </div>
-                            <div class="overflow-x-auto max-h-[250px]">
-                                <table class="w-full text-left">
-                                    <thead><tr><th>Fecha</th><th>Remate</th><th>Segmento</th><th>Lote</th><th class="text-right">Monto</th></tr></thead>
-                                    <tbody id="ficha-historial-tabla"></tbody>
+                            <div class="overflow-x-auto max-h-[300px] border border-slate-200 rounded-xl">
+                                <table class="w-full text-left bg-white">
+                                    <thead class="sticky top-0 bg-slate-50 border-b border-slate-200"><tr><th class="pl-4">Fecha</th><th>Remate</th><th>Segmento</th><th>Lote</th><th class="text-right pr-4">Monto</th></tr></thead>
+                                    <tbody id="ficha-historial-tabla" class="divide-y divide-slate-50"></tbody>
                                 </table>
                             </div>
                         </div>
                         
-                        <div class="glass-panel p-2 xl:col-span-2 overflow-hidden">
-                            <div class="p-3 pb-0"><h4 class="font-semibold text-xs text-premium-muted uppercase tracking-wider">Directorio General</h4></div>
-                            <div class="overflow-x-auto max-h-[400px] px-2">
-                                <table class="w-full text-left whitespace-nowrap">
-                                    <thead>
+                        <div class="glass-panel p-4 xl:col-span-2 overflow-hidden">
+                            <div class="p-2 pb-4"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest">Directorio General</h4></div>
+                            <div class="overflow-x-auto max-h-[400px] rounded-lg border border-slate-100">
+                                <table class="w-full text-left whitespace-nowrap bg-white">
+                                    <thead class="sticky top-0 bg-slate-50">
                                         <tr>
-                                            <th class="cursor-pointer" onclick="sortTable(this, 'string')">Razón Social ↕️</th>
-                                            <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">Frec. ↕️</th>
-                                            <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Inversión ↕️</th>
-                                            <th class="text-center cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'string')">Segmento ↕️</th>
+                                            <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Razón Social ↕️</th>
+                                            <th class="text-center cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Frec. ↕️</th>
+                                            <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Inversión ↕️</th>
+                                            <th class="text-center pr-4 cursor-pointer hidden sm:table-cell hover:text-premium-text transition" onclick="sortTable(this, 'string')">Segmento ↕️</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="bi-tabla-clientes"></tbody>
+                                    <tbody id="bi-tabla-clientes" class="divide-y divide-slate-50"></tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-4 text-center">Salud de Cartera</h4><div class="relative h-48 md:h-64 w-full"><canvas id="bi-chartSegments"></canvas></div></div>
+                        <div class="glass-panel p-6"><h4 class="font-extrabold text-[10px] md:text-xs text-premium-muted uppercase tracking-widest mb-6 text-center">Salud de Cartera</h4><div class="relative h-56 md:h-72 w-full"><canvas id="bi-chartSegments"></canvas></div></div>
                     </div>
                 </div>
 
                 <!-- MODULE: DATOS (CONCLUSIONES IA) -->
-                <div id="module-conclusiones" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Datos</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
-                        <button onclick="window.print()" class="px-4 py-2 bg-white border border-premium-border rounded-xl text-xs font-medium hover:bg-slate-50 transition w-full md:w-auto">Imprimir Resumen</button>
+                <div id="module-conclusiones" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
+                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Datos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Conclusiones directas legibles</p></div>
+                        <button onclick="window.print()" class="px-5 py-2.5 bg-white border border-slate-200 shadow-sm rounded-xl text-xs font-bold hover:bg-slate-50 hover:shadow-md transition w-full md:w-auto uppercase tracking-wider text-premium-text">🖨️ Imprimir Resumen</button>
                     </div>
-                    <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 text-premium-text"></div>
+                    <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 text-premium-text"></div>
                 </div>
 
                 <!-- MODULE: BUSCADOR -->
-                <div id="module-buscador" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Buscador Global</h2></div>
-                        <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-premium-border rounded-xl px-4 py-2.5 text-sm text-premium-text w-full md:w-80 shadow-sm focus:outline-none focus:border-premium-text transition" onkeyup="buscarPatente()">
+                <div id="module-buscador" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
+                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Buscador Global</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Motor de búsqueda histórico</p></div>
+                        <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-premium-text w-full md:w-80 shadow-inner focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all" onkeyup="buscarPatente()">
                     </div>
-                    <div class="glass-panel p-2 overflow-hidden">
-                        <div class="overflow-x-auto max-h-[600px] px-2">
-                            <table class="w-full text-left whitespace-nowrap">
-                                <thead><tr><th>Fecha</th><th>Remate Orig.</th><th class="text-center">N° Lote</th><th>Detalle Ext.</th><th>Adjudicatario</th><th class="text-right">Monto</th></tr></thead>
-                                <tbody id="buscador-tabla-resultados"><tr><td colspan="6" class="p-8 text-center text-premium-muted text-xs">Ingrese un parámetro mínimo de 3 caracteres.</td></tr></tbody>
+                    <div class="glass-panel p-4 overflow-hidden">
+                        <div class="overflow-x-auto max-h-[600px] rounded-lg border border-slate-100">
+                            <table class="w-full text-left whitespace-nowrap bg-white">
+                                <thead class="sticky top-0 bg-slate-50"><tr><th class="pl-4">Fecha</th><th>Remate Orig.</th><th class="text-center">N° Lote</th><th>Detalle Ext.</th><th>Adjudicatario</th><th class="text-right pr-4">Monto</th></tr></thead>
+                                <tbody id="buscador-tabla-resultados" class="divide-y divide-slate-50"><tr><td colspan="6" class="p-10 text-center text-premium-muted text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr></tbody>
                             </table>
                         </div>
                     </div>
@@ -410,41 +448,41 @@
 
     <!-- MODALES -->
     <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
-        <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-4 md:p-5 border-b border-premium-border flex justify-between items-start">
-                <div><h3 class="text-lg font-semibold tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase tracking-wider mt-1" id="modal-subtitulo"></p></div>
-                <button onclick="cerrarModal()" class="text-premium-muted hover:text-premium-text transition">✕</button>
+        <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
+            <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
+                <div><h3 class="text-xl font-black tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5" id="modal-subtitulo"></p></div>
+                <button onclick="cerrarModal()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button>
             </div>
-            <div class="px-4 md:px-5 py-3 bg-premium-bg flex flex-wrap gap-4 text-[10px] border-b border-premium-border uppercase tracking-wider font-semibold">
-                <div><span class="text-premium-muted">Total:</span> <span class="text-premium-text" id="modal-total-pujas">0</span></div>
-                <div><span class="text-premium-muted">Únicos:</span> <span class="text-premium-highlight" id="modal-unicos-reales">0</span></div>
-                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-2 py-0.5 rounded text-premium-text hover:bg-white transition">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-2 py-0.5 rounded text-premium-muted hover:text-premium-text transition">Solo Reales</button></div>
+            <div class="px-5 md:px-6 py-3 bg-white flex flex-wrap gap-5 text-[10px] border-b border-slate-200 uppercase tracking-widest font-extrabold items-center">
+                <div><span class="text-premium-muted">Total Pujas:</span> <span class="text-premium-text text-xs ml-1" id="modal-total-pujas">0</span></div>
+                <div><span class="text-premium-muted">Pujadores Únicos:</span> <span class="text-premium-highlight text-xs ml-1" id="modal-unicos-reales">0</span></div>
+                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition">Solo Reales</button></div>
             </div>
-            <div class="flex-1 overflow-x-auto overflow-y-auto p-2">
+            <div class="flex-1 overflow-x-auto overflow-y-auto p-2 bg-white">
                 <table class="w-full text-left">
-                    <thead><tr><th class="pl-3">#</th><th class="hidden sm:table-cell">Fecha</th><th>Nombre</th><th class="text-right">Monto</th><th class="text-center pr-3">Status</th></tr></thead>
-                    <tbody id="modal-tabla-pujas"></tbody>
+                    <thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">#</th><th class="hidden sm:table-cell">Fecha</th><th>Nombre</th><th class="text-right">Monto</th><th class="text-center pr-4">Status</th></tr></thead>
+                    <tbody id="modal-tabla-pujas" class="divide-y divide-slate-50"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <div id="modal-fuga" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
-        <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-4 md:p-5 border-b border-premium-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div><h3 class="text-lg font-semibold tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
-                <div class="flex items-center gap-3 w-full sm:w-auto"><button onclick="exportarFugaExcel()" class="text-[10px] font-medium bg-premium-bg border border-premium-border px-3 py-1.5 rounded-lg hover:bg-white transition flex-1 sm:flex-none">⬇️ Exportar Excel</button><button onclick="cerrarModalFuga()" class="text-premium-muted hover:text-premium-text transition">✕</button></div>
+        <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
+            <div class="p-5 md:p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
+                <div><h3 class="text-xl font-black tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
+                <div class="flex items-center gap-3 w-full sm:w-auto"><button onclick="exportarFugaExcel()" class="text-[10px] font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition shadow-sm flex-1 sm:flex-none uppercase tracking-widest text-premium-text">⬇️ Exportar Excel</button><button onclick="cerrarModalFuga()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition shrink-0">✕</button></div>
             </div>
-            <div class="flex-1 overflow-x-auto overflow-y-auto p-2">
-                <table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white"><tr><th class="pl-3">Matriz Origen</th><th>Inactivo por</th><th>Razón Social</th><th>Contacto</th></tr></thead><tbody id="modal-tabla-fuga"></tbody></table>
+            <div class="flex-1 overflow-x-auto overflow-y-auto p-2 bg-white">
+                <table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Matriz Origen</th><th>Inactivo por</th><th>Razón Social</th><th>Contacto</th></tr></thead><tbody id="modal-tabla-fuga" class="divide-y divide-slate-50"></tbody></table>
             </div>
         </div>
     </div>
 
     <div id="modal-multilote" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
-        <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-2xl shadow-2xl">
-            <div class="p-4 md:p-5 border-b border-premium-border flex justify-between items-center"><div><h3 class="text-lg font-semibold tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="cerrarModalMulti()" class="text-premium-muted hover:text-premium-text transition">✕</button></div>
-            <div class="flex-1 overflow-y-auto overflow-x-auto p-2"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white"><tr><th class="pl-3">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-3">Inversión</th></tr></thead><tbody id="modal-tabla-multilote"></tbody></table></div>
+        <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
+            <div class="p-5 md:p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50"><div><h3 class="text-xl font-black tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="cerrarModalMulti()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button></div>
+            <div class="flex-1 overflow-y-auto overflow-x-auto p-2 bg-white"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-4">Inversión</th></tr></thead><tbody id="modal-tabla-multilote" class="divide-y divide-slate-50"></tbody></table></div>
         </div>
     </div>
 
@@ -936,10 +974,10 @@ function renderCalendar() {
     let gridHtml = '';
     for(let i=0; i<12; i++) {
         let hasData = monthsWithData.has(i); let isSelected = calSelectedMonths.has(i);
-        let baseClasses = "py-1.5 text-center text-xs rounded-md font-semibold transition select-none ";
+        let baseClasses = "py-1.5 text-center text-xs rounded-md font-bold transition select-none ";
         if(!hasData && !isSelected) { baseClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
-        else if (isSelected) { baseClasses += "bg-premium-highlight text-white shadow-sm cursor-pointer"; } 
-        else { baseClasses += "bg-white border border-premium-border text-premium-text hover:border-premium-highlight hover:text-premium-highlight cursor-pointer shadow-sm"; }
+        else if (isSelected) { baseClasses += "bg-premium-text text-white shadow-sm cursor-pointer hover:bg-black"; } 
+        else { baseClasses += "bg-white border border-slate-200 text-premium-text hover:border-premium-text cursor-pointer shadow-sm"; }
         gridHtml += `<div class="${baseClasses}" ${hasData || isSelected ? `onclick="toggleCalMonth(${i})"` : ''}>${monthNames[i]}</div>`;
     }
     document.getElementById('cal-months').innerHTML = gridHtml;
@@ -949,15 +987,15 @@ function renderCalendar() {
     
     let listHtml = '';
     if(rematesToShow.length > 0) {
-        listHtml += `<div class="text-[10px] font-bold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
+        listHtml += `<div class="text-[10px] font-extrabold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
         rematesToShow.forEach(r => {
             let isChecked = checkedNodes.includes(r.id);
             listHtml += `
-            <div class="flex items-start gap-2.5 cursor-pointer mb-2.5 group hover:bg-premium-bg p-1.5 rounded-lg transition -ml-1.5" onclick="toggleNode('${r.id}')">
-                <input type="checkbox" class="mt-0.5 shrink-0 pointer-events-none" ${isChecked?'checked':''}>
+            <div class="flex items-start gap-3 cursor-pointer mb-2 group hover:bg-slate-50 p-2 rounded-xl transition border border-transparent hover:border-slate-200" onclick="toggleNode('${r.id}')">
+                <input type="checkbox" class="mt-1 shrink-0 pointer-events-none" ${isChecked?'checked':''}>
                 <div class="flex flex-col min-w-0 pointer-events-none">
-                    <span class="text-[11px] font-semibold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight">${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,25)}</span>
-                    <span class="text-[9px] text-premium-muted font-medium">${r.tipo} • ${new Date(r.fechaData.timestamp).toLocaleDateString('es-CL')}</span>
+                    <span class="text-[11px] font-bold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight">${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,25)}</span>
+                    <span class="text-[9px] text-premium-muted font-semibold mt-0.5">${r.tipo} • ${new Date(r.fechaData.timestamp).toLocaleDateString('es-CL')}</span>
                 </div>
             </div>`;
         });
@@ -965,10 +1003,10 @@ function renderCalendar() {
     document.getElementById('cal-matrices').innerHTML = listHtml;
 }
 
-function toggleNode(id){ 
+window.toggleNode = function(id){ 
     if(checkedNodes.includes(id)) checkedNodes=checkedNodes.filter(n=>n!==id); else checkedNodes.push(id); 
     renderCalendar(); actualizarVistaActual(); 
-}
+};
 
 function limpiarSeleccion(){ checkedNodes=[]; calSelectedMonths.clear(); renderCalendar(); actualizarVistaActual(); }
 
@@ -1025,6 +1063,17 @@ function renderDashboard(){
     } catch(e) {}
 }
 
+window.filtrarLotesMain = function() {
+    const term = (document.getElementById('search-lotes-main').value || '').toLowerCase();
+    const tbody = document.getElementById('sv-tabla-top-lotes');
+    if(!tbody) return;
+    const rows = tbody.getElementsByTagName('tr');
+    for(let i=0; i<rows.length; i++) {
+        const text = rows[i].innerText.toLowerCase();
+        rows[i].style.display = text.includes(term) ? '' : 'none';
+    }
+};
+
 function renderSingleView(nodeId){
     try {
         const node=nodeRematesMap[nodeId]; const agg=buildAgg(node.remates,nodeId,node.label);
@@ -1056,7 +1105,17 @@ function renderSingleView(nodeId){
                 let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
                 let dSignL = deltaLote >= 0 ? '+' : ''; 
                 let dColorL = deltaLote >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
-                return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')"><td class="font-medium text-premium-muted w-16">N° ${l.numeroLote||'-'}</td><td class="font-medium max-w-[300px] truncate text-premium-text" title="${l.loteStr}">${l.loteStr}</td><td class="text-center"><span class="bg-premium-bg border border-premium-border text-premium-text px-2 py-0.5 rounded font-semibold">${l.pujadoresRealesCount}</span></td><td class="text-right text-premium-muted">${formatMoney(l.minimo)}</td><td class="text-right font-medium text-premium-success">${formatMoney(l.monto)}</td><td class="text-right font-medium ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td></tr>`;
+                return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')">
+                    <td class="font-semibold text-premium-muted w-20 pl-6 whitespace-nowrap">Lote ${l.numeroLote||'-'}</td>
+                    <td class="max-w-[300px]">
+                        <div class="font-bold text-premium-text truncate text-sm" title="${l.loteStr}">${l.loteStr}</div>
+                        <div class="text-[10px] text-premium-muted uppercase tracking-widest font-semibold truncate mt-1" title="${l.clienteReal}">👤 ${l.clienteReal}</div>
+                    </td>
+                    <td class="text-center"><span class="bg-slate-100 border border-slate-200 text-premium-text px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
+                    <td class="text-right text-premium-muted font-medium">${formatMoney(l.minimo)}</td>
+                    <td class="text-right font-black text-premium-success">${formatMoney(l.monto)}</td>
+                    <td class="text-right pr-6 font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td>
+                </tr>`;
             }).join('');
         }
         
@@ -1069,18 +1128,18 @@ function renderCompareView(nodesList){
         if(document.getElementById('cv-tabla-comparativa')) {
             document.getElementById('cv-tabla-comparativa').innerHTML=compareData.map(d=>{
                 let dSign = d.deltaPujaTotal >= 0 ? '+' : ''; let dColor = d.deltaPujaTotal >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
-                return `<tr><td class="font-medium text-premium-text max-w-[150px] truncate" title="${d.label}">${d.label}</td><td class="text-right font-medium text-premium-success">${formatMoney(d.venta)}</td><td class="text-right text-premium-muted hidden sm:table-cell">${formatMoney(d.comisionTotal)}</td><td class="text-center text-premium-text">${d.lotes}</td><td class="text-center font-medium text-premium-success">${d.eficaciaLotes.toFixed(1)}%</td><td class="text-center text-premium-text">${d.garantias}</td><td class="text-center text-premium-muted hidden sm:table-cell">${d.nuevos}</td><td class="text-center font-medium ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)}</td></tr>`;
+                return `<tr><td class="pl-4 font-bold text-premium-text max-w-[150px] truncate" title="${d.label}">${d.label}</td><td class="text-right font-black text-premium-success">${formatMoney(d.venta)}</td><td class="text-right text-premium-muted hidden sm:table-cell font-medium">${formatMoney(d.comisionTotal)}</td><td class="text-center font-bold text-premium-text">${d.lotes}</td><td class="text-center font-black text-premium-success">${d.eficaciaLotes.toFixed(1)}%</td><td class="text-center font-bold text-premium-text">${d.garantias}</td><td class="text-center text-premium-muted hidden sm:table-cell font-medium">${d.nuevos}</td><td class="text-right pr-4 font-black ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)}</td></tr>`;
             }).join(''); 
         }
         const labels=compareData.map(d=>d.label); 
         try {
-            if(cvChartVentasInst) cvChartVentasInst.destroy(); if(document.getElementById('cv-chartVentas')) { cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0066CC',borderRadius:2},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#1D1D1F',borderRadius:2}] },options:{responsive:true,maintainAspectRatio:false}}); }
-            if(cvChartGarantiasInst) cvChartGarantiasInst.destroy(); if(document.getElementById('cv-chartGarantias')) { cvChartGarantiasInst=new Chart(document.getElementById('cv-chartGarantias').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Nuevos',data:compareData.map(d=>d.nuevos),backgroundColor:'#1D1D1F',borderRadius:2},{label:'Recurrentes',data:compareData.map(d=>d.antiguos),backgroundColor:'#D1D1D6',borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#F5F5F7'}}}}}); }
+            if(cvChartVentasInst) cvChartVentasInst.destroy(); if(document.getElementById('cv-chartVentas')) { cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0066CC',borderRadius:4},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#1D1D1F',borderRadius:4}] },options:{responsive:true,maintainAspectRatio:false}}); }
+            if(cvChartGarantiasInst) cvChartGarantiasInst.destroy(); if(document.getElementById('cv-chartGarantias')) { cvChartGarantiasInst=new Chart(document.getElementById('cv-chartGarantias').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Nuevos',data:compareData.map(d=>d.nuevos),backgroundColor:'#1D1D1F',borderRadius:4},{label:'Recurrentes',data:compareData.map(d=>d.antiguos),backgroundColor:'#D1D1D6',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#F5F5F7'}}}}}); }
         } catch(ec) {}
     } catch (e) {}
 }
 
-function abrirModalMultiLote() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-medium text-premium-text">${nombre}</td><td class="text-center font-medium text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-medium text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); }
+function abrirModalMultiLote() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-premium-text">${nombre}</td><td class="text-center font-black text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); }
 function cerrarModalMulti() { document.getElementById('modal-multilote').classList.add('hidden'); }
 
 function renderConclusiones() {
@@ -1094,25 +1153,31 @@ function renderConclusiones() {
         if(checkedNodes.length > 1) {
             let ref1 = buildAgg(nodeRematesMap[checkedNodes[0]].remates, 'R1', nodeRematesMap[checkedNodes[0]].label); let ref2 = buildAgg(nodeRematesMap[checkedNodes[1]].remates, 'R2', nodeRematesMap[checkedNodes[1]].label);
             let varVenta = ref1.venta > 0 ? ((ref2.venta - ref1.venta) / ref1.venta * 100) : 0; let signoVar = varVenta >= 0 ? '+' : '';
-            html += `<div class="glass-panel p-4 md:p-5 border-l-4 border-l-premium-highlight md:col-span-2"><h3 class="text-sm font-semibold text-premium-text mb-2">Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-xs text-premium-muted leading-relaxed">Al comparar <b>${nodeRematesMap[checkedNodes[0]].label}</b> con <b>${nodeRematesMap[checkedNodes[1]].label}</b>, se observa una variación en la venta total del <b>${signoVar}${varVenta.toFixed(1)}%</b>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
+            html += `<div class="glass-panel p-5 md:p-6 border-l-4 border-l-premium-highlight md:col-span-2 bg-slate-50"><h3 class="text-sm font-black text-premium-text mb-2">Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-xs text-premium-muted leading-relaxed font-medium">Al comparar <strong class="text-premium-text">${nodeRematesMap[checkedNodes[0]].label}</strong> con <strong class="text-premium-text">${nodeRematesMap[checkedNodes[1]].label}</strong>, se observa una variación en la venta total del <strong class="text-premium-highlight">${signoVar}${varVenta.toFixed(1)}%</strong>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
         }
 
         let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-premium-success' : 'text-premium-danger';
 
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">1. Venta Total</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Las operaciones válidas sumaron una venta adjudicada de <b>${formatMoney(agg.venta)}</b>.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">2. Comisiones Estimadas (12% + IVA)</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">El remate generó un ingreso por comisiones de <b>${formatMoney(agg.comisionTotal)}</b>.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">3. Efectividad del Remate</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Se logró vender el <b>${agg.eficaciaLotes.toFixed(1)}%</b> de todos los lotes disponibles en el catálogo.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">4. Incremento sobre el Mínimo (Delta)</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Las pujas incrementaron el valor de salida en <b>${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</b>, lo que representa un margen positivo del <b class="${sobreColor}">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</b> sobre los mínimos propuestos.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">5. Ticket Promedio</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">El valor promedio de venta por cada lote adjudicado fue de <b>${formatMoney(agg.ticketPromedio)}</b>.</p></div>`;
+        const cardClasses = "glass-panel p-5 md:p-6 bg-gradient-to-b from-white to-slate-50/50";
+        const titleClasses = "font-extrabold text-sm text-premium-text mb-3 flex items-center gap-2";
+        const badgeClasses = "bg-slate-100 px-2 py-0.5 rounded-md text-[10px] text-premium-muted border border-slate-200";
+        const textClasses = "text-xs md:text-sm text-slate-600 leading-relaxed font-medium";
+        const strongClasses = "text-premium-text font-black";
+
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">1</span> Venta Total</h4><p class="${textClasses}">Las operaciones válidas sumaron una venta adjudicada de <strong class="${strongClasses}">${formatMoney(agg.venta)}</strong>.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">2</span> Comisiones Est.</h4><p class="${textClasses}">El remate generó un ingreso por comisiones de <strong class="${strongClasses}">${formatMoney(agg.comisionTotal)}</strong>.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">3</span> Efectividad</h4><p class="${textClasses}">Se logró vender el <strong class="${strongClasses}">${agg.eficaciaLotes.toFixed(1)}%</strong> de todos los lotes disponibles en el catálogo.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">4</span> Delta</h4><p class="${textClasses}">Las pujas incrementaron el valor de salida en <strong class="${strongClasses}">${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</strong>, un margen del <strong class="${sobreColor} font-black">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</strong>.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">5</span> Ticket Promedio</h4><p class="${textClasses}">El valor promedio de venta por cada lote adjudicado fue de <strong class="${strongClasses}">${formatMoney(agg.ticketPromedio)}</strong>.</p></div>`;
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">6. Tasa de Cierre de Clientes</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">El <b>${tasaExito.toFixed(1)}%</b> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
-        html += `<div class="glass-panel p-4 md:p-5 flex flex-col justify-between"><h4 class="font-semibold text-xs text-premium-text mb-2">7. Clientes que NO adjudicaron</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Hubo <b>${agg.perdedoresCount} clientes</b> que pagaron garantía pero no lograron comprar nada.</p><button onclick="abrirModalFuga()" class="mt-3 px-3 py-1.5 bg-premium-bg border border-premium-border text-premium-text font-medium rounded text-xs text-center hover:bg-white transition no-print">Ver listado</button></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">6</span> Tasa de Cierre</h4><p class="${textClasses}">El <strong class="${strongClasses}">${tasaExito.toFixed(1)}%</strong> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
+        html += `<div class="${cardClasses} flex flex-col justify-between"><h4 class="${titleClasses}"><span class="${badgeClasses}">7</span> Fuga</h4><p class="${textClasses} mb-4">Hubo <strong class="text-premium-danger font-black">${agg.perdedoresCount} clientes</strong> que pagaron garantía pero no lograron comprar nada.</p><button onclick="abrirModalFuga()" class="w-full py-2 bg-white border border-slate-200 text-premium-text font-bold rounded-lg text-xs hover:bg-slate-50 transition shadow-sm no-print uppercase tracking-widest">Ver listado</button></div>`;
         let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">8. Clientes Nuevos</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">El <b>${agg.pctVentaNuevos.toFixed(1)}%</b> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">8</span> Clientes Nuevos</h4><p class="${textClasses}">El <strong class="${strongClasses}">${agg.pctVentaNuevos.toFixed(1)}%</strong> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">9. Compradores de Volumen</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Un total de <b>${multi} clientes</b> operaron en volumen y compraron más de un lote.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">9</span> Volúmen</h4><p class="${textClasses}">Un total de <strong class="${strongClasses}">${multi} clientes</strong> operaron en volumen y compraron más de un lote.</p></div>`;
         let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
-        html += `<div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-xs text-premium-text mb-2">10. Limpieza de Datos</h4><p class="text-[11px] md:text-xs text-premium-muted leading-relaxed">Se aislaron automáticamente <b>${falsos} pujas internas o pruebas de sistema</b>.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">10</span> Limpieza</h4><p class="${textClasses}">Se aislaron automáticamente <strong class="${strongClasses}">${falsos} pujas</strong> internas o pruebas de sistema.</p></div>`;
 
         if(document.getElementById('conclusiones-content')) document.getElementById('conclusiones-content').innerHTML = html;
     } catch (e) {}
@@ -1129,12 +1194,12 @@ function renderPanelAutos(){
         try {
             if(flotaMarcasInst) flotaMarcasInst.destroy(); if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { flotaMarcasInst=new Chart(document.getElementById('flota-marcas-chart').getContext('2d'),{type:'doughnut',data:{labels:marcasSorted.map(m=>m[0]),datasets:[{data:marcasSorted.map(m=>m[1]),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#86868B','#E5E5EA'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); }
             const modelosSorted = Object.entries(modelosMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
-            if(flotaAniosInst) flotaAniosInst.destroy(); if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades Adjudicadas',data:modelosSorted.map(a=>a[1]),backgroundColor:'#0066CC',borderRadius:2}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#F5F5F7'}},y:{grid:{display:false}}}}}); }
+            if(flotaAniosInst) flotaAniosInst.destroy(); if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades Adjudicadas',data:modelosSorted.map(a=>a[1]),backgroundColor:'#0066CC',borderRadius:4}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#F5F5F7'}},y:{grid:{display:false}}}}}); }
         } catch(ec) {}
         const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term));
         if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
-            return `<tr><td class="font-medium text-premium-muted max-w-[120px] truncate" title="${a.remate}">${a.remate.substring(0,20)}</td><td class="text-center font-medium text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-medium text-premium-text">${a.categoria}</span> <span class="text-premium-muted">${a.modeloStr}</span></td><td class="text-right text-premium-muted">${formatMoney(a.minimo)}</td><td class="text-right font-medium text-premium-success">${formatMoney(a.monto)}</td></tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted">Sin vehículos en la selección actual.</td></tr>';
+            return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[120px] truncate" title="${a.remate}">${a.remate.substring(0,20)}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-black text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(a.monto)}</td></tr>`;
+        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin vehículos en la selección actual.</td></tr>';
     } catch (e) {}
 }
 
@@ -1143,8 +1208,8 @@ function abrirModalFuga() {
         if(!globalAgg) return; let html = '';
         if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
             globalAgg.fugaList.sort((a,b)=>a.nombre.localeCompare(b.nombre)); let hoy = Date.now();
-            globalAgg.fugaList.forEach(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; let nombreRemate = f.numRemate ? `${f.numRemate}` : '-'; html += `<tr><td class="pl-4 font-medium text-[10px] md:text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-[10px] md:text-xs font-medium">${textoDias}</td><td class="font-medium text-[10px] md:text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-[10px] md:text-xs text-premium-muted truncate max-w-[150px]">${f.email||'-'}</td></tr>`; });
-        } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted">No hay registros.</td></tr>'; }
+            globalAgg.fugaList.forEach(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; let nombreRemate = f.numRemate ? `${f.numRemate}` : '-'; html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; });
+        } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted font-medium">No hay registros.</td></tr>'; }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
     } catch (e) {}
 }
@@ -1164,7 +1229,7 @@ function abrirModalPujadores(loteEncoded, nodeId){
         let adjudicado=null; node.remates.forEach(r=>{ let adj=r.adjudicaciones.find(a=>a.loteStr===loteStr); if(adj) adjudicado=adj; }); currentAdjudicadoModal = adjudicado; currentModalPujas=todasPujas.sort((a,b)=>b.monto-a.monto);
         if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').innerText="Lote Seleccionado"; if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adj: ${adjudicado && !adjudicado.esFalso?formatMoney(adjudicado.monto):'FALSO'} | Min: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
         if(document.getElementById('modal-total-pujas')) document.getElementById('modal-total-pujas').innerText=todasPujas.length; if(document.getElementById('modal-unicos-reales')) document.getElementById('modal-unicos-reales').innerText=[...new Set(todasPujas.filter(p=>!p.esFalso).map(p=>p.nombreNorm))].length; if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
-        currentFiltroModal='todos'; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-medium'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium';
+        currentFiltroModal='todos'; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold';
         renderModalTabla(); if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.remove('hidden');
     } catch(e) {}
 }
@@ -1175,13 +1240,13 @@ function renderModalTabla(){
         if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso); if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
-            let badge = p.esFalso ? '<span class="text-[9px] font-bold text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
-            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs text-premium-muted hidden sm:table-cell">${p.fecha||'-'}</td><td class="font-medium text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-medium ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted">Sin pujas registradas</td></tr>';
+            let badge = p.esFalso ? '<span class="text-[9px] font-black text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-black text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-black text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
+            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${p.fecha||'-'}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-black ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
+        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin pujas registradas</td></tr>';
     } catch(e) {}
 }
 
-function filtrarModal(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-medium':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-medium':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-medium':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-medium'; renderModalTabla(); }
+function filtrarModal(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-bold':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold'; renderModalTabla(); }
 function cerrarModal(){ if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.add('hidden'); }
 
 function procesarDatosClientes(){ 
@@ -1206,7 +1271,7 @@ function procesarDatosClientes(){
 function renderPanelClientesData(filtered,isFiltered=false){ 
     try {
         if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="font-medium text-[10px] md:text-xs text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-[10px] md:text-xs text-premium-muted">${c.frecuencia}</td><td class="text-right text-[10px] md:text-xs font-medium text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-[10px] md:text-xs font-medium ${c.color} hidden sm:table-cell">${c.segmento}</td></tr>`).join(''); }
+        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="pl-4 font-bold text-xs md:text-sm text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-premium-muted font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-black text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-black ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
         if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#E30000'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
     } catch(e) {}
 }
@@ -1218,7 +1283,7 @@ function abrirFichaCliente(nombreStr){
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
         if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+b.monto,0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+b.monto,0)); 
-        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="text-[10px] md:text-xs text-premium-muted">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-medium text-premium-text">${h.remate?h.remate.substring(0,25):'-'}</td><td class="text-[10px] md:text-xs text-premium-muted">${h.tipo}</td><td class="font-medium text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right text-[10px] md:text-xs font-medium text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
+        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate?h.remate.substring(0,25):'-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
 }
@@ -1228,10 +1293,10 @@ function cerrarFicha(){ if(document.getElementById('bi-ficha-cliente')) document
 function buscarPatente(){ 
     try {
         const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); const tbody=document.getElementById('buscador-tabla-resultados'); 
-        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-8 text-center text-premium-muted text-[10px] md:text-xs">Ingrese 3 caracteres.</td></tr>'; return; } 
+        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-10 text-center text-premium-muted text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr>'; return; } 
         let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData.timestamp,remate:r.fileName,lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
-        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-8 text-center font-medium text-[10px] md:text-xs text-premium-danger">Sin resultados</td></tr>`; return; } 
-        tbody.innerHTML=resultados.map(res=>`<tr><td class="text-[10px] md:text-xs text-premium-muted">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="font-medium text-[10px] md:text-xs truncate max-w-[120px] text-premium-text">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="text-center text-[10px] md:text-xs font-medium text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell">${res.lote}</td><td class="font-medium text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right text-[10px] md:text-xs font-medium text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
+        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-10 text-center font-bold text-sm text-premium-danger">Sin resultados</td></tr>`; return; } 
+        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[120px] text-premium-text">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) {}
 }
 </script>
