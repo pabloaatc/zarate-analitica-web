@@ -68,7 +68,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.5</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.6</div>
 
     <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
@@ -636,7 +636,7 @@ window.onload = () => {
 async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
 
 // ===========================================
-// LÓGICA PRINCIPAL Y EXTRACCIÓN
+// LÓGICA PRINCIPAL (MOTOR TURBO v1.6)
 // ===========================================
 
 window.addEventListener('error', function(e) {
@@ -752,7 +752,7 @@ const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20)
 function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
 
 // ===========================================
-// MOTOR DE PROCESAMIENTO TURBO (BULK UPSERT + CONTADOR)
+// MOTOR DE PROCESAMIENTO TURBO (Lotes de 5 + Manejo de Errores)
 // ===========================================
 async function iniciarProcesamiento(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
@@ -764,10 +764,10 @@ async function iniciarProcesamiento(files){
     
     let successCount = 0;
     
-    // FASE 1: EXTRACCIÓN (Con contador en vivo)
+    // FASE 1: EXTRACCIÓN EN VIVO
     for(let i = 0; i < validFiles.length; i++){ 
         statusLabel.innerText = `Extrayendo ${i+1}/${validFiles.length}...`;
-        await new Promise(r => setTimeout(r, 50)); // Micro-pausa para actualizar UI
+        await new Promise(r => setTimeout(r, 50)); 
         
         try{ 
             const data = await parseExcel(validFiles[i]); 
@@ -784,12 +784,12 @@ async function iniciarProcesamiento(files){
     
     if(successCount === 0) {
         statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); 
-        statusLabel.innerText = `Error: Sin datos válidos`;
+        statusLabel.innerText = `Error de formato`;
         return;
     }
 
     // FASE 2: CRUCE DE CLIENTES
-    statusLabel.innerText = "Cruzando clientes...";
+    statusLabel.innerText = "Cruzando datos...";
     await new Promise(r => setTimeout(r, 50));
 
     db.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp);
@@ -809,22 +809,27 @@ async function iniciarProcesamiento(files){
         remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
     });
     
-    // FASE 3: GUARDADO EN LA NUBE (BULK UPSERT TURBO)
-    statusLabel.innerText = "Guardando en la Nube...";
-    await new Promise(r => setTimeout(r, 50));
-
+    // FASE 3: GUARDADO EN LA NUBE (Lotes de 5 para evitar colapso)
     try { 
-        // En lugar de enviar uno por uno, empacamos todos los remates y los mandamos de una vez
         const bulkData = db.remates.map(remate => ({ id: remate._dbId, payload: remate }));
-        const { error } = await supabaseClient.from('app_state').upsert(bulkData);
         
-        if(error) throw error;
+        for (let i = 0; i < bulkData.length; i += 5) {
+            statusLabel.innerText = `Subiendo ${Math.min(i+5, bulkData.length)}/${bulkData.length}...`;
+            await new Promise(r => setTimeout(r, 50));
+            
+            const chunk = bulkData.slice(i, i + 5);
+            const { error } = await supabaseClient.from('app_state').upsert(chunk);
+            if (error) throw error;
+        }
         
         statusLabel.classList.replace('text-premium-highlight', 'text-premium-success'); 
         statusLabel.innerText = `En Línea (${db.remates.length})`;
     } catch (e) { 
         statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); 
-        statusLabel.innerText = `Error DB`; 
+        // Mostrar el motivo exacto del error en pantalla
+        let errorMsg = e.message || "Desconocido";
+        if (errorMsg.includes("row-level security")) errorMsg = "Bloqueado (Revisar Correo)";
+        statusLabel.innerText = `Error: ${errorMsg.substring(0, 22)}`; 
         console.error("Error al guardar en Supabase:", e);
     }
     
@@ -835,10 +840,6 @@ async function iniciarProcesamiento(files){
     procesarDatosClientes(); 
     actualizarVistaActual(); 
 }
-
-// ===========================================
-// FUNCIONES SECUNDARIAS Y PANELES
-// ===========================================
 
 async function parseExcel(file){
     const buffer=await file.arrayBuffer(); const wb=XLSX.read(buffer,{type:'array'}); const sheets={}; wb.SheetNames.forEach(n=>sheets[n.toLowerCase()]=n);
