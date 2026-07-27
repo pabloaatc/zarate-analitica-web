@@ -28,7 +28,6 @@
     <style>
         body { background-color: #F2F2F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
         
-        /* Modern Glass Panel with Deep Shadows */
         .glass-panel { 
             background: #FFFFFF; 
             border: 1px solid rgba(229, 229, 234, 0.8); 
@@ -74,7 +73,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.0</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.1</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -637,6 +636,17 @@ if(typeof Chart !== 'undefined') {
     Chart.defaults.font.size = 10;
 }
 
+// FUSIÓN Y LIMPIEZA DE NOMBRES INTELIGENTE
+function formatearNombreRemate(fileName, timestamp) {
+    let numMatch = fileName.match(/(?:REMATE|ZARATE).*?(\d{3,5})/i) || fileName.match(/\b(\d{4})\b/);
+    let num = numMatch ? (numMatch[1] || numMatch[0]) : '';
+    let dateStr = timestamp ? new Date(timestamp).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}) : '';
+    if(num && dateStr) return `Remate ${num} - ${dateStr}`;
+    if(num) return `Remate ${num}`;
+    let base = fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,18);
+    return dateStr ? `${base} - ${dateStr}` : base;
+}
+
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
     try {
@@ -931,7 +941,7 @@ function actualizarSidebar(){
     try {
         if(!db.remates.length) return;
         let segments = new Set(); let years = new Set(); nodeRematesMap = {}; 
-        db.remates.forEach(r => { segments.add(r.tipo); years.add(r.fechaData.year); nodeRematesMap[r.id] = { label: r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,18), remates: [r] }; });
+        db.remates.forEach(r => { segments.add(r.tipo); years.add(r.fechaData.year); nodeRematesMap[r.id] = { label: formatearNombreRemate(r.fileName, r.fechaData.timestamp), remates: [r] }; });
         if(segments.size > 0 && !segments.has(calSegment) && calSegment !== 'Todos') calSegment = Array.from(segments)[0];
         if(years.size > 0 && !years.has(calYear)) calYear = Math.max(...Array.from(years));
         const segHtml = `<option value="Todos" ${'Todos'===calSegment?'selected':''}>📊 Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===calSegment?'selected':''}>🚗 ${s}</option>`).join('');
@@ -943,28 +953,6 @@ function actualizarSidebar(){
 
 function onCalSegmentChange(val) { calSegment = val; renderCalendar(); }
 function onCalYearChange(val) { calYear = parseInt(val); renderCalendar(); }
-
-function toggleCalMonth(m) {
-    if(calSelectedMonths.has(m)) {
-        calSelectedMonths.delete(m);
-        const toRemove = getRematesForMonth(m).map(r => r.id);
-        checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
-    } else {
-        calSelectedMonths.add(m);
-        const toAdd = getRematesForMonth(m).map(r => r.id);
-        toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
-    }
-    renderCalendar(); actualizarVistaActual();
-}
-
-function getRematesForMonth(m) {
-    return db.remates.filter(r => {
-        let matchSeg = calSegment === 'Todos' || r.tipo === calSegment;
-        let matchYear = r.fechaData.year === calYear;
-        let monthIndex = new Date(r.fechaData.timestamp).getMonth(); 
-        return matchSeg && matchYear && monthIndex === m;
-    });
-}
 
 function renderCalendar() {
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -990,17 +978,31 @@ function renderCalendar() {
         listHtml += `<div class="text-[10px] font-extrabold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
         rematesToShow.forEach(r => {
             let isChecked = checkedNodes.includes(r.id);
+            let tituloSidebar = formatearNombreRemate(r.fileName, r.fechaData.timestamp);
             listHtml += `
             <div class="flex items-start gap-3 cursor-pointer mb-2 group hover:bg-slate-50 p-2 rounded-xl transition border border-transparent hover:border-slate-200" onclick="toggleNode('${r.id}')">
                 <input type="checkbox" class="mt-1 shrink-0 pointer-events-none" ${isChecked?'checked':''}>
                 <div class="flex flex-col min-w-0 pointer-events-none">
-                    <span class="text-[11px] font-bold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight">${r.fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,25)}</span>
-                    <span class="text-[9px] text-premium-muted font-semibold mt-0.5">${r.tipo} • ${new Date(r.fechaData.timestamp).toLocaleDateString('es-CL')}</span>
+                    <span class="text-[11px] font-bold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight" title="${tituloSidebar}">${tituloSidebar}</span>
+                    <span class="text-[9px] text-premium-muted font-semibold mt-0.5">${r.tipo}</span>
                 </div>
             </div>`;
         });
     }
     document.getElementById('cal-matrices').innerHTML = listHtml;
+}
+
+function toggleCalMonth(m) {
+    if(calSelectedMonths.has(m)) {
+        calSelectedMonths.delete(m);
+        const toRemove = getRematesForMonth(m).map(r => r.id);
+        checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
+    } else {
+        calSelectedMonths.add(m);
+        const toAdd = getRematesForMonth(m).map(r => r.id);
+        toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
+    }
+    renderCalendar(); actualizarVistaActual();
 }
 
 window.toggleNode = function(id){ 
@@ -1188,7 +1190,7 @@ function renderPanelAutos(){
         if(currentModule !== 'autos') return; const emptyState=document.getElementById('empty-state'); const autosMod=document.getElementById('module-autos');
         if(checkedNodes.length===0){ emptyState.classList.remove('hidden'); autosMod.classList.add('hidden'); return; }
         emptyState.classList.add('hidden'); autosMod.classList.remove('hidden');
-        let autos = []; let allRemates = getSelectedRemates(); allRemates.forEach(r => { r.adjudicaciones.forEach(a => { if(!a.esFalso && !a.esChatarra) autos.push({...a, remate: r.fileName}); }); });
+        let autos = []; let allRemates = getSelectedRemates(); allRemates.forEach(r => { r.adjudicaciones.forEach(a => { if(!a.esFalso && !a.esChatarra) autos.push({...a, remate: formatearNombreRemate(r.fileName, r.fechaData.timestamp)}); }); });
         let marcasMap = {}; let modelosMap = {}; autos.forEach(a => { if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') marcasMap[a.categoria] = (marcasMap[a.categoria]||0) + 1; if(a.modeloStr && a.modeloStr.trim() !== '') modelosMap[a.modeloStr] = (modelosMap[a.modeloStr]||0) + 1; });
         const marcasSorted = Object.entries(marcasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
         try {
@@ -1198,7 +1200,7 @@ function renderPanelAutos(){
         } catch(ec) {}
         const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term));
         if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
-            return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[120px] truncate" title="${a.remate}">${a.remate.substring(0,20)}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-black text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(a.monto)}</td></tr>`;
+            return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-black text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(a.monto)}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin vehículos en la selección actual.</td></tr>';
     } catch (e) {}
 }
@@ -1208,7 +1210,13 @@ function abrirModalFuga() {
         if(!globalAgg) return; let html = '';
         if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
             globalAgg.fugaList.sort((a,b)=>a.nombre.localeCompare(b.nombre)); let hoy = Date.now();
-            globalAgg.fugaList.forEach(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; let nombreRemate = f.numRemate ? `${f.numRemate}` : '-'; html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; });
+            globalAgg.fugaList.forEach(f => { 
+                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
+                let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
+                let dateStr = f.fechaRemate ? new Date(f.fechaRemate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}) : '';
+                let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` + (dateStr ? ` - ${dateStr}` : '') : '-'; 
+                html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
+            });
         } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted font-medium">No hay registros.</td></tr>'; }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
     } catch (e) {}
@@ -1218,7 +1226,12 @@ function cerrarModalFuga() { document.getElementById('modal-fuga').classList.add
 function exportarFugaExcel() {
     try {
         if(!globalAgg || !globalAgg.fugaList) return; let hoy = Date.now();
-        const wsData = globalAgg.fugaList.map(f => { let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; return { "N° Remate": f.numRemate || '-', "Días Inactivo": diasFuga, "Fecha": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-', "Cliente": f.nombre, "RUT": f.rut || 'No Registrado', "Email": f.email || 'No Registrado' }; });
+        const wsData = globalAgg.fugaList.map(f => { 
+            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
+            let dateStr = f.fechaRemate ? new Date(f.fechaRemate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}) : '';
+            let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` + (dateStr ? ` - ${dateStr}` : '') : '-';
+            return { "Matriz": nombreRemate, "Días Inactivo": diasFuga, "Fecha": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-', "Cliente": f.nombre, "RUT": f.rut || 'No Registrado', "Email": f.email || 'No Registrado' }; 
+        });
         const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
     } catch (e) {}
 }
@@ -1240,7 +1253,7 @@ function renderModalTabla(){
         if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso); if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
-            let badge = p.esFalso ? '<span class="text-[9px] font-black text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-black text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-black text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
+            let badge = p.esFalso ? '<span class="text-[9px] font-black text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
             return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${p.fecha||'-'}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-black ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin pujas registradas</td></tr>';
     } catch(e) {}
@@ -1257,7 +1270,7 @@ function procesarDatosClientes(){
             r.adjudicaciones.forEach(adj=>{ 
                 if(adj.esFalso) return; const c=adj.clienteReal; 
                 if(!mapBI[c]) mapBI[c]={nombre:c, rut: adj.rut||'-', email: adj.email||'-', compras:[],totalGastado:0,lotesSiniestrados:0,lotesRetail:0,tipos:new Set()}; 
-                mapBI[c].compras.push({fecha:r.fechaData.timestamp,monto:adj.monto, tipo: r.tipo, lote: adj.numeroLote? 'Lote '+adj.numeroLote : (adj.loteStr?adj.loteStr.substring(0,10):''), remate: r.fileName}); 
+                mapBI[c].compras.push({fecha:r.fechaData.timestamp,monto:adj.monto, tipo: r.tipo, lote: adj.numeroLote? 'Lote '+adj.numeroLote : (adj.loteStr?adj.loteStr.substring(0,10):''), remate: formatearNombreRemate(r.fileName, r.fechaData.timestamp)}); 
                 mapBI[c].totalGastado+=adj.monto; if(r.tipo==='Siniestrados') mapBI[c].lotesSiniestrados++; else mapBI[c].lotesRetail++; mapBI[c].tipos.add(r.tipo); 
             }); 
         }); 
@@ -1283,7 +1296,7 @@ function abrirFichaCliente(nombreStr){
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
         if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+b.monto,0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+b.monto,0)); 
-        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate?h.remate.substring(0,25):'-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
+        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
 }
@@ -1294,9 +1307,9 @@ function buscarPatente(){
     try {
         const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); const tbody=document.getElementById('buscador-tabla-resultados'); 
         if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-10 text-center text-premium-muted text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr>'; return; } 
-        let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData.timestamp,remate:r.fileName,lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
+        let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData.timestamp,remate:formatearNombreRemate(r.fileName, r.fechaData.timestamp),lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
         if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-10 text-center font-bold text-sm text-premium-danger">Sin resultados</td></tr>`; return; } 
-        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[120px] text-premium-text">${res.remate?res.remate.replace(/\.xlsx?$|\.xls$/i,''):'-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
+        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.remate ? res.remate : '-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) {}
 }
 </script>
