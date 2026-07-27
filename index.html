@@ -68,7 +68,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.6</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v1.7</div>
 
     <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
@@ -636,7 +636,7 @@ window.onload = () => {
 async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
 
 // ===========================================
-// LÓGICA PRINCIPAL (MOTOR TURBO v1.6)
+// LÓGICA PRINCIPAL (MOTOR TURBO v1.7 CINTA TRANSPORTADORA)
 // ===========================================
 
 window.addEventListener('error', function(e) {
@@ -752,7 +752,7 @@ const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20)
 function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
 
 // ===========================================
-// MOTOR DE PROCESAMIENTO TURBO (Lotes de 5 + Manejo de Errores)
+// MOTOR DE PROCESAMIENTO TURBO (v1.7)
 // ===========================================
 async function iniciarProcesamiento(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
@@ -809,16 +809,15 @@ async function iniciarProcesamiento(files){
         remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
     });
     
-    // FASE 3: GUARDADO EN LA NUBE (Lotes de 5 para evitar colapso)
+    // FASE 3: GUARDADO EN LA NUBE (CINTA TRANSPORTADORA INDIVIDUAL)
     try { 
         const bulkData = db.remates.map(remate => ({ id: remate._dbId, payload: remate }));
         
-        for (let i = 0; i < bulkData.length; i += 5) {
-            statusLabel.innerText = `Subiendo ${Math.min(i+5, bulkData.length)}/${bulkData.length}...`;
-            await new Promise(r => setTimeout(r, 50));
+        for (let i = 0; i < bulkData.length; i++) {
+            statusLabel.innerText = `Guardando ${i+1}/${bulkData.length}...`;
+            await new Promise(r => setTimeout(r, 10)); // Pausa mínima visual
             
-            const chunk = bulkData.slice(i, i + 5);
-            const { error } = await supabaseClient.from('app_state').upsert(chunk);
+            const { error } = await supabaseClient.from('app_state').upsert(bulkData[i]);
             if (error) throw error;
         }
         
@@ -826,9 +825,9 @@ async function iniciarProcesamiento(files){
         statusLabel.innerText = `En Línea (${db.remates.length})`;
     } catch (e) { 
         statusLabel.classList.replace('text-premium-highlight', 'text-premium-danger'); 
-        // Mostrar el motivo exacto del error en pantalla
         let errorMsg = e.message || "Desconocido";
         if (errorMsg.includes("row-level security")) errorMsg = "Bloqueado (Revisar Correo)";
+        if (errorMsg.includes("Failed to fetch")) errorMsg = "Conexión interrumpida";
         statusLabel.innerText = `Error: ${errorMsg.substring(0, 22)}`; 
         console.error("Error al guardar en Supabase:", e);
     }
@@ -1075,6 +1074,7 @@ function renderSingleView(nodeId){
         if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); if(document.getElementById('sv-kpi-ticket-promedio-side')) document.getElementById('sv-kpi-ticket-promedio-side').innerText=formatMoney(agg.ticketPromedio); 
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
         
+        // Cambio de Textos
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
         if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
