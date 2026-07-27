@@ -28,6 +28,7 @@
     <style>
         body { background-color: #F2F2F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
         
+        /* Modern Glass Panel with Deep Shadows */
         .glass-panel { 
             background: #FFFFFF; 
             border: 1px solid rgba(229, 229, 234, 0.8); 
@@ -47,7 +48,7 @@
         .nav-item:hover { background-color: #EAEAEB; color: #1D1D1F; }
         .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         
-        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; transition: all 0.2s;}
+        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; transition: all 0.2s; cursor: pointer;}
         input[type="checkbox"]::before { content: ""; width: 0.6em; height: 0.6em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
         input[type="checkbox"]:checked { background-color: #1D1D1F; border-color: #1D1D1F; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
@@ -73,7 +74,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.1</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.2</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -172,7 +173,7 @@
                     <div class="text-[10px] font-extrabold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                         <span>Filtro de Periodos</span>
                         <div class="flex gap-3">
-                            <button onclick="seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1 font-bold" title="Ir al remate más reciente">⚡Reciente</button>
+                            <button onclick="seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1 font-bold" title="Ir al remate más reciente">⚡Último Remate</button>
                             <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition font-bold">Limpiar</button>
                         </div>
                     </div>
@@ -636,15 +637,15 @@ if(typeof Chart !== 'undefined') {
     Chart.defaults.font.size = 10;
 }
 
-// FUSIÓN Y LIMPIEZA DE NOMBRES INTELIGENTE
+// FORMATEADOR DE NOMBRES INTELIGENTE
 function formatearNombreRemate(fileName, timestamp) {
     let numMatch = fileName.match(/(?:REMATE|ZARATE).*?(\d{3,5})/i) || fileName.match(/\b(\d{4})\b/);
     let num = numMatch ? (numMatch[1] || numMatch[0]) : '';
-    let dateStr = timestamp ? new Date(timestamp).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}) : '';
-    if(num && dateStr) return `Remate ${num} - ${dateStr}`;
+    let dateStr = timestamp ? new Date(timestamp).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/-/g, '/') : '';
+    if(num && dateStr) return `Remate ${num} (${dateStr})`;
     if(num) return `Remate ${num}`;
     let base = fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,18);
-    return dateStr ? `${base} - ${dateStr}` : base;
+    return dateStr ? `${base} (${dateStr})` : base;
 }
 
 async function initApp() {
@@ -980,13 +981,13 @@ function renderCalendar() {
             let isChecked = checkedNodes.includes(r.id);
             let tituloSidebar = formatearNombreRemate(r.fileName, r.fechaData.timestamp);
             listHtml += `
-            <div class="flex items-start gap-3 cursor-pointer mb-2 group hover:bg-slate-50 p-2 rounded-xl transition border border-transparent hover:border-slate-200" onclick="toggleNode('${r.id}')">
-                <input type="checkbox" class="mt-1 shrink-0 pointer-events-none" ${isChecked?'checked':''}>
-                <div class="flex flex-col min-w-0 pointer-events-none">
+            <label class="flex items-start gap-3 cursor-pointer mb-2 group hover:bg-slate-50 p-2 rounded-xl transition border border-transparent hover:border-slate-200">
+                <input type="checkbox" class="mt-1 shrink-0 cursor-pointer" onchange="toggleNode('${r.id}')" ${isChecked?'checked':''}>
+                <div class="flex flex-col min-w-0">
                     <span class="text-[11px] font-bold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight" title="${tituloSidebar}">${tituloSidebar}</span>
                     <span class="text-[9px] text-premium-muted font-semibold mt-0.5">${r.tipo}</span>
                 </div>
-            </div>`;
+            </label>`;
         });
     }
     document.getElementById('cal-matrices').innerHTML = listHtml;
@@ -1018,19 +1019,15 @@ window.seleccionarUltimoRemate = function() {
     const rematesOrdenados = [...db.remates].sort((a,b) => b.fechaData.timestamp - a.fechaData.timestamp);
     const ultimo = rematesOrdenados[0];
 
-    checkedNodes = [ultimo.id];
-    
     calSegment = ultimo.tipo;
     calYear = ultimo.fechaData.year;
+    actualizarSidebar(); 
+
+    checkedNodes = [ultimo.id];
     
     const monthIndex = new Date(ultimo.fechaData.timestamp).getMonth();
     calSelectedMonths.clear();
     calSelectedMonths.add(monthIndex);
-    
-    const segSelect = document.getElementById('cal-segment');
-    if(segSelect) segSelect.value = calSegment;
-    const yearSelect = document.getElementById('cal-year');
-    if(yearSelect) yearSelect.value = calYear;
     
     renderCalendar();
     cambiarSeccion('remates');
@@ -1213,8 +1210,8 @@ function abrirModalFuga() {
             globalAgg.fugaList.forEach(f => { 
                 let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
                 let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
-                let dateStr = f.fechaRemate ? new Date(f.fechaRemate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}) : '';
-                let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` + (dateStr ? ` - ${dateStr}` : '') : '-'; 
+                let dateStr = f.fechaRemate ? new Date(f.fechaRemate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/-/g, '/') : '';
+                let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` + (dateStr ? ` (${dateStr})` : '') : '-'; 
                 html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
             });
         } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted font-medium">No hay registros.</td></tr>'; }
@@ -1228,8 +1225,8 @@ function exportarFugaExcel() {
         if(!globalAgg || !globalAgg.fugaList) return; let hoy = Date.now();
         const wsData = globalAgg.fugaList.map(f => { 
             let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
-            let dateStr = f.fechaRemate ? new Date(f.fechaRemate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}) : '';
-            let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` + (dateStr ? ` - ${dateStr}` : '') : '-';
+            let dateStr = f.fechaRemate ? new Date(f.fechaRemate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/-/g, '/') : '';
+            let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` + (dateStr ? ` (${dateStr})` : '') : '-';
             return { "Matriz": nombreRemate, "Días Inactivo": diasFuga, "Fecha": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-', "Cliente": f.nombre, "RUT": f.rut || 'No Registrado', "Email": f.email || 'No Registrado' }; 
         });
         const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
