@@ -28,7 +28,6 @@
     <style>
         body { background-color: #F2F2F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
         
-        /* Modern Glass Panel with Deep Shadows */
         .glass-panel { 
             background: #FFFFFF; 
             border: 1px solid rgba(229, 229, 234, 0.8); 
@@ -48,7 +47,7 @@
         .nav-item:hover { background-color: #EAEAEB; color: #1D1D1F; }
         .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         
-        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; transition: all 0.2s; cursor: pointer;}
+        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; transition: all 0.2s;}
         input[type="checkbox"]::before { content: ""; width: 0.6em; height: 0.6em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
         input[type="checkbox"]:checked { background-color: #1D1D1F; border-color: #1D1D1F; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
@@ -74,7 +73,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.2</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.3</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -91,7 +90,7 @@
             <h2 class="text-xl font-bold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
             <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6 font-semibold">Control Directivo</p>
             
-            <form id="login-form" onsubmit="handleLogin(event)" class="text-left">
+            <form id="login-form" onsubmit="window.handleLogin(event)" class="text-left">
                 <div class="mb-4">
                     <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all font-medium" required placeholder="Correo Electrónico">
                 </div>
@@ -104,7 +103,7 @@
                 </button>
             </form>
 
-            <form id="invite-form" onsubmit="handleSetPassword(event)" class="text-left hidden">
+            <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
                 <div class="mb-2 text-center">
                     <span class="bg-premium-success/10 text-premium-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Invitación Aceptada</span>
                 </div>
@@ -125,7 +124,7 @@
         <!-- HEADER -->
         <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0 shadow-sm">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
+                <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base md:text-lg shadow-md">Z</div>
@@ -137,18 +136,18 @@
             
             <div class="flex items-center gap-3 md:gap-4">
                 <div id="admin-controls" class="hidden items-center gap-2 md:gap-4">
-                    <button onclick="limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-bold px-3 py-1.5 rounded-full hover:bg-red-50 transition border border-red-100 shadow-sm" title="Vaciar datos de la nube">Vaciar Base</button>
+                    <button onclick="window.limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-bold px-3 py-1.5 rounded-full hover:bg-red-50 transition border border-red-100 shadow-sm" title="Vaciar datos de la nube">Vaciar Base</button>
                     <div class="upload-area px-3 md:px-4 py-1.5 flex items-center gap-2 md:gap-3 shadow-sm">
                         <label for="file-input" class="font-bold text-[12px] md:text-[11px] text-premium-text cursor-pointer"><span class="md:hidden">📄</span><span class="hidden md:inline">📄 Archivos</span></label>
                         <span class="text-premium-border hidden md:inline">|</span>
                         <label for="folder-input" class="font-bold text-[11px] text-premium-text cursor-pointer hidden md:inline">📁 Carpeta</label>
-                        <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="iniciarProcesamiento(this.files)">
-                        <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="iniciarProcesamiento(this.files)">
+                        <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="window.iniciarProcesamiento(this.files)">
+                        <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="window.iniciarProcesamiento(this.files)">
                     </div>
                 </div>
                 
                 <div class="h-4 w-px bg-premium-border hidden sm:block"></div>
-                <button onclick="handleLogout()" class="flex items-center gap-2 text-xs font-semibold text-premium-muted hover:text-premium-text transition" title="Cerrar Sesión">
+                <button onclick="window.handleLogout()" class="flex items-center gap-2 text-xs font-semibold text-premium-muted hover:text-premium-text transition" title="Cerrar Sesión">
                     <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline border border-premium-border"></span> 
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
@@ -156,32 +155,32 @@
         </header>
 
         <div class="flex-1 flex overflow-hidden relative">
-            <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
+            <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar()"></div>
 
             <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print shadow-2xl md:shadow-none">
                 <div class="flex justify-between items-center mb-6 px-2 mt-2">
                     <div class="text-[9px] font-extrabold text-premium-muted uppercase tracking-widest">Módulos</div>
-                    <button onclick="toggleSidebar()" class="md:hidden text-premium-muted p-1 hover:bg-slate-100 rounded font-bold">✕</button>
+                    <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted p-1 hover:bg-slate-100 rounded font-bold">✕</button>
                 </div>
-                <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="cambiarSeccion('remates')">Resumen de Remates</div>
-                <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('autos')">Análisis de Vehículos</div>
-                <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('clientes')">Clientes</div>
-                <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('conclusiones')">Datos</div>
-                <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="cambiarSeccion('buscador')">Buscador Global</div>
+                <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="window.cambiarSeccion('remates')">Resumen de Remates</div>
+                <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('autos')">Análisis de Vehículos</div>
+                <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('clientes')">Clientes</div>
+                <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
+                <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
                 
                 <div id="calendar-container" class="mt-2">
                     <div class="text-[10px] font-extrabold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                         <span>Filtro de Periodos</span>
                         <div class="flex gap-3">
-                            <button onclick="seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1 font-bold" title="Ir al remate más reciente">⚡Último Remate</button>
-                            <button onclick="limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition font-bold">Limpiar</button>
+                            <button onclick="window.seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1 font-bold" title="Ir al remate más reciente">⚡Último Remate</button>
+                            <button onclick="window.limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition font-bold">Limpiar</button>
                         </div>
                     </div>
                     
                     <div class="px-2 space-y-3">
                         <div class="flex gap-2">
-                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="onCalSegmentChange(this.value)"></select>
-                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="onCalYearChange(this.value)"></select>
+                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="window.onCalSegmentChange(this.value)"></select>
+                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="window.onCalYearChange(this.value)"></select>
                         </div>
                         <div id="cal-months" class="grid grid-cols-4 gap-1.5"></div>
                         <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50"></div>
@@ -202,14 +201,12 @@
                 <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-6 md:space-y-8 max-w-[1400px] mx-auto pb-10">
                     <div id="single-view" class="space-y-6 md:space-y-8 hidden">
-                        <!-- HEADER DE MÓDULO CON MINI-CARDS -->
                         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 border-b border-premium-border pb-5">
                             <div class="w-full xl:w-auto overflow-hidden">
                                 <h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text truncate" id="sv-titulo">-</h2>
                                 <p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2" id="sv-subtitulo">-</p>
                             </div>
                             
-                            <!-- TARJETAS SUPERIORES ELEGANTES -->
                             <div class="flex gap-2 md:gap-3 flex-wrap justify-end shrink-0 w-full xl:w-auto">
                                 <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
                                     <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Ticket Promedio</p>
@@ -226,9 +223,7 @@
                             </div>
                         </div>
 
-                        <!-- CARDS PRINCIPALES (ALTO UNIFORME, FONDOS DEGRADADOS) -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
-                            <!-- CARD 1 -->
                             <div class="glass-panel p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
                                 <div class="absolute top-0 right-0 w-40 h-40 bg-premium-success/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                                 <h4 class="font-extrabold text-lg mb-6 text-premium-text tracking-tight flex items-center gap-2">
@@ -245,7 +240,6 @@
                                 </div>
                             </div>
 
-                            <!-- CARD 2 -->
                             <div class="glass-panel p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
                                 <div class="absolute top-0 right-0 w-40 h-40 bg-premium-highlight/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                                 <h4 class="font-extrabold text-lg mb-6 text-premium-text tracking-tight flex items-center gap-2">
@@ -265,13 +259,12 @@
                                     <div class="w-full h-px bg-slate-200/60"></div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm text-premium-muted font-semibold truncate pr-2">Compras Volumen (>1 lote)</span>
-                                        <div class="flex items-center gap-3 shrink-0"><span class="font-black text-lg text-premium-text" id="sv-kpi-multilote">0</span><button onclick="abrirModalMultiLote()" class="text-[9px] text-white bg-premium-text hover:bg-black px-2 py-1 rounded font-bold transition no-print shadow-sm uppercase tracking-wider">Ver lista</button></div>
+                                        <div class="flex items-center gap-3 shrink-0"><span class="font-black text-lg text-premium-text" id="sv-kpi-multilote">0</span><button onclick="window.abrirModalMultiLote()" class="text-[9px] text-white bg-premium-text hover:bg-black px-2 py-1 rounded font-bold transition no-print shadow-sm uppercase tracking-wider">Ver lista</button></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- TABLA COMPLETA CON BUSCADOR -->
                         <div class="glass-panel p-6 md:p-8 overflow-hidden w-full bg-white">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 pb-4">
                                 <h4 class="font-extrabold text-lg text-premium-text tracking-tight flex items-center gap-2">
@@ -284,12 +277,12 @@
                                 <table class="w-full text-left bg-white">
                                     <thead class="sticky top-0 bg-slate-50 shadow-sm z-10 border-b border-slate-200">
                                         <tr>
-                                            <th class="pl-6 py-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Lote ↕️</th>
-                                            <th class="py-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Detalle del Vehículo ↕️</th>
-                                            <th class="py-4 text-center cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Pujas ↕️</th>
-                                            <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
-                                            <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
-                                            <th class="py-4 text-right pr-6 hidden sm:table-cell cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Delta ↕️</th>
+                                            <th class="pl-6 py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
+                                            <th class="py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Detalle del Vehículo ↕️</th>
+                                            <th class="py-4 text-center cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Pujas ↕️</th>
+                                            <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
+                                            <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
+                                            <th class="py-4 text-right pr-6 hidden sm:table-cell cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Delta ↕️</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sv-tabla-top-lotes" class="divide-y divide-slate-100"></tbody>
@@ -307,14 +300,14 @@
                             <table class="w-full text-left whitespace-nowrap">
                                 <thead>
                                     <tr>
-                                        <th class="pl-4 cursor-pointer" onclick="sortTable(this, 'string')">Matriz Analizada ↕️</th>
-                                        <th class="text-right cursor-pointer" onclick="sortTable(this, 'money')">Venta ↕️</th>
-                                        <th class="text-right cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'money')">Comisión ↕️</th>
-                                        <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">L. Vend. ↕️</th>
-                                        <th class="text-center cursor-pointer" onclick="sortTable(this, 'percent')">Efectividad ↕️</th>
-                                        <th class="text-center cursor-pointer" onclick="sortTable(this, 'number')">Garantías ↕️</th>
-                                        <th class="text-center cursor-pointer hidden sm:table-cell" onclick="sortTable(this, 'number')">Nuevos ↕️</th>
-                                        <th class="text-right pr-4 cursor-pointer" onclick="sortTable(this, 'money')">Sobreprecio ↕️</th>
+                                        <th class="pl-4 cursor-pointer" onclick="window.sortTable(this, 'string')">Matriz Analizada ↕️</th>
+                                        <th class="text-right cursor-pointer" onclick="window.sortTable(this, 'money')">Venta ↕️</th>
+                                        <th class="text-right cursor-pointer hidden sm:table-cell" onclick="window.sortTable(this, 'money')">Comisión ↕️</th>
+                                        <th class="text-center cursor-pointer" onclick="window.sortTable(this, 'number')">L. Vend. ↕️</th>
+                                        <th class="text-center cursor-pointer" onclick="window.sortTable(this, 'percent')">Efectividad ↕️</th>
+                                        <th class="text-center cursor-pointer" onclick="window.sortTable(this, 'number')">Garantías ↕️</th>
+                                        <th class="text-center cursor-pointer hidden sm:table-cell" onclick="window.sortTable(this, 'number')">Nuevos ↕️</th>
+                                        <th class="text-right pr-4 cursor-pointer" onclick="window.sortTable(this, 'money')">Sobreprecio ↕️</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cv-tabla-comparativa"></tbody>
@@ -331,7 +324,7 @@
                 <div id="module-autos" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
                         <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Estructura del catálogo adjudicado</p></div>
-                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text w-full md:w-72 focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="renderPanelAutos()">
+                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text w-full md:w-72 focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="window.renderPanelAutos()">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6 text-center">Top Marcas Adjudicadas</h4><div class="relative h-56 md:h-72 w-full"><canvas id="flota-marcas-chart"></canvas></div></div>
@@ -342,11 +335,11 @@
                             <table class="w-full text-left whitespace-nowrap bg-white">
                                 <thead class="sticky top-0 bg-slate-50">
                                     <tr>
-                                        <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Matriz ↕️</th>
-                                        <th class="cursor-pointer text-center hover:text-premium-text transition" onclick="sortTable(this, 'string')">Lote ↕️</th>
-                                        <th class="cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Vehículo Extraído ↕️</th>
-                                        <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
-                                        <th class="text-right pr-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
+                                        <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
+                                        <th class="cursor-pointer text-center hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Lote ↕️</th>
+                                        <th class="cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Vehículo Extraído ↕️</th>
+                                        <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
+                                        <th class="text-right pr-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
                                     </tr>
                                 </thead>
                                 <tbody id="flota-tabla-resultados" class="divide-y divide-slate-50"></tbody>
@@ -360,8 +353,8 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
                         <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Clientes</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Directorio y comportamiento de cartera</p></div>
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                            <select id="filter-client-type" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-auto focus:border-premium-highlight shadow-sm transition" onchange="filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
-                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-72 focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="filtrarClientes()">
+                            <select id="filter-client-type" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-auto focus:border-premium-highlight shadow-sm transition" onchange="window.filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
+                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-72 focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="window.filtrarClientes()">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -380,7 +373,7 @@
                                         <span>Email: <span id="ficha-email" class="text-premium-text lowercase"></span></span>
                                     </div>
                                 </div>
-                                <button onclick="cerrarFicha()" class="text-premium-muted hover:text-premium-danger bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold no-print transition border border-slate-200">✕ Cerrar Ficha</button>
+                                <button onclick="window.cerrarFicha()" class="text-premium-muted hover:text-premium-danger bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold no-print transition border border-slate-200">✕ Cerrar Ficha</button>
                             </div>
                             <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-5 border-y border-slate-100 mb-5 bg-slate-50/50 rounded-xl px-4">
                                 <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">1ra Compra</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-primera">-</p></div>
@@ -403,10 +396,10 @@
                                 <table class="w-full text-left whitespace-nowrap bg-white">
                                     <thead class="sticky top-0 bg-slate-50">
                                         <tr>
-                                            <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Razón Social ↕️</th>
-                                            <th class="text-center cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Frec. ↕️</th>
-                                            <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Inversión ↕️</th>
-                                            <th class="text-center pr-4 cursor-pointer hidden sm:table-cell hover:text-premium-text transition" onclick="sortTable(this, 'string')">Segmento ↕️</th>
+                                            <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Razón Social ↕️</th>
+                                            <th class="text-center cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Frec. ↕️</th>
+                                            <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Inversión ↕️</th>
+                                            <th class="text-center pr-4 cursor-pointer hidden sm:table-cell hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Segmento ↕️</th>
                                         </tr>
                                     </thead>
                                     <tbody id="bi-tabla-clientes" class="divide-y divide-slate-50"></tbody>
@@ -430,7 +423,7 @@
                 <div id="module-buscador" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
                         <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Buscador Global</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Motor de búsqueda histórico</p></div>
-                        <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-premium-text w-full md:w-80 shadow-inner focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all" onkeyup="buscarPatente()">
+                        <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-premium-text w-full md:w-80 shadow-inner focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all" onkeyup="window.buscarPatente()">
                     </div>
                     <div class="glass-panel p-4 overflow-hidden">
                         <div class="overflow-x-auto max-h-[600px] rounded-lg border border-slate-100">
@@ -451,12 +444,12 @@
         <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
                 <div><h3 class="text-xl font-black tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5" id="modal-subtitulo"></p></div>
-                <button onclick="cerrarModal()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button>
+                <button onclick="window.cerrarModal()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button>
             </div>
             <div class="px-5 md:px-6 py-3 bg-white flex flex-wrap gap-5 text-[10px] border-b border-slate-200 uppercase tracking-widest font-extrabold items-center">
                 <div><span class="text-premium-muted">Total Pujas:</span> <span class="text-premium-text text-xs ml-1" id="modal-total-pujas">0</span></div>
                 <div><span class="text-premium-muted">Pujadores Únicos:</span> <span class="text-premium-highlight text-xs ml-1" id="modal-unicos-reales">0</span></div>
-                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition">Todos</button><button onclick="filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition">Solo Reales</button></div>
+                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition">Solo Reales</button></div>
             </div>
             <div class="flex-1 overflow-x-auto overflow-y-auto p-2 bg-white">
                 <table class="w-full text-left">
@@ -471,7 +464,7 @@
         <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
                 <div><h3 class="text-xl font-black tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
-                <div class="flex items-center gap-3 w-full sm:w-auto"><button onclick="exportarFugaExcel()" class="text-[10px] font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition shadow-sm flex-1 sm:flex-none uppercase tracking-widest text-premium-text">⬇️ Exportar Excel</button><button onclick="cerrarModalFuga()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition shrink-0">✕</button></div>
+                <div class="flex items-center gap-3 w-full sm:w-auto"><button onclick="window.exportarFugaExcel()" class="text-[10px] font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition shadow-sm flex-1 sm:flex-none uppercase tracking-widest text-premium-text">⬇️ Exportar Excel</button><button onclick="window.cerrarModalFuga()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition shrink-0">✕</button></div>
             </div>
             <div class="flex-1 overflow-x-auto overflow-y-auto p-2 bg-white">
                 <table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Matriz Origen</th><th>Inactivo por</th><th>Razón Social</th><th>Contacto</th></tr></thead><tbody id="modal-tabla-fuga" class="divide-y divide-slate-50"></tbody></table>
@@ -481,7 +474,7 @@
 
     <div id="modal-multilote" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
-            <div class="p-5 md:p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50"><div><h3 class="text-xl font-black tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="cerrarModalMulti()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button></div>
+            <div class="p-5 md:p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50"><div><h3 class="text-xl font-black tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="window.cerrarModalMulti()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button></div>
             <div class="flex-1 overflow-y-auto overflow-x-auto p-2 bg-white"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-4">Inversión</th></tr></thead><tbody id="modal-tabla-multilote" class="divide-y divide-slate-50"></tbody></table></div>
         </div>
     </div>
@@ -495,7 +488,7 @@ const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 let sessionUser = null;
 
-function toggleSidebar() {
+window.toggleSidebar = function() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('mobile-overlay');
     if (sidebar.classList.contains('-translate-x-full')) {
@@ -505,7 +498,7 @@ function toggleSidebar() {
         sidebar.classList.add('-translate-x-full');
         overlay.classList.add('hidden');
     }
-}
+};
 
 async function checkSession() {
     try {
@@ -555,7 +548,7 @@ async function checkSession() {
     }
 }
 
-async function handleLogin(e) {
+window.handleLogin = async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-login');
     const err = document.getElementById('login-error');
@@ -583,9 +576,9 @@ async function handleLogin(e) {
         err.innerText = msj; err.classList.remove('hidden');
         btn.innerHTML = "Iniciar Sesión"; btn.disabled = false;
     }
-}
+};
 
-async function handleSetPassword(e) {
+window.handleSetPassword = async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-invite');
     const err = document.getElementById('invite-error');
@@ -606,7 +599,7 @@ async function handleSetPassword(e) {
         err.classList.remove('hidden');
         btn.innerHTML = "Guardar y Entrar"; btn.disabled = false;
     }
-}
+};
 
 window.onload = () => {
     const hash = window.location.hash;
@@ -620,7 +613,7 @@ window.onload = () => {
     }
 };
 
-async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
+window.handleLogout = async function() { await supabaseClient.auth.signOut(); window.location.reload(); };
 
 let db = { remates: [] };
 let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
@@ -637,15 +630,25 @@ if(typeof Chart !== 'undefined') {
     Chart.defaults.font.size = 10;
 }
 
-// FORMATEADOR DE NOMBRES INTELIGENTE
+// FORMATEADOR DE NOMBRES ESTRICTO CON PROTECCIÓN
 function formatearNombreRemate(fileName, timestamp) {
-    let numMatch = fileName.match(/(?:REMATE|ZARATE).*?(\d{3,5})/i) || fileName.match(/\b(\d{4})\b/);
-    let num = numMatch ? (numMatch[1] || numMatch[0]) : '';
-    let dateStr = timestamp ? new Date(timestamp).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/-/g, '/') : '';
-    if(num && dateStr) return `Remate ${num} (${dateStr})`;
-    if(num) return `Remate ${num}`;
-    let base = fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,18);
-    return dateStr ? `${base} (${dateStr})` : base;
+    try {
+        if(!fileName || typeof fileName !== 'string') fileName = "Matriz Desconocida";
+        let numMatch = fileName.match(/(?:REMATE|ZARATE).*?(\d{3,5})/i) || fileName.match(/\b(\d{4})\b/);
+        let num = numMatch ? (numMatch[1] || numMatch[0]) : '';
+        let dateStr = '';
+        if (timestamp && !isNaN(timestamp)) {
+            let d = new Date(timestamp);
+            let dd = String(d.getDate()).padStart(2, '0');
+            let mm = String(d.getMonth() + 1).padStart(2, '0');
+            let yyyy = d.getFullYear();
+            dateStr = `${dd}/${mm}/${yyyy}`;
+        }
+        if(num && dateStr) return `Remate ${num} (${dateStr})`;
+        if(num) return `Remate ${num}`;
+        let base = fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,18);
+        return dateStr ? `${base} (${dateStr})` : base;
+    } catch(e) { return "Matriz"; }
 }
 
 async function initApp() {
@@ -670,7 +673,7 @@ async function initApp() {
     if(db.remates && db.remates.length > 0) { actualizarSidebar(); }
 }
 
-function sortTable(thElement, type) {
+window.sortTable = function(thElement, type) {
     const table = thElement.closest('table'); const tbody = table.querySelector('tbody'); if(!tbody) return;
     const rows = Array.from(tbody.querySelectorAll('tr')); if(rows.length === 0 || (rows.length === 1 && rows[0].innerText.includes('Sin'))) return;
     const colIndex = Array.from(thElement.parentNode.children).indexOf(thElement);
@@ -683,7 +686,7 @@ function sortTable(thElement, type) {
         if (valA < valB) return asc ? -1 : 1; if (valA > valB) return asc ? 1 : -1; return 0;
     });
     tbody.innerHTML = ''; rows.forEach(row => tbody.appendChild(row));
-}
+};
 
 function parseValueForSort(str, type) {
     if(!str || str.trim()==='-' || str.trim()==='' || str.trim() === 'Desconocido' || str.trim().includes('Sin Registro')) return -9999999999;
@@ -701,7 +704,7 @@ document.body.addEventListener('drop', async e=>{
     e.preventDefault(); dropZone.classList.remove('dragover'); 
     const items=e.dataTransfer.items; const allFiles=[]; 
     if(items){ const promises=[]; for(let i=0;i<items.length;i++){ const item=items[i].webkitGetAsEntry(); if(item) promises.push(traverseFileTree(item, allFiles)); } await Promise.all(promises); } 
-    else { allFiles.push(...e.dataTransfer.files); } iniciarProcesamiento(allFiles);
+    else { allFiles.push(...e.dataTransfer.files); } window.iniciarProcesamiento(allFiles);
 });
 
 function traverseFileTree(item, filesArray){ 
@@ -713,8 +716,24 @@ function traverseFileTree(item, filesArray){
 
 function formatExcelDate(excelDate) {
     if(!excelDate) return '-';
-    if(typeof excelDate === 'number') { if(excelDate > 1000000) { return new Date(excelDate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}); } let d = new Date(Math.round((excelDate - 25569) * 86400 * 1000)); d.setMinutes(d.getMinutes() + d.getTimezoneOffset()); return d.toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}); }
-    if(typeof excelDate === 'string') { return excelDate.trim().split(' ')[0]; } return String(excelDate);
+    let d;
+    if(typeof excelDate === 'number') { 
+        if(excelDate > 1000000) { d = new Date(excelDate); } 
+        else { d = new Date(Math.round((excelDate - 25569) * 86400 * 1000)); d.setMinutes(d.getMinutes() + d.getTimezoneOffset()); }
+    } else if(typeof excelDate === 'string') { 
+        let parts = excelDate.trim().split(' ')[0].split(/[-/]/);
+        if (parts.length === 3) {
+            if (parts[0].length === 4) return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`;
+            else return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`;
+        }
+        return excelDate.replace(/-/g, '/');
+    } else { return String(excelDate); }
+    
+    if (isNaN(d.getTime())) return '-';
+    let dd = String(d.getDate()).padStart(2, '0');
+    let mm = String(d.getMonth() + 1).padStart(2, '0');
+    let yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
 }
 
 function esClienteFalso(nombre, email=''){
@@ -744,9 +763,7 @@ const formatMoney = (num) => {
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
 const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
-function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
-
-async function iniciarProcesamiento(files){
+window.iniciarProcesamiento = async function(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
     
@@ -792,7 +809,7 @@ async function iniciarProcesamiento(files){
     loadingText.innerText = "Sincronizando Cruces de Clientes...";
     await new Promise(r => setTimeout(r, 20));
 
-    db.remates.sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp);
+    db.remates.sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
     let clientesGlobales=[]; let adjudicatariosGlobales=[];
     
     db.remates.forEach(remate=>{ 
@@ -836,7 +853,7 @@ async function iniciarProcesamiento(files){
     
     loadingOverlay.classList.remove('flex');
     loadingOverlay.classList.add('hidden');
-}
+};
 
 
 async function parseExcel(file){
@@ -918,7 +935,7 @@ function buildAgg(rematesList,id,label){
     return agg;
 }
 
-function cambiarSeccion(mod){ 
+window.cambiarSeccion = function(mod){ 
     try {
         currentModule=mod; 
         document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
@@ -933,16 +950,21 @@ function cambiarSeccion(mod){
         else if(mod==='conclusiones'){ document.getElementById('module-conclusiones').classList.remove('hidden'); renderConclusiones(); }
         else if(mod==='autos'){ document.getElementById('module-autos').classList.remove('hidden'); renderPanelAutos(); }
         else if(mod==='clientes'){ if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); renderPanelClientesData(clientDB,false); } } 
-        else { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); buscarPatente(); } 
-        if(window.innerWidth < 768) { toggleSidebar(); }
+        else { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); window.buscarPatente(); } 
+        if(window.innerWidth < 768) { window.toggleSidebar(); }
     } catch(e) {}
-}
+};
 
 function actualizarSidebar(){ 
     try {
-        if(!db.remates.length) return;
+        if(!db.remates || !db.remates.length) return;
         let segments = new Set(); let years = new Set(); nodeRematesMap = {}; 
-        db.remates.forEach(r => { segments.add(r.tipo); years.add(r.fechaData.year); nodeRematesMap[r.id] = { label: formatearNombreRemate(r.fileName, r.fechaData.timestamp), remates: [r] }; });
+        db.remates.forEach(r => { 
+            if (!r.fechaData) r.fechaData = { year: new Date().getFullYear(), timestamp: Date.now() };
+            segments.add(r.tipo || 'Desconocido'); 
+            years.add(r.fechaData.year); 
+            nodeRematesMap[r.id] = { label: formatearNombreRemate(r.fileName, r.fechaData.timestamp), remates: [r] }; 
+        });
         if(segments.size > 0 && !segments.has(calSegment) && calSegment !== 'Todos') calSegment = Array.from(segments)[0];
         if(years.size > 0 && !years.has(calYear)) calYear = Math.max(...Array.from(years));
         const segHtml = `<option value="Todos" ${'Todos'===calSegment?'selected':''}>📊 Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===calSegment?'selected':''}>🚗 ${s}</option>`).join('');
@@ -952,8 +974,8 @@ function actualizarSidebar(){
     } catch(e) {}
 }
 
-function onCalSegmentChange(val) { calSegment = val; renderCalendar(); }
-function onCalYearChange(val) { calYear = parseInt(val); renderCalendar(); }
+window.onCalSegmentChange = function(val) { calSegment = val; renderCalendar(); };
+window.onCalYearChange = function(val) { calYear = parseInt(val); renderCalendar(); };
 
 function renderCalendar() {
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -967,12 +989,12 @@ function renderCalendar() {
         if(!hasData && !isSelected) { baseClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
         else if (isSelected) { baseClasses += "bg-premium-text text-white shadow-sm cursor-pointer hover:bg-black"; } 
         else { baseClasses += "bg-white border border-slate-200 text-premium-text hover:border-premium-text cursor-pointer shadow-sm"; }
-        gridHtml += `<div class="${baseClasses}" ${hasData || isSelected ? `onclick="toggleCalMonth(${i})"` : ''}>${monthNames[i]}</div>`;
+        gridHtml += `<div class="${baseClasses}" ${hasData || isSelected ? `onclick="window.toggleCalMonth(${i})"` : ''}>${monthNames[i]}</div>`;
     }
     document.getElementById('cal-months').innerHTML = gridHtml;
     
     let rematesToShow = []; calSelectedMonths.forEach(m => { rematesToShow = rematesToShow.concat(getRematesForMonth(m)); });
-    rematesToShow.sort((a,b) => a.fechaData.timestamp - b.fechaData.timestamp);
+    rematesToShow.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
     
     let listHtml = '';
     if(rematesToShow.length > 0) {
@@ -981,19 +1003,19 @@ function renderCalendar() {
             let isChecked = checkedNodes.includes(r.id);
             let tituloSidebar = formatearNombreRemate(r.fileName, r.fechaData.timestamp);
             listHtml += `
-            <label class="flex items-start gap-3 cursor-pointer mb-2 group hover:bg-slate-50 p-2 rounded-xl transition border border-transparent hover:border-slate-200">
-                <input type="checkbox" class="mt-1 shrink-0 cursor-pointer" onchange="toggleNode('${r.id}')" ${isChecked?'checked':''}>
-                <div class="flex flex-col min-w-0">
+            <div class="flex items-start gap-3 cursor-pointer mb-2 group hover:bg-slate-50 p-2 rounded-xl transition border border-transparent hover:border-slate-200" onclick="window.toggleNode('${r.id}')">
+                <input type="checkbox" class="mt-1 shrink-0 pointer-events-none" ${isChecked?'checked':''}>
+                <div class="flex flex-col min-w-0 pointer-events-none">
                     <span class="text-[11px] font-bold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight" title="${tituloSidebar}">${tituloSidebar}</span>
                     <span class="text-[9px] text-premium-muted font-semibold mt-0.5">${r.tipo}</span>
                 </div>
-            </label>`;
+            </div>`;
         });
     }
     document.getElementById('cal-matrices').innerHTML = listHtml;
 }
 
-function toggleCalMonth(m) {
+window.toggleCalMonth = function(m) {
     if(calSelectedMonths.has(m)) {
         calSelectedMonths.delete(m);
         const toRemove = getRematesForMonth(m).map(r => r.id);
@@ -1004,53 +1026,55 @@ function toggleCalMonth(m) {
         toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
     }
     renderCalendar(); actualizarVistaActual();
-}
+};
 
 window.toggleNode = function(id){ 
     if(checkedNodes.includes(id)) checkedNodes=checkedNodes.filter(n=>n!==id); else checkedNodes.push(id); 
     renderCalendar(); actualizarVistaActual(); 
 };
 
-function limpiarSeleccion(){ checkedNodes=[]; calSelectedMonths.clear(); renderCalendar(); actualizarVistaActual(); }
+window.limpiarSeleccion = function(){ 
+    checkedNodes=[]; calSelectedMonths.clear(); renderCalendar(); actualizarVistaActual(); 
+};
 
 window.seleccionarUltimoRemate = function() {
     if (!db.remates || db.remates.length === 0) return;
     
-    const rematesOrdenados = [...db.remates].sort((a,b) => b.fechaData.timestamp - a.fechaData.timestamp);
+    const rematesOrdenados = [...db.remates].sort((a,b) => (b.fechaData?.timestamp||0) - (a.fechaData?.timestamp||0));
     const ultimo = rematesOrdenados[0];
 
-    calSegment = ultimo.tipo;
-    calYear = ultimo.fechaData.year;
-    actualizarSidebar(); 
-
     checkedNodes = [ultimo.id];
+    calSegment = ultimo.tipo || 'Siniestrados';
+    calYear = ultimo.fechaData?.year || new Date().getFullYear();
     
-    const monthIndex = new Date(ultimo.fechaData.timestamp).getMonth();
+    actualizarSidebar();
+    
+    const monthIndex = ultimo.fechaData?.timestamp ? new Date(ultimo.fechaData.timestamp).getMonth() : new Date().getMonth();
     calSelectedMonths.clear();
     calSelectedMonths.add(monthIndex);
     
     renderCalendar();
-    cambiarSeccion('remates');
+    window.cambiarSeccion('remates');
     actualizarVistaActual();
     
-    if(window.innerWidth < 768) { toggleSidebar(); }
+    if(window.innerWidth < 768) { window.toggleSidebar(); }
 };
 
 function actualizarVistaActual() { 
     try {
         if (currentModule === 'remates') renderDashboard(); 
-        else if (currentModule === 'autos') renderPanelAutos(); 
+        else if (currentModule === 'autos') window.renderPanelAutos(); 
         else if (currentModule === 'conclusiones') renderConclusiones(); 
         else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); renderPanelClientesData(clientDB, false); } }
     } catch(e) {}
 }
 
-async function limpiarBase(){ 
+window.limpiarBase = async function(){ 
     if(!confirm("¿Borrar todos los datos de la nube?")) return;
     db = {remates:[]}; checkedNodes = []; clientDB = []; calSelectedMonths.clear(); document.getElementById('empty-state').classList.remove('hidden'); 
     try { await supabaseClient.from('app_state').delete().gte('id', 0); } catch (e) { }
     actualizarSidebar(); location.reload(); 
-}
+};
 
 function renderDashboard(){ 
     try {
@@ -1104,7 +1128,7 @@ function renderSingleView(nodeId){
                 let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
                 let dSignL = deltaLote >= 0 ? '+' : ''; 
                 let dColorL = deltaLote >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
-                return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')">
+                return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')">
                     <td class="font-semibold text-premium-muted w-20 pl-6 whitespace-nowrap">Lote ${l.numeroLote||'-'}</td>
                     <td class="max-w-[300px]">
                         <div class="font-bold text-premium-text truncate text-sm" title="${l.loteStr}">${l.loteStr}</div>
@@ -1138,8 +1162,8 @@ function renderCompareView(nodesList){
     } catch (e) {}
 }
 
-function abrirModalMultiLote() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-premium-text">${nombre}</td><td class="text-center font-black text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); }
-function cerrarModalMulti() { document.getElementById('modal-multilote').classList.add('hidden'); }
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-premium-text">${nombre}</td><td class="text-center font-black text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); };
+window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); };
 
 function renderConclusiones() {
     try {
@@ -1170,7 +1194,7 @@ function renderConclusiones() {
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">5</span> Ticket Promedio</h4><p class="${textClasses}">El valor promedio de venta por cada lote adjudicado fue de <strong class="${strongClasses}">${formatMoney(agg.ticketPromedio)}</strong>.</p></div>`;
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">6</span> Tasa de Cierre</h4><p class="${textClasses}">El <strong class="${strongClasses}">${tasaExito.toFixed(1)}%</strong> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
-        html += `<div class="${cardClasses} flex flex-col justify-between"><h4 class="${titleClasses}"><span class="${badgeClasses}">7</span> Fuga</h4><p class="${textClasses} mb-4">Hubo <strong class="text-premium-danger font-black">${agg.perdedoresCount} clientes</strong> que pagaron garantía pero no lograron comprar nada.</p><button onclick="abrirModalFuga()" class="w-full py-2 bg-white border border-slate-200 text-premium-text font-bold rounded-lg text-xs hover:bg-slate-50 transition shadow-sm no-print uppercase tracking-widest">Ver listado</button></div>`;
+        html += `<div class="${cardClasses} flex flex-col justify-between"><h4 class="${titleClasses}"><span class="${badgeClasses}">7</span> Fuga</h4><p class="${textClasses} mb-4">Hubo <strong class="text-premium-danger font-black">${agg.perdedoresCount} clientes</strong> que pagaron garantía pero no lograron comprar nada.</p><button onclick="window.abrirModalFuga()" class="w-full py-2 bg-white border border-slate-200 text-premium-text font-bold rounded-lg text-xs hover:bg-slate-50 transition shadow-sm no-print uppercase tracking-widest">Ver listado</button></div>`;
         let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">8</span> Clientes Nuevos</h4><p class="${textClasses}">El <strong class="${strongClasses}">${agg.pctVentaNuevos.toFixed(1)}%</strong> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
@@ -1182,7 +1206,7 @@ function renderConclusiones() {
     } catch (e) {}
 }
 
-function renderPanelAutos(){
+window.renderPanelAutos = function(){
     try {
         if(currentModule !== 'autos') return; const emptyState=document.getElementById('empty-state'); const autosMod=document.getElementById('module-autos');
         if(checkedNodes.length===0){ emptyState.classList.remove('hidden'); autosMod.classList.add('hidden'); return; }
@@ -1200,9 +1224,9 @@ function renderPanelAutos(){
             return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-black text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(a.monto)}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin vehículos en la selección actual.</td></tr>';
     } catch (e) {}
-}
+};
 
-function abrirModalFuga() {
+window.abrirModalFuga = function() {
     try {
         if(!globalAgg) return; let html = '';
         if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
@@ -1210,30 +1234,28 @@ function abrirModalFuga() {
             globalAgg.fugaList.forEach(f => { 
                 let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
                 let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
-                let dateStr = f.fechaRemate ? new Date(f.fechaRemate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/-/g, '/') : '';
-                let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` + (dateStr ? ` (${dateStr})` : '') : '-'; 
+                let nombreRemate = formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
                 html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
             });
         } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted font-medium">No hay registros.</td></tr>'; }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
     } catch (e) {}
-}
-function cerrarModalFuga() { document.getElementById('modal-fuga').classList.add('hidden'); }
+};
+window.cerrarModalFuga = function() { document.getElementById('modal-fuga').classList.add('hidden'); };
 
-function exportarFugaExcel() {
+window.exportarFugaExcel = function() {
     try {
         if(!globalAgg || !globalAgg.fugaList) return; let hoy = Date.now();
         const wsData = globalAgg.fugaList.map(f => { 
             let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
-            let dateStr = f.fechaRemate ? new Date(f.fechaRemate).toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}).replace(/-/g, '/') : '';
-            let nombreRemate = f.numRemate ? `Remate ${f.numRemate}` + (dateStr ? ` (${dateStr})` : '') : '-';
+            let nombreRemate = formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate);
             return { "Matriz": nombreRemate, "Días Inactivo": diasFuga, "Fecha": f.fechaRemate ? formatExcelDate(f.fechaRemate) : '-', "Cliente": f.nombre, "RUT": f.rut || 'No Registrado', "Email": f.email || 'No Registrado' }; 
         });
         const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
     } catch (e) {}
-}
+};
 
-function abrirModalPujadores(loteEncoded, nodeId){
+window.abrirModalPujadores = function(loteEncoded, nodeId){
     try {
         const loteStr=decodeURIComponent(loteEncoded); const node=nodeRematesMap[nodeId]; let todasPujas=[]; node.remates.forEach(r=>{ if(r.posturasPorLote && r.posturasPorLote[loteStr]) todasPujas=todasPujas.concat(r.posturasPorLote[loteStr]); });
         let adjudicado=null; node.remates.forEach(r=>{ let adj=r.adjudicaciones.find(a=>a.loteStr===loteStr); if(adj) adjudicado=adj; }); currentAdjudicadoModal = adjudicado; currentModalPujas=todasPujas.sort((a,b)=>b.monto-a.monto);
@@ -1242,7 +1264,7 @@ function abrirModalPujadores(loteEncoded, nodeId){
         currentFiltroModal='todos'; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold';
         renderModalTabla(); if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.remove('hidden');
     } catch(e) {}
-}
+};
 
 function renderModalTabla(){
     try {
@@ -1251,13 +1273,13 @@ function renderModalTabla(){
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
             let badge = p.esFalso ? '<span class="text-[9px] font-black text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
-            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${p.fecha||'-'}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-black ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
+            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${formatExcelDate(p.fecha)}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-black ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin pujas registradas</td></tr>';
     } catch(e) {}
 }
 
-function filtrarModal(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-bold':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold'; renderModalTabla(); }
-function cerrarModal(){ if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.add('hidden'); }
+window.filtrarModal = function(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-bold':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold'; renderModalTabla(); };
+window.cerrarModal = function(){ if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.add('hidden'); };
 
 function procesarDatosClientes(){ 
     try {
@@ -1281,14 +1303,14 @@ function procesarDatosClientes(){
 function renderPanelClientesData(filtered,isFiltered=false){ 
     try {
         if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="pl-4 font-bold text-xs md:text-sm text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-premium-muted font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-black text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-black ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
+        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="pl-4 font-bold text-xs md:text-sm text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-premium-muted font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-black text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-black ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
         if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#E30000'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
     } catch(e) {}
 }
 
-function filtrarClientes(){ try { const term=(document.getElementById('search-client').value||'').toLowerCase(); const tipo=document.getElementById('filter-client-type').value; let filtered=clientDB.filter(c=>{ const matchName=(c.nombre||'').toLowerCase().includes(term); let matchTipo=true; if(tipo==='siniestrados') matchTipo=c.lotesSiniestrados>0 && c.lotesRetail===0; if(tipo==='retail') matchTipo=c.lotesRetail>0 && c.lotesSiniestrados===0; if(tipo==='ambos') matchTipo=c.isHibrido; return matchName && matchTipo; }); renderPanelClientesData(filtered, term!=="" || tipo!=="todos"); } catch(e) {} }
+window.filtrarClientes = function(){ try { const term=(document.getElementById('search-client').value||'').toLowerCase(); const tipo=document.getElementById('filter-client-type').value; let filtered=clientDB.filter(c=>{ const matchName=(c.nombre||'').toLowerCase().includes(term); let matchTipo=true; if(tipo==='siniestrados') matchTipo=c.lotesSiniestrados>0 && c.lotesRetail===0; if(tipo==='retail') matchTipo=c.lotesRetail>0 && c.lotesSiniestrados===0; if(tipo==='ambos') matchTipo=c.isHibrido; return matchName && matchTipo; }); renderPanelClientesData(filtered, term!=="" || tipo!=="todos"); } catch(e) {} };
 
-function abrirFichaCliente(nombreStr){ 
+window.abrirFichaCliente = function(nombreStr){ 
     try {
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
@@ -1296,11 +1318,11 @@ function abrirFichaCliente(nombreStr){
         if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
-}
+};
 
-function cerrarFicha(){ if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.add('hidden'); }
+window.cerrarFicha = function(){ if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.add('hidden'); };
 
-function buscarPatente(){ 
+window.buscarPatente = function(){ 
     try {
         const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); const tbody=document.getElementById('buscador-tabla-resultados'); 
         if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-10 text-center text-premium-muted text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr>'; return; } 
@@ -1308,7 +1330,7 @@ function buscarPatente(){
         if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-10 text-center font-bold text-sm text-premium-danger">Sin resultados</td></tr>`; return; } 
         tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.remate ? res.remate : '-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) {}
-}
+};
 </script>
 </body>
 </html>
