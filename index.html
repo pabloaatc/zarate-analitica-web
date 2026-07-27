@@ -62,7 +62,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v2.0 (Stable)</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v2.1</div>
 
     <!-- OVERLAY DE CARGA EN VIVO (BLOQUEA LA PANTALLA) -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -154,9 +154,8 @@
                 </div>
                 <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="cambiarSeccion('remates')">Resumen de Remates</div>
                 <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('autos')">Análisis de Vehículos</div>
-                <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('clientes')">Inteligencia de Clientes</div>
-                <div id="nav-mod-custom" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('custom')">Generador de Informes</div>
-                <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('conclusiones')">Directorio Ejecutivo</div>
+                <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('clientes')">Clientes</div>
+                <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="cambiarSeccion('conclusiones')">Datos</div>
                 <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="cambiarSeccion('buscador')">Buscador Global</div>
                 
                 <div id="calendar-container" class="mt-2">
@@ -323,7 +322,7 @@
                 <!-- MODULE: CLIENTES -->
                 <div id="module-clientes" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Inteligencia de Clientes</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
+                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Clientes</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Directorio y comportamiento de cartera</p></div>
                         <div class="flex flex-col sm:flex-row gap-2 md:gap-3 w-full md:w-auto">
                             <select id="filter-client-type" class="bg-white border border-premium-border rounded-xl px-3 py-2 text-sm text-premium-text outline-none w-full sm:w-auto focus:border-premium-text transition" onchange="filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
                             <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-premium-border rounded-xl px-4 py-2 text-sm text-premium-text outline-none w-full sm:w-64 focus:border-premium-text transition" onkeyup="filtrarClientes()">
@@ -382,48 +381,10 @@
                     </div>
                 </div>
 
-                <!-- MODULE: INFORME PERSONALIZADO -->
-                <div id="module-custom" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
-                    <div class="border-b border-premium-border pb-4 no-print">
-                        <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Generador de Informes</h2>
-                        <p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Seleccione KPIs para construir reporte</p>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-                        <div class="glass-panel p-4 md:p-5 bg-white no-print">
-                            <h3 class="font-semibold text-sm text-premium-text mb-4">1. Configuración de Métricas</h3>
-                            <div class="space-y-3 text-xs text-premium-text font-medium" id="custom-checkboxes">
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-disp" checked> <span class="group-hover:text-premium-highlight transition">Lotes Disponibles</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-vend" checked> <span class="group-hover:text-premium-highlight transition">Lotes Vendidos</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-efi" checked> <span class="group-hover:text-premium-highlight transition">Efectividad (%)</span></label>
-                                <div class="my-3 border-b border-premium-border/50"></div>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-venta" checked> <span class="group-hover:text-premium-highlight transition">Venta Total</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-comision" checked> <span class="group-hover:text-premium-highlight transition">Comisión Generada</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-ticket" checked> <span class="group-hover:text-premium-highlight transition">Ticket Promedio</span></label>
-                                <div class="my-3 border-b border-premium-border/50"></div>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-participan" checked> <span class="group-hover:text-premium-highlight transition">Clientes c/Garantía</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-ganadores" checked> <span class="group-hover:text-premium-highlight transition">Clientes que adjudicaron</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-fuga" checked> <span class="group-hover:text-premium-highlight transition">Clientes que NO adjudicaron</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-nuevos" checked> <span class="group-hover:text-premium-highlight transition">Clientes nuevos que adjudicaron</span></label>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-multi" checked> <span class="group-hover:text-premium-highlight transition">Clientes que adjudicaron > 1 lote</span></label>
-                                <div class="my-3 border-b border-premium-border/50"></div>
-                                <label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="chk-kpi-lotesestrella" checked> <span class="group-hover:text-premium-highlight transition">Top 5 Lotes (Tabla)</span></label>
-                            </div>
-                            <button onclick="generarInformePersonalizado()" class="w-full mt-6 py-2.5 bg-premium-text hover:bg-black text-white font-medium rounded-xl transition shadow-sm text-sm">Generar Vista Previa</button>
-                        </div>
-                        <div class="lg:col-span-2 space-y-4">
-                            <div class="flex justify-between items-center no-print">
-                                <h3 class="font-semibold text-sm text-premium-text">2. Previa del Documento</h3>
-                                <button onclick="window.print()" class="px-4 py-1.5 bg-premium-highlight text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center gap-2">🖨️ Exportar PDF</button>
-                            </div>
-                            <div id="custom-report-output" class="glass-panel p-4 md:p-10 bg-white min-h-[400px]"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MODULE: CONCLUSIONES IA -->
+                <!-- MODULE: DATOS (CONCLUSIONES IA) -->
                 <div id="module-conclusiones" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 border-b border-premium-border pb-4 no-print">
-                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Directorio Ejecutivo</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
+                        <div><h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text">Datos</h2><p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1">Conclusiones directas legibles</p></div>
                         <button onclick="window.print()" class="px-4 py-2 bg-white border border-premium-border rounded-xl text-xs font-medium hover:bg-slate-50 transition w-full md:w-auto">Imprimir Resumen</button>
                     </div>
                     <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 text-premium-text"></div>
@@ -496,9 +457,6 @@ const supabaseUrl = 'https://gxfvjmuzxzpghlbzzmui.supabase.co';
 const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-// ===========================================
-// SISTEMA DE SEGURIDAD Y MANEJO DE INVITACIONES
-// ===========================================
 let sessionUser = null;
 
 function toggleSidebar() {
@@ -628,10 +586,6 @@ window.onload = () => {
 
 async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
 
-// ===========================================
-// LÓGICA PRINCIPAL v2.0 (MOTOR 1x1 ULTRA ESTABLE Y BLOQUEO UI)
-// ===========================================
-
 let db = { remates: [] };
 let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
 let svChartRetencionInst=null, svChartVentasInst=null, cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
@@ -747,13 +701,12 @@ function getSelectedRemates() { return db.remates.filter(r => checkedNodes.inclu
 
 
 // ===========================================
-// MOTOR DE PROCESAMIENTO v2.0 (BLOQUEO Y LISTA INDIVIDUAL)
+// MOTOR DE PROCESAMIENTO v2.1 (BLOQUEO Y LISTA INDIVIDUAL)
 // ===========================================
 async function iniciarProcesamiento(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
     
-    // Activa la pantalla de carga que bloquea clics accidentales
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingText = document.getElementById('loading-text');
     loadingOverlay.classList.remove('hidden');
@@ -762,17 +715,15 @@ async function iniciarProcesamiento(files){
     let successCount = 0;
     let upsertQueue = [];
     
-    // FASE 1: Análisis y Extracción Local
     for(let i = 0; i < validFiles.length; i++){ 
         loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
-        await new Promise(r => setTimeout(r, 20)); // Micro pausa obligatoria para refrescar UI
+        await new Promise(r => setTimeout(r, 20)); 
         
         try { 
             const data = await parseExcel(validFiles[i]); 
             if(data) { 
                 const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
                 if (existsIdx >= 0) {
-                    // Mantener el ID antiguo para no desmarcar checkboxes activos
                     data._dbId = db.remates[existsIdx]._dbId;
                     data.id = db.remates[existsIdx].id;
                     db.remates[existsIdx] = data; 
@@ -795,7 +746,6 @@ async function iniciarProcesamiento(files){
         return;
     }
 
-    // FASE 2: Cruces Globales Rápidos
     loadingText.innerText = "Sincronizando Cruces de Clientes...";
     await new Promise(r => setTimeout(r, 20));
 
@@ -816,15 +766,11 @@ async function iniciarProcesamiento(files){
         remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
     });
     
-    // FASE 3: Subida en Cinta Transportadora 
     try { 
         for (let i = 0; i < upsertQueue.length; i++) {
             loadingText.innerText = `Subiendo a la Nube (${i+1}/${upsertQueue.length})...`;
-            
             const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
             if (error) throw error;
-            
-            // Pausa obligatoria para evitar el bloqueo del servidor
             await new Promise(r => setTimeout(r, 50)); 
         }
         
@@ -841,7 +787,6 @@ async function iniciarProcesamiento(files){
     document.getElementById('file-input').value = ""; 
     document.getElementById('folder-input').value = "";
     
-    // Finalizamos y retiramos el bloqueo
     actualizarSidebar(); 
     procesarDatosClientes(); 
     actualizarVistaActual(); 
@@ -932,12 +877,18 @@ function buildAgg(rematesList,id,label){
 
 function cambiarSeccion(mod){ 
     try {
-        currentModule=mod; document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-custom').className=mod==='custom'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mb-8':'nav-item nav-inactive mb-8'; 
-        ['module-remates', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-custom', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+        currentModule=mod; 
+        document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mb-8':'nav-item nav-inactive mb-8'; 
+        
+        ['module-remates', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+        
         if(mod==='remates'){ document.getElementById('module-remates').classList.remove('hidden'); renderDashboard(); } 
         else if(mod==='conclusiones'){ document.getElementById('module-conclusiones').classList.remove('hidden'); renderConclusiones(); }
         else if(mod==='autos'){ document.getElementById('module-autos').classList.remove('hidden'); renderPanelAutos(); }
-        else if(mod==='custom'){ document.getElementById('module-custom').classList.remove('hidden'); generarInformePersonalizado(); }
         else if(mod==='clientes'){ if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); renderPanelClientesData(clientDB,false); } } 
         else { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); buscarPatente(); } 
         if(window.innerWidth < 768) { toggleSidebar(); }
@@ -1007,7 +958,6 @@ function renderCalendar() {
         listHtml += `<div class="text-[10px] font-bold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
         rematesToShow.forEach(r => {
             let isChecked = checkedNodes.includes(r.id);
-            // ESTRUCTURA CORREGIDA PARA QUE EL CHECKBOX FUNCIONE PERFECTO
             listHtml += `
             <div class="flex items-start gap-2.5 cursor-pointer mb-2.5 group hover:bg-premium-bg p-1.5 rounded-lg transition -ml-1.5" onclick="toggleNode('${r.id}')">
                 <input type="checkbox" class="mt-0.5 shrink-0 pointer-events-none" ${isChecked?'checked':''}>
@@ -1057,7 +1007,9 @@ window.seleccionarUltimoRemate = function() {
 
 function actualizarVistaActual() { 
     try {
-        if (currentModule === 'remates') renderDashboard(); else if (currentModule === 'autos') renderPanelAutos(); else if (currentModule === 'conclusiones') renderConclusiones(); else if (currentModule === 'custom') generarInformePersonalizado(); 
+        if (currentModule === 'remates') renderDashboard(); 
+        else if (currentModule === 'autos') renderPanelAutos(); 
+        else if (currentModule === 'conclusiones') renderConclusiones(); 
         else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); renderPanelClientesData(clientDB, false); } }
     } catch(e) {}
 }
@@ -1181,35 +1133,6 @@ function renderPanelAutos(){
         if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
             return `<tr><td class="font-medium text-premium-muted max-w-[120px] truncate" title="${a.remate}">${a.remate.substring(0,20)}</td><td class="text-center font-medium text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-medium text-premium-text">${a.categoria}</span> <span class="text-premium-muted">${a.modeloStr}</span></td><td class="text-right text-premium-muted">${formatMoney(a.minimo)}</td><td class="text-right font-medium text-premium-success">${formatMoney(a.monto)}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted">Sin vehículos en la selección actual.</td></tr>';
-    } catch (e) {}
-}
-
-function generarInformePersonalizado() {
-    try {
-        if(currentModule !== 'custom') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-custom');
-        if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
-        emptyState.classList.add('hidden'); container.classList.remove('hidden');
-        let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates, 'G', 'Selección Global'); 
-        let out = `<div class="space-y-6"><div><h1 class="text-xl md:text-2xl font-semibold text-premium-text border-b border-premium-border pb-3">Reporte de Gestión Comercial</h1><p class="text-[10px] md:text-[11px] text-premium-muted mt-2">Muestra base: ${checkedNodes.length} periodos consolidados.</p></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">`;
-        if(document.getElementById('chk-kpi-disp') && document.getElementById('chk-kpi-disp').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Lotes Disponibles</p><p class="text-xl font-medium text-premium-text mt-1">${agg.lotesDisponibles}</p></div>`;
-        if(document.getElementById('chk-kpi-vend') && document.getElementById('chk-kpi-vend').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Lotes Vendidos</p><p class="text-xl font-medium text-premium-highlight mt-1">${agg.lotes}</p></div>`;
-        if(document.getElementById('chk-kpi-efi') && document.getElementById('chk-kpi-efi').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Efectividad del Remate</p><p class="text-xl font-medium text-premium-success mt-1">${agg.eficaciaLotes.toFixed(1)}%</p></div>`;
-        if(document.getElementById('chk-kpi-venta') && document.getElementById('chk-kpi-venta').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Venta Total Adjudicada</p><p class="text-xl font-medium text-premium-success mt-1">${formatMoney(agg.venta)}</p></div>`;
-        if(document.getElementById('chk-kpi-comision') && document.getElementById('chk-kpi-comision').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Comisión Generada</p><p class="text-xl font-medium text-premium-text mt-1">${formatMoney(agg.comisionTotal)}</p></div>`;
-        if(document.getElementById('chk-kpi-ticket') && document.getElementById('chk-kpi-ticket').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Ticket Promedio</p><p class="text-xl font-medium text-premium-text mt-1">${formatMoney(agg.ticketPromedio)}</p></div>`;
-        if(document.getElementById('chk-kpi-sobreprecio') && document.getElementById('chk-kpi-sobreprecio').checked) { let dSign = agg.deltaPujaTotal >= 0 ? '+' : ''; let dColor = agg.deltaPujaTotal >= 0 ? 'text-premium-highlight' : 'text-premium-danger'; out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Delta Puja</p><p class="text-xl font-medium ${dColor} mt-1">${dSign}${formatMoney(agg.deltaPujaTotal)} <span class="text-xs">(${dSign}${agg.sobreprecioReal.toFixed(1)}%)</span></p></div>`; }
-        if(document.getElementById('chk-kpi-participan') && document.getElementById('chk-kpi-participan').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes c/Garantía</p><p class="text-xl font-medium text-premium-text mt-1">${agg.garantias}</p></div>`;
-        if(document.getElementById('chk-kpi-ganadores') && document.getElementById('chk-kpi-ganadores').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes que adjudicaron</p><p class="text-xl font-medium text-premium-success mt-1">${agg.ganadoresUnicosCount}</p></div>`;
-        if(document.getElementById('chk-kpi-fuga') && document.getElementById('chk-kpi-fuga').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes que NO adjudicaron</p><p class="text-xl font-medium text-premium-danger mt-1">${agg.perdedoresCount}</p></div>`;
-        if(document.getElementById('chk-kpi-nuevos') && document.getElementById('chk-kpi-nuevos').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes nuevos que adjudicaron</p><p class="text-xl font-medium text-premium-highlight mt-1">${agg.ganadoresNuevos}</p></div>`;
-        let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        if(document.getElementById('chk-kpi-multi') && document.getElementById('chk-kpi-multi').checked) out += `<div class="p-4 border border-premium-border rounded-xl"><p class="text-[10px] text-premium-muted uppercase tracking-wider font-semibold">Clientes que adjudicaron > 1 lote</p><p class="text-xl font-medium text-premium-text mt-1">${multi}</p></div>`;
-        out += `</div>`;
-        if(document.getElementById('chk-kpi-lotesestrella') && document.getElementById('chk-kpi-lotesestrella').checked) {
-            const topLotes=[...agg.adjudicaciones].filter(a=>!a.esFalso).sort((a,b)=>b.pujadoresRealesCount-a.pujadoresRealesCount).slice(0,5);
-            if(topLotes.length > 0) { out += `<div class="mt-8 border border-premium-border rounded-xl overflow-hidden"><div class="bg-premium-bg px-4 md:px-5 py-3 border-b border-premium-border font-semibold text-[10px] md:text-xs text-premium-text">Top 5 Lotes (Demanda)</div><table class="w-full text-left"><thead><tr><th class="pl-4">Detalle</th><th class="text-center">Pujadores</th><th class="text-right">Adjudicado</th><th class="text-right pr-4">Delta</th></tr></thead><tbody>`; topLotes.forEach(l => { let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let dSign = deltaLote >= 0 ? '+' : ''; out += `<tr><td class="pl-4 text-[10px] md:text-xs text-premium-muted truncate max-w-[200px]">${l.loteStr}</td><td class="text-[10px] md:text-xs text-center font-medium text-premium-text">${l.pujadoresRealesCount}</td><td class="text-[10px] md:text-xs text-right font-medium text-premium-success">${formatMoney(l.monto)}</td><td class="text-[10px] md:text-xs text-right pr-4 text-premium-muted">${l.minimo>0?(dSign+formatMoney(deltaLote)):'-'}</td></tr>`; }); out += `</tbody></table></div>`; }
-        } out += `</div>`;
-        if(document.getElementById('custom-report-output')) document.getElementById('custom-report-output').innerHTML = out;
     } catch (e) {}
 }
 
