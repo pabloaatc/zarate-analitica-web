@@ -62,9 +62,9 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v2.1</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v2.2</div>
 
-    <!-- OVERLAY DE CARGA EN VIVO (BLOQUEA LA PANTALLA) -->
+    <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
         <div class="w-14 h-14 border-4 border-premium-highlight border-t-transparent rounded-full animate-spin shadow-lg"></div>
         <p id="loading-text" class="mt-6 font-semibold text-premium-text text-sm tracking-wide text-center max-w-xs">Procesando...</p>
@@ -191,17 +191,20 @@
                 <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-4 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div id="single-view" class="space-y-4 md:space-y-6 hidden">
+                        <!-- Header Single View -->
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-premium-border pb-4">
                             <div class="w-full sm:w-auto overflow-hidden">
                                 <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-premium-text truncate" id="sv-titulo">-</h2>
                                 <p class="text-[10px] md:text-[11px] text-premium-muted uppercase tracking-wider mt-1" id="sv-subtitulo">-</p>
                             </div>
                             <div class="flex gap-4 md:gap-6 text-right shrink-0">
+                                <div><p class="text-[8px] md:text-[9px] text-premium-muted uppercase font-semibold">Ticket Promedio</p><p class="text-lg md:text-xl font-semibold text-premium-text mt-0.5" id="sv-kpi-ticket-top">$0</p></div>
                                 <div><p class="text-[8px] md:text-[9px] text-premium-muted uppercase font-semibold">Comisión Estimada</p><p class="text-lg md:text-xl font-semibold text-premium-highlight mt-0.5" id="sv-kpi-comision-top">$0</p></div>
                                 <div><p class="text-[8px] md:text-[9px] text-premium-muted uppercase font-semibold">Venta Adjudicada</p><p class="text-lg md:text-xl font-semibold text-premium-success mt-0.5" id="sv-kpi-venta">$0</p></div>
                             </div>
                         </div>
 
+                        <!-- KPIs Principales -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div class="glass-panel p-4 md:p-5">
                                 <h4 class="font-semibold text-sm mb-3 md:mb-4 text-premium-text">Efectividad del Remate</h4>
@@ -236,28 +239,23 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-                            <div class="xl:col-span-2 glass-panel p-4 md:p-5 overflow-hidden">
-                                <h4 class="font-semibold text-sm mb-3 text-premium-text">Lotes de Mayor Demanda</h4>
-                                <div class="overflow-x-auto overflow-y-auto max-h-[300px]">
-                                    <table class="w-full text-left">
-                                        <thead>
-                                            <tr>
-                                                <th>Lote</th>
-                                                <th>Detalle</th>
-                                                <th class="text-center">Pujas Reales</th>
-                                                <th class="text-right">Mínimo</th>
-                                                <th class="text-right">Adjudicado</th>
-                                                <th class="text-right hidden sm:table-cell">Delta</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="sv-tabla-top-lotes"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="space-y-4 md:space-y-6 no-print">
-                                <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-2">Ticket Promedio</h4><p class="text-xl md:text-2xl font-semibold text-premium-text mb-4" id="sv-kpi-ticket-promedio-side">$0</p><div class="relative h-32 w-full"><canvas id="sv-chartVentas"></canvas></div></div>
-                                <div class="glass-panel p-4 md:p-5"><h4 class="font-semibold text-[10px] md:text-xs text-premium-muted uppercase tracking-wider mb-2">Retención</h4><div class="relative h-32 w-full"><canvas id="sv-chartRetencion"></canvas></div></div>
+                        <!-- TABLA COMPLETA DE LOTES (FULL WIDTH) -->
+                        <div class="glass-panel p-4 md:p-5 overflow-hidden w-full">
+                            <h4 class="font-semibold text-sm mb-3 text-premium-text">Detalle de Lotes Adjudicados</h4>
+                            <div class="overflow-x-auto overflow-y-auto max-h-[600px] border border-premium-border rounded-xl">
+                                <table class="w-full text-left">
+                                    <thead class="sticky top-0 bg-white shadow-sm z-10">
+                                        <tr>
+                                            <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Lote ↕️</th>
+                                            <th class="cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'string')">Detalle ↕️</th>
+                                            <th class="text-center cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'number')">Pujas Reales ↕️</th>
+                                            <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Mínimo ↕️</th>
+                                            <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Adjudicado ↕️</th>
+                                            <th class="text-right pr-4 hidden sm:table-cell cursor-pointer hover:text-premium-text transition" onclick="sortTable(this, 'money')">Delta ↕️</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sv-tabla-top-lotes"></tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -588,7 +586,7 @@ async function handleLogout() { await supabaseClient.auth.signOut(); window.loca
 
 let db = { remates: [] };
 let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
-let svChartRetencionInst=null, svChartVentasInst=null, cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
+let cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
 
 let calSegment = 'Siniestrados';
@@ -699,10 +697,6 @@ const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20)
 
 function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
 
-
-// ===========================================
-// MOTOR DE PROCESAMIENTO v2.1 (BLOQUEO Y LISTA INDIVIDUAL)
-// ===========================================
 async function iniciarProcesamiento(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
@@ -1035,7 +1029,11 @@ function renderSingleView(nodeId){
     try {
         const node=nodeRematesMap[nodeId]; const agg=buildAgg(node.remates,nodeId,node.label);
         if(document.getElementById('sv-titulo')) document.getElementById('sv-titulo').innerText=agg.label; if(document.getElementById('sv-subtitulo')) document.getElementById('sv-subtitulo').innerText=`${node.remates.length} matrices consolidadas`;
-        if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); if(document.getElementById('sv-kpi-ticket-promedio-side')) document.getElementById('sv-kpi-ticket-promedio-side').innerText=formatMoney(agg.ticketPromedio); 
+        
+        if(document.getElementById('sv-kpi-ticket-top')) document.getElementById('sv-kpi-ticket-top').innerText=formatMoney(agg.ticketPromedio); 
+        if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); 
+        if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); 
+        
         if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
         
         if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
@@ -1047,17 +1045,21 @@ function renderSingleView(nodeId){
         const mapC={}; agg.adjudicaciones.forEach(a=>{ if(a.esFalso) return; if(!mapC[a.clienteReal]) mapC[a.clienteReal]={lotes:0,total:0}; mapC[a.clienteReal].lotes++; mapC[a.clienteReal].total+=a.monto; }); let multi=0; Object.values(mapC).forEach(c=>{ if(c.lotes>1) multi++; }); 
         if(document.getElementById('sv-kpi-multilote')) document.getElementById('sv-kpi-multilote').innerText=multi; globalMapCMulti = mapC;
         
-        const topLotes=[...agg.adjudicaciones].filter(a=>!a.esFalso).sort((a,b)=>b.pujadoresRealesCount-a.pujadoresRealesCount).slice(0,10);
-        if(document.getElementById('sv-tabla-top-lotes')) document.getElementById('sv-tabla-top-lotes').innerHTML=topLotes.map(l=>{
-            let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; let dSignL = deltaLote >= 0 ? '+' : ''; let dColorL = deltaLote >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
-            return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')"><td class="font-medium text-premium-muted w-16">N° ${l.numeroLote||'-'}</td><td class="font-medium max-w-[200px] truncate text-premium-text" title="${l.loteStr}">${l.loteStr}</td><td class="text-center"><span class="bg-premium-bg border border-premium-border text-premium-text px-2 py-0.5 rounded font-semibold">${l.pujadoresRealesCount}</span></td><td class="text-right text-premium-muted">${formatMoney(l.minimo)}</td><td class="text-right font-medium text-premium-success">${formatMoney(l.monto)}</td><td class="text-right font-medium ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td></tr>`;
-        }).join('');
+        const lotesTabla=[...agg.adjudicaciones].filter(a=>!a.esFalso && a.monto > 0).sort((a,b)=> {
+            let numA = parseInt(a.numeroLote) || 0;
+            let numB = parseInt(b.numeroLote) || 0;
+            return numA - numB;
+        });
         
-        const sortedRems=[...node.remates].sort((a,b)=>a.fechaData.timestamp-b.fechaData.timestamp); const labels=sortedRems.map((r,idx)=>`S${idx+1}`); let showRetencion = sortedRems.some(r => r.nuevos > 0 || r.antiguos > 0); let showVentas = sortedRems.some(r => r.ventaTotal > 0);
-        try {
-            if(svChartRetencionInst) svChartRetencionInst.destroy(); if(showRetencion && document.getElementById('sv-chartRetencion')) { svChartRetencionInst=new Chart(document.getElementById('sv-chartRetencion').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Nuevos',data:sortedRems.map(r=>r.nuevos),backgroundColor:'#1D1D1F',borderRadius:2},{label:'Recurrentes',data:sortedRems.map(r=>r.antiguos),backgroundColor:'#D1D1D6',borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#F5F5F7'}}}}}); }
-            if(svChartVentasInst) svChartVentasInst.destroy(); if(showVentas && document.getElementById('sv-chartVentas')) { svChartVentasInst=new Chart(document.getElementById('sv-chartVentas').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Venta Siniestrados',data:sortedRems.map(r=>r.tipo==='Siniestrados'?r.ventaTotal:0),backgroundColor:'#0066CC',borderRadius:2},{label:'Venta Retail',data:sortedRems.map(r=>r.tipo==='Retail'?r.ventaTotal:0),backgroundColor:'#1D1D1F',borderRadius:2}] }}); }
-        } catch(ec) {}
+        if(document.getElementById('sv-tabla-top-lotes')) {
+            document.getElementById('sv-tabla-top-lotes').innerHTML=lotesTabla.map(l=>{
+                let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
+                let dSignL = deltaLote >= 0 ? '+' : ''; 
+                let dColorL = deltaLote >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
+                return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')"><td class="font-medium text-premium-muted w-16">N° ${l.numeroLote||'-'}</td><td class="font-medium max-w-[300px] truncate text-premium-text" title="${l.loteStr}">${l.loteStr}</td><td class="text-center"><span class="bg-premium-bg border border-premium-border text-premium-text px-2 py-0.5 rounded font-semibold">${l.pujadoresRealesCount}</span></td><td class="text-right text-premium-muted">${formatMoney(l.minimo)}</td><td class="text-right font-medium text-premium-success">${formatMoney(l.monto)}</td><td class="text-right font-medium ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td></tr>`;
+            }).join('');
+        }
+        
     } catch (e) {}
 }
 
