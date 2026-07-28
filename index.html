@@ -8,53 +8,58 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- TIPOGRAFÍA ROBOTO (Más cuadrada, técnica y corporativa) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { 
             theme: { 
                 extend: { 
-                    fontFamily: { 
-                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'] 
-                    }, 
+                    fontFamily: { sans: ['Roboto', 'sans-serif'] }, 
                     colors: { 
                         premium: { 
-                            bg: '#F2F2F7', panel: '#FFFFFF', text: '#1D1D1F', muted: '#86868B', 
-                            border: '#E5E5EA', highlight: '#0066CC', success: '#1B8233', 
-                            danger: '#E30000', accent: '#000000'
+                            bg: '#F3F4F6', panel: '#FFFFFF', text: '#111827', muted: '#6B7280', 
+                            border: '#E5E7EB', highlight: '#2563EB', success: '#16A34A', 
+                            danger: '#DC2626', accent: '#000000'
                         } 
-                    } 
+                    },
+                    borderRadius: { 'xl': '0.5rem', '2xl': '0.75rem', '3xl': '1rem' } /* Bordes más cuadrados */
                 } 
             } 
         }
     </script>
     <style>
-        body { background-color: #F2F2F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body { background-color: #F3F4F6; color: #111827; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         
+        /* Paneles con bordes rectos y sombras nítidas */
         .glass-panel { 
-            background: #FFFFFF; border: 1px solid rgba(229, 229, 234, 0.8); border-radius: 1.5rem; 
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 0.5rem; 
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); transition: all 0.2s ease-in-out; 
         }
-        .glass-panel:hover { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
+        .glass-panel:hover { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); }
 
-        .nav-item { padding: 0.75rem 1rem; border-radius: 0.75rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #86868B;}
-        .nav-item:hover { background-color: #EAEAEB; color: #1D1D1F; }
-        .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .nav-item { padding: 0.65rem 1rem; border-radius: 0.375rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #4B5563;}
+        .nav-item:hover { background-color: #F3F4F6; color: #111827; }
+        .nav-active { background-color: #111827 !important; color: #FFFFFF !important; font-weight: 700; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
         
-        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.2em; height: 1.2em; border: 1.5px solid #C7C7CC; border-radius: 0.35em; display: grid; place-content: center; transition: all 0.2s; cursor: pointer;}
+        /* Checkboxes cuadrados perfectos */
+        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1rem; height: 1.1rem; border: 1.5px solid #D1D5DB; border-radius: 0.2rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
         input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
-        input[type="checkbox"]:checked { background-color: #1D1D1F; border-color: #1D1D1F; }
+        input[type="checkbox"]:checked { background-color: #111827; border-color: #111827; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; } 
         ::-webkit-scrollbar-track { background: transparent; } 
-        ::-webkit-scrollbar-thumb { background: #D1D1D6; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #86868B; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
-        .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); }
+        .modal-bg { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
         
-        thead th { background-color: #f8fafc; border-bottom: 1px solid #E5E5EA; color: #86868B; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; padding-bottom: 0.75rem; padding-top: 0.75rem; }
-        tbody tr { border-bottom: 1px solid #F5F5F7; transition: background-color 0.2s; }
-        tbody tr:hover { background-color: #FAFAFA; }
-        tbody td { font-size: 0.8rem; color: #1D1D1F; padding: 0.85rem 0.5rem; }
+        thead th { background-color: #F9FAFB; border-bottom: 2px solid #E5E7EB; color: #4B5563; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; padding: 0.75rem 0.5rem; }
+        tbody tr { border-bottom: 1px solid #F3F4F6; transition: background-color 0.15s; }
+        tbody tr:hover { background-color: #F9FAFB; }
+        tbody td { font-size: 0.8rem; color: #111827; padding: 0.75rem 0.5rem; }
         
         @media print {
             aside, header, #paraguas-bar, .no-print { display: none !important; }
@@ -65,35 +70,34 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v4.4 (Datos Pro)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v5.0 (Enterprise)</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
-        <div class="w-14 h-14 border-4 border-premium-highlight border-t-transparent rounded-full animate-spin shadow-lg"></div>
-        <p id="loading-text" class="mt-6 font-bold text-premium-text text-lg tracking-tight text-center max-w-xs">Procesando...</p>
-        <p class="text-[10px] text-premium-muted uppercase tracking-widest mt-2 font-semibold">No cierre esta ventana</p>
+    <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[200] hidden flex-col items-center justify-center transition-all">
+        <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin shadow-sm"></div>
+        <p id="loading-text" class="mt-6 font-bold text-gray-900 text-lg tracking-tight text-center max-w-xs">Procesando...</p>
+        <p class="text-xs text-gray-500 uppercase tracking-widest mt-1 font-medium">No cierre esta ventana</p>
     </div>
 
     <!-- PANTALLA DE LOGIN -->
-    <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-slate-50 to-slate-200 z-[100] flex items-center justify-center p-4">
-        <div class="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl border border-white w-full max-w-[360px] text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
-            <div class="w-14 h-14 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-2xl mx-auto mb-4 shadow-lg">Z</div>
-            <h2 class="text-xl font-extrabold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
-            <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6 font-semibold">Control Directivo</p>
+    <div id="login-screen" class="fixed inset-0 bg-gray-100 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-lg shadow-xl border border-gray-200 w-full max-w-[360px] text-center relative overflow-hidden">
+            <div class="w-12 h-12 rounded-md bg-black flex items-center justify-center font-bold text-white text-xl mx-auto mb-4 shadow-sm">Z</div>
+            <h2 class="text-xl font-bold text-gray-900 mb-1 tracking-tight">Zárate Analítica</h2>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-6 font-bold">Control Directivo</p>
             
             <form id="login-form" onsubmit="window.handleLogin(event)" class="text-left">
-                <div class="mb-4"><input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent transition-all font-medium" required placeholder="Correo Electrónico"></div>
-                <div class="mb-6"><input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent transition-all font-medium" required placeholder="Contraseña"></div>
-                <div id="login-error" class="hidden text-premium-danger text-[10px] font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
-                <button type="submit" id="btn-login" class="w-full bg-premium-accent hover:bg-gray-800 text-white font-semibold py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">Iniciar Sesión</button>
+                <div class="mb-4"><input type="email" id="email" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-black transition-all" required placeholder="Correo Electrónico"></div>
+                <div class="mb-6"><input type="password" id="password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-black transition-all" required placeholder="Contraseña"></div>
+                <div id="login-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
+                <button type="submit" id="btn-login" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Iniciar Sesión</button>
             </form>
             <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
-                <div class="mb-2 text-center"><span class="bg-premium-success/10 text-premium-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Invitación Aceptada</span></div>
-                <p class="text-xs text-premium-muted mb-6 text-center leading-relaxed font-medium">¡Bienvenido! Crea tu contraseña definitiva.</p>
-                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-success transition-all font-medium" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
-                <div id="invite-error" class="hidden text-premium-danger text-[10px] font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
-                <button type="submit" id="btn-invite" class="w-full bg-premium-success hover:bg-green-700 text-white font-semibold py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">Guardar y Entrar</button>
+                <div class="mb-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Invitación Aceptada</span></div>
+                <p class="text-xs text-gray-500 mb-6 text-center leading-relaxed font-medium mt-4">¡Bienvenido! Crea tu contraseña definitiva.</p>
+                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-green-600 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
+                <div id="invite-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
+                <button type="submit" id="btn-invite" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Guardar y Entrar</button>
             </form>
         </div>
     </div>
@@ -102,33 +106,36 @@
     <div id="app-content" class="hidden flex-col h-screen">
         
         <!-- HEADER MAESTRO -->
-        <header class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 z-30 relative shadow-sm no-print">
+        <header class="bg-gray-900 px-4 md:px-6 py-2.5 flex items-center justify-between shrink-0 z-30 relative shadow-md no-print text-white">
             <div class="flex items-center gap-3">
-                <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition p-1 bg-gray-50 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base shadow-sm">Z</div>
-                <div class="hidden sm:block"><h1 class="font-extrabold text-sm text-premium-text tracking-tight">Zárate Analítica</h1></div>
+                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-300 hover:text-white transition p-1 bg-gray-800 rounded"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                <div class="w-7 h-7 rounded bg-white flex items-center justify-center font-bold text-black text-sm shadow-sm">Z</div>
+                <div class="hidden sm:block"><h1 class="font-bold text-sm tracking-wide text-gray-100">Zárate Analítica</h1></div>
             </div>
             
             <div class="flex items-center gap-3 md:gap-4">
-                <span class="text-[9px] text-premium-muted uppercase tracking-widest font-extrabold hidden md:inline" id="db-status">Conectando...</span>
-                <div class="h-4 w-px bg-premium-border hidden sm:block"></div>
-                <button onclick="window.handleLogout()" class="flex items-center gap-2 text-xs font-semibold text-premium-muted hover:text-premium-text transition bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-xl border border-gray-200">
+                <span class="text-[9px] text-green-400 uppercase tracking-widest font-bold hidden md:inline flex items-center gap-1" id="db-status"><span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Conectando...</span>
+                <div class="h-4 w-px bg-gray-700 hidden sm:block"></div>
+                <button onclick="window.handleLogout()" class="flex items-center gap-2 text-xs font-medium text-gray-300 hover:text-white transition bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded border border-gray-600">
                     <span id="user-display-email" class="hidden sm:inline"></span> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
         </header>
 
         <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
-        <div id="paraguas-bar" class="bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 md:px-6 py-3 flex justify-between items-center shrink-0 z-20 sticky top-0 shadow-sm no-print">
-            <div class="flex items-center gap-2 md:gap-4 flex-wrap">
-                <span class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest hidden lg:inline">Filtro Global:</span>
+        <div id="paraguas-bar" class="bg-white border-b border-gray-300 px-4 md:px-6 py-2.5 flex justify-between items-center shrink-0 z-20 sticky top-0 shadow-sm no-print">
+            <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:inline mr-2">Filtro Global</span>
                 
-                <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
-                <span class="text-gray-300 font-light text-xl hidden sm:inline">/</span>
-                <select id="macro-year" onchange="window.updateMacroFilter()" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
-                <span class="text-gray-300 font-light text-xl hidden sm:inline">/</span>
+                <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition"></select>
+                <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
+                <select id="macro-year" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition">
+                    <option value="ALL">🌐 Todos los Años</option>
+                    <option value="CUSTOM" hidden>⚙️ Año Mix</option>
+                </select>
+                <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
-                <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs font-extrabold text-blue-700 outline-none cursor-pointer hover:bg-blue-100 transition shadow-sm">
+                <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded px-2.5 py-1.5 text-xs font-bold text-blue-800 outline-none cursor-pointer hover:bg-blue-100 transition">
                     <option value="ALL">Todo el Año</option>
                     <optgroup label="Semestres">
                         <option value="S1">1er Semestre (Ene-Jun)</option>
@@ -160,161 +167,157 @@
 
             <!-- BOTONES SUPERIORES DERECHOS -->
             <div class="flex items-center gap-2 shrink-0 ml-2">
-                <button onclick="window.seleccionarUltimoRemate()" class="flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-4 py-2 rounded-xl shadow-sm hover:shadow-md hover:bg-blue-100 transition shrink-0">
-                    <span>⚡</span> <span class="hidden md:inline">Último Remate</span>
+                <button onclick="window.seleccionarUltimoRemate()" class="flex items-center gap-1.5 bg-white text-blue-700 border border-blue-200 text-[11px] font-bold px-3 py-1.5 rounded hover:bg-blue-50 transition shrink-0">
+                    <span>⚡ Último Remate</span>
                 </button>
-                <button onclick="window.abrirModalArbol()" class="flex items-center gap-2 bg-gray-900 text-white border border-gray-800 text-xs font-bold px-4 py-2 rounded-xl shadow-md hover:bg-black hover:shadow-lg transition shrink-0">
-                    <span>🗂️</span> <span class="hidden md:inline">Administrar Matrices (<span id="count-matrices-btn">0</span>)</span>
+                <button onclick="window.abrirModalArbol()" class="flex items-center gap-1.5 bg-gray-800 text-white border border-gray-900 text-[11px] font-bold px-3 py-1.5 rounded shadow-sm hover:bg-black transition shrink-0">
+                    <span>🗂️ Matrices (<span id="count-matrices-btn">0</span>)</span>
                 </button>
             </div>
         </div>
 
         <div class="flex-1 flex overflow-hidden relative">
-            <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar()"></div>
+            <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar()"></div>
 
-            <!-- SIDEBAR ULTRA LIMPIO -->
-            <aside id="sidebar" class="absolute md:relative z-40 w-[240px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white flex flex-col shrink-0 no-print shadow-2xl md:shadow-none">
-                <div class="p-4 flex-1 overflow-y-auto">
-                    <div class="flex justify-between items-center mb-6 px-1 mt-2">
-                        <div class="text-[9px] font-extrabold text-premium-muted uppercase tracking-widest">Módulos</div>
-                        <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted p-1 hover:bg-slate-100 rounded font-bold">✕</button>
+            <!-- SIDEBAR NAVEGACIÓN -->
+            <aside id="sidebar" class="absolute md:relative z-40 w-[220px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 border-r border-gray-200 bg-white flex flex-col shrink-0 no-print">
+                <div class="p-3 flex-1 overflow-y-auto space-y-1">
+                    <div class="flex justify-between items-center mb-4 px-2 mt-2">
+                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Navegación</div>
+                        <button onclick="window.toggleSidebar()" class="md:hidden text-gray-400 hover:text-gray-800 p-1 bg-gray-100 rounded">✕</button>
                     </div>
-                    <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="window.cambiarSeccion('remates')">Resumen General</div>
-                    <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('autos')">Análisis Vehicular</div>
-                    <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('clientes')">Gestión de Clientes</div>
-                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
-                    <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
+                    <div id="nav-mod-remates" class="nav-item nav-active" onclick="window.cambiarSeccion('remates')">Resumen General</div>
+                    <div id="nav-mod-autos" class="nav-item nav-inactive" onclick="window.cambiarSeccion('autos')">Análisis Vehicular</div>
+                    <div id="nav-mod-clientes" class="nav-item nav-inactive" onclick="window.cambiarSeccion('clientes')">Gestión de Clientes</div>
+                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
+                    <div id="nav-mod-buscador" class="nav-item nav-inactive" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
                 </div>
 
-                <!-- CONTROLES ADMIN EN EL SIDEBAR -->
-                <div id="admin-controls" class="hidden flex-col gap-2 p-4 border-t border-gray-100 bg-gray-50/50">
-                    <label for="file-input" class="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-blue-50 hover:border-blue-300 transition cursor-pointer shadow-sm">
-                        <p class="text-xl mb-1">📁</p>
-                        <p class="text-[10px] font-extrabold text-gray-600 uppercase tracking-widest">Subir Excel</p>
+                <div id="admin-controls" class="hidden flex-col gap-2 p-4 border-t border-gray-200 bg-gray-50">
+                    <label for="file-input" class="w-full bg-white border border-dashed border-gray-400 rounded-md p-3 text-center hover:bg-blue-50 hover:border-blue-400 transition cursor-pointer shadow-sm">
+                        <p class="text-lg mb-1">📁</p>
+                        <p class="text-[10px] font-bold text-gray-700 uppercase tracking-wide">Subir Excel</p>
                     </label>
                     <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="window.iniciarProcesamiento(this.files)">
-                    
-                    <button onclick="window.limpiarBase()" class="text-[10px] text-red-500 font-extrabold py-2 mt-1 rounded-lg hover:bg-red-50 hover:text-red-700 transition w-full text-center tracking-widest uppercase" id="btn-vaciar-base">Vaciar Base Completa</button>
+                    <button onclick="window.limpiarBase()" class="text-[10px] text-red-600 font-bold py-2 mt-1 rounded hover:bg-red-50 hover:text-red-800 transition w-full text-center tracking-wide uppercase border border-transparent hover:border-red-200" id="btn-vaciar-base">Vaciar Nube</button>
                 </div>
             </aside>
 
             <!-- ÁREA DE TRABAJO -->
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
                 <!-- EMPTY STATE -->
-                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/90 backdrop-blur-md no-print p-6">
-                    <div class="w-20 h-20 rounded-[2rem] bg-white flex items-center justify-center mb-5 border border-premium-border shadow-xl shadow-slate-200/50">
-                        <svg class="w-8 h-8 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/95 no-print p-6">
+                    <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-300 shadow-sm">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
-                    <p class="font-bold text-xl text-premium-text tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-premium-muted mt-2 text-center max-w-sm font-medium">Sube archivos Excel o cambia el filtro en la barra superior para comenzar.</p>
+                    <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o cambia el filtro en la barra superior para comenzar a analizar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
-                <div id="module-remates" class="hidden space-y-6 md:space-y-8 max-w-[1400px] mx-auto pb-10">
-                    <div id="dashboard-view" class="space-y-6 md:space-y-8">
+                <div id="module-remates" class="hidden space-y-5 md:space-y-6 max-w-[1400px] mx-auto pb-10">
+                    <div id="dashboard-view" class="space-y-5 md:space-y-6">
                         <!-- HEADER DINÁMICO -->
-                        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 border-b border-premium-border pb-5">
+                        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-gray-300 pb-4">
                             <div class="w-full xl:w-auto overflow-hidden">
-                                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text truncate" id="dash-titulo">-</h2>
-                                <p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2" id="dash-subtitulo">-</p>
+                                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900 truncate" id="dash-titulo">-</h2>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1" id="dash-subtitulo">-</p>
                             </div>
                             
                             <div class="flex gap-2 md:gap-3 flex-wrap justify-end shrink-0 w-full xl:w-auto">
-                                <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
-                                    <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Ticket Promedio</p>
-                                    <p class="text-xl md:text-2xl font-extrabold text-premium-text tracking-tight" id="dash-kpi-ticket">$0</p>
+                                <div class="bg-white border border-gray-200 rounded-md px-4 py-2 shadow-sm min-w-[120px]">
+                                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest mb-0.5">Ticket Promedio</p>
+                                    <p class="text-lg md:text-xl font-bold text-gray-900" id="dash-kpi-ticket">$0</p>
                                 </div>
-                                <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
-                                    <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Comisión Est.</p>
-                                    <p class="text-xl md:text-2xl font-extrabold text-premium-highlight tracking-tight" id="dash-kpi-comision">$0</p>
+                                <div class="bg-white border border-gray-200 rounded-md px-4 py-2 shadow-sm min-w-[120px]">
+                                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest mb-0.5">Comisión Est.</p>
+                                    <p class="text-lg md:text-xl font-bold text-blue-700" id="dash-kpi-comision">$0</p>
                                 </div>
-                                <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center border-b-4 border-b-premium-success min-w-[150px] hover:shadow-md transition">
-                                    <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Venta Total</p>
-                                    <p class="text-xl md:text-2xl font-extrabold text-premium-success tracking-tight" id="dash-kpi-venta">$0</p>
+                                <div class="bg-white border border-gray-200 rounded-md px-4 py-2 shadow-sm border-l-4 border-l-green-600 min-w-[140px]">
+                                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest mb-0.5">Venta Total</p>
+                                    <p class="text-lg md:text-xl font-black text-green-700" id="dash-kpi-venta">$0</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- CARDS PRINCIPALES -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
                             <!-- CARD 1 -->
-                            <div class="glass-panel p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
-                                <div class="absolute top-0 right-0 w-40 h-40 bg-premium-success/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-                                <h4 class="font-extrabold text-lg mb-6 text-premium-text tracking-tight flex items-center gap-2">
-                                    <span class="bg-white px-2 py-1 rounded border border-slate-200 text-xs shadow-sm">📊</span> Efectividad Consolidada
+                            <div class="glass-panel p-5 md:p-6 flex flex-col h-full bg-white relative">
+                                <h4 class="font-bold text-base mb-5 text-gray-800 tracking-tight flex items-center gap-2 border-b border-gray-100 pb-3">
+                                    📊 Rendimiento Base
                                 </h4>
-                                <div class="space-y-4 flex-1">
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Disponibles (Base)</span><span class="font-extrabold text-lg text-premium-text" id="dash-kpi-lotes-disp">0</span></div>
-                                    <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Vendidos</span><span class="font-extrabold text-lg text-premium-text" id="dash-kpi-lotes">0</span></div>
+                                <div class="space-y-3 flex-1">
+                                    <div class="flex justify-between items-center"><span class="text-sm text-gray-600 font-medium">Lotes Disponibles (Base)</span><span class="font-bold text-base text-gray-900" id="dash-kpi-lotes-disp">0</span></div>
+                                    <div class="w-full h-px bg-gray-100"></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-gray-600 font-medium">Lotes Vendidos</span><span class="font-bold text-base text-gray-900" id="dash-kpi-lotes">0</span></div>
                                 </div>
-                                <div class="mt-8 pt-5 border-t border-slate-200 flex justify-between items-end">
-                                    <span class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Efectividad</span>
-                                    <span class="font-extrabold text-5xl text-premium-success tracking-tighter" id="dash-kpi-eficacia">0%</span>
+                                <div class="mt-6 pt-4 border-t border-gray-200 flex justify-between items-end">
+                                    <span class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Efectividad</span>
+                                    <span class="font-black text-4xl text-green-600 tracking-tighter" id="dash-kpi-eficacia">0%</span>
                                 </div>
                             </div>
 
                             <!-- CARD 2 -->
-                            <div class="glass-panel p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
-                                <div class="absolute top-0 right-0 w-40 h-40 bg-premium-highlight/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-                                <h4 class="font-extrabold text-lg mb-6 text-premium-text tracking-tight flex items-center gap-2">
-                                    <span class="bg-white px-2 py-1 rounded border border-slate-200 text-xs shadow-sm">👥</span> Comportamiento de Clientes
+                            <div class="glass-panel p-5 md:p-6 flex flex-col h-full bg-white relative">
+                                <h4 class="font-bold text-base mb-5 text-gray-800 tracking-tight flex items-center gap-2 border-b border-gray-100 pb-3">
+                                    👥 Comportamiento de Clientes
                                 </h4>
-                                <div class="space-y-4 flex-1">
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Garantías Pagadas</span><span class="font-extrabold text-lg text-premium-text" id="dash-kpi-garantias">0</span></div>
-                                    <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Adjudicatarios (Ganadores)</span><span class="font-extrabold text-lg text-premium-success" id="dash-kpi-ganadores">0</span></div>
-                                    <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Fuga (No adjudicaron)</span><span class="font-extrabold text-lg text-premium-danger" id="dash-kpi-perdedores">0</span></div>
-                                    <div class="w-full h-px bg-slate-200/60"></div>
+                                <div class="space-y-3 flex-1">
+                                    <div class="flex justify-between items-center"><span class="text-sm text-gray-600 font-medium">Garantías Pagadas</span><span class="font-bold text-base text-gray-900" id="dash-kpi-garantias">0</span></div>
+                                    <div class="w-full h-px bg-gray-100"></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-gray-600 font-medium">Adjudicatarios (Ganadores)</span><span class="font-bold text-base text-green-700" id="dash-kpi-ganadores">0</span></div>
+                                    <div class="w-full h-px bg-gray-100"></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-gray-600 font-medium">Fuga (No adjudicaron)</span><span class="font-bold text-base text-red-600" id="dash-kpi-perdedores">0</span></div>
+                                    <div class="w-full h-px bg-gray-100"></div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm text-premium-muted font-semibold truncate pr-2">Nuevos Adjudicatarios</span>
-                                        <div class="shrink-0 flex items-center gap-2"><span class="font-extrabold text-lg text-premium-highlight" id="dash-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted font-bold tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200" id="dash-kpi-1racompra-pct"></span></div>
+                                        <span class="text-sm text-gray-600 font-medium truncate pr-2">Nuevos Adjudicatarios</span>
+                                        <div class="shrink-0 flex items-center gap-2"><span class="font-bold text-base text-blue-600" id="dash-kpi-1racompra">0</span><span class="text-[9px] text-gray-500 font-bold tracking-widest bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200" id="dash-kpi-1racompra-pct"></span></div>
                                     </div>
-                                    <div class="w-full h-px bg-slate-200/60"></div>
+                                    <div class="w-full h-px bg-gray-100"></div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm text-premium-muted font-semibold truncate pr-2">Compras Volumen (>1 lote)</span>
-                                        <div class="flex items-center gap-3 shrink-0"><span class="font-extrabold text-lg text-premium-text" id="dash-kpi-multilote">0</span><button onclick="window.abrirModalMultiLote()" class="text-[9px] text-white bg-premium-text hover:bg-black px-2 py-1 rounded font-bold transition no-print shadow-sm uppercase tracking-wider">Ver lista</button></div>
+                                        <span class="text-sm text-gray-600 font-medium truncate pr-2">Compras Volumen (>1 lote)</span>
+                                        <div class="flex items-center gap-3 shrink-0"><span class="font-bold text-base text-gray-900" id="dash-kpi-multilote">0</span><button onclick="window.abrirModalMultiLote()" class="text-[9px] text-white bg-gray-800 hover:bg-black px-2 py-1 rounded font-bold transition no-print uppercase tracking-wider">Ver lista</button></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- GRÁFICOS DINÁMICOS -->
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8 mt-4 no-print">
-                            <div class="glass-panel p-6 md:p-8">
-                                <h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6">Composición de Ventas</h4>
-                                <div class="relative h-56 md:h-72 w-full"><canvas id="dash-chartVentas"></canvas></div>
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2 no-print">
+                            <div class="glass-panel p-5">
+                                <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Composición de Ventas</h4>
+                                <div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartVentas"></canvas></div>
                             </div>
-                            <div class="glass-panel p-6 md:p-8">
-                                <h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6">Tracción de Clientes</h4>
-                                <div class="relative h-56 md:h-72 w-full"><canvas id="dash-chartClientes"></canvas></div>
+                            <div class="glass-panel p-5">
+                                <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4>
+                                <div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartClientes"></canvas></div>
                             </div>
                         </div>
 
                         <!-- TABLA COMPLETA CON BUSCADOR -->
-                        <div class="glass-panel p-6 md:p-8 overflow-hidden w-full bg-white">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 pb-4">
-                                <h4 class="font-extrabold text-lg text-premium-text tracking-tight flex items-center gap-2">
-                                    <span class="bg-gray-50 px-2 py-1 rounded border border-slate-200 text-xs shadow-sm">🚗</span> Detalle Global de Lotes Adjudicados
+                        <div class="glass-panel p-5 overflow-hidden w-full bg-white">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-gray-200 pb-3">
+                                <h4 class="font-bold text-base text-gray-800 tracking-tight flex items-center gap-2">
+                                    🚗 Detalle Global de Lotes Adjudicados
                                 </h4>
-                                <input type="text" id="search-lotes-main" placeholder="Buscar lote, modelo o cliente..." class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all w-full sm:w-72 shadow-inner font-medium text-premium-text placeholder:text-slate-400" onkeyup="window.filtrarLotesMain()">
+                                <input type="text" id="search-lotes-main" placeholder="Buscar lote, modelo o cliente..." class="bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-blue-600 transition-all w-full sm:w-64 font-medium text-gray-900 placeholder:text-gray-400" onkeyup="window.filtrarLotesMain()">
                             </div>
                             
-                            <div class="overflow-x-auto overflow-y-auto max-h-[600px] border border-slate-200 rounded-xl shadow-sm">
+                            <div class="overflow-x-auto overflow-y-auto max-h-[600px] border border-gray-200 rounded-md">
                                 <table class="w-full text-left bg-white">
-                                    <thead class="sticky top-0 bg-slate-50 shadow-sm z-10 border-b border-slate-200">
+                                    <thead class="sticky top-0 bg-gray-50 z-10 border-b border-gray-300 shadow-sm">
                                         <tr>
-                                            <th class="pl-6 py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
-                                            <th class="py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
-                                            <th class="py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Detalle del Vehículo ↕️</th>
-                                            <th class="py-4 text-center cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Pujas ↕️</th>
-                                            <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
-                                            <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
-                                            <th class="py-4 text-right pr-6 hidden sm:table-cell cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Delta ↕️</th>
+                                            <th class="pl-4 py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
+                                            <th class="py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
+                                            <th class="py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Detalle del Vehículo ↕️</th>
+                                            <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Pujas ↕️</th>
+                                            <th class="py-3 text-right cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
+                                            <th class="py-3 text-right cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
+                                            <th class="py-3 text-right pr-4 hidden sm:table-cell cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Delta ↕️</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="dash-tabla-lotes" class="divide-y divide-slate-100"></tbody>
+                                    <tbody id="dash-tabla-lotes" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -322,115 +325,115 @@
                 </div>
 
                 <!-- MODULE: MODELOS Y VEHICULOS -->
-                <div id="module-autos" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Estructura del catálogo adjudicado</p></div>
-                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text w-full md:w-72 focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="window.renderPanelAutos()">
+                <div id="module-autos" class="hidden space-y-5 md:space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
+                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Análisis de Vehículos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Estructura del catálogo adjudicado</p></div>
+                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 w-full md:w-64 focus:outline-none focus:border-blue-600 transition-all" onkeyup="window.renderPanelAutos()">
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6 text-center">Top Marcas Adjudicadas</h4><div class="relative h-56 md:h-72 w-full"><canvas id="flota-marcas-chart"></canvas></div></div>
-                        <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6 text-center">Top Modelos Específicos</h4><div class="relative h-56 md:h-72 w-full"><canvas id="flota-modelos-chart"></canvas></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-56 md:h-64 w-full"><canvas id="flota-marcas-chart"></canvas></div></div>
+                        <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4 text-center">Top Modelos Específicos</h4><div class="relative h-56 md:h-64 w-full"><canvas id="flota-modelos-chart"></canvas></div></div>
                     </div>
                     <div class="glass-panel p-4">
-                        <div class="overflow-x-auto max-h-[600px] rounded-lg border border-slate-100">
+                        <div class="overflow-x-auto max-h-[600px] rounded-md border border-gray-200">
                             <table class="w-full text-left whitespace-nowrap bg-white">
-                                <thead class="sticky top-0 bg-slate-50">
+                                <thead class="sticky top-0 bg-gray-50 border-b border-gray-200">
                                     <tr>
-                                        <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
-                                        <th class="cursor-pointer text-center hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Lote ↕️</th>
-                                        <th class="cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Vehículo Extraído ↕️</th>
-                                        <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
-                                        <th class="text-right pr-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
+                                        <th class="pl-4 py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
+                                        <th class="py-3 cursor-pointer text-center hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Lote ↕️</th>
+                                        <th class="py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Vehículo Extraído ↕️</th>
+                                        <th class="py-3 text-right cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
+                                        <th class="py-3 text-right pr-4 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
                                     </tr>
                                 </thead>
-                                <tbody id="flota-tabla-resultados" class="divide-y divide-slate-50"></tbody>
+                                <tbody id="flota-tabla-resultados" class="divide-y divide-gray-100"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
                 <!-- MODULE: CLIENTES -->
-                <div id="module-clientes" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Gestión de Clientes</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Directorio y comportamiento de cartera</p></div>
-                        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                            <select id="filter-client-type" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-auto focus:border-premium-highlight shadow-sm transition" onchange="window.filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
-                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-72 focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="window.filtrarClientes()">
+                <div id="module-clientes" class="hidden space-y-5 md:space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
+                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Gestión de Clientes</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Directorio y comportamiento de cartera</p></div>
+                        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                            <select id="filter-client-type" class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 outline-none w-full sm:w-auto focus:border-blue-600 transition" onchange="window.filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
+                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 outline-none w-full sm:w-64 focus:border-blue-600 transition-all" onkeyup="window.filtrarClientes()">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Total Clientes</p><p class="text-2xl md:text-3xl font-extrabold mt-2 text-premium-text" id="bi-kpi-total">0</p></div>
-                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Inversión Prom.</p><p class="text-2xl md:text-3xl font-extrabold text-premium-success mt-2" id="bi-kpi-ltv">$0</p></div>
-                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Cruces</p><p class="text-2xl md:text-3xl font-extrabold text-premium-highlight mt-2" id="bi-kpi-hibridos">0</p></div>
-                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">En Riesgo</p><p class="text-2xl md:text-3xl font-extrabold text-premium-danger mt-2" id="bi-kpi-inactivos">0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Total Clientes</p><p class="text-2xl font-black mt-1 text-gray-900" id="bi-kpi-total">0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Inversión Prom.</p><p class="text-2xl font-black text-green-700 mt-1" id="bi-kpi-ltv">$0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Cruces</p><p class="text-2xl font-black text-blue-700 mt-1" id="bi-kpi-hibridos">0</p></div>
+                        <div class="glass-panel p-4"><p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">En Riesgo</p><p class="text-2xl font-black text-red-600 mt-1" id="bi-kpi-inactivos">0</p></div>
                     </div>
-                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                        <div id="bi-ficha-cliente" class="glass-panel p-6 xl:col-span-3 hidden border-l-8 border-l-premium-highlight">
-                            <div class="flex flex-col md:flex-row justify-between items-start mb-5 gap-3">
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+                        <div id="bi-ficha-cliente" class="glass-panel p-5 xl:col-span-3 hidden border-l-4 border-l-blue-600">
+                            <div class="flex flex-col md:flex-row justify-between items-start mb-4 gap-3">
                                 <div>
-                                    <h3 class="text-xl md:text-2xl font-extrabold text-premium-text tracking-tight" id="ficha-nombre">-</h3>
-                                    <div class="flex flex-wrap gap-4 mt-2 text-[10px] text-premium-muted uppercase tracking-widest font-bold">
-                                        <span>RUT: <span id="ficha-rut" class="text-premium-text"></span></span>
-                                        <span>Email: <span id="ficha-email" class="text-premium-text lowercase"></span></span>
+                                    <h3 class="text-lg md:text-xl font-black text-gray-900 tracking-tight" id="ficha-nombre">-</h3>
+                                    <div class="flex flex-wrap gap-4 mt-1 text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                                        <span>RUT: <span id="ficha-rut" class="text-gray-900"></span></span>
+                                        <span>Email: <span id="ficha-email" class="text-gray-900 lowercase"></span></span>
                                     </div>
                                 </div>
-                                <button onclick="window.cerrarFicha()" class="text-premium-muted hover:text-premium-danger bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold no-print transition border border-slate-200">✕ Cerrar Ficha</button>
+                                <button onclick="window.cerrarFicha()" class="text-gray-500 hover:text-red-600 bg-gray-50 hover:bg-red-50 px-3 py-1.5 rounded text-xs font-bold no-print transition border border-gray-200">✕ Cerrar Ficha</button>
                             </div>
-                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-5 border-y border-slate-100 mb-5 bg-slate-50/50 rounded-xl px-4">
-                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">1ra Compra</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-primera">-</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Última Compra</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-ultima">-</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Lotes Adj.</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-lotes">0</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Vol. Siniestros</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-monto-sin">$0</p></div>
-                                <div><p class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Vol. Retail</p><p class="font-bold text-sm md:text-base text-premium-text mt-1" id="ficha-monto-ret">$0</p></div>
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-y border-gray-200 mb-4 bg-gray-50 rounded px-4">
+                                <div><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">1ra Compra</p><p class="font-bold text-sm text-gray-900 mt-1" id="ficha-primera">-</p></div>
+                                <div><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Última Compra</p><p class="font-bold text-sm text-gray-900 mt-1" id="ficha-ultima">-</p></div>
+                                <div><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Lotes Adj.</p><p class="font-bold text-sm text-gray-900 mt-1" id="ficha-lotes">0</p></div>
+                                <div><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Vol. Siniestros</p><p class="font-bold text-sm text-gray-900 mt-1" id="ficha-monto-sin">$0</p></div>
+                                <div><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Vol. Retail</p><p class="font-bold text-sm text-gray-900 mt-1" id="ficha-monto-ret">$0</p></div>
                             </div>
-                            <div class="overflow-x-auto max-h-[300px] border border-slate-200 rounded-xl">
+                            <div class="overflow-x-auto max-h-[300px] border border-gray-200 rounded">
                                 <table class="w-full text-left bg-white">
-                                    <thead class="sticky top-0 bg-slate-50 border-b border-slate-200"><tr><th class="pl-4">Fecha</th><th>Remate</th><th>Segmento</th><th>Lote</th><th class="text-right pr-4">Monto</th></tr></thead>
-                                    <tbody id="ficha-historial-tabla" class="divide-y divide-slate-50"></tbody>
+                                    <thead class="sticky top-0 bg-gray-50 border-b border-gray-200"><tr><th class="pl-4">Fecha</th><th>Remate</th><th>Segmento</th><th>Lote</th><th class="text-right pr-4">Monto</th></tr></thead>
+                                    <tbody id="ficha-historial-tabla" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
                         </div>
                         
                         <div class="glass-panel p-4 xl:col-span-2 overflow-hidden">
-                            <div class="p-2 pb-4"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest">Directorio General</h4></div>
-                            <div class="overflow-x-auto max-h-[400px] rounded-lg border border-slate-100">
+                            <div class="p-2 pb-3"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest">Directorio General</h4></div>
+                            <div class="overflow-x-auto max-h-[400px] rounded-md border border-gray-200">
                                 <table class="w-full text-left whitespace-nowrap bg-white">
-                                    <thead class="sticky top-0 bg-slate-50">
+                                    <thead class="sticky top-0 bg-gray-50">
                                         <tr>
-                                            <th class="pl-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Razón Social ↕️</th>
-                                            <th class="text-center cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Frec. ↕️</th>
-                                            <th class="text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Inversión ↕️</th>
-                                            <th class="text-center pr-4 cursor-pointer hidden sm:table-cell hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Segmento ↕️</th>
+                                            <th class="pl-4 py-2.5 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Razón Social ↕️</th>
+                                            <th class="text-center py-2.5 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Frec. ↕️</th>
+                                            <th class="text-right py-2.5 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Inversión ↕️</th>
+                                            <th class="text-center pr-4 py-2.5 cursor-pointer hidden sm:table-cell hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Segmento ↕️</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="bi-tabla-clientes" class="divide-y divide-slate-50"></tbody>
+                                    <tbody id="bi-tabla-clientes" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="glass-panel p-6"><h4 class="font-extrabold text-[10px] md:text-xs text-premium-muted uppercase tracking-widest mb-6 text-center">Salud de Cartera</h4><div class="relative h-56 md:h-72 w-full"><canvas id="bi-chartSegments"></canvas></div></div>
+                        <div class="glass-panel p-5"><h4 class="font-bold text-[10px] md:text-xs text-gray-500 uppercase tracking-widest mb-4 text-center">Salud de Cartera</h4><div class="relative h-56 md:h-64 w-full"><canvas id="bi-chartSegments"></canvas></div></div>
                     </div>
                 </div>
 
-                <!-- MODULE: DATOS (REPORTE EJECUTIVO) -->
-                <div id="module-conclusiones" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Datos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Reporte Ejecutivo Estructurado</p></div>
-                        <button onclick="window.print()" class="px-5 py-2.5 bg-white border border-slate-200 shadow-sm rounded-xl text-xs font-bold hover:bg-slate-50 hover:shadow-md transition w-full md:w-auto uppercase tracking-wider text-premium-text">🖨️ Imprimir Resumen</button>
+                <!-- MODULE: DATOS (REDISEÑO TOTAL) -->
+                <div id="module-conclusiones" class="hidden space-y-5 md:space-y-6 max-w-[1000px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
+                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Datos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Reporte Ejecutivo Estructurado</p></div>
+                        <button onclick="window.print()" class="px-4 py-2 bg-white border border-gray-300 shadow-sm rounded-md text-xs font-bold hover:bg-gray-50 transition w-full md:w-auto uppercase tracking-wider text-gray-800">🖨️ Imprimir Reporte</button>
                     </div>
                     <div id="conclusiones-content"></div>
                 </div>
 
                 <!-- MODULE: BUSCADOR -->
-                <div id="module-buscador" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Buscador Global</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Motor de búsqueda histórico</p></div>
-                        <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-premium-text w-full md:w-80 shadow-inner focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all" onkeyup="window.buscarPatente()">
+                <div id="module-buscador" class="hidden space-y-5 md:space-y-6 max-w-[1200px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
+                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Buscador Global</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Motor de búsqueda histórico</p></div>
+                        <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-900 w-full md:w-80 shadow-inner focus:outline-none focus:border-blue-600 transition-all" onkeyup="window.buscarPatente()">
                     </div>
                     <div class="glass-panel p-4 overflow-hidden">
-                        <div class="overflow-x-auto max-h-[600px] rounded-lg border border-slate-100">
+                        <div class="overflow-x-auto max-h-[600px] rounded-md border border-gray-200">
                             <table class="w-full text-left whitespace-nowrap bg-white">
-                                <thead class="sticky top-0 bg-slate-50"><tr><th class="pl-4">Fecha</th><th>Remate Orig.</th><th class="text-center">N° Lote</th><th>Detalle Ext.</th><th>Adjudicatario</th><th class="text-right pr-4">Monto</th></tr></thead>
-                                <tbody id="buscador-tabla-resultados" class="divide-y divide-slate-50"><tr><td colspan="6" class="p-10 text-center text-premium-muted text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr></tbody>
+                                <thead class="sticky top-0 bg-gray-50"><tr><th class="pl-4 py-3">Fecha</th><th class="py-3">Remate Orig.</th><th class="text-center py-3">N° Lote</th><th class="py-3">Detalle Ext.</th><th class="py-3">Adjudicatario</th><th class="text-right pr-4 py-3">Monto</th></tr></thead>
+                                <tbody id="buscador-tabla-resultados" class="divide-y divide-gray-100"><tr><td colspan="6" class="p-10 text-center text-gray-500 text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr></tbody>
                             </table>
                         </div>
                     </div>
@@ -440,59 +443,61 @@
         </div>
     </div> <!-- FIN APP CONTENT -->
 
-    <!-- MODAL ARBOL DE SELECCION (EL NUEVO MENU ESCONDIDO) -->
+    <!-- MODAL ARBOL DE SELECCION (ADMIN MATRICES) -->
     <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
-        <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
-            <div class="p-5 md:p-6 border-b border-slate-700 flex justify-between items-start bg-gray-900">
-                <div><h3 class="text-xl font-extrabold tracking-tight text-white">Administrar Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1.5">Activa o desactiva para ajustar la muestra</p></div>
-                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded-lg p-1.5 shadow-sm transition">✕</button>
+        <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200">
+            <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-50">
+                <div><h3 class="text-lg font-black tracking-tight text-gray-900">Administrar Matrices</h3><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Activa o desactiva para ajustar la muestra</p></div>
+                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-gray-800 bg-white border border-gray-300 rounded p-1 shadow-sm transition">✕</button>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 bg-white" id="arbol-container">
+            <div class="flex-1 overflow-y-auto p-0 bg-white" id="arbol-container">
                 <!-- Se llena con JS -->
             </div>
-            <div class="p-4 border-t border-gray-100 bg-gray-50">
-                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition shadow-md">Aplicar y Ver Resumen</button>
+            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar y Ver Resumen</button>
             </div>
         </div>
     </div>
 
-    <!-- OTROS MODALES (PUJADORES Y MULTILOTE) -->
+    <!-- MODAL PUJAS -->
     <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
-        <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
-            <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
-                <div><h3 class="text-xl font-extrabold tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5" id="modal-subtitulo"></p></div>
-                <button onclick="window.cerrarModal()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button>
+        <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200">
+            <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-50">
+                <div><h3 class="text-lg font-black tracking-tight text-gray-900" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1" id="modal-subtitulo"></p></div>
+                <button onclick="window.cerrarModal()" class="text-gray-400 hover:text-gray-800 bg-white border border-gray-300 rounded p-1 shadow-sm transition">✕</button>
             </div>
-            <div class="px-5 md:px-6 py-3 bg-white flex flex-wrap gap-5 text-[10px] border-b border-slate-200 uppercase tracking-widest font-extrabold items-center">
-                <div><span class="text-premium-muted">Total Pujas:</span> <span class="text-premium-text text-xs ml-1" id="modal-total-pujas">0</span></div>
-                <div><span class="text-premium-muted">Pujadores Únicos:</span> <span class="text-premium-highlight text-xs ml-1" id="modal-unicos-reales">0</span></div>
-                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition">Solo Reales</button></div>
+            <div class="px-5 py-2.5 bg-white flex flex-wrap gap-5 text-[10px] border-b border-gray-200 uppercase tracking-widest font-bold items-center">
+                <div><span class="text-gray-400">Total Pujas:</span> <span class="text-gray-900 text-xs ml-1" id="modal-total-pujas">0</span></div>
+                <div><span class="text-gray-400">Pujadores Únicos:</span> <span class="text-blue-700 text-xs ml-1" id="modal-unicos-reales">0</span></div>
+                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded bg-black text-white shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition">Solo Reales</button></div>
             </div>
-            <div class="flex-1 overflow-x-auto overflow-y-auto p-2 bg-white">
+            <div class="flex-1 overflow-x-auto overflow-y-auto p-0 bg-white">
                 <table class="w-full text-left">
-                    <thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">#</th><th class="hidden sm:table-cell">Fecha</th><th>Nombre</th><th class="text-right">Monto</th><th class="text-center pr-4">Status</th></tr></thead>
-                    <tbody id="modal-tabla-pujas" class="divide-y divide-slate-50"></tbody>
+                    <thead class="sticky top-0 bg-gray-50 shadow-sm border-b border-gray-200"><tr><th class="pl-5 py-3">#</th><th class="hidden sm:table-cell py-3">Fecha</th><th class="py-3">Nombre</th><th class="text-right py-3">Monto</th><th class="text-center pr-5 py-3">Status</th></tr></thead>
+                    <tbody id="modal-tabla-pujas" class="divide-y divide-gray-100"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- MODAL FUGA -->
     <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
-        <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
-            <div class="p-5 md:p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
-                <div><h3 class="text-xl font-extrabold tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
-                <div class="flex items-center gap-3 w-full sm:w-auto"><button onclick="window.exportarFugaExcel()" class="text-[10px] font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition shadow-sm flex-1 sm:flex-none uppercase tracking-widest text-premium-text">⬇️ Exportar Excel</button><button onclick="window.cerrarModalFuga()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition shrink-0">✕</button></div>
+        <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200">
+            <div class="p-5 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50">
+                <div><h3 class="text-lg font-black tracking-tight text-red-600">Clientes que NO adjudicaron</h3></div>
+                <div class="flex items-center gap-3 w-full sm:w-auto"><button onclick="window.exportarFugaExcel()" class="text-[10px] font-bold bg-white border border-gray-300 px-3 py-1.5 rounded hover:bg-gray-100 transition shadow-sm flex-1 sm:flex-none uppercase tracking-widest text-gray-800">⬇️ Exportar Excel</button><button onclick="window.cerrarModalFuga()" class="text-gray-400 hover:text-gray-800 bg-white border border-gray-300 rounded p-1 shadow-sm transition shrink-0">✕</button></div>
             </div>
-            <div class="flex-1 overflow-x-auto overflow-y-auto p-2 bg-white">
-                <table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Matriz Origen</th><th>Inactivo por</th><th>Razón Social</th><th>Contacto</th></tr></thead><tbody id="modal-tabla-fuga" class="divide-y divide-slate-50"></tbody></table>
+            <div class="flex-1 overflow-x-auto overflow-y-auto p-0 bg-white">
+                <table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-gray-50 shadow-sm border-b border-gray-200"><tr><th class="pl-5 py-3">Matriz Origen</th><th class="py-3">Inactivo por</th><th class="py-3">Razón Social</th><th class="py-3">Contacto</th></tr></thead><tbody id="modal-tabla-fuga" class="divide-y divide-gray-100"></tbody></table>
             </div>
         </div>
     </div>
 
+    <!-- MODAL MULTILOTE -->
     <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
-        <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
-            <div class="p-5 md:p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50"><div><h3 class="text-xl font-extrabold tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="window.cerrarModalMulti()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button></div>
-            <div class="flex-1 overflow-y-auto overflow-x-auto p-2 bg-white"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-4">Inversión</th></tr></thead><tbody id="modal-tabla-multilote" class="divide-y divide-slate-50"></tbody></table></div>
+        <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200">
+            <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50"><div><h3 class="text-lg font-black tracking-tight text-gray-900">Compradores > 1 Lote</h3></div><button onclick="window.cerrarModalMulti()" class="text-gray-400 hover:text-gray-800 bg-white border border-gray-300 rounded p-1 shadow-sm transition">✕</button></div>
+            <div class="flex-1 overflow-y-auto overflow-x-auto p-0 bg-white"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-gray-50 shadow-sm border-b border-gray-200"><tr><th class="pl-5 py-3">Cliente</th><th class="text-center py-3">Volumen</th><th class="text-right pr-5 py-3">Inversión</th></tr></thead><tbody id="modal-tabla-multilote" class="divide-y divide-gray-100"></tbody></table></div>
         </div>
     </div>
 
@@ -510,9 +515,9 @@ let dashChartVentasInst=null, dashChartClientesInst=null, biChartSegmentsInst=nu
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
 
 if(typeof Chart !== 'undefined') { 
-    Chart.defaults.color = '#86868B'; 
-    Chart.defaults.font.family = 'sans-serif'; 
-    Chart.defaults.font.size = 10;
+    Chart.defaults.color = '#6B7280'; 
+    Chart.defaults.font.family = 'Roboto, sans-serif'; 
+    Chart.defaults.font.size = 11;
 }
 
 window.toggleSidebar = function() {
@@ -646,18 +651,18 @@ window.formatearNombreRemate = function(fileName, timestamp) {
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
     try {
-        statusLabel.innerText = "Sincronizando...";
+        statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Sincronizando...';
         const { data, error } = await supabaseClient.from('app_state').select('*');
         if (data && data.length > 0) {
             if (data.length === 1 && data[0].payload && data[0].payload.remates) { db = data[0].payload; } 
             else { db.remates = data.map(row => { let r = row.payload; r._dbId = row.id; return r; }); }
             db.remates.forEach(r => { if (!r.id) r.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); });
-            statusLabel.innerText = `En Línea (${db.remates.length})`; statusLabel.classList.replace('text-premium-muted', 'text-premium-success');
+            statusLabel.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> En Línea (${db.remates.length})`;
         } else {
-            statusLabel.innerText = "Base Vacía";
+            statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Base Vacía';
         }
     } catch (e) {
-        statusLabel.innerText = "Error BD"; statusLabel.classList.replace('text-premium-muted', 'text-premium-danger');
+        statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
     }
     if(db.remates && db.remates.length > 0) { window.actualizarFiltrosGlobales(); }
 }
@@ -683,21 +688,25 @@ window.actualizarFiltrosGlobales = function() {
     let currentYr = yearSelect.value || Math.max(...Array.from(years));
     
     segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
-    yearSelect.innerHTML = Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==currentYr?'selected':''}>Año ${y}</option>`).join('');
+    
+    // Mantenemos "Todos los años" y "Custom" y agregamos los años dinámicos
+    let yrOptions = `<option value="ALL" ${currentYr === 'ALL' ? 'selected' : ''}>🌐 Todos los Años</option>`;
+    yrOptions += `<option value="CUSTOM" hidden ${currentYr === 'CUSTOM' ? 'selected' : ''}>⚙️ Año Mix</option>`;
+    yrOptions += Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==currentYr?'selected':''}>Año ${y}</option>`).join('');
+    yearSelect.innerHTML = yrOptions;
     
     window.updateMacroFilter();
 };
 
 window.updateMacroFilter = function(forceCustom = false) {
     let seg = document.getElementById('macro-segment').value;
-    let yr = Number(document.getElementById('macro-year').value);
+    let yr = document.getElementById('macro-year').value; // Puede ser 'ALL', 'CUSTOM' o un número
     let periodElement = document.getElementById('macro-period');
     let period = periodElement ? periodElement.value : 'ALL';
     
     if(!forceCustom) {
-        let allowedMonths = [];
-        if(period === 'ALL') allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
-        else if(period === 'S1') allowedMonths = [0,1,2,3,4,5];
+        let allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+        if(period === 'S1') allowedMonths = [0,1,2,3,4,5];
         else if(period === 'S2') allowedMonths = [6,7,8,9,10,11];
         else if(period === 'Q1') allowedMonths = [0,1,2];
         else if(period === 'Q2') allowedMonths = [3,4,5];
@@ -708,13 +717,14 @@ window.updateMacroFilter = function(forceCustom = false) {
         checkedNodes = db.remates.filter(r => {
             let matchSeg = seg === 'Todos' || r.tipo === seg;
             let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-            let matchYr = rYr === yr;
+            let matchYr = (yr === 'ALL') ? true : (rYr === Number(yr));
             let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
             let matchM = allowedMonths.includes(rM);
             return matchSeg && matchYr && matchM;
         }).map(r => r.id);
     } else {
         if(periodElement) periodElement.value = 'CUSTOM';
+        document.getElementById('macro-year').value = 'CUSTOM';
     }
     
     window.updateAdminButtonCount();
@@ -742,58 +752,84 @@ window.seleccionarUltimoRemate = function() {
     window.actualizarVistaActual();
 };
 
+// --- LOGICA MODAL MATRICES MASIVA ---
+window.toggleArbolAll = function(check) {
+    let seg = document.getElementById('macro-segment').value;
+    let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
+    if(check) {
+        let ids = rematesFiltrados.map(r => r.id);
+        ids.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
+    } else {
+        let idsToRemove = rematesFiltrados.map(r => r.id);
+        checkedNodes = checkedNodes.filter(id => !idsToRemove.includes(id));
+    }
+    window.updateMacroFilter(true);
+    window.abrirModalArbol();
+};
+
 window.abrirModalArbol = function() {
     const container = document.getElementById('arbol-container');
     let html = '';
     
     let seg = document.getElementById('macro-segment').value;
-    let yr = Number(document.getElementById('macro-year').value);
-    
-    let rematesFiltrados = db.remates.filter(r => {
-        let matchSeg = seg === 'Todos' || r.tipo === seg;
-        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-        let matchYr = rYr === yr;
-        return matchSeg && matchYr;
+    let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
+
+    let byYear = {};
+    rematesFiltrados.forEach(r => {
+        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        if(!byYear[y]) byYear[y] = {};
+        let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+        if(!byYear[y][m]) byYear[y][m] = [];
+        byYear[y][m].push(r);
     });
 
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    let byMonth = {};
-    
-    rematesFiltrados.forEach(r => {
-        let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-        if(!byMonth[m]) byMonth[m] = [];
-        byMonth[m].push(r);
-    });
 
-    Object.keys(byMonth).sort((a,b)=>a-b).forEach(m => {
-        let rematesMes = byMonth[m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
-        let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
-        let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
+    html += `
+        <div class="flex justify-between items-center mb-5 bg-gray-50 border border-gray-200 p-3 rounded-md shadow-sm sticky top-0 z-10">
+            <span class="text-xs font-bold text-gray-700">Acciones Rápidas:</span>
+            <div class="flex gap-2">
+                <button onclick="window.toggleArbolAll(true)" class="bg-white border border-gray-300 text-gray-800 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-gray-100 transition">✔ Marcar Todas</button>
+                <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition">✖ Desmarcar</button>
+            </div>
+        </div>
+    `;
+
+    Object.keys(byYear).sort((a,b)=>b-a).forEach(y => {
+        html += `<div class="mb-6">
+                    <h4 class="font-black text-gray-900 border-b-2 border-gray-900 pb-1 mb-3 text-sm">Año ${y}</h4>`;
         
-        html += `
-        <div class="mb-3 border border-gray-200 rounded-xl overflow-hidden bg-gray-50/50 transition shadow-sm">
-            <div class="flex justify-between items-center p-3 bg-white border-b border-gray-100">
-                <label class="flex items-center gap-3 cursor-pointer w-full">
-                    <input type="checkbox" onchange="window.toggleArbolMes(${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''} scale-110">
-                    <span class="font-extrabold text-gray-900 text-sm uppercase tracking-wide">${monthNames[m]}</span>
-                    <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded ml-auto">${rematesMes.length} matrices</span>
-                </label>
-            </div>
-            <div class="p-3 flex flex-col gap-3">
-                ${rematesMes.map(r => {
-                    let isChecked = checkedNodes.includes(r.id);
-                    return `
-                    <label class="flex items-center gap-3 cursor-pointer group ml-2">
-                        <input type="checkbox" onchange="window.toggleArbolRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''}>
-                        <span class="text-xs font-semibold text-gray-600 group-hover:text-black transition">${window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)}</span>
+        Object.keys(byYear[y]).sort((a,b)=>a-b).forEach(m => {
+            let rematesMes = byYear[y][m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
+            let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
+            let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
+            
+            html += `
+            <div class="mb-3 border border-gray-200 rounded-md overflow-hidden bg-gray-50/50 transition">
+                <div class="flex justify-between items-center p-3 bg-white border-b border-gray-100">
+                    <label class="flex items-center gap-3 cursor-pointer w-full">
+                        <input type="checkbox" onchange="window.toggleArbolMes(${y}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
+                        <span class="font-bold text-gray-800 text-sm uppercase tracking-wide">${monthNames[m]}</span>
+                        <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded ml-auto">${rematesMes.length} matrices</span>
                     </label>
-                    `;
-                }).join('')}
-            </div>
-        </div>`;
+                </div>
+                <div class="p-3 flex flex-col gap-3">
+                    ${rematesMes.map(r => {
+                        let isChecked = checkedNodes.includes(r.id);
+                        return `
+                        <label class="flex items-center gap-3 cursor-pointer group ml-2">
+                            <input type="checkbox" onchange="window.toggleArbolRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''}>
+                            <span class="text-xs font-medium text-gray-600 group-hover:text-black transition">${window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)}</span>
+                        </label>
+                        `;
+                    }).join('')}
+                </div>
+            </div>`;
+        });
+        html += `</div>`;
     });
     
-    if(rematesFiltrados.length === 0) html = '<p class="text-center text-xs font-bold text-gray-400 p-6">No hay matrices en este año y segmento.</p>';
+    if(rematesFiltrados.length === 0) html = '<p class="text-center text-xs font-bold text-gray-400 p-6">No hay matrices en la base de datos.</p>';
 
     container.innerHTML = html;
     document.getElementById('modal-arbol').classList.remove('hidden');
@@ -802,15 +838,14 @@ window.abrirModalArbol = function() {
 
 window.cerrarModalArbol = function() { document.getElementById('modal-arbol').classList.add('hidden'); document.getElementById('modal-arbol').classList.remove('flex'); };
 
-window.toggleArbolMes = function(mesIndex, isChecked) {
+window.toggleArbolMes = function(year, mesIndex, isChecked) {
     let seg = document.getElementById('macro-segment').value;
-    let yr = Number(document.getElementById('macro-year').value);
     
     let idsInMonth = db.remates.filter(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
         let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-        return matchSeg && rYr === yr && rM === mesIndex;
+        return matchSeg && rYr === year && rM === mesIndex;
     }).map(r => r.id);
     
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
@@ -974,14 +1009,10 @@ window.iniciarProcesamiento = async function(files){
             if (error) throw error;
             await new Promise(r => setTimeout(r, 50)); 
         }
-        document.getElementById('db-status').classList.replace('text-premium-highlight', 'text-premium-success'); 
-        document.getElementById('db-status').innerText = `En Línea (${db.remates.length})`;
+        document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> En Línea (${db.remates.length})`;
     } catch (e) { 
-        document.getElementById('db-status').classList.replace('text-premium-success', 'text-premium-danger'); 
-        let errorMsg = e.message || "Desconocido";
-        if (errorMsg.includes("row-level security")) errorMsg = "Bloqueado (Revisar Correo)";
-        if (errorMsg.includes("Failed to fetch")) errorMsg = "Conexión interrumpida";
-        document.getElementById('db-status').innerText = `Error: ${errorMsg.substring(0, 22)}`; 
+        document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
+        alert("Error de guardado en la nube: " + e.message);
     }
     
     document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
@@ -1148,16 +1179,16 @@ window.renderDashboard = function(){
                     let dSignL = deltaLote >= 0 ? '+' : ''; 
                     let dColorL = deltaLote >= 0 ? 'text-premium-success' : 'text-premium-danger';
                     let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData?.timestamp) === l.origen)?.id || checkedNodes[0];
-                    return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
-                        <td class="font-bold text-premium-muted w-32 pl-6 truncate text-[10px] md:text-xs uppercase" title="${l.origen}">${l.origen}</td>
-                        <td class="font-extrabold text-premium-text w-16 whitespace-nowrap text-xs">Lote ${l.numeroLote||'-'}</td>
+                    return `<tr class="cursor-pointer hover:bg-gray-50 transition" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
+                        <td class="font-bold text-gray-500 w-32 pl-6 truncate text-[10px] md:text-xs uppercase" title="${l.origen}">${l.origen}</td>
+                        <td class="font-black text-gray-900 w-16 whitespace-nowrap text-xs">Lote ${l.numeroLote||'-'}</td>
                         <td class="max-w-[300px]">
-                            <div class="font-bold text-premium-text truncate text-xs" title="${l.loteStr}">${l.loteStr}</div>
-                            <div class="text-[10px] text-premium-muted uppercase tracking-widest font-semibold truncate mt-1" title="${l.clienteReal}">👤 ${l.clienteReal}</div>
+                            <div class="font-bold text-gray-900 truncate text-xs" title="${l.loteStr}">${l.loteStr}</div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest font-bold truncate mt-1" title="${l.clienteReal}">👤 ${l.clienteReal}</div>
                         </td>
-                        <td class="text-center"><span class="bg-slate-100 border border-slate-200 text-premium-text px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
-                        <td class="text-right text-premium-muted font-medium">${formatMoney(l.minimo)}</td>
-                        <td class="text-right font-extrabold text-premium-success">${formatMoney(l.monto)}</td>
+                        <td class="text-center"><span class="bg-gray-100 border border-gray-200 text-gray-800 px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
+                        <td class="text-right text-gray-500 font-medium">${formatMoney(l.minimo)}</td>
+                        <td class="text-right font-black text-green-700">${formatMoney(l.monto)}</td>
                         <td class="text-right pr-6 font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td>
                     </tr>`;
                 }).join('');
@@ -1194,8 +1225,8 @@ window.renderDashboard = function(){
             }
 
             const showRetail = cRetail.some(val => val > 0);
-            let datasetsVentas = [{label:'Venta Siniestrados', data: cSiniestros, backgroundColor: '#0066CC', borderRadius:4}];
-            if(showRetail) datasetsVentas.push({label:'Venta Retail', data: cRetail, backgroundColor: '#1D1D1F', borderRadius:4});
+            let datasetsVentas = [{label:'Venta Siniestrados', data: cSiniestros, backgroundColor: '#2563EB', borderRadius:4}];
+            if(showRetail) datasetsVentas.push({label:'Venta Retail', data: cRetail, backgroundColor: '#111827', borderRadius:4});
 
             const canvasVentas = document.getElementById('dash-chartVentas');
             if(canvasVentas) {
@@ -1206,7 +1237,7 @@ window.renderDashboard = function(){
             const canvasClientes = document.getElementById('dash-chartClientes');
             if (canvasClientes) {
                 if(dashChartClientesInst) dashChartClientesInst.destroy();
-                dashChartClientesInst = new Chart(canvasClientes.getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: [{label:'Nuevos', data: cNuevos, backgroundColor: '#1D1D1F', borderRadius:4}, {label:'Recurrentes', data: cRecurrentes, backgroundColor: '#D1D1D6', borderRadius:4}] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
+                dashChartClientesInst = new Chart(canvasClientes.getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: [{label:'Nuevos', data: cNuevos, backgroundColor: '#111827', borderRadius:4}, {label:'Recurrentes', data: cRecurrentes, backgroundColor: '#D1D5DB', borderRadius:4}] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
             }
         } catch(e) { console.error("Error graficos", e); }
 
@@ -1224,9 +1255,10 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-premium-text">${nombre}</td><td class="text-center font-extrabold text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-extrabold text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
+// === NUEVO DISEÑO ESTRUCTURADO DE DATOS DIRECTIVOS ===
 window.renderConclusiones = function() {
     try {
         if(currentModule !== 'conclusiones') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
@@ -1235,106 +1267,105 @@ window.renderConclusiones = function() {
 
         let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates); let html = ''; globalAgg = agg; if(!clientDB.length) procesarDatosClientes(); 
 
-        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-premium-success' : 'text-premium-danger';
-
-        // --- INICIO: NUEVO REPORTE EJECUTIVO ESTRUCTURADO ---
-        html += `<div class="space-y-8 text-premium-text">`;
+        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-green-700' : 'text-red-600';
+        let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
+        let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
+        let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
+        let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
 
         // SECCIÓN 1: Resultados Financieros
         html += `
-        <div>
-            <h3 class="text-lg font-black text-gray-900 mb-4 border-b border-gray-200 pb-2">1. Resultados Financieros</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-premium-success">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Venta Total Adjudicada</p>
-                    <p class="text-2xl font-black text-gray-900">${formatMoney(agg.venta)}</p>
-                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Suma de operaciones válidas.</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-premium-highlight">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Comisiones (12% + IVA)</p>
-                    <p class="text-2xl font-black text-gray-900">${formatMoney(agg.comisionTotal)}</p>
-                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Ingresos estimados para la firma.</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-gray-800">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Ticket Promedio</p>
-                    <p class="text-2xl font-black text-gray-900">${formatMoney(agg.ticketPromedio)}</p>
-                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Valor promedio por lote vendido.</p>
-                </div>
+        <div class="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <div class="px-5 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
+                <span class="bg-gray-200 text-gray-700 px-2 rounded font-black text-xs">1</span>
+                <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Resultados Financieros</h3>
             </div>
+            <table class="w-full text-left">
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Venta Total Adjudicada</td>
+                    <td class="py-3 px-5 font-black text-gray-900 text-lg">${formatMoney(agg.venta)}</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Suma de operaciones válidas (sin Iva).</td>
+                </tr>
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Comisiones Estimadas</td>
+                    <td class="py-3 px-5 font-black text-blue-700 text-lg">${formatMoney(agg.comisionTotal)}</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Ingresos calculados al 12% + IVA.</td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Ticket Promedio</td>
+                    <td class="py-3 px-5 font-black text-gray-900 text-lg">${formatMoney(agg.ticketPromedio)}</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Valor promedio por lote vendido.</td>
+                </tr>
+            </table>
         </div>
         `;
 
         // SECCIÓN 2: Rendimiento de Catálogo
         html += `
-        <div>
-            <h3 class="text-lg font-black text-gray-900 mb-4 border-b border-gray-200 pb-2">2. Rendimiento de Catálogo</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-gray-400">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Colocación Base</p>
-                    <p class="text-2xl font-black text-gray-900">${agg.lotes.toLocaleString('es-CL')} <span class="text-sm font-semibold text-gray-400">/ ${agg.lotesDisponibles.toLocaleString('es-CL')} lotes</span></p>
-                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Volumen físico subastado.</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-premium-success">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Efectividad Total</p>
-                    <p class="text-2xl font-black text-gray-900">${agg.eficaciaLotes.toFixed(1)}%</p>
-                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Porcentaje de catálogo vendido.</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-premium-highlight">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Incremento sobre Mínimo</p>
-                    <p class="text-2xl font-black text-gray-900">${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</p>
-                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Margen final: <span class="${sobreColor} font-bold">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</span></p>
-                </div>
+        <div class="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <div class="px-5 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
+                <span class="bg-gray-200 text-gray-700 px-2 rounded font-black text-xs">2</span>
+                <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Rendimiento de Catálogo</h3>
             </div>
+            <table class="w-full text-left">
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Efectividad Total</td>
+                    <td class="py-3 px-5 font-black text-green-600 text-lg">${agg.eficaciaLotes.toFixed(1)}%</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Porcentaje del catálogo subastado exitosamente.</td>
+                </tr>
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Volumen Físico</td>
+                    <td class="py-3 px-5 font-bold text-gray-900 text-sm"><span class="font-black text-lg">${agg.lotes.toLocaleString('es-CL')}</span> vendidos de ${agg.lotesDisponibles.toLocaleString('es-CL')} disp.</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Unidades de vehículos procesadas.</td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Incremento sobre Mínimo</td>
+                    <td class="py-3 px-5 font-black text-gray-900 text-lg">${sobreSigno}${formatMoney(agg.deltaPujaTotal)} <span class="${sobreColor} text-sm ml-2 font-bold">(${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%)</span></td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Margen generado gracias a las pujas.</td>
+                </tr>
+            </table>
         </div>
         `;
 
-        // SECCIÓN 3: Tracción de Clientes
-        let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
-        let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
-        
+        // SECCIÓN 3: Tracción de Clientes y Auditoría
         html += `
-        <div>
-            <h3 class="text-lg font-black text-gray-900 mb-4 border-b border-gray-200 pb-2">3. Tracción de Clientes y Audiencia</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-center">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Participación</p>
-                    <p class="text-xl font-black text-gray-900">${agg.garantias.toLocaleString('es-CL')} <span class="text-xs text-gray-400 font-medium">garantías pagadas</span></p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-center">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Tasa de Cierre</p>
-                    <p class="text-xl font-black text-premium-success">${tasaExito.toFixed(1)}% <span class="text-xs text-gray-400 font-medium">adjudicó un lote</span></p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Fuga</p>
-                        <p class="text-xl font-black text-premium-danger">${agg.perdedoresCount.toLocaleString('es-CL')} <span class="text-xs text-gray-400 font-medium">sin compra</span></p>
-                    </div>
-                    <button onclick="window.abrirModalFuga()" class="mt-3 text-[9px] w-full bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-700 py-1.5 rounded font-bold uppercase tracking-wider transition">Ver Listado</button>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-center">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Nuevos</p>
-                    <p class="text-xl font-black text-premium-highlight">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="text-xs text-gray-400 font-medium">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></p>
-                </div>
+        <div class="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <div class="px-5 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
+                <span class="bg-gray-200 text-gray-700 px-2 rounded font-black text-xs">3</span>
+                <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Tracción y Audiencia</h3>
             </div>
-            
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 text-sm font-medium text-gray-700 flex items-center justify-between shadow-sm">
-                    <span>⚡ <strong class="text-gray-900">Compradores Volumen:</strong> Hubo <strong class="text-premium-highlight">${multi} clientes</strong> que se adjudicaron más de un lote en la muestra.</span>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm font-medium text-gray-500 flex items-center justify-between shadow-sm">
-                    <span>🛡️ <strong class="text-gray-700">Auditoría:</strong> Se aislaron automáticamente <strong class="text-gray-700">${falsos} pujas internas</strong> o pruebas de sistema.</span>
-                </div>
-            </div>
+            <table class="w-full text-left">
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Tasa de Cierre</td>
+                    <td class="py-3 px-5 font-black text-green-600 text-lg">${tasaExito.toFixed(1)}%</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Del total de garantías, este porcentaje se adjudicó un lote.</td>
+                </tr>
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Fuga de Clientes</td>
+                    <td class="py-3 px-5 font-black text-red-600 text-lg">${agg.perdedoresCount.toLocaleString('es-CL')} <button onclick="window.abrirModalFuga()" class="ml-3 text-[9px] bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 py-1 px-2 rounded font-bold uppercase tracking-wider transition">Ver Lista</button></td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Clientes que pagaron garantía y no lograron comprar.</td>
+                </tr>
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Clientes Nuevos</td>
+                    <td class="py-3 px-5 font-black text-blue-700 text-lg">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="text-sm font-bold text-gray-400 ml-2">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Adjudicatarios que no figuraban en el historial.</td>
+                </tr>
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Compradores Volumen</td>
+                    <td class="py-3 px-5 font-black text-gray-900 text-lg">${multi}</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Clientes que se adjudicaron más de un lote.</td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Limpieza de Datos (Falsos)</td>
+                    <td class="py-3 px-5 font-black text-gray-900 text-lg">${falsos}</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Pujas internas de Zarate aisladas de la métrica real.</td>
+                </tr>
+            </table>
         </div>
         `;
-
-        html += `</div>`;
-        // --- FIN NUEVO REPORTE ---
 
         document.getElementById('conclusiones-content').innerHTML = html;
-        document.getElementById('conclusiones-content').className = "text-premium-text";
+        document.getElementById('conclusiones-content').className = "text-gray-900";
     } catch (e) { console.error(e); }
 };
 
@@ -1347,14 +1378,14 @@ window.renderPanelAutos = function(){
         let marcasMap = {}; let modelosMap = {}; autos.forEach(a => { if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') marcasMap[a.categoria] = (marcasMap[a.categoria]||0) + 1; if(a.modeloStr && a.modeloStr.trim() !== '') modelosMap[a.modeloStr] = (modelosMap[a.modeloStr]||0) + 1; });
         const marcasSorted = Object.entries(marcasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
         try {
-            if(flotaMarcasInst) flotaMarcasInst.destroy(); if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { flotaMarcasInst=new Chart(document.getElementById('flota-marcas-chart').getContext('2d'),{type:'doughnut',data:{labels:marcasSorted.map(m=>m[0]),datasets:[{data:marcasSorted.map(m=>m[1]),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#86868B','#E5E5EA'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); }
+            if(flotaMarcasInst) flotaMarcasInst.destroy(); if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { flotaMarcasInst=new Chart(document.getElementById('flota-marcas-chart').getContext('2d'),{type:'doughnut',data:{labels:marcasSorted.map(m=>m[0]),datasets:[{data:marcasSorted.map(m=>m[1]),backgroundColor:['#111827','#2563EB','#16A34A','#6B7280','#E5E7EB'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); }
             const modelosSorted = Object.entries(modelosMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
-            if(flotaAniosInst) flotaAniosInst.destroy(); if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades Adjudicadas',data:modelosSorted.map(a=>a[1]),backgroundColor:'#0066CC',borderRadius:4}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#F5F5F7'}},y:{grid:{display:false}}}}}); }
+            if(flotaAniosInst) flotaAniosInst.destroy(); if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades Adjudicadas',data:modelosSorted.map(a=>a[1]),backgroundColor:'#2563EB',borderRadius:4}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#F3F4F6'}},y:{grid:{display:false}}}}}); }
         } catch(ec) {}
         const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term));
         if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
-            return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-black text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(a.monto)}</td></tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin vehículos en la selección actual.</td></tr>';
+            return `<tr><td class="pl-4 font-bold text-gray-500 max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="text-center font-bold text-gray-900">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-black text-gray-900">${a.categoria}</span> <span class="text-gray-500 font-medium">${a.modeloStr}</span></td><td class="text-right text-gray-500 font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(a.monto)}</td></tr>`;
+        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-500 font-medium">Sin vehículos en la selección actual.</td></tr>';
     } catch (e) {}
 };
 
@@ -1367,9 +1398,9 @@ window.abrirModalFuga = function() {
                 let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
                 let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
                 let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
-                html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
+                html += `<tr><td class="pl-5 font-bold text-xs text-gray-900">${nombreRemate}</td><td class="text-red-600 text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-gray-900 truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-gray-500 font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
             });
-        } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted font-medium">No hay registros.</td></tr>'; }
+        } else { html = '<tr><td colspan="4" class="p-8 text-center text-gray-500 font-medium">No hay registros.</td></tr>'; }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; document.getElementById('modal-fuga').classList.remove('hidden'); document.getElementById('modal-fuga').classList.add('flex');
     } catch (e) {}
 };
@@ -1406,9 +1437,8 @@ window.abrirModalPujadores = function(loteEncoded, nodeId){
         if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
         
         currentFiltroModal='todos'; 
-        if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold'; 
-        if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; 
-        if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold';
+        if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded bg-black text-white shadow-sm transition font-bold'; 
+        if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition font-bold'; 
         
         renderModalTabla(); 
         document.getElementById('modal-pujadores').classList.remove('hidden'); document.getElementById('modal-pujadores').classList.add('flex');
@@ -1421,13 +1451,13 @@ function renderModalTabla(){
         if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso); if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
-            let badge = p.esFalso ? '<span class="text-[9px] font-black text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
-            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${window.formatExcelDate(p.fecha)}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-black ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin pujas registradas</td></tr>';
+            let badge = p.esFalso ? '<span class="text-[9px] font-black text-red-600 border border-red-200 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-green-700 border border-green-200 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-green-600 px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
+            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-5 text-[10px] md:text-xs font-bold text-gray-500">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-gray-500 hidden sm:table-cell">${window.formatExcelDate(p.fecha)}</td><td class="font-bold text-[10px] md:text-xs text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-black ${esAdj?'text-green-700':'text-gray-900'}">${formatMoney(p.monto)}</td><td class="text-center pr-5">${badge}</td></tr>`;
+        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-500 font-medium">Sin pujas registradas</td></tr>';
     } catch(e) {}
 }
 
-window.filtrarModal = function(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-bold':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold'; renderModalTabla(); };
+window.filtrarModal = function(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded bg-black text-white shadow-sm transition font-bold':'px-3 py-1 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded bg-black text-white shadow-sm transition font-bold':'px-3 py-1 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition font-bold'; renderModalTabla(); };
 window.cerrarModal = function(){ document.getElementById('modal-pujadores').classList.add('hidden'); document.getElementById('modal-pujadores').classList.remove('flex'); };
 
 function procesarDatosClientes(){ 
@@ -1445,7 +1475,7 @@ function procesarDatosClientes(){
         }); 
         clientDB=Object.values(mapBI).map(c=>{ 
             c.compras.sort((a,b)=>b.fecha-a.fecha); c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null; c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null; c.frecuencia=c.compras.length; c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP-c.ultimaCompra)/(1000*60*60*24)) : 0; c.isHibrido=c.tipos.size>1; 
-            if(c.frecuencia>3 && c.recencyDias<=60){ c.segmento="Excelente"; c.color="text-premium-text"; } else if(c.frecuencia>1 && c.recencyDias<=60){ c.segmento="Recurrente"; c.color="text-premium-highlight"; } else if(c.frecuencia===1 && c.recencyDias<=60){ c.segmento="Nuevo"; c.color="text-premium-success"; } else { c.segmento="En Riesgo"; c.color="text-premium-danger"; } return c; 
+            if(c.frecuencia>3 && c.recencyDias<=60){ c.segmento="Excelente"; c.color="text-gray-900"; } else if(c.frecuencia>1 && c.recencyDias<=60){ c.segmento="Recurrente"; c.color="text-blue-700"; } else if(c.frecuencia===1 && c.recencyDias<=60){ c.segmento="Nuevo"; c.color="text-green-700"; } else { c.segmento="En Riesgo"; c.color="text-red-600"; } return c; 
         }).sort((a,b)=>b.totalGastado-a.totalGastado); 
     } catch(e) {}
 }
@@ -1453,8 +1483,8 @@ function procesarDatosClientes(){
 window.renderPanelClientesData = function(filtered,isFiltered=false){ 
     try {
         if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="pl-4 font-bold text-xs md:text-sm text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-premium-muted font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-black text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-black ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
-        if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#E30000'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
+        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-gray-50 border-b border-gray-100"><td class="pl-4 font-bold text-xs md:text-sm text-gray-900 max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-gray-500 font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-black text-green-700">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-black ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
+        if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#111827','#2563EB','#16A34A','#DC2626'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
     } catch(e) {}
 };
 
@@ -1465,7 +1495,7 @@ window.abrirFichaCliente = function(nombreStr){
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
         if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?window.formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+(Number(b.monto)||0),0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+(Number(b.monto)||0),0)); 
-        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?window.formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
+        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-gray-500">${h.fecha?window.formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-gray-900">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-gray-500 font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-blue-700">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-green-700">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
 };
@@ -1475,10 +1505,10 @@ window.cerrarFicha = function(){ if(document.getElementById('bi-ficha-cliente'))
 window.buscarPatente = function(){ 
     try {
         const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); const tbody=document.getElementById('buscador-tabla-resultados'); 
-        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-10 text-center text-premium-muted text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr>'; return; } 
+        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-10 text-center text-gray-500 text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr>'; return; } 
         let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData?.timestamp,remate:window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
-        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-10 text-center font-bold text-sm text-premium-danger">Sin resultados</td></tr>`; return; } 
-        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?window.formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.remate ? res.remate : '-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
+        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-10 text-center font-bold text-sm text-red-600">Sin resultados</td></tr>`; return; } 
+        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-gray-500">${res.fecha?window.formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-gray-900">${res.remate ? res.remate : '-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-gray-900">Lote ${res.numeroLote||'-'}</td><td class="text-gray-500 text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-gray-900">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-green-700">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) {}
 };
 </script>
