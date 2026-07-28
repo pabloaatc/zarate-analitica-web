@@ -8,7 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <!-- TIPOGRAFÍA ROBOTO (Más cuadrada, técnica y corporativa) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -24,7 +23,7 @@
                             danger: '#DC2626', accent: '#000000'
                         } 
                     },
-                    borderRadius: { 'xl': '0.5rem', '2xl': '0.75rem', '3xl': '1rem' } /* Bordes más cuadrados */
+                    borderRadius: { 'xl': '0.5rem', '2xl': '0.75rem', '3xl': '1rem' }
                 } 
             } 
         }
@@ -32,18 +31,13 @@
     <style>
         body { background-color: #F3F4F6; color: #111827; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         
-        /* Paneles con bordes rectos y sombras nítidas */
-        .glass-panel { 
-            background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 0.5rem; 
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); transition: all 0.2s ease-in-out; 
-        }
+        .glass-panel { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); transition: all 0.2s ease-in-out; }
         .glass-panel:hover { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); }
 
         .nav-item { padding: 0.65rem 1rem; border-radius: 0.375rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #4B5563;}
         .nav-item:hover { background-color: #F3F4F6; color: #111827; }
         .nav-active { background-color: #111827 !important; color: #FFFFFF !important; font-weight: 700; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
         
-        /* Checkboxes cuadrados perfectos */
         input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1rem; height: 1.1rem; border: 1.5px solid #D1D5DB; border-radius: 0.2rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
         input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
         input[type="checkbox"]:checked { background-color: #111827; border-color: #111827; }
@@ -70,9 +64,9 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v5.0 (Enterprise)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v6.0 (Time-Travel)</div>
 
-    <!-- OVERLAY DE CARGA EN VIVO -->
+    <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[200] hidden flex-col items-center justify-center transition-all">
         <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin shadow-sm"></div>
         <p id="loading-text" class="mt-6 font-bold text-gray-900 text-lg tracking-tight text-center max-w-xs">Procesando...</p>
@@ -82,6 +76,7 @@
     <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gray-100 z-[100] flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-lg shadow-xl border border-gray-200 w-full max-w-[360px] text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 to-green-500"></div>
             <div class="w-12 h-12 rounded-md bg-black flex items-center justify-center font-bold text-white text-xl mx-auto mb-4 shadow-sm">Z</div>
             <h2 class="text-xl font-bold text-gray-900 mb-1 tracking-tight">Zárate Analítica</h2>
             <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-6 font-bold">Control Directivo</p>
@@ -187,10 +182,14 @@
                         <button onclick="window.toggleSidebar()" class="md:hidden text-gray-400 hover:text-gray-800 p-1 bg-gray-100 rounded">✕</button>
                     </div>
                     <div id="nav-mod-remates" class="nav-item nav-active" onclick="window.cambiarSeccion('remates')">Resumen General</div>
+                    
+                    <!-- NUEVO MODULO DE COMPARATIVA HISTORICA -->
+                    <div id="nav-mod-comparativa" class="nav-item nav-inactive" onclick="window.cambiarSeccion('comparativa')">Comparativa Histórica</div>
+                    
                     <div id="nav-mod-autos" class="nav-item nav-inactive" onclick="window.cambiarSeccion('autos')">Análisis Vehicular</div>
                     <div id="nav-mod-clientes" class="nav-item nav-inactive" onclick="window.cambiarSeccion('clientes')">Gestión de Clientes</div>
-                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
-                    <div id="nav-mod-buscador" class="nav-item nav-inactive" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
+                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive" onclick="window.cambiarSeccion('conclusiones')">Datos Ejecutivos</div>
+                    <div id="nav-mod-buscador" class="nav-item nav-inactive mt-6" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
                 </div>
 
                 <div id="admin-controls" class="hidden flex-col gap-2 p-4 border-t border-gray-200 bg-gray-50">
@@ -214,7 +213,7 @@
                     <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o cambia el filtro en la barra superior para comenzar a analizar.</p>
                 </div>
 
-                <!-- MODULE: REMATES -->
+                <!-- MODULE: REMATES (RESUMEN GENERAL) -->
                 <div id="module-remates" class="hidden space-y-5 md:space-y-6 max-w-[1400px] mx-auto pb-10">
                     <div id="dashboard-view" class="space-y-5 md:space-y-6">
                         <!-- HEADER DINÁMICO -->
@@ -283,18 +282,6 @@
                             </div>
                         </div>
 
-                        <!-- GRÁFICOS DINÁMICOS -->
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2 no-print">
-                            <div class="glass-panel p-5">
-                                <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Composición de Ventas</h4>
-                                <div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartVentas"></canvas></div>
-                            </div>
-                            <div class="glass-panel p-5">
-                                <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4>
-                                <div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartClientes"></canvas></div>
-                            </div>
-                        </div>
-
                         <!-- TABLA COMPLETA CON BUSCADOR -->
                         <div class="glass-panel p-5 overflow-hidden w-full bg-white">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-gray-200 pb-3">
@@ -324,11 +311,54 @@
                     </div>
                 </div>
 
+                <!-- NUEVO MODULE: COMPARATIVA HISTÓRICA -->
+                <div id="module-comparativa" class="hidden space-y-5 md:space-y-6 max-w-[1400px] mx-auto pb-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4">
+                        <div>
+                            <h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Comparativa Histórica</h2>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Análisis de evolución temporal de los datos filtrados</p>
+                        </div>
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <span class="text-xs font-bold text-gray-500 hidden sm:inline">Agrupar por:</span>
+                            <select id="comp-groupby" onchange="window.renderComparativa()" class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-bold text-gray-900 focus:border-blue-600 transition w-full sm:w-auto shadow-sm">
+                                <option value="year">Años Completos</option>
+                                <option value="semester">Semestres</option>
+                                <option value="quarter">Trimestres (Q1-Q4)</option>
+                                <option value="month" selected>Mes a Mes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5">
+                        <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Evolución de Venta Adjudicada</h4>
+                        <div class="relative h-64 md:h-80 w-full"><canvas id="comp-chart"></canvas></div>
+                    </div>
+
+                    <div class="glass-panel p-5 overflow-hidden">
+                        <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tabla de Consolidación Histórica</h4>
+                        <div class="overflow-x-auto max-h-[600px] rounded-md border border-gray-200">
+                            <table class="w-full text-left whitespace-nowrap bg-white">
+                                <thead class="sticky top-0 bg-gray-50 shadow-sm border-b border-gray-200 z-10">
+                                    <tr>
+                                        <th class="pl-4 py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Periodo ↕️</th>
+                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Matrices ↕️</th>
+                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Lotes Vendidos ↕️</th>
+                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'percent')">Efectividad ↕️</th>
+                                        <th class="py-3 text-right cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Venta Total ↕️</th>
+                                        <th class="py-3 text-right pr-4 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Comisiones Est. ↕️</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comp-table-body" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- MODULE: MODELOS Y VEHICULOS -->
                 <div id="module-autos" class="hidden space-y-5 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
                         <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Análisis de Vehículos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Estructura del catálogo adjudicado</p></div>
-                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 w-full md:w-64 focus:outline-none focus:border-blue-600 transition-all" onkeyup="window.renderPanelAutos()">
+                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 w-full md:w-64 focus:outline-none focus:border-blue-600 transition-all shadow-sm" onkeyup="window.renderPanelAutos()">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-56 md:h-64 w-full"><canvas id="flota-marcas-chart"></canvas></div></div>
@@ -358,7 +388,7 @@
                         <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Gestión de Clientes</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Directorio y comportamiento de cartera</p></div>
                         <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                             <select id="filter-client-type" class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 outline-none w-full sm:w-auto focus:border-blue-600 transition" onchange="window.filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
-                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 outline-none w-full sm:w-64 focus:border-blue-600 transition-all" onkeyup="window.filtrarClientes()">
+                            <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 outline-none w-full sm:w-64 focus:border-blue-600 transition-all shadow-sm" onkeyup="window.filtrarClientes()">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -414,10 +444,10 @@
                     </div>
                 </div>
 
-                <!-- MODULE: DATOS (REDISEÑO TOTAL) -->
+                <!-- MODULE: DATOS EJECUTIVOS -->
                 <div id="module-conclusiones" class="hidden space-y-5 md:space-y-6 max-w-[1000px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
-                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Datos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Reporte Ejecutivo Estructurado</p></div>
+                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Datos Ejecutivos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Reporte Financiero Estructurado</p></div>
                         <button onclick="window.print()" class="px-4 py-2 bg-white border border-gray-300 shadow-sm rounded-md text-xs font-bold hover:bg-gray-50 transition w-full md:w-auto uppercase tracking-wider text-gray-800">🖨️ Imprimir Reporte</button>
                     </div>
                     <div id="conclusiones-content"></div>
@@ -443,18 +473,29 @@
         </div>
     </div> <!-- FIN APP CONTENT -->
 
-    <!-- MODAL ARBOL DE SELECCION (ADMIN MATRICES) -->
+    <!-- MODAL ARBOL DE SELECCION (ADMIN MATRICES) - CON TABS -->
     <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200">
             <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-50">
-                <div><h3 class="text-lg font-black tracking-tight text-gray-900">Administrar Matrices</h3><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Activa o desactiva para ajustar la muestra</p></div>
+                <div><h3 class="text-lg font-black tracking-tight text-gray-900">Administrar Matrices</h3><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Selección específica de datos</p></div>
                 <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-gray-800 bg-white border border-gray-300 rounded p-1 shadow-sm transition">✕</button>
             </div>
-            <div class="flex-1 overflow-y-auto p-0 bg-white" id="arbol-container">
+            
+            <div id="arbol-tabs-container"></div>
+            
+            <div class="flex justify-between items-center bg-gray-100 border-b border-gray-200 p-3 z-10 shadow-inner">
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Acciones Masivas:</span>
+                <div class="flex gap-2">
+                    <button onclick="window.toggleArbolAll(true)" class="bg-white border border-gray-300 text-gray-800 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-gray-50 transition shadow-sm">✔ Marcar Todas</button>
+                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar Todo</button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 bg-white" id="arbol-content-container">
                 <!-- Se llena con JS -->
             </div>
             <div class="p-4 border-t border-gray-200 bg-gray-50">
-                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar y Ver Resumen</button>
+                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar Cambios</button>
             </div>
         </div>
     </div>
@@ -511,8 +552,9 @@ const supabaseClient = createClient(supabaseUrl, supabaseKey);
 let sessionUser = null;
 let db = { remates: [] };
 let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
-let dashChartVentasInst=null, dashChartClientesInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
+let dashChartVentasInst=null, dashChartClientesInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null, compChartInst=null;
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
+let currentModalYearTab = null;
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#6B7280'; 
@@ -685,11 +727,10 @@ window.actualizarFiltrosGlobales = function() {
     let yearSelect = document.getElementById('macro-year');
     
     let currentSeg = segSelect.value || Array.from(segments)[0];
-    let currentYr = yearSelect.value || Math.max(...Array.from(years));
+    let currentYr = yearSelect.value || Math.max(...Array.from(years)).toString();
     
     segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
     
-    // Mantenemos "Todos los años" y "Custom" y agregamos los años dinámicos
     let yrOptions = `<option value="ALL" ${currentYr === 'ALL' ? 'selected' : ''}>🌐 Todos los Años</option>`;
     yrOptions += `<option value="CUSTOM" hidden ${currentYr === 'CUSTOM' ? 'selected' : ''}>⚙️ Año Mix</option>`;
     yrOptions += Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==currentYr?'selected':''}>Año ${y}</option>`).join('');
@@ -700,7 +741,7 @@ window.actualizarFiltrosGlobales = function() {
 
 window.updateMacroFilter = function(forceCustom = false) {
     let seg = document.getElementById('macro-segment').value;
-    let yr = document.getElementById('macro-year').value; // Puede ser 'ALL', 'CUSTOM' o un número
+    let yr = document.getElementById('macro-year').value;
     let periodElement = document.getElementById('macro-period');
     let period = periodElement ? periodElement.value : 'ALL';
     
@@ -742,7 +783,7 @@ window.seleccionarUltimoRemate = function() {
     let periodSelect = document.getElementById('macro-period');
     
     if (segSelect) segSelect.value = ultimo.tipo || 'Siniestrados';
-    if (yearSelect) yearSelect.value = ultimo.fechaData?.year ? Number(ultimo.fechaData.year) : new Date().getFullYear();
+    if (yearSelect) yearSelect.value = ultimo.fechaData?.year ? Number(ultimo.fechaData.year).toString() : new Date().getFullYear().toString();
     if (periodSelect) periodSelect.value = 'CUSTOM';
     
     checkedNodes = [ultimo.id];
@@ -752,24 +793,36 @@ window.seleccionarUltimoRemate = function() {
     window.actualizarVistaActual();
 };
 
-// --- LOGICA MODAL MATRICES MASIVA ---
+// --- LOGICA MODAL MATRICES CON TABS (EVITA SCROLL INFINITO) ---
+window.switchModalYear = function(y) {
+    currentModalYearTab = y;
+    window.abrirModalArbol();
+};
+
 window.toggleArbolAll = function(check) {
     let seg = document.getElementById('macro-segment').value;
-    let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
+    // Apply only to the currently visible year tab, or to ALL?
+    // Let's apply to the currently visible year tab for better UX control
+    let rematesEnPantalla = db.remates.filter(r => {
+        let matchSeg = seg === 'Todos' || r.tipo === seg;
+        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        return matchSeg && rYr === Number(currentModalYearTab);
+    });
+
     if(check) {
-        let ids = rematesFiltrados.map(r => r.id);
+        let ids = rematesEnPantalla.map(r => r.id);
         ids.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
     } else {
-        let idsToRemove = rematesFiltrados.map(r => r.id);
-        checkedNodes = checkedNodes.filter(id => !idsToRemove.includes(id));
+        // Desmarcar ABSOLUTAMENTE TODO (Es más útil como "Limpiar Todo" global)
+        checkedNodes = [];
     }
     window.updateMacroFilter(true);
     window.abrirModalArbol();
 };
 
 window.abrirModalArbol = function() {
-    const container = document.getElementById('arbol-container');
-    let html = '';
+    const tabsContainer = document.getElementById('arbol-tabs-container');
+    const contentContainer = document.getElementById('arbol-content-container');
     
     let seg = document.getElementById('macro-segment').value;
     let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
@@ -783,32 +836,42 @@ window.abrirModalArbol = function() {
         byYear[y][m].push(r);
     });
 
+    let years = Object.keys(byYear).sort((a,b)=>b-a);
+    if(years.length > 0 && !years.includes(String(currentModalYearTab))) {
+        currentModalYearTab = years[0];
+    }
+
+    // TABS HTML
+    let tabsHtml = '';
+    if(years.length > 1) {
+        tabsHtml = `<div class="flex gap-2 p-3 bg-white border-b border-gray-200 overflow-x-auto shadow-sm z-20">`;
+        years.forEach(y => {
+            let active = String(y) === String(currentModalYearTab) ? 'bg-black text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200';
+            tabsHtml += `<button onclick="window.switchModalYear('${y}')" class="px-4 py-1.5 rounded text-xs font-bold transition whitespace-nowrap ${active}">Año ${y}</button>`;
+        });
+        tabsHtml += `</div>`;
+    }
+    tabsContainer.innerHTML = tabsHtml;
+
+    // CONTENT HTML
+    let contentHtml = '';
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-    html += `
-        <div class="flex justify-between items-center mb-5 bg-gray-50 border border-gray-200 p-3 rounded-md shadow-sm sticky top-0 z-10">
-            <span class="text-xs font-bold text-gray-700">Acciones Rápidas:</span>
-            <div class="flex gap-2">
-                <button onclick="window.toggleArbolAll(true)" class="bg-white border border-gray-300 text-gray-800 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-gray-100 transition">✔ Marcar Todas</button>
-                <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition">✖ Desmarcar</button>
-            </div>
-        </div>
-    `;
-
-    Object.keys(byYear).sort((a,b)=>b-a).forEach(y => {
-        html += `<div class="mb-6">
-                    <h4 class="font-black text-gray-900 border-b-2 border-gray-900 pb-1 mb-3 text-sm">Año ${y}</h4>`;
+    if(years.length === 0) {
+        contentHtml = '<p class="text-center text-xs font-bold text-gray-400 p-6">No hay matrices disponibles.</p>';
+    } else {
+        let currentData = byYear[currentModalYearTab] || {};
         
-        Object.keys(byYear[y]).sort((a,b)=>a-b).forEach(m => {
-            let rematesMes = byYear[y][m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
+        Object.keys(currentData).sort((a,b)=>a-b).forEach(m => {
+            let rematesMes = currentData[m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
             let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
             let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
             
-            html += `
+            contentHtml += `
             <div class="mb-3 border border-gray-200 rounded-md overflow-hidden bg-gray-50/50 transition">
                 <div class="flex justify-between items-center p-3 bg-white border-b border-gray-100">
                     <label class="flex items-center gap-3 cursor-pointer w-full">
-                        <input type="checkbox" onchange="window.toggleArbolMes(${y}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
+                        <input type="checkbox" onchange="window.toggleArbolMes(${currentModalYearTab}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
                         <span class="font-bold text-gray-800 text-sm uppercase tracking-wide">${monthNames[m]}</span>
                         <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded ml-auto">${rematesMes.length} matrices</span>
                     </label>
@@ -826,12 +889,9 @@ window.abrirModalArbol = function() {
                 </div>
             </div>`;
         });
-        html += `</div>`;
-    });
-    
-    if(rematesFiltrados.length === 0) html = '<p class="text-center text-xs font-bold text-gray-400 p-6">No hay matrices en la base de datos.</p>';
+    }
 
-    container.innerHTML = html;
+    contentContainer.innerHTML = contentHtml;
     document.getElementById('modal-arbol').classList.remove('hidden');
     document.getElementById('modal-arbol').classList.add('flex');
 };
@@ -845,7 +905,7 @@ window.toggleArbolMes = function(year, mesIndex, isChecked) {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
         let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-        return matchSeg && rYr === year && rM === mesIndex;
+        return matchSeg && rYr === Number(year) && rM === Number(mesIndex);
     }).map(r => r.id);
     
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
@@ -1082,12 +1142,13 @@ window.cambiarSeccion = function(mod){
     try {
         currentModule=mod; 
         document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-comparativa').className=mod==='comparativa'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
         document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
         document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
         document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
-        document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mb-8':'nav-item nav-inactive mb-8'; 
+        document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mt-6':'nav-item nav-inactive mt-6'; 
         
-        ['module-remates', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+        ['module-remates', 'module-comparativa', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
         
         window.actualizarVistaActual();
         if(window.innerWidth < 768) { window.toggleSidebar(); }
@@ -1097,6 +1158,7 @@ window.cambiarSeccion = function(mod){
 window.actualizarVistaActual = function() { 
     try {
         if (currentModule === 'remates') window.renderDashboard(); 
+        else if (currentModule === 'comparativa') window.renderComparativa();
         else if (currentModule === 'autos') window.renderPanelAutos(); 
         else if (currentModule === 'conclusiones') window.renderConclusiones(); 
         else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); } }
@@ -1137,11 +1199,13 @@ window.renderDashboard = function(){
         let titulo = "Selección Activa";
         try {
             let selectPeriodo = document.getElementById('macro-period');
+            let selectYear = document.getElementById('macro-year');
             if (selectPeriodo) {
-                if (selectPeriodo.value === 'CUSTOM') {
+                if (selectPeriodo.value === 'CUSTOM' || selectYear.value === 'CUSTOM') {
                     titulo = "Selección Personalizada";
                 } else if (selectPeriodo.selectedIndex >= 0 && selectPeriodo.options[selectPeriodo.selectedIndex]) {
-                    titulo = selectPeriodo.options[selectPeriodo.selectedIndex].text;
+                    let yT = selectYear.value === 'ALL' ? 'Histórico' : selectYear.value;
+                    titulo = selectPeriodo.options[selectPeriodo.selectedIndex].text + " " + yT;
                 }
             }
             if(checkedNodes.length === 1 && allRemates.length === 1) {
@@ -1177,11 +1241,11 @@ window.renderDashboard = function(){
                 document.getElementById('dash-tabla-lotes').innerHTML = lotesTabla.map(l=>{
                     let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
                     let dSignL = deltaLote >= 0 ? '+' : ''; 
-                    let dColorL = deltaLote >= 0 ? 'text-premium-success' : 'text-premium-danger';
+                    let dColorL = deltaLote >= 0 ? 'text-green-600' : 'text-red-600';
                     let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData?.timestamp) === l.origen)?.id || checkedNodes[0];
                     return `<tr class="cursor-pointer hover:bg-gray-50 transition" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
-                        <td class="font-bold text-gray-500 w-32 pl-6 truncate text-[10px] md:text-xs uppercase" title="${l.origen}">${l.origen}</td>
-                        <td class="font-black text-gray-900 w-16 whitespace-nowrap text-xs">Lote ${l.numeroLote||'-'}</td>
+                        <td class="font-bold text-gray-500 w-32 pl-4 truncate text-[10px] md:text-xs uppercase" title="${l.origen}">${l.origen}</td>
+                        <td class="font-black text-gray-900 w-16 whitespace-nowrap text-xs text-center">Lote ${l.numeroLote||'-'}</td>
                         <td class="max-w-[300px]">
                             <div class="font-bold text-gray-900 truncate text-xs" title="${l.loteStr}">${l.loteStr}</div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-widest font-bold truncate mt-1" title="${l.clienteReal}">👤 ${l.clienteReal}</div>
@@ -1189,7 +1253,7 @@ window.renderDashboard = function(){
                         <td class="text-center"><span class="bg-gray-100 border border-gray-200 text-gray-800 px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
                         <td class="text-right text-gray-500 font-medium">${formatMoney(l.minimo)}</td>
                         <td class="text-right font-black text-green-700">${formatMoney(l.monto)}</td>
-                        <td class="text-right pr-6 font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td>
+                        <td class="text-right pr-4 font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td>
                     </tr>`;
                 }).join('');
             }
@@ -1244,6 +1308,89 @@ window.renderDashboard = function(){
     } catch(e) { console.error(e); }
 };
 
+// === NUEVO MODULO: COMPARATIVA HISTÓRICA ===
+window.renderComparativa = function() {
+    try {
+        if(currentModule !== 'comparativa') return; 
+        const emptyState = document.getElementById('empty-state'); const compMod = document.getElementById('module-comparativa');
+        
+        if(checkedNodes.length === 0){ emptyState.classList.remove('hidden'); compMod.classList.add('hidden'); return; } 
+        emptyState.classList.add('hidden'); compMod.classList.remove('hidden');
+        
+        let allRemates = getSelectedRemates();
+        let groupMode = document.getElementById('comp-groupby').value;
+        let groups = {};
+        let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+        allRemates.forEach(r => {
+            let d = r.fechaData;
+            let dateObj = d?.timestamp ? new Date(d.timestamp) : new Date();
+            let y = d?.year || dateObj.getFullYear();
+            let m = dateObj.getMonth(); 
+            
+            let key = ''; let label = '';
+            
+            if(groupMode === 'year') {
+                key = `${y}`; label = `Año ${y}`;
+            } else if(groupMode === 'semester') {
+                let s = m < 6 ? 1 : 2;
+                key = `${y}-S${s}`; label = `S${s} ${y}`;
+            } else if(groupMode === 'quarter') {
+                let q = Math.floor(m/3) + 1;
+                key = `${y}-Q${q}`; label = `Q${q} ${y}`;
+            } else {
+                key = `${y}-${String(m).padStart(2,'0')}`; 
+                label = `${monthNamesShort[m]} ${y}`;
+            }
+            
+            if(!groups[key]) groups[key] = { label, key, remates: [] };
+            groups[key].remates.push(r);
+        });
+
+        let sortedKeys = Object.keys(groups).sort();
+        let tableHtml = '';
+        let chartLabels = [];
+        let dataVenta = [];
+        let dataComision = [];
+
+        sortedKeys.forEach(k => {
+            let g = groups[k];
+            let agg = buildAgg(g.remates);
+            chartLabels.push(g.label);
+            dataVenta.push(agg.venta);
+            dataComision.push(agg.comisionTotal);
+            
+            tableHtml += `
+            <tr class="hover:bg-gray-50 transition border-b border-gray-100">
+                <td class="pl-4 py-3 font-bold text-gray-900">${g.label}</td>
+                <td class="text-center py-3 font-bold text-gray-500">${g.remates.length}</td>
+                <td class="text-center py-3 font-bold text-gray-900">${agg.lotes.toLocaleString('es-CL')}</td>
+                <td class="text-center py-3 font-black text-green-600">${agg.eficaciaLotes.toFixed(1)}%</td>
+                <td class="text-right py-3 font-black text-gray-900">${formatMoney(agg.venta)}</td>
+                <td class="text-right pr-4 py-3 font-bold text-blue-700">${formatMoney(agg.comisionTotal)}</td>
+            </tr>`;
+        });
+
+        document.getElementById('comp-table-body').innerHTML = tableHtml;
+
+        const canvasComp = document.getElementById('comp-chart');
+        if(canvasComp) {
+            if(compChartInst) compChartInst.destroy();
+            compChartInst = new Chart(canvasComp.getContext('2d'), { 
+                type: 'line', 
+                data: { 
+                    labels: chartLabels, 
+                    datasets: [
+                        { label: 'Venta Total Adjudicada', data: dataVenta, borderColor: '#111827', backgroundColor: '#111827', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 4 },
+                        { label: 'Comisiones Estimadas', data: dataComision, borderColor: '#2563EB', backgroundColor: '#2563EB', borderWidth: 2, borderDash: [5, 5], tension: 0.3, pointBackgroundColor: '#2563EB', pointRadius: 3 }
+                    ] 
+                }, 
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } 
+            });
+        }
+    } catch(e) { console.error(e); }
+};
+
 window.filtrarLotesMain = function() {
     const term = (document.getElementById('search-lotes-main').value || '').toLowerCase();
     const tbody = document.getElementById('dash-tabla-lotes');
@@ -1255,10 +1402,10 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-5 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-5 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
-// === NUEVO DISEÑO ESTRUCTURADO DE DATOS DIRECTIVOS ===
+// === NUEVO DISEÑO ESTRUCTURADO DE DATOS ===
 window.renderConclusiones = function() {
     try {
         if(currentModule !== 'conclusiones') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
@@ -1273,9 +1420,11 @@ window.renderConclusiones = function() {
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
         let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
 
+        html += `<div class="space-y-6 text-gray-900">`;
+
         // SECCIÓN 1: Resultados Financieros
         html += `
-        <div class="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
             <div class="px-5 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
                 <span class="bg-gray-200 text-gray-700 px-2 rounded font-black text-xs">1</span>
                 <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Resultados Financieros</h3>
@@ -1302,7 +1451,7 @@ window.renderConclusiones = function() {
 
         // SECCIÓN 2: Rendimiento de Catálogo
         html += `
-        <div class="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
             <div class="px-5 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
                 <span class="bg-gray-200 text-gray-700 px-2 rounded font-black text-xs">2</span>
                 <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Rendimiento de Catálogo</h3>
@@ -1329,7 +1478,7 @@ window.renderConclusiones = function() {
 
         // SECCIÓN 3: Tracción de Clientes y Auditoría
         html += `
-        <div class="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
             <div class="px-5 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
                 <span class="bg-gray-200 text-gray-700 px-2 rounded font-black text-xs">3</span>
                 <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Tracción y Audiencia</h3>
@@ -1338,7 +1487,7 @@ window.renderConclusiones = function() {
                 <tr class="border-b border-gray-100 hover:bg-gray-50">
                     <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Tasa de Cierre</td>
                     <td class="py-3 px-5 font-black text-green-600 text-lg">${tasaExito.toFixed(1)}%</td>
-                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Del total de garantías, este porcentaje se adjudicó un lote.</td>
+                    <td class="py-3 px-5 text-xs text-gray-500 hidden sm:table-cell">Del total de ${agg.garantias.toLocaleString('es-CL')} garantías, este % adjudicó.</td>
                 </tr>
                 <tr class="border-b border-gray-100 hover:bg-gray-50">
                     <td class="py-3 px-5 text-gray-600 font-bold text-sm w-1/3">Fuga de Clientes</td>
@@ -1363,6 +1512,8 @@ window.renderConclusiones = function() {
             </table>
         </div>
         `;
+
+        html += `</div>`;
 
         document.getElementById('conclusiones-content').innerHTML = html;
         document.getElementById('conclusiones-content').className = "text-gray-900";
