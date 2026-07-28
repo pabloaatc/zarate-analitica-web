@@ -64,14 +64,14 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.2 (Autostart Fix)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.3 (Time Master)</div>
 
     <!-- OVERLAY GIGANTE DE SINCRONIZACIÓN INICIAL -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] flex-col items-center justify-center transition-all backdrop-blur-sm flex">
         <div class="w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin shadow-sm mb-6"></div>
         <h2 class="text-3xl font-black text-gray-900 tracking-tight text-center mb-2">Zárate Analítica</h2>
         <p id="loading-text" class="font-bold text-blue-600 text-sm tracking-widest text-center uppercase">Sincronizando Base de Datos...</p>
-        <p class="text-[10px] text-gray-500 mt-4 font-medium uppercase">Preparando datos consolidados</p>
+        <p class="text-[10px] text-gray-500 mt-4 font-medium uppercase">Esto puede tomar unos segundos</p>
     </div>
 
     <!-- PANTALLA DE LOGIN -->
@@ -87,13 +87,6 @@
                 <div class="mb-6"><input type="password" id="password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-black transition-all" required placeholder="Contraseña"></div>
                 <div id="login-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
                 <button type="submit" id="btn-login" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Iniciar Sesión</button>
-            </form>
-            <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
-                <div class="mb-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Invitación Aceptada</span></div>
-                <p class="text-xs text-gray-500 mb-6 text-center leading-relaxed font-medium mt-4">¡Bienvenido! Crea tu contraseña definitiva.</p>
-                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-green-600 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
-                <div id="invite-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
-                <button type="submit" id="btn-invite" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Guardar y Entrar</button>
             </form>
         </div>
     </div>
@@ -123,45 +116,57 @@
             <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1 relative">
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:inline mr-2">Filtro Global</span>
                 
-                <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
+                <select id="macro-segment" onchange="window.aplicarCambioSegmento()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
-                <!-- EL NUEVO SUPER FILTRO DESPLEGABLE -->
+                <!-- SUPER FILTRO DE TIEMPO (REDSEÑADO: AÑOS EN COLUMNAS + ATAJOS RÁPIDOS) -->
                 <div class="relative" id="dropdown-container">
-                    <button type="button" onclick="window.toggleDropdown(event)" class="bg-blue-50 border border-blue-200 rounded px-4 py-2 text-xs font-black text-blue-800 flex items-center gap-2 hover:bg-blue-100 transition shadow-sm min-w-[180px] justify-between">
-                        <span id="dropdown-label">📅 Seleccione Periodo...</span>
+                    <button type="button" onclick="window.toggleDropdown(event)" class="bg-blue-50 border border-blue-200 rounded px-4 py-2 text-xs font-black text-blue-800 flex items-center gap-2 hover:bg-blue-100 transition shadow-sm min-w-[200px] justify-between">
+                        <span id="dropdown-label">📅 Cargando...</span>
                         <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
 
                     <!-- CONTENIDO DEL SUPER FILTRO -->
                     <div id="dropdown-menu" onclick="event.stopPropagation()" class="hidden absolute top-full mt-1.5 left-0 bg-white border border-gray-200 rounded-lg shadow-2xl w-80 z-50 flex-col overflow-hidden">
                         
-                        <!-- Buscador -->
-                        <div class="p-3 border-b border-gray-100 bg-gray-50">
-                            <input type="text" id="dropdown-search" placeholder="🔍 Buscar mes o remate..." class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none shadow-inner transition" onkeyup="window.filterDropdown()">
-                        </div>
-                        
-                        <!-- Botones Rápidos -->
-                        <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Acciones Rápidas:</span>
-                            <div class="flex gap-1.5">
-                                <button onclick="window.quickSelect('TODO')" class="text-[10px] bg-white border border-gray-300 hover:bg-gray-50 px-2 py-1 rounded font-bold text-gray-800 shadow-sm transition">Todo</button>
-                                <button onclick="window.quickSelect('NADA')" class="text-[10px] bg-white border border-gray-300 hover:bg-red-50 hover:text-red-600 px-2 py-1 rounded font-bold text-gray-800 shadow-sm transition">Ninguno</button>
+                        <!-- 1. AÑOS EN COLUMNAS (BOTONES/PILLS) -->
+                        <div class="p-3 border-b border-gray-200 bg-white">
+                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2">1. Selecciona Año(s):</span>
+                            <div id="dropdown-years-grid" class="flex gap-2 flex-wrap">
+                                <!-- JS inyecta los botones de años aquí -->
                             </div>
                         </div>
-                        
-                        <!-- El Árbol Pequeño y Sofisticado -->
-                        <div class="p-3 max-h-[50vh] overflow-y-auto" id="dropdown-tree">
+
+                        <!-- 2. ATAJOS RÁPIDOS -->
+                        <div class="p-3 bg-gray-50 border-b border-gray-200">
+                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2 flex justify-between">
+                                <span>2. Filtro Rápido:</span>
+                                <button onclick="window.quickSelect('NADA')" class="text-red-500 hover:text-red-700 underline">Desmarcar Todo</button>
+                            </span>
+                            <div class="grid grid-cols-4 gap-1.5">
+                                <button onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
+                                <button onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
+                                <button onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
+                                <button onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
+                                <button onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
+                                <button onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
+                                <button onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
+                            </div>
+                        </div>
+
+                        <!-- 3. ÁRBOL DE MESES ESPECÍFICO (Solo muestra los años seleccionados arriba) -->
+                        <div class="p-3 max-h-[35vh] overflow-y-auto bg-white" id="dropdown-tree">
                             <!-- JS inyecta meses y remates aquí -->
                         </div>
                         
-                        <!-- Botón Aplicar -->
+                        <!-- BOTÓN APLICAR -->
                         <div class="p-3 border-t border-gray-200 bg-gray-50">
                             <button type="button" onclick="window.applyDropdown()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm text-xs">Aplicar y Cerrar</button>
                         </div>
                     </div>
                 </div>
 
+                <!-- GESTOR MATRICES -->
                 <button onclick="window.abrirModalGestor()" class="ml-2 flex items-center gap-1.5 bg-gray-900 text-white border border-gray-900 text-[11px] font-bold px-4 py-2 rounded shadow-sm hover:bg-black transition shrink-0 hidden md:flex">
                     <span>🗂️</span> Gestor de Matrices (<span id="count-matrices-btn">0</span>)
                 </button>
@@ -475,7 +480,7 @@
         </div>
     </div> <!-- FIN APP CONTENT -->
 
-    <!-- MODAL GESTOR MATRICES -->
+    <!-- MODAL GESTOR MATRICES (FULL SCREEN) -->
     <div id="modal-gestor" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalGestor(event)">
         <div class="bg-white max-w-4xl w-full h-[90vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200" onclick="event.stopPropagation()">
             <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-900 text-white rounded-t-xl shrink-0">
@@ -769,13 +774,22 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
             let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
             if(!isNaN(y)) years.add(y);
         });
-        let maxYear = years.size > 0 ? Math.max(...Array.from(years)) : new Date().getFullYear();
+        let maxYear = Math.max(...Array.from(years));
         window.globalSelectedYears = [maxYear];
         window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+        
+        let initialRemates = db.remates.filter(r => {
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            let matchSeg = currentSeg === 'Todos' || r.tipo === currentSeg;
+            return matchSeg && rYr === maxYear;
+        }).map(r => r.id);
+        checkedNodes = initialRemates;
     }
     
     window.renderDropdownUI();
-    window.applyDropdown(); 
+    window.updateDropdownLabel();
+    window.updateAdminButtonCount();
+    window.renderApp();
 };
 
 window.applyModalSelection = function() {
@@ -785,6 +799,7 @@ window.applyModalSelection = function() {
     window.renderApp();
 };
 
+// === NUEVO FILTRO CUSTOM TIEMPO ===
 window.toggleDropdown = function(e) {
     if(e) e.stopPropagation();
     const menu = document.getElementById('dropdown-menu');
@@ -795,16 +810,6 @@ window.toggleDropdown = function(e) {
         menu.classList.add('hidden');
         menu.classList.remove('flex');
     }
-};
-
-window.quickSelect = function(type) {
-    if(type === 'TODO') {
-        let seg = document.getElementById('macro-segment').value;
-        checkedNodes = db.remates.filter(r => seg === 'Todos' || r.tipo === seg).map(r => r.id);
-    } else if (type === 'NADA') {
-        checkedNodes = [];
-    }
-    window.renderDropdownUI();
 };
 
 window.renderDropdownUI = function() {
@@ -844,6 +849,9 @@ window.renderDropdownUI = function() {
     let html = '';
 
     Object.keys(byYear).sort((a,b)=>b-a).forEach(y => {
+        // Solo renderizar el arbol si el año esta seleccionado en las columnas de arriba! (Evita el infinito hacia abajo)
+        if(!window.globalSelectedYears.includes(Number(y))) return;
+
         html += `<div class="mb-3 dropdown-year-group"><div class="sticky top-0 bg-white py-1 mb-1 z-10 border-b border-gray-100"><span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Año ${y}</span></div>`;
         
         Object.keys(byYear[y]).sort((a,b)=>a-b).forEach(m => {
@@ -885,9 +893,24 @@ window.renderDropdownUI = function() {
 window.toggleTimeYear = function(y, checked) {
     if(checked) {
         if(!window.globalSelectedYears.includes(y)) window.globalSelectedYears.push(y);
+        // Cuando agregas un año, se selecciona TODO su contenido por defecto para no dejarlo vacio
+        let seg = document.getElementById('macro-segment').value;
+        let toAdd = db.remates.filter(r => {
+            let matchSeg = seg === 'Todos' || r.tipo === seg;
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            return matchSeg && rYr === y;
+        }).map(r => r.id);
+        toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
     } else {
         window.globalSelectedYears = window.globalSelectedYears.filter(val => val !== y);
+        // Deseleccionar todo lo de ese año
+        let toRemove = db.remates.filter(r => {
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            return rYr === y;
+        }).map(r => r.id);
+        checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
     }
+    window.renderDropdownUI();
 };
 
 window.toggleDropExpand = function(id) {
@@ -912,6 +935,33 @@ window.toggleDropMes = function(year, mesIndex, isChecked) {
 window.toggleDropRemate = function(id, isChecked) {
     if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
+    window.renderDropdownUI();
+};
+
+window.quickSelect = function(type) {
+    let allowedMonths = [];
+    if(type === 'TODO') allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+    else if(type === 'S1') allowedMonths = [0,1,2,3,4,5];
+    else if(type === 'S2') allowedMonths = [6,7,8,9,10,11];
+    else if(type === 'Q1') allowedMonths = [0,1,2];
+    else if(type === 'Q2') allowedMonths = [3,4,5];
+    else if(type === 'Q3') allowedMonths = [6,7,8];
+    else if(type === 'Q4') allowedMonths = [9,10,11];
+    
+    if(type === 'NADA') {
+        checkedNodes = [];
+    } else {
+        let seg = document.getElementById('macro-segment').value;
+        // Solo aplicar a los años que el usuario tiene activos en los botones!
+        checkedNodes = db.remates.filter(r => {
+            let matchSeg = seg === 'Todos' || r.tipo === seg;
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            let matchYr = window.globalSelectedYears.includes(rYr);
+            let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+            return matchSeg && matchYr && allowedMonths.includes(rM);
+        }).map(r => r.id);
+    }
+    
     window.renderDropdownUI();
 };
 
@@ -940,6 +990,7 @@ window.filterDropdown = function() {
 };
 
 window.updateMacroFilter = function() {
+    // Si cambia de Siniestrados a Retail, aplica inmediatamente
     window.applyDropdown();
 };
 
@@ -977,11 +1028,8 @@ window.seleccionarUltimoRemate = function() {
     if (segSelect) segSelect.value = ultimo.tipo || 'Siniestrados';
     
     let y = ultimo.fechaData?.year ? Number(ultimo.fechaData.year) : new Date().getFullYear();
-    let m = ultimo.fechaData?.timestamp ? new Date(ultimo.fechaData.timestamp).getMonth() : 0;
     
     window.globalSelectedYears = [y];
-    window.globalSelectedMonths = [m];
-    
     checkedNodes = [ultimo.id];
     
     window.renderDropdownUI();
@@ -1059,7 +1107,7 @@ window.abrirModalGestor = function() {
     if(years.length > 1) {
         tabsHtml = `<div class="flex gap-2 px-6 pt-3 overflow-x-auto">`;
         years.forEach(y => {
-            let active = String(y) === String(currentGestorYearTab) ? 'bg-white text-gray-900 border-t border-l border-r border-gray-200 shadow-sm relative top-[1px]' : 'bg-transparent text-gray-500 hover:text-gray-800';
+            let active = String(y) === String(currentGestorYearTab) ? 'bg-gray-50 text-gray-900 border-t border-l border-r border-gray-200 shadow-sm relative top-[1px]' : 'bg-transparent text-gray-500 hover:text-gray-800';
             tabsHtml += `<button onclick="window.switchGestorYear('${y}')" class="px-6 py-2 rounded-t-lg text-sm font-bold transition whitespace-nowrap ${active}">Año ${y}</button>`;
         });
         tabsHtml += `</div>`;
@@ -1294,7 +1342,6 @@ window.iniciarProcesamiento = async function(files){
     
     document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
     
-    // Al subir nuevos datos, queremos volver a calcular el año más reciente
     window.actualizarFiltrosGlobales(true); 
     procesarDatosClientes(); 
     window.actualizarVistaActual(); 
@@ -1396,7 +1443,7 @@ window.limpiarBase = async function(){
         if(error) throw error;
         db = {remates:[]}; checkedNodes = []; clientDB = []; 
         document.getElementById('empty-state').classList.remove('hidden'); 
-        window.actualizarFiltrosGlobales(); 
+        window.actualizarFiltrosGlobales(true); 
         location.reload(); 
     } catch (e) { 
         alert("Error al vaciar la base de datos de la nube.\nRevisa tus permisos de Administrador o tu conexión.\n\nDetalle: " + e.message);
@@ -1682,7 +1729,7 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-5 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-5 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function(e) { 
     if(e && e.target.id !== 'modal-multilote') return;
     document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); 
