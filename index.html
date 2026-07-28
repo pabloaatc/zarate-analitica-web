@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v6.0 (Time-Travel)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.0 (Matrix Core)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[200] hidden flex-col items-center justify-center transition-all">
@@ -119,17 +119,19 @@
 
         <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
         <div id="paraguas-bar" class="bg-white border-b border-gray-300 px-4 md:px-6 py-2.5 flex justify-between items-center shrink-0 z-20 sticky top-0 shadow-sm no-print">
-            <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+            <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1">
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:inline mr-2">Filtro Global</span>
                 
                 <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition"></select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
+                
+                <!-- Año ahora puede ser ALL para cruzar datos -->
                 <select id="macro-year" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition">
                     <option value="ALL">🌐 Todos los Años</option>
-                    <option value="CUSTOM" hidden>⚙️ Año Mix</option>
                 </select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
+                <!-- Periodo limpio sin Custom -->
                 <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded px-2.5 py-1.5 text-xs font-bold text-blue-800 outline-none cursor-pointer hover:bg-blue-100 transition">
                     <option value="ALL">Todo el Año</option>
                     <optgroup label="Semestres">
@@ -156,17 +158,19 @@
                         <option value="M10">Noviembre</option>
                         <option value="M11">Diciembre</option>
                     </optgroup>
-                    <option value="CUSTOM" hidden>Selección Personalizada</option>
+                    <option value="MANUAL" hidden class="bg-gray-800 text-white">📌 Selección Manual</option>
                 </select>
+
+                <!-- EL CORAZÓN: GESTOR DE MATRICES RE-UBICADO -->
+                <button onclick="window.abrirModalArbol()" class="ml-2 flex items-center gap-1.5 bg-gray-900 text-white border border-gray-900 text-[11px] font-bold px-4 py-1.5 rounded shadow-sm hover:bg-black transition shrink-0">
+                    <span>🗂️</span> Gestor de Matrices (<span id="count-matrices-btn">0</span>)
+                </button>
             </div>
 
-            <!-- BOTONES SUPERIORES DERECHOS -->
-            <div class="flex items-center gap-2 shrink-0 ml-2">
-                <button onclick="window.seleccionarUltimoRemate()" class="flex items-center gap-1.5 bg-white text-blue-700 border border-blue-200 text-[11px] font-bold px-3 py-1.5 rounded hover:bg-blue-50 transition shrink-0">
+            <!-- BOTON ULTIMO REMATE -->
+            <div class="flex items-center shrink-0 ml-4">
+                <button onclick="window.seleccionarUltimoRemate()" class="flex items-center gap-1.5 bg-white text-blue-700 border border-blue-200 text-[11px] font-bold px-3 py-1.5 rounded hover:bg-blue-50 transition shrink-0 shadow-sm">
                     <span>⚡ Último Remate</span>
-                </button>
-                <button onclick="window.abrirModalArbol()" class="flex items-center gap-1.5 bg-gray-800 text-white border border-gray-900 text-[11px] font-bold px-3 py-1.5 rounded shadow-sm hover:bg-black transition shrink-0">
-                    <span>🗂️ Matrices (<span id="count-matrices-btn">0</span>)</span>
                 </button>
             </div>
         </div>
@@ -183,12 +187,11 @@
                     </div>
                     <div id="nav-mod-remates" class="nav-item nav-active" onclick="window.cambiarSeccion('remates')">Resumen General</div>
                     
-                    <!-- NUEVO MODULO DE COMPARATIVA HISTORICA -->
                     <div id="nav-mod-comparativa" class="nav-item nav-inactive" onclick="window.cambiarSeccion('comparativa')">Comparativa Histórica</div>
                     
                     <div id="nav-mod-autos" class="nav-item nav-inactive" onclick="window.cambiarSeccion('autos')">Análisis Vehicular</div>
                     <div id="nav-mod-clientes" class="nav-item nav-inactive" onclick="window.cambiarSeccion('clientes')">Gestión de Clientes</div>
-                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive" onclick="window.cambiarSeccion('conclusiones')">Datos Ejecutivos</div>
+                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
                     <div id="nav-mod-buscador" class="nav-item nav-inactive mt-6" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
                 </div>
 
@@ -210,13 +213,12 @@
                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o cambia el filtro en la barra superior para comenzar a analizar.</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o usa el Gestor de Matrices para comenzar a analizar.</p>
                 </div>
 
-                <!-- MODULE: REMATES (RESUMEN GENERAL) -->
+                <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-5 md:space-y-6 max-w-[1400px] mx-auto pb-10">
                     <div id="dashboard-view" class="space-y-5 md:space-y-6">
-                        <!-- HEADER DINÁMICO -->
                         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-gray-300 pb-4">
                             <div class="w-full xl:w-auto overflow-hidden">
                                 <h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900 truncate" id="dash-titulo">-</h2>
@@ -239,13 +241,9 @@
                             </div>
                         </div>
 
-                        <!-- CARDS PRINCIPALES -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
-                            <!-- CARD 1 -->
                             <div class="glass-panel p-5 md:p-6 flex flex-col h-full bg-white relative">
-                                <h4 class="font-bold text-base mb-5 text-gray-800 tracking-tight flex items-center gap-2 border-b border-gray-100 pb-3">
-                                    📊 Rendimiento Base
-                                </h4>
+                                <h4 class="font-bold text-base mb-5 text-gray-800 tracking-tight flex items-center gap-2 border-b border-gray-100 pb-3">📊 Rendimiento Base</h4>
                                 <div class="space-y-3 flex-1">
                                     <div class="flex justify-between items-center"><span class="text-sm text-gray-600 font-medium">Lotes Disponibles (Base)</span><span class="font-bold text-base text-gray-900" id="dash-kpi-lotes-disp">0</span></div>
                                     <div class="w-full h-px bg-gray-100"></div>
@@ -257,11 +255,8 @@
                                 </div>
                             </div>
 
-                            <!-- CARD 2 -->
                             <div class="glass-panel p-5 md:p-6 flex flex-col h-full bg-white relative">
-                                <h4 class="font-bold text-base mb-5 text-gray-800 tracking-tight flex items-center gap-2 border-b border-gray-100 pb-3">
-                                    👥 Comportamiento de Clientes
-                                </h4>
+                                <h4 class="font-bold text-base mb-5 text-gray-800 tracking-tight flex items-center gap-2 border-b border-gray-100 pb-3">👥 Comportamiento de Clientes</h4>
                                 <div class="space-y-3 flex-1">
                                     <div class="flex justify-between items-center"><span class="text-sm text-gray-600 font-medium">Garantías Pagadas</span><span class="font-bold text-base text-gray-900" id="dash-kpi-garantias">0</span></div>
                                     <div class="w-full h-px bg-gray-100"></div>
@@ -282,15 +277,16 @@
                             </div>
                         </div>
 
-                        <!-- TABLA COMPLETA CON BUSCADOR -->
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2 no-print">
+                            <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Composición de Ventas</h4><div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartVentas"></canvas></div></div>
+                            <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4><div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartClientes"></canvas></div></div>
+                        </div>
+
                         <div class="glass-panel p-5 overflow-hidden w-full bg-white">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-gray-200 pb-3">
-                                <h4 class="font-bold text-base text-gray-800 tracking-tight flex items-center gap-2">
-                                    🚗 Detalle Global de Lotes Adjudicados
-                                </h4>
+                                <h4 class="font-bold text-base text-gray-800 tracking-tight flex items-center gap-2">🚗 Detalle Global de Lotes Adjudicados</h4>
                                 <input type="text" id="search-lotes-main" placeholder="Buscar lote, modelo o cliente..." class="bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-blue-600 transition-all w-full sm:w-64 font-medium text-gray-900 placeholder:text-gray-400" onkeyup="window.filtrarLotesMain()">
                             </div>
-                            
                             <div class="overflow-x-auto overflow-y-auto max-h-[600px] border border-gray-200 rounded-md">
                                 <table class="w-full text-left bg-white">
                                     <thead class="sticky top-0 bg-gray-50 z-10 border-b border-gray-300 shadow-sm">
@@ -311,13 +307,10 @@
                     </div>
                 </div>
 
-                <!-- NUEVO MODULE: COMPARATIVA HISTÓRICA -->
+                <!-- MODULE: COMPARATIVA HISTÓRICA -->
                 <div id="module-comparativa" class="hidden space-y-5 md:space-y-6 max-w-[1400px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4">
-                        <div>
-                            <h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Comparativa Histórica</h2>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Análisis de evolución temporal de los datos filtrados</p>
-                        </div>
+                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Comparativa Histórica</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Análisis de evolución temporal de los datos filtrados</p></div>
                         <div class="flex items-center gap-3 w-full md:w-auto">
                             <span class="text-xs font-bold text-gray-500 hidden sm:inline">Agrupar por:</span>
                             <select id="comp-groupby" onchange="window.renderComparativa()" class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-bold text-gray-900 focus:border-blue-600 transition w-full sm:w-auto shadow-sm">
@@ -328,30 +321,8 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="glass-panel p-5">
-                        <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Evolución de Venta Adjudicada</h4>
-                        <div class="relative h-64 md:h-80 w-full"><canvas id="comp-chart"></canvas></div>
-                    </div>
-
-                    <div class="glass-panel p-5 overflow-hidden">
-                        <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tabla de Consolidación Histórica</h4>
-                        <div class="overflow-x-auto max-h-[600px] rounded-md border border-gray-200">
-                            <table class="w-full text-left whitespace-nowrap bg-white">
-                                <thead class="sticky top-0 bg-gray-50 shadow-sm border-b border-gray-200 z-10">
-                                    <tr>
-                                        <th class="pl-4 py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Periodo ↕️</th>
-                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Matrices ↕️</th>
-                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Lotes Vendidos ↕️</th>
-                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'percent')">Efectividad ↕️</th>
-                                        <th class="py-3 text-right cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Venta Total ↕️</th>
-                                        <th class="py-3 text-right pr-4 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Comisiones Est. ↕️</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="comp-table-body" class="divide-y divide-gray-100"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Evolución de Venta Adjudicada</h4><div class="relative h-64 md:h-80 w-full"><canvas id="comp-chart"></canvas></div></div>
+                    <div class="glass-panel p-5 overflow-hidden"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tabla de Consolidación Histórica</h4><div class="overflow-x-auto max-h-[600px] rounded-md border border-gray-200"><table class="w-full text-left whitespace-nowrap bg-white"><thead class="sticky top-0 bg-gray-50 shadow-sm border-b border-gray-200 z-10"><tr><th class="pl-4 py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Periodo ↕️</th><th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Matrices ↕️</th><th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Lotes Vendidos ↕️</th><th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'percent')">Efectividad ↕️</th><th class="py-3 text-right cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Venta Total ↕️</th><th class="py-3 text-right pr-4 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Comisiones Est. ↕️</th></tr></thead><tbody id="comp-table-body" class="divide-y divide-gray-100"></tbody></table></div></div>
                 </div>
 
                 <!-- MODULE: MODELOS Y VEHICULOS -->
@@ -444,10 +415,10 @@
                     </div>
                 </div>
 
-                <!-- MODULE: DATOS EJECUTIVOS -->
+                <!-- MODULE: DATOS (REPORTE EJECUTIVO) -->
                 <div id="module-conclusiones" class="hidden space-y-5 md:space-y-6 max-w-[1000px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
-                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Datos Ejecutivos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Reporte Financiero Estructurado</p></div>
+                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Datos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Reporte Ejecutivo Estructurado</p></div>
                         <button onclick="window.print()" class="px-4 py-2 bg-white border border-gray-300 shadow-sm rounded-md text-xs font-bold hover:bg-gray-50 transition w-full md:w-auto uppercase tracking-wider text-gray-800">🖨️ Imprimir Reporte</button>
                     </div>
                     <div id="conclusiones-content"></div>
@@ -473,21 +444,25 @@
         </div>
     </div> <!-- FIN APP CONTENT -->
 
-    <!-- MODAL ARBOL DE SELECCION (ADMIN MATRICES) - CON TABS -->
+    <!-- MODAL ARBOL DE SELECCION (GESTOR MATRICES) -->
     <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200">
-            <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-50">
-                <div><h3 class="text-lg font-black tracking-tight text-gray-900">Administrar Matrices</h3><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Selección específica de datos</p></div>
-                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-gray-800 bg-white border border-gray-300 rounded p-1 shadow-sm transition">✕</button>
+            <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-900 text-white rounded-t-xl">
+                <div><h3 class="text-lg font-black tracking-tight">Gestor de Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1">Control absoluto de la muestra</p></div>
+                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded p-1 shadow-sm transition">✕</button>
+            </div>
+            
+            <div class="bg-gray-50 border-b border-gray-200 p-4">
+                <input type="text" id="search-arbol" placeholder="🔍 Buscar matriz o fecha rápida..." class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition outline-none shadow-sm" onkeyup="window.filtrarModalArbol()">
             </div>
             
             <div id="arbol-tabs-container"></div>
             
             <div class="flex justify-between items-center bg-gray-100 border-b border-gray-200 p-3 z-10 shadow-inner">
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Acciones Masivas:</span>
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Acciones Rápidas:</span>
                 <div class="flex gap-2">
                     <button onclick="window.toggleArbolAll(true)" class="bg-white border border-gray-300 text-gray-800 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-gray-50 transition shadow-sm">✔ Marcar Todas</button>
-                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar Todo</button>
+                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar</button>
                 </div>
             </div>
 
@@ -495,7 +470,7 @@
                 <!-- Se llena con JS -->
             </div>
             <div class="p-4 border-t border-gray-200 bg-gray-50">
-                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar Cambios</button>
+                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar y Ver Resultados</button>
             </div>
         </div>
     </div>
@@ -732,20 +707,28 @@ window.actualizarFiltrosGlobales = function() {
     segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
     
     let yrOptions = `<option value="ALL" ${currentYr === 'ALL' ? 'selected' : ''}>🌐 Todos los Años</option>`;
-    yrOptions += `<option value="CUSTOM" hidden ${currentYr === 'CUSTOM' ? 'selected' : ''}>⚙️ Año Mix</option>`;
     yrOptions += Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==currentYr?'selected':''}>Año ${y}</option>`).join('');
     yearSelect.innerHTML = yrOptions;
     
     window.updateMacroFilter();
 };
 
-window.updateMacroFilter = function(forceCustom = false) {
+window.applyModalSelection = function() {
+    // Cuando el usuario usa el Gestor, bloqueamos el periodo visualmente a "Manual"
+    let periodElement = document.getElementById('macro-period');
+    if(periodElement) periodElement.value = 'MANUAL';
+    
+    window.updateAdminButtonCount();
+    window.actualizarVistaActual();
+};
+
+window.updateMacroFilter = function() {
     let seg = document.getElementById('macro-segment').value;
     let yr = document.getElementById('macro-year').value;
     let periodElement = document.getElementById('macro-period');
     let period = periodElement ? periodElement.value : 'ALL';
     
-    if(!forceCustom) {
+    if(period !== 'MANUAL') {
         let allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
         if(period === 'S1') allowedMonths = [0,1,2,3,4,5];
         else if(period === 'S2') allowedMonths = [6,7,8,9,10,11];
@@ -763,9 +746,6 @@ window.updateMacroFilter = function(forceCustom = false) {
             let matchM = allowedMonths.includes(rM);
             return matchSeg && matchYr && matchM;
         }).map(r => r.id);
-    } else {
-        if(periodElement) periodElement.value = 'CUSTOM';
-        document.getElementById('macro-year').value = 'CUSTOM';
     }
     
     window.updateAdminButtonCount();
@@ -784,7 +764,7 @@ window.seleccionarUltimoRemate = function() {
     
     if (segSelect) segSelect.value = ultimo.tipo || 'Siniestrados';
     if (yearSelect) yearSelect.value = ultimo.fechaData?.year ? Number(ultimo.fechaData.year).toString() : new Date().getFullYear().toString();
-    if (periodSelect) periodSelect.value = 'CUSTOM';
+    if (periodSelect) periodSelect.value = 'MANUAL';
     
     checkedNodes = [ultimo.id];
     
@@ -793,7 +773,7 @@ window.seleccionarUltimoRemate = function() {
     window.actualizarVistaActual();
 };
 
-// --- LOGICA MODAL MATRICES CON TABS (EVITA SCROLL INFINITO) ---
+// --- LOGICA MODAL GESTOR MATRICES ---
 window.switchModalYear = function(y) {
     currentModalYearTab = y;
     window.abrirModalArbol();
@@ -801,8 +781,6 @@ window.switchModalYear = function(y) {
 
 window.toggleArbolAll = function(check) {
     let seg = document.getElementById('macro-segment').value;
-    // Apply only to the currently visible year tab, or to ALL?
-    // Let's apply to the currently visible year tab for better UX control
     let rematesEnPantalla = db.remates.filter(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
         let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
@@ -813,11 +791,27 @@ window.toggleArbolAll = function(check) {
         let ids = rematesEnPantalla.map(r => r.id);
         ids.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
     } else {
-        // Desmarcar ABSOLUTAMENTE TODO (Es más útil como "Limpiar Todo" global)
         checkedNodes = [];
     }
-    window.updateMacroFilter(true);
+    window.applyModalSelection();
     window.abrirModalArbol();
+};
+
+window.filtrarModalArbol = function() {
+    let term = document.getElementById('search-arbol').value.toLowerCase();
+    document.querySelectorAll('.arbol-mes-group').forEach(mesGroup => {
+        let hasVisibleChild = false;
+        mesGroup.querySelectorAll('.arbol-remate-item').forEach(remateItem => {
+            let text = remateItem.innerText.toLowerCase();
+            if(text.includes(term)) {
+                remateItem.style.display = 'flex';
+                hasVisibleChild = true;
+            } else {
+                remateItem.style.display = 'none';
+            }
+        });
+        mesGroup.style.display = hasVisibleChild ? 'block' : 'none';
+    });
 };
 
 window.abrirModalArbol = function() {
@@ -841,7 +835,6 @@ window.abrirModalArbol = function() {
         currentModalYearTab = years[0];
     }
 
-    // TABS HTML
     let tabsHtml = '';
     if(years.length > 1) {
         tabsHtml = `<div class="flex gap-2 p-3 bg-white border-b border-gray-200 overflow-x-auto shadow-sm z-20">`;
@@ -853,7 +846,6 @@ window.abrirModalArbol = function() {
     }
     tabsContainer.innerHTML = tabsHtml;
 
-    // CONTENT HTML
     let contentHtml = '';
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
@@ -868,7 +860,7 @@ window.abrirModalArbol = function() {
             let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
             
             contentHtml += `
-            <div class="mb-3 border border-gray-200 rounded-md overflow-hidden bg-gray-50/50 transition">
+            <div class="arbol-mes-group mb-3 border border-gray-200 rounded-md overflow-hidden bg-gray-50/50 transition">
                 <div class="flex justify-between items-center p-3 bg-white border-b border-gray-100">
                     <label class="flex items-center gap-3 cursor-pointer w-full">
                         <input type="checkbox" onchange="window.toggleArbolMes(${currentModalYearTab}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
@@ -880,7 +872,7 @@ window.abrirModalArbol = function() {
                     ${rematesMes.map(r => {
                         let isChecked = checkedNodes.includes(r.id);
                         return `
-                        <label class="flex items-center gap-3 cursor-pointer group ml-2">
+                        <label class="arbol-remate-item flex items-center gap-3 cursor-pointer group ml-2">
                             <input type="checkbox" onchange="window.toggleArbolRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''}>
                             <span class="text-xs font-medium text-gray-600 group-hover:text-black transition">${window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)}</span>
                         </label>
@@ -892,11 +884,20 @@ window.abrirModalArbol = function() {
     }
 
     contentContainer.innerHTML = contentHtml;
+    // Apply search filter if there was any text typed
+    window.filtrarModalArbol();
+    
     document.getElementById('modal-arbol').classList.remove('hidden');
     document.getElementById('modal-arbol').classList.add('flex');
 };
 
-window.cerrarModalArbol = function() { document.getElementById('modal-arbol').classList.add('hidden'); document.getElementById('modal-arbol').classList.remove('flex'); };
+window.cerrarModalArbol = function() { 
+    document.getElementById('modal-arbol').classList.add('hidden'); 
+    document.getElementById('modal-arbol').classList.remove('flex'); 
+    // Clear search
+    let searchEl = document.getElementById('search-arbol');
+    if(searchEl) searchEl.value = '';
+};
 
 window.toggleArbolMes = function(year, mesIndex, isChecked) {
     let seg = document.getElementById('macro-segment').value;
@@ -911,14 +912,14 @@ window.toggleArbolMes = function(year, mesIndex, isChecked) {
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
     
-    window.updateMacroFilter(true);
+    window.applyModalSelection();
     window.abrirModalArbol(); 
 };
 
 window.toggleArbolRemate = function(id, isChecked) {
     if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    window.updateMacroFilter(true);
+    window.applyModalSelection();
     window.abrirModalArbol(); 
 };
 
@@ -1181,7 +1182,7 @@ window.limpiarBase = async function(){
         location.reload(); 
     } catch (e) { 
         alert("Error al vaciar la base de datos de la nube.\nRevisa tus permisos de Administrador o tu conexión.\n\nDetalle: " + e.message);
-        if(btn) btn.innerText = "Vaciar Base Completa";
+        if(btn) btn.innerText = "Vaciar Nube";
     }
 };
 
@@ -1201,10 +1202,10 @@ window.renderDashboard = function(){
             let selectPeriodo = document.getElementById('macro-period');
             let selectYear = document.getElementById('macro-year');
             if (selectPeriodo) {
-                if (selectPeriodo.value === 'CUSTOM' || selectYear.value === 'CUSTOM') {
-                    titulo = "Selección Personalizada";
+                if (selectPeriodo.value === 'MANUAL') {
+                    titulo = "Selección Manual (Gestor de Matrices)";
                 } else if (selectPeriodo.selectedIndex >= 0 && selectPeriodo.options[selectPeriodo.selectedIndex]) {
-                    let yT = selectYear.value === 'ALL' ? 'Histórico' : selectYear.value;
+                    let yT = selectYear.value === 'ALL' ? 'Histórico Completo' : selectYear.value;
                     titulo = selectPeriodo.options[selectPeriodo.selectedIndex].text + " " + yT;
                 }
             }
@@ -1270,13 +1271,17 @@ window.renderDashboard = function(){
                 let monthMap = {};
                 allRemates.forEach(r => {
                     let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-                    if(!monthMap[m]) monthMap[m] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: monthNamesShort[m] };
-                    if(r.tipo === 'Siniestrados') monthMap[m].siniestros += (Number(r.ventaTotal) || 0);
-                    if(r.tipo === 'Retail') monthMap[m].retail += (Number(r.ventaTotal) || 0);
-                    monthMap[m].nuevos += (Number(r.nuevos) || 0); monthMap[m].antiguos += (Number(r.antiguos) || 0);
+                    // If multiple years are selected, append year to label to differentiate
+                    let y = r.fechaData?.year ? String(r.fechaData.year).slice(-2) : 'XX';
+                    let labelStr = document.getElementById('macro-year').value === 'ALL' ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
+                    
+                    let mk = `${y}-${m}`; // unique key
+                    if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: labelStr, rawD: r.fechaData?.timestamp||0 };
+                    if(r.tipo === 'Siniestrados') monthMap[mk].siniestros += (Number(r.ventaTotal) || 0);
+                    if(r.tipo === 'Retail') monthMap[mk].retail += (Number(r.ventaTotal) || 0);
+                    monthMap[mk].nuevos += (Number(r.nuevos) || 0); monthMap[mk].antiguos += (Number(r.antiguos) || 0);
                 });
-                Object.keys(monthMap).sort((a,b)=>a-b).forEach(k => {
-                    let v = monthMap[k];
+                Object.values(monthMap).sort((a,b)=>a.rawD - b.rawD).forEach(v => {
                     chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos);
                 });
             } else {
@@ -1308,7 +1313,6 @@ window.renderDashboard = function(){
     } catch(e) { console.error(e); }
 };
 
-// === NUEVO MODULO: COMPARATIVA HISTÓRICA ===
 window.renderComparativa = function() {
     try {
         if(currentModule !== 'comparativa') return; 
@@ -1402,10 +1406,9 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-5 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-5 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
-// === NUEVO DISEÑO ESTRUCTURADO DE DATOS ===
 window.renderConclusiones = function() {
     try {
         if(currentModule !== 'conclusiones') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
