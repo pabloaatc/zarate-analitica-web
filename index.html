@@ -64,14 +64,14 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.3 (Time Master)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.4 (Stable UI)</div>
 
     <!-- OVERLAY GIGANTE DE SINCRONIZACIÓN INICIAL -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] flex-col items-center justify-center transition-all backdrop-blur-sm flex">
         <div class="w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin shadow-sm mb-6"></div>
         <h2 class="text-3xl font-black text-gray-900 tracking-tight text-center mb-2">Zárate Analítica</h2>
         <p id="loading-text" class="font-bold text-blue-600 text-sm tracking-widest text-center uppercase">Sincronizando Base de Datos...</p>
-        <p class="text-[10px] text-gray-500 mt-4 font-medium uppercase">Esto puede tomar unos segundos</p>
+        <p class="text-[10px] text-gray-500 mt-4 font-medium uppercase">Preparando datos consolidados</p>
     </div>
 
     <!-- PANTALLA DE LOGIN -->
@@ -87,6 +87,13 @@
                 <div class="mb-6"><input type="password" id="password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-black transition-all" required placeholder="Contraseña"></div>
                 <div id="login-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
                 <button type="submit" id="btn-login" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Iniciar Sesión</button>
+            </form>
+            <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
+                <div class="mb-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Invitación Aceptada</span></div>
+                <p class="text-xs text-gray-500 mb-6 text-center leading-relaxed font-medium mt-4">¡Bienvenido! Crea tu contraseña definitiva.</p>
+                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-green-600 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
+                <div id="invite-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
+                <button type="submit" id="btn-invite" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Guardar y Entrar</button>
             </form>
         </div>
     </div>
@@ -116,10 +123,10 @@
             <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1 relative">
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:inline mr-2">Filtro Global</span>
                 
-                <select id="macro-segment" onchange="window.aplicarCambioSegmento()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
+                <select id="macro-segment" onchange="window.renderApp()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
-                <!-- SUPER FILTRO DE TIEMPO (REDSEÑADO: AÑOS EN COLUMNAS + ATAJOS RÁPIDOS) -->
+                <!-- SUPER FILTRO DE TIEMPO PERSONALIZADO -->
                 <div class="relative" id="dropdown-container">
                     <button type="button" onclick="window.toggleDropdown(event)" class="bg-blue-50 border border-blue-200 rounded px-4 py-2 text-xs font-black text-blue-800 flex items-center gap-2 hover:bg-blue-100 transition shadow-sm min-w-[200px] justify-between">
                         <span id="dropdown-label">📅 Cargando...</span>
@@ -139,22 +146,22 @@
 
                         <!-- 2. ATAJOS RÁPIDOS -->
                         <div class="p-3 bg-gray-50 border-b border-gray-200">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2 flex justify-between">
-                                <span>2. Filtro Rápido:</span>
-                                <button onclick="window.quickSelect('NADA')" class="text-red-500 hover:text-red-700 underline">Desmarcar Todo</button>
-                            </span>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">2. Filtro Rápido:</span>
+                                <button type="button" onclick="window.quickSelect('NADA')" class="text-[10px] text-red-500 hover:text-red-700 underline font-bold transition">Desmarcar Todo</button>
+                            </div>
                             <div class="grid grid-cols-4 gap-1.5">
-                                <button onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
-                                <button onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
-                                <button onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
-                                <button onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
-                                <button onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
-                                <button onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
-                                <button onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
+                                <button type="button" onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
+                                <button type="button" onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
+                                <button type="button" onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
+                                <button type="button" onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
+                                <button type="button" onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
+                                <button type="button" onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
+                                <button type="button" onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
                             </div>
                         </div>
 
-                        <!-- 3. ÁRBOL DE MESES ESPECÍFICO (Solo muestra los años seleccionados arriba) -->
+                        <!-- 3. ÁRBOL DE MESES ESPECÍFICO -->
                         <div class="p-3 max-h-[35vh] overflow-y-auto bg-white" id="dropdown-tree">
                             <!-- JS inyecta meses y remates aquí -->
                         </div>
@@ -480,7 +487,7 @@
         </div>
     </div> <!-- FIN APP CONTENT -->
 
-    <!-- MODAL GESTOR MATRICES (FULL SCREEN) -->
+    <!-- MODAL GESTOR MATRICES -->
     <div id="modal-gestor" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalGestor(event)">
         <div class="bg-white max-w-4xl w-full h-[90vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200" onclick="event.stopPropagation()">
             <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-900 text-white rounded-t-xl shrink-0">
@@ -563,9 +570,10 @@ let dashChartVentasInst=null, dashChartClientesInst=null, biChartSegmentsInst=nu
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
 let currentGestorYearTab = null;
 
-// ESTADO FILTRO GLOBAL
+// ESTADO FILTRO GLOBAL Y MEMORIA DE EXPANSIÓN
 window.globalSelectedYears = [];
 window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+window.expandedDropMonths = new Set(); // Guarda los meses abiertos en el dropdown
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#6B7280'; 
@@ -727,6 +735,7 @@ window.formatearNombreRemate = function(fileName, timestamp) {
     } catch(e) { return "Matriz"; }
 };
 
+// --- LOGICA DE ARRANQUE E INICIO ---
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
     const loadingOverlay = document.getElementById('loading-overlay');
@@ -750,7 +759,7 @@ async function initApp() {
     }
     
     if(db.remates && db.remates.length > 0) { 
-        window.actualizarFiltrosGlobales(true); 
+        window.actualizarFiltrosGlobales(true); // isInitialLoad = true
     }
 }
 
@@ -769,6 +778,7 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
     
     if(isInitialLoad) {
+        // Encontrar el año máximo para el inicio inteligente
         let years = new Set();
         db.remates.forEach(r => {
             let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
@@ -792,12 +802,10 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     window.renderApp();
 };
 
-window.applyModalSelection = function() {
-    let label = document.getElementById('dropdown-label');
-    if(label) label.innerHTML = "📌 Selección Manual";
-    window.updateAdminButtonCount();
+window.aplicarCambioSegmento = function() {
+    window.quickSelect('TODO'); // Al cambiar Siniestrados/Retail, forzamos recargar las selecciones actuales
     window.renderApp();
-};
+}
 
 // === NUEVO FILTRO CUSTOM TIEMPO ===
 window.toggleDropdown = function(e) {
@@ -824,13 +832,14 @@ window.renderDropdownUI = function() {
     let yearsHtml = '';
     yearsArr.forEach(y => {
         let isChecked = window.globalSelectedYears.includes(Number(y)) ? 'checked' : '';
+        let activeClass = isChecked ? 'bg-black text-white shadow-md border-black' : 'bg-white text-gray-500 hover:text-gray-900 border-gray-200';
         yearsHtml += `
-        <label class="time-year-label flex items-center gap-2 cursor-pointer bg-white border border-gray-200 rounded px-2.5 py-1.5 hover:bg-gray-50 transition shadow-sm flex-1 sm:flex-none justify-center">
-            <input type="checkbox" value="${y}" class="macro-year-cb" onchange="window.toggleTimeYear(${y}, this.checked)" ${isChecked}> 
-            <span class="text-xs font-bold text-gray-800">${y}</span>
+        <label class="flex items-center gap-2 cursor-pointer rounded px-3 py-1.5 transition flex-1 sm:flex-none justify-center ${activeClass}">
+            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)"> 
+            <span class="text-xs font-bold">${y}</span>
         </label>`;
     });
-    const tyc = document.getElementById('time-years-container');
+    const tyc = document.getElementById('dropdown-years-grid');
     if(tyc) tyc.innerHTML = yearsHtml;
 
     let seg = document.getElementById('macro-segment').value;
@@ -849,32 +858,39 @@ window.renderDropdownUI = function() {
     let html = '';
 
     Object.keys(byYear).sort((a,b)=>b-a).forEach(y => {
-        // Solo renderizar el arbol si el año esta seleccionado en las columnas de arriba! (Evita el infinito hacia abajo)
+        // Solo renderizar el arbol si el año esta seleccionado en las columnas de arriba!
         if(!window.globalSelectedYears.includes(Number(y))) return;
 
-        html += `<div class="mb-3 dropdown-year-group"><div class="sticky top-0 bg-white py-1 mb-1 z-10 border-b border-gray-100"><span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Año ${y}</span></div>`;
+        html += `<div class="mb-4 dropdown-year-group"><div class="sticky top-0 bg-white py-1 mb-2 z-10"><span class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-1 block">Año ${y}</span></div>`;
         
         Object.keys(byYear[y]).sort((a,b)=>a-b).forEach(m => {
             let rematesMes = byYear[y][m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
             let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
             let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
             
+            let dropId = `drop-${y}-${m}`;
+            let isExpanded = window.expandedDropMonths.has(dropId);
+            let hiddenClass = isExpanded ? '' : 'hidden';
+            let arrowClass = isExpanded ? 'rotate-180' : '';
+            
             html += `
             <div class="dropdown-month-group mb-1.5">
                 <div class="flex items-center justify-between p-1.5 hover:bg-gray-50 rounded transition group">
-                    <label class="flex items-center gap-2 cursor-pointer flex-1">
-                        <input type="checkbox" onchange="window.toggleDropMes(${y}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''} !w-3.5 !h-3.5">
+                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                        <input type="checkbox" onchange="window.toggleDropMes(${y}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
                         <span class="text-sm font-bold text-gray-800 uppercase tracking-wide group-hover:text-blue-700 transition" data-search="${monthNames[m]}">${monthNames[m]}</span>
                     </label>
-                    <button type="button" class="text-gray-400 hover:text-gray-900 px-2" onclick="window.toggleDropExpand('drop-${y}-${m}')">▼</button>
+                    <button type="button" class="text-gray-400 hover:text-gray-900 px-2 flex items-center justify-center h-full" onclick="window.toggleDropExpand('${dropId}')">
+                        <svg class="w-3.5 h-3.5 transform transition-transform ${arrowClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
                 </div>
-                <div id="drop-${y}-${m}" class="hidden pl-6 pr-2 py-1 space-y-1.5 border-l-2 border-gray-100 ml-2">
+                <div id="${dropId}" class="${hiddenClass} pl-6 pr-2 py-1 space-y-2 border-l-2 border-gray-100 ml-2">
                     ${rematesMes.map(r => {
                         let isChecked = checkedNodes.includes(r.id);
                         let rName = window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp);
                         return `
-                        <label class="dropdown-remate-item flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" onchange="window.toggleDropRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''} class="!w-3 !h-3 !rounded-sm">
+                        <label class="dropdown-remate-item flex items-center gap-3 cursor-pointer group">
+                            <input type="checkbox" onchange="window.toggleDropRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''} class="!w-3.5 !h-3.5 !rounded-sm">
                             <span class="text-xs font-medium text-gray-500 group-hover:text-gray-900 transition truncate" data-search="${rName}" title="${rName}">${rName}</span>
                         </label>
                         `;
@@ -885,7 +901,12 @@ window.renderDropdownUI = function() {
         html += `</div>`;
     });
     
-    if(rematesFiltrados.length === 0) html = '<p class="text-center text-xs font-bold text-gray-400 p-4">No hay datos.</p>';
+    if(window.globalSelectedYears.length === 0) {
+        html = '<p class="text-center text-xs font-bold text-gray-400 p-4">Selecciona un año arriba.</p>';
+    } else if (html === '') {
+        html = '<p class="text-center text-xs font-bold text-gray-400 p-4">No hay datos en el periodo.</p>';
+    }
+    
     const dt = document.getElementById('dropdown-tree');
     if(dt) dt.innerHTML = html;
 };
@@ -893,7 +914,6 @@ window.renderDropdownUI = function() {
 window.toggleTimeYear = function(y, checked) {
     if(checked) {
         if(!window.globalSelectedYears.includes(y)) window.globalSelectedYears.push(y);
-        // Cuando agregas un año, se selecciona TODO su contenido por defecto para no dejarlo vacio
         let seg = document.getElementById('macro-segment').value;
         let toAdd = db.remates.filter(r => {
             let matchSeg = seg === 'Todos' || r.tipo === seg;
@@ -903,7 +923,6 @@ window.toggleTimeYear = function(y, checked) {
         toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
     } else {
         window.globalSelectedYears = window.globalSelectedYears.filter(val => val !== y);
-        // Deseleccionar todo lo de ese año
         let toRemove = db.remates.filter(r => {
             let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
             return rYr === y;
@@ -914,8 +933,12 @@ window.toggleTimeYear = function(y, checked) {
 };
 
 window.toggleDropExpand = function(id) {
-    const el = document.getElementById(id);
-    if(el) el.classList.toggle('hidden');
+    if (window.expandedDropMonths.has(id)) {
+        window.expandedDropMonths.delete(id);
+    } else {
+        window.expandedDropMonths.add(id);
+    }
+    window.renderDropdownUI(); 
 };
 
 window.toggleDropMes = function(year, mesIndex, isChecked) {
@@ -952,7 +975,6 @@ window.quickSelect = function(type) {
         checkedNodes = [];
     } else {
         let seg = document.getElementById('macro-segment').value;
-        // Solo aplicar a los años que el usuario tiene activos en los botones!
         checkedNodes = db.remates.filter(r => {
             let matchSeg = seg === 'Todos' || r.tipo === seg;
             let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
@@ -982,16 +1004,16 @@ window.filterDropdown = function() {
         if(monthMatch || hasVisibleChild) {
             group.style.display = 'block';
             let contentDiv = group.querySelector('div[id^="drop-"]');
-            if(term.length > 1 && contentDiv) contentDiv.classList.remove('hidden');
+            if(term.length > 1 && contentDiv) {
+                contentDiv.classList.remove('hidden');
+                // Auto expandir icono si forzamos por busqueda
+                let svg = group.querySelector('svg');
+                if(svg) svg.classList.add('rotate-180');
+            }
         } else {
             group.style.display = 'none';
         }
     });
-};
-
-window.updateMacroFilter = function() {
-    // Si cambia de Siniestrados a Retail, aplica inmediatamente
-    window.applyDropdown();
 };
 
 window.applyDropdown = function() {
@@ -1166,7 +1188,9 @@ window.cerrarModalGestor = function(e) {
     document.getElementById('modal-gestor').classList.remove('flex'); 
     let searchEl = document.getElementById('search-gestor');
     if(searchEl) searchEl.value = '';
-    window.applyModalSelection();
+    window.updateDropdownLabel();
+    window.renderDropdownUI(); // Sincroniza el arbol pequeño con los cambios del grande
+    window.applyDropdown(); // Aplica y recarga
 };
 
 window.toggleGestorMes = function(year, mesIndex, isChecked) {
@@ -1421,7 +1445,7 @@ window.cambiarSeccion = function(mod){
     } catch(e) { console.error(e); }
 };
 
-window.renderApp = function() { 
+window.actualizarVistaActual = function() { 
     try {
         if (currentModule === 'remates') window.renderDashboard(); 
         else if (currentModule === 'comparativa') window.renderComparativa();
@@ -1443,7 +1467,7 @@ window.limpiarBase = async function(){
         if(error) throw error;
         db = {remates:[]}; checkedNodes = []; clientDB = []; 
         document.getElementById('empty-state').classList.remove('hidden'); 
-        window.actualizarFiltrosGlobales(true); 
+        window.actualizarFiltrosGlobales(); 
         location.reload(); 
     } catch (e) { 
         alert("Error al vaciar la base de datos de la nube.\nRevisa tus permisos de Administrador o tu conexión.\n\nDetalle: " + e.message);
@@ -1729,7 +1753,7 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-5 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-5 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function(e) { 
     if(e && e.target.id !== 'modal-multilote') return;
     document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); 
