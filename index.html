@@ -62,15 +62,15 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
+<body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeTimeMenuIfOutside(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.3 (UX Fix)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.0 (Custom Filter)</div>
 
-    <!-- OVERLAY DE CARGA -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[200] hidden flex-col items-center justify-center transition-all">
-        <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin shadow-sm"></div>
-        <p id="loading-text" class="mt-6 font-bold text-gray-900 text-lg tracking-tight text-center max-w-xs">Procesando...</p>
-        <p class="text-xs text-gray-500 uppercase tracking-widest mt-1 font-medium">No cierre esta ventana</p>
+    <!-- OVERLAY DE CARGA EN VIVO (ACTUALIZADO PARA SINCRONIZACIÓN INICIAL) -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] hidden flex-col items-center justify-center transition-all backdrop-blur-sm">
+        <div class="w-14 h-14 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin shadow-sm mb-6"></div>
+        <h2 class="text-2xl font-black text-gray-900 tracking-tight text-center mb-1">Zárate Analítica</h2>
+        <p id="loading-text" class="font-bold text-blue-600 text-sm tracking-wide text-center uppercase">Sincronizando Base de Datos...</p>
     </div>
 
     <!-- PANTALLA DE LOGIN -->
@@ -110,47 +110,54 @@
             </div>
         </header>
 
-        <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
+        <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL CON NUEVO FILTRO -->
         <div id="paraguas-bar" class="bg-white border-b border-gray-300 px-4 md:px-6 py-2.5 flex justify-between items-center shrink-0 z-20 sticky top-0 shadow-sm no-print">
-            <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1">
+            <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1 relative">
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:inline mr-2">Filtro Global</span>
                 
                 <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition"></select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
-                <select id="macro-year" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition">
-                    <option value="ALL">🌐 Todos los Años</option>
-                </select>
-                <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
-                
-                <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded px-2.5 py-1.5 text-xs font-bold text-blue-800 outline-none cursor-pointer hover:bg-blue-100 transition">
-                    <option value="ALL">Todo el Año</option>
-                    <optgroup label="Semestres">
-                        <option value="S1">1er Semestre (Ene-Jun)</option>
-                        <option value="S2">2do Semestre (Jul-Dic)</option>
-                    </optgroup>
-                    <optgroup label="Trimestres">
-                        <option value="Q1">Q1 (Ene-Mar)</option>
-                        <option value="Q2">Q2 (Abr-Jun)</option>
-                        <option value="Q3">Q3 (Jul-Sep)</option>
-                        <option value="Q4">Q4 (Oct-Dic)</option>
-                    </optgroup>
-                    <optgroup label="Meses">
-                        <option value="M0">Enero</option>
-                        <option value="M1">Febrero</option>
-                        <option value="M2">Marzo</option>
-                        <option value="M3">Abril</option>
-                        <option value="M4">Mayo</option>
-                        <option value="M5">Junio</option>
-                        <option value="M6">Julio</option>
-                        <option value="M7">Agosto</option>
-                        <option value="M8">Septiembre</option>
-                        <option value="M9">Octubre</option>
-                        <option value="M10">Noviembre</option>
-                        <option value="M11">Diciembre</option>
-                    </optgroup>
-                    <option value="MANUAL" hidden class="bg-gray-800 text-white">📌 Selección Manual</option>
-                </select>
+                <!-- NUEVO FILTRO DE TIEMPO PERSONALIZADO (AÑOS Y MESES JUNTOS) -->
+                <div class="relative" id="custom-time-container">
+                    <button type="button" onclick="window.toggleTimeMenu(event)" id="time-filter-btn" class="bg-blue-50 border border-blue-200 rounded px-3 py-1.5 text-xs font-black text-blue-800 flex items-center gap-2 hover:bg-blue-100 transition shadow-sm">
+                        <span id="time-filter-label">📅 Cargando...</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <!-- EL MENÚ DESPLEGABLE CON CHECKBOXES Y BUSCADOR -->
+                    <div id="time-filter-menu" class="hidden absolute top-full mt-1.5 left-0 bg-white border border-gray-200 rounded-lg shadow-2xl w-72 z-50 flex-col overflow-hidden">
+                        <div class="p-2.5 border-b border-gray-100 bg-gray-50">
+                            <input type="text" id="time-search" placeholder="🔍 Buscar año, mes o trimestre..." class="w-full bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-medium focus:border-black outline-none shadow-inner" onkeyup="window.filterTimeMenu()">
+                        </div>
+                        <div class="p-3 max-h-[60vh] overflow-y-auto">
+                            <!-- Sección Años -->
+                            <div class="mb-4">
+                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Años a Incluir</div>
+                                <div id="time-years-container" class="flex flex-wrap gap-2">
+                                    <!-- JS llena con checkboxes -->
+                                </div>
+                            </div>
+                            <!-- Sección Meses -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Meses</div>
+                                    <div class="flex gap-1">
+                                        <button type="button" onclick="window.quickSelectMonths('ALL')" class="text-[9px] bg-gray-200 hover:bg-gray-300 px-1.5 py-0.5 rounded font-bold text-gray-700 transition">Todo</button>
+                                        <button type="button" onclick="window.quickSelectMonths('S1')" class="text-[9px] bg-gray-200 hover:bg-gray-300 px-1.5 py-0.5 rounded font-bold text-gray-700 transition">S1</button>
+                                        <button type="button" onclick="window.quickSelectMonths('S2')" class="text-[9px] bg-gray-200 hover:bg-gray-300 px-1.5 py-0.5 rounded font-bold text-gray-700 transition">S2</button>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-x-3 gap-y-2" id="time-months-container">
+                                    <!-- JS llena con checkboxes de meses -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 border-t border-gray-100 bg-gray-50 flex gap-2">
+                            <button type="button" onclick="window.applyTimeFilter()" class="w-full bg-black text-white font-bold py-2 rounded-md hover:bg-gray-800 transition shadow-sm text-xs">Aplicar Filtro</button>
+                        </div>
+                    </div>
+                </div>
 
                 <button onclick="window.abrirModalArbol()" class="ml-2 flex items-center gap-1.5 bg-gray-900 text-white border border-gray-900 text-[11px] font-bold px-4 py-1.5 rounded shadow-sm hover:bg-black transition shrink-0">
                     <span>🗂️</span> Gestor de Matrices (<span id="count-matrices-btn">0</span>)
@@ -197,7 +204,7 @@
                 <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-300 shadow-sm">
-                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
                     <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o usa el Gestor de Matrices para comenzar a analizar.</p>
@@ -266,20 +273,10 @@
 
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2 no-print">
                             <div class="glass-panel p-5">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest">Composición de Ventas y Lotes</h4>
-                                    <select id="dash-groupby" onchange="window.renderDashboard()" class="bg-gray-50 border border-gray-200 rounded px-2 py-1 text-[10px] font-bold text-gray-700 outline-none cursor-pointer">
-                                        <option value="auto">Agrupación Automática</option>
-                                        <option value="remate">Matriz por Matriz</option>
-                                        <option value="month">Mes a Mes</option>
-                                    </select>
-                                </div>
-                                <div class="relative h-64 md:h-80 w-full"><canvas id="dash-chartVentas"></canvas></div>
+                                <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Composición de Ventas y Lotes</h4>
+                                <div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartVentas"></canvas></div>
                             </div>
-                            <div class="glass-panel p-5">
-                                <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4>
-                                <div class="relative h-64 md:h-80 w-full"><canvas id="dash-chartClientes"></canvas></div>
-                            </div>
+                            <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4><div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartClientes"></canvas></div></div>
                         </div>
 
                         <div class="glass-panel p-5 overflow-hidden w-full bg-white">
@@ -554,6 +551,10 @@ let dashChartVentasInst=null, dashChartClientesInst=null, biChartSegmentsInst=nu
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
 let currentModalYearTab = null;
 
+// VARIABLES FILTRO CUSTOM
+window.globalSelectedYears = [];
+window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#6B7280'; 
     Chart.defaults.font.family = 'Roboto, sans-serif'; 
@@ -690,6 +691,11 @@ window.formatearNombreRemate = function(fileName, timestamp) {
 
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    
+    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.classList.add('flex');
+
     try {
         statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Sincronizando...';
         const { data, error } = await supabaseClient.from('app_state').select('*');
@@ -703,8 +709,14 @@ async function initApp() {
         }
     } catch (e) {
         statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
+    } finally {
+        loadingOverlay.classList.add('hidden');
+        loadingOverlay.classList.remove('flex');
     }
-    if(db.remates && db.remates.length > 0) { window.actualizarFiltrosGlobales(); }
+    
+    if(db.remates && db.remates.length > 0) { 
+        window.actualizarFiltrosGlobales(true); 
+    }
 }
 
 window.updateAdminButtonCount = function() {
@@ -712,7 +724,8 @@ window.updateAdminButtonCount = function() {
     if (btnCount) btnCount.innerText = checkedNodes.length;
 };
 
-window.actualizarFiltrosGlobales = function() {
+// MODIFICADO: Inicia en el año más reciente
+window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     if(!db.remates || !db.remates.length) return;
     let segments = new Set(); let years = new Set();
     db.remates.forEach(r => {
@@ -722,60 +735,163 @@ window.actualizarFiltrosGlobales = function() {
     });
     
     let segSelect = document.getElementById('macro-segment');
-    let yearSelect = document.getElementById('macro-year');
-    
     let currentSeg = segSelect.value || Array.from(segments)[0];
-    let currentYr = yearSelect.value || Math.max(...Array.from(years)).toString();
-    
     segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
     
-    let yrOptions = `<option value="ALL" ${currentYr === 'ALL' ? 'selected' : ''}>🌐 Todos los Años</option>`;
-    yrOptions += `<option value="CUSTOM" hidden ${currentYr === 'CUSTOM' ? 'selected' : ''}>⚙️ Año Mix</option>`;
-    yrOptions += Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==currentYr?'selected':''}>Año ${y}</option>`).join('');
-    yearSelect.innerHTML = yrOptions;
+    let yearsArr = Array.from(years).sort((a,b)=>b-a);
+    let maxYear = yearsArr.length > 0 ? yearsArr[0] : new Date().getFullYear();
+
+    if(isInitialLoad || window.globalSelectedYears.length === 0) {
+        window.globalSelectedYears = [maxYear];
+        window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+    }
     
-    window.updateMacroFilter();
+    window.renderTimeFilterUI();
+    window.applyTimeFilter();
 };
 
 window.applyModalSelection = function() {
-    let periodElement = document.getElementById('macro-period');
-    if(periodElement) periodElement.value = 'MANUAL';
+    // Al usar el Gestor de Matrices, desconectamos el UI del Filtro de Tiempo
+    let label = document.getElementById('time-filter-label');
+    if(label) label.innerHTML = "📌 Selección Manual";
     window.updateAdminButtonCount();
     window.actualizarVistaActual();
 };
 
-window.updateMacroFilter = function(forceCustom = false) {
-    let seg = document.getElementById('macro-segment').value;
-    let yr = document.getElementById('macro-year').value;
-    let periodElement = document.getElementById('macro-period');
-    let period = periodElement ? periodElement.value : 'ALL';
-    
-    if(!forceCustom) {
-        let allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
-        if(period === 'S1') allowedMonths = [0,1,2,3,4,5];
-        else if(period === 'S2') allowedMonths = [6,7,8,9,10,11];
-        else if(period === 'Q1') allowedMonths = [0,1,2];
-        else if(period === 'Q2') allowedMonths = [3,4,5];
-        else if(period === 'Q3') allowedMonths = [6,7,8];
-        else if(period === 'Q4') allowedMonths = [9,10,11];
-        else if(period.startsWith('M')) allowedMonths = [Number(period.substring(1))];
-        
-        checkedNodes = db.remates.filter(r => {
-            let matchSeg = seg === 'Todos' || r.tipo === seg;
-            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-            let matchYr = (yr === 'ALL') ? true : (rYr === Number(yr));
-            let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-            let matchM = allowedMonths.includes(rM);
-            return matchSeg && matchYr && matchM;
-        }).map(r => r.id);
+// === NUEVO FILTRO CUSTOM TIEMPO ===
+window.toggleTimeMenu = function(e) {
+    if(e) e.stopPropagation();
+    const menu = document.getElementById('time-filter-menu');
+    if(menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        menu.classList.add('flex');
     } else {
-        if(periodElement) periodElement.value = 'CUSTOM';
-        document.getElementById('macro-year').value = 'CUSTOM';
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
     }
+};
+
+window.closeTimeMenuIfOutside = function(e) {
+    const container = document.getElementById('custom-time-container');
+    const menu = document.getElementById('time-filter-menu');
+    if (container && menu && !menu.classList.contains('hidden') && !container.contains(e.target)) {
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+    }
+};
+
+window.renderTimeFilterUI = function() {
+    let years = new Set();
+    db.remates.forEach(r => {
+        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        if(!isNaN(y)) years.add(y);
+    });
+    
+    let yearsArr = Array.from(years).sort((a,b)=>b-a);
+    
+    let yearsHtml = '';
+    yearsArr.forEach(y => {
+        let isChecked = window.globalSelectedYears.includes(Number(y)) ? 'checked' : '';
+        yearsHtml += `
+        <label class="time-year-label flex items-center gap-2 cursor-pointer bg-white border border-gray-200 rounded px-2.5 py-1.5 hover:bg-gray-50 transition shadow-sm flex-1 sm:flex-none justify-center">
+            <input type="checkbox" value="${y}" class="macro-year-cb" onchange="window.toggleTimeYear(${y}, this.checked)" ${isChecked}> 
+            <span class="text-xs font-bold text-gray-800">${y}</span>
+        </label>`;
+    });
+    document.getElementById('time-years-container').innerHTML = yearsHtml;
+
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    let monthsHtml = '';
+    monthNames.forEach((m, idx) => {
+        let isChecked = window.globalSelectedMonths.includes(idx) ? 'checked' : '';
+        let activeClass = isChecked ? 'bg-gray-900 text-white shadow-sm border-gray-900' : 'bg-white text-gray-500 hover:text-gray-900 hover:border-gray-400 border-gray-200';
+        monthsHtml += `
+        <div onclick="window.toggleTimeMonth(${idx})" class="time-month-label py-1.5 text-center text-xs rounded border font-bold transition cursor-pointer select-none ${activeClass}">
+            ${m}
+        </div>`;
+    });
+    document.getElementById('time-months-container').innerHTML = monthsHtml;
+};
+
+window.toggleTimeYear = function(y, checked) {
+    if(checked) {
+        if(!window.globalSelectedYears.includes(y)) window.globalSelectedYears.push(y);
+    } else {
+        window.globalSelectedYears = window.globalSelectedYears.filter(val => val !== y);
+    }
+};
+
+window.toggleTimeMonth = function(m) {
+    if(window.globalSelectedMonths.includes(m)) {
+        window.globalSelectedMonths = window.globalSelectedMonths.filter(val => val !== m);
+    } else {
+        window.globalSelectedMonths.push(m);
+    }
+    window.renderTimeFilterUI();
+};
+
+window.quickSelectMonths = function(type) {
+    if(type === 'ALL') window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+    else if(type === 'S1') window.globalSelectedMonths = [0,1,2,3,4,5];
+    else if(type === 'S2') window.globalSelectedMonths = [6,7,8,9,10,11];
+    else if(type === 'Q1') window.globalSelectedMonths = [0,1,2];
+    else if(type === 'Q2') window.globalSelectedMonths = [3,4,5];
+    else if(type === 'Q3') window.globalSelectedMonths = [6,7,8];
+    else if(type === 'Q4') window.globalSelectedMonths = [9,10,11];
+    window.renderTimeFilterUI();
+};
+
+window.filterTimeMenu = function() {
+    let term = document.getElementById('time-search').value.toLowerCase();
+    document.querySelectorAll('.time-year-label').forEach(el => {
+        el.style.display = el.innerText.toLowerCase().includes(term) ? '' : 'none';
+    });
+    document.querySelectorAll('.time-month-label').forEach(el => {
+        el.style.display = el.innerText.toLowerCase().includes(term) ? '' : 'none';
+    });
+};
+
+window.updateMacroFilter = function() {
+    window.applyTimeFilter();
+};
+
+window.applyTimeFilter = function() {
+    const menu = document.getElementById('time-filter-menu');
+    if(menu) { menu.classList.add('hidden'); menu.classList.remove('flex'); }
+
+    let seg = document.getElementById('macro-segment').value;
+    
+    checkedNodes = db.remates.filter(r => {
+        let matchSeg = seg === 'Todos' || r.tipo === seg;
+        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        let matchYr = window.globalSelectedYears.includes(rYr);
+        let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+        let matchM = window.globalSelectedMonths.includes(rM);
+        return matchSeg && matchYr && matchM;
+    }).map(r => r.id);
+
+    let labelStr = '📅 ';
+    if(window.globalSelectedYears.length === 0) labelStr += 'Sin Año';
+    else if(window.globalSelectedYears.length === 1) labelStr += window.globalSelectedYears[0];
+    else labelStr += 'Multiaño';
+
+    let mCount = window.globalSelectedMonths.length;
+    if(mCount === 12) labelStr += ' (Todo)';
+    else if(mCount === 6 && window.globalSelectedMonths.includes(0) && window.globalSelectedMonths.includes(5)) labelStr += ' (S1)';
+    else if(mCount === 6 && window.globalSelectedMonths.includes(6) && window.globalSelectedMonths.includes(11)) labelStr += ' (S2)';
+    else if(mCount === 1) {
+        const mNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        labelStr += ` (${mNames[window.globalSelectedMonths[0]]})`;
+    }
+    else labelStr += ` (${mCount} meses)`;
+
+    document.getElementById('time-filter-label').innerText = labelStr;
     
     window.updateAdminButtonCount();
     window.actualizarVistaActual();
 };
+
+// ----------------------------------------
 
 window.seleccionarUltimoRemate = function() {
     if (!db.remates || db.remates.length === 0) return;
@@ -784,14 +900,19 @@ window.seleccionarUltimoRemate = function() {
     const ultimo = rematesOrdenados[0];
 
     let segSelect = document.getElementById('macro-segment');
-    let yearSelect = document.getElementById('macro-year');
-    let periodSelect = document.getElementById('macro-period');
-    
     if (segSelect) segSelect.value = ultimo.tipo || 'Siniestrados';
-    if (yearSelect) yearSelect.value = ultimo.fechaData?.year ? Number(ultimo.fechaData.year).toString() : new Date().getFullYear().toString();
-    if (periodSelect) periodSelect.value = 'MANUAL';
+    
+    let y = ultimo.fechaData?.year ? Number(ultimo.fechaData.year) : new Date().getFullYear();
+    let m = ultimo.fechaData?.timestamp ? new Date(ultimo.fechaData.timestamp).getMonth() : 0;
+    
+    window.globalSelectedYears = [y];
+    window.globalSelectedMonths = [m];
+    
+    window.renderTimeFilterUI();
+    window.applyTimeFilter();
     
     checkedNodes = [ultimo.id];
+    document.getElementById('time-filter-label').innerText = "📌 Matriz Única";
     
     window.updateAdminButtonCount();
     window.cambiarSeccion('remates');
@@ -1049,11 +1170,11 @@ window.iniciarProcesamiento = async function(files){
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingText = document.getElementById('loading-text');
     loadingOverlay.classList.remove('hidden'); loadingOverlay.classList.add('flex');
+    loadingText.innerText = `Analizando Matrices...`;
     
     let successCount = 0; let upsertQueue = [];
     
     for(let i = 0; i < validFiles.length; i++){ 
-        loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
         await new Promise(r => setTimeout(r, 20)); 
         try { 
             const data = await parseExcel(validFiles[i]); 
@@ -1072,7 +1193,7 @@ window.iniciarProcesamiento = async function(files){
         document.getElementById('db-status').innerText = `Error: Archivos Inválidos`; return;
     }
 
-    loadingText.innerText = "Sincronizando Cruces..."; await new Promise(r => setTimeout(r, 20));
+    loadingText.innerText = "Sincronizando a la Nube..."; await new Promise(r => setTimeout(r, 20));
 
     db.remates.sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
     let clientesGlobales=[]; let adjudicatariosGlobales=[];
@@ -1090,10 +1211,8 @@ window.iniciarProcesamiento = async function(files){
     
     try { 
         for (let i = 0; i < upsertQueue.length; i++) {
-            loadingText.innerText = `Subiendo a la Nube (${i+1}/${upsertQueue.length})...`;
             const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
             if (error) throw error;
-            await new Promise(r => setTimeout(r, 50)); 
         }
         document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> En Línea (${db.remates.length})`;
     } catch (e) { 
@@ -1167,11 +1286,11 @@ function buildAgg(rematesList){
 window.cambiarSeccion = function(mod){ 
     try {
         currentModule=mod; 
-        document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
-        document.getElementById('nav-mod-comparativa').className=mod==='comparativa'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
-        document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
-        document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
-        document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active':'nav-item nav-inactive'; 
+        document.getElementById('nav-mod-comparativa').className=mod==='comparativa'?'nav-item nav-active':'nav-item nav-inactive'; 
+        document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active':'nav-item nav-inactive'; 
+        document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active':'nav-item nav-inactive'; 
+        document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active':'nav-item nav-inactive'; 
         document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mt-6':'nav-item nav-inactive mt-6'; 
         
         ['module-remates', 'module-comparativa', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
@@ -1224,18 +1343,8 @@ window.renderDashboard = function(){
         
         let titulo = "Selección Activa";
         try {
-            let selectPeriodo = document.getElementById('macro-period');
-            let selectYear = document.getElementById('macro-year');
-            if (selectPeriodo) {
-                if (selectPeriodo.value === 'CUSTOM') {
-                    titulo = "Selección Personalizada";
-                } else if (selectPeriodo.value === 'MANUAL') {
-                    titulo = "Selección Manual (Gestor de Matrices)";
-                } else if (selectPeriodo.selectedIndex >= 0 && selectPeriodo.options[selectPeriodo.selectedIndex]) {
-                    let yT = selectYear.value === 'ALL' ? 'Histórico Completo' : selectYear.value;
-                    titulo = selectPeriodo.options[selectPeriodo.selectedIndex].text + " " + yT;
-                }
-            }
+            let labelElement = document.getElementById('time-filter-label');
+            if (labelElement) titulo = labelElement.innerText.replace('📅 ', '');
             if(checkedNodes.length === 1 && allRemates.length === 1) {
                 titulo = window.formatearNombreRemate(allRemates[0].fileName, allRemates[0].fechaData?.timestamp);
             }
@@ -1305,8 +1414,8 @@ window.renderDashboard = function(){
                 let monthMap = {};
                 allRemates.forEach(r => {
                     let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-                    let y = r.fechaData?.year ? String(r.fechaData.year).slice(-2) : 'XX';
-                    let labelStr = document.getElementById('macro-year').value === 'ALL' ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
+                    let y = r.fechaData?.year ? String(r.fechaData.year) : 'XX';
+                    let labelStr = window.globalSelectedYears.length > 1 ? `${monthNamesShort[m]} ${y}` : monthNamesShort[m];
                     
                     let mk = `${y}-${m}`; 
                     if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, lotes: 0, label: labelStr, rawD: r.fechaData?.timestamp||0, count: 0 };
@@ -1350,7 +1459,7 @@ window.renderDashboard = function(){
                             tooltip: {
                                 callbacks: {
                                     afterBody: function(context) {
-                                        return '\nRemates Consolidados: ' + cMatrices[context[0].dataIndex];
+                                        return '\nMatrices Consolidadas: ' + cMatrices[context[0].dataIndex];
                                     }
                                 }
                             }
@@ -1470,7 +1579,7 @@ window.renderComparativa = function() {
                         tooltip: {
                             callbacks: {
                                 afterBody: function(context) {
-                                    return '\nRemates Consolidados: ' + dataMatrices[context[0].dataIndex];
+                                    return '\nMatrices Consolidadas: ' + dataMatrices[context[0].dataIndex];
                                 }
                             }
                         }
@@ -1496,7 +1605,7 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-5 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-5 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
 // === NUEVO DISEÑO ESTRUCTURADO DE DATOS ===
