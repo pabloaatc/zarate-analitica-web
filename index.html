@@ -13,7 +13,6 @@
             theme: { 
                 extend: { 
                     fontFamily: { 
-                        /* Usando fuentes nativas del sistema para un look cuadrado, limpio y profesional */
                         sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'] 
                     }, 
                     colors: { 
@@ -66,7 +65,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v4.3 (Clean UI)</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v4.4 (Datos Pro)</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -183,7 +182,7 @@
                     <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="window.cambiarSeccion('remates')">Resumen General</div>
                     <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('autos')">Análisis Vehicular</div>
                     <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('clientes')">Gestión de Clientes</div>
-                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('conclusiones')">Datos Directivos</div>
+                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
                     <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
                 </div>
 
@@ -210,7 +209,7 @@
                     <p class="text-sm text-premium-muted mt-2 text-center max-w-sm font-medium">Sube archivos Excel o cambia el filtro en la barra superior para comenzar.</p>
                 </div>
 
-                <!-- MODULE: REMATES (AHORA UNIFICADO) -->
+                <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-6 md:space-y-8 max-w-[1400px] mx-auto pb-10">
                     <div id="dashboard-view" class="space-y-6 md:space-y-8">
                         <!-- HEADER DINÁMICO -->
@@ -412,13 +411,13 @@
                     </div>
                 </div>
 
-                <!-- MODULE: DATOS (CONCLUSIONES IA) -->
+                <!-- MODULE: DATOS (REPORTE EJECUTIVO) -->
                 <div id="module-conclusiones" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Datos Directivos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Conclusiones macro legibles</p></div>
+                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Datos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Reporte Ejecutivo Estructurado</p></div>
                         <button onclick="window.print()" class="px-5 py-2.5 bg-white border border-slate-200 shadow-sm rounded-xl text-xs font-bold hover:bg-slate-50 hover:shadow-md transition w-full md:w-auto uppercase tracking-wider text-premium-text">🖨️ Imprimir Resumen</button>
                     </div>
-                    <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 text-premium-text"></div>
+                    <div id="conclusiones-content"></div>
                 </div>
 
                 <!-- MODULE: BUSCADOR -->
@@ -445,7 +444,7 @@
     <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-700 flex justify-between items-start bg-gray-900">
-                <div><h3 class="text-xl font-extrabold tracking-tight text-white">Gestor de Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1.5">Activa o desactiva matrices para ajustar la muestra</p></div>
+                <div><h3 class="text-xl font-extrabold tracking-tight text-white">Administrar Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1.5">Activa o desactiva para ajustar la muestra</p></div>
                 <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded-lg p-1.5 shadow-sm transition">✕</button>
             </div>
             <div class="flex-1 overflow-y-auto p-4 bg-white" id="arbol-container">
@@ -1238,29 +1237,105 @@ window.renderConclusiones = function() {
 
         let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-premium-success' : 'text-premium-danger';
 
-        const cardClasses = "glass-panel p-5 md:p-6 bg-gradient-to-b from-white to-slate-50/50";
-        const titleClasses = "font-extrabold text-sm text-premium-text mb-3 flex items-center gap-2";
-        const badgeClasses = "bg-slate-100 px-2 py-0.5 rounded-md text-[10px] text-premium-muted border border-slate-200";
-        const textClasses = "text-xs md:text-sm text-slate-600 leading-relaxed font-medium";
-        const strongClasses = "text-premium-text font-extrabold";
+        // --- INICIO: NUEVO REPORTE EJECUTIVO ESTRUCTURADO ---
+        html += `<div class="space-y-8 text-premium-text">`;
 
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">1</span> Venta Total</h4><p class="${textClasses}">Las operaciones válidas sumaron una venta adjudicada de <strong class="${strongClasses}">${formatMoney(agg.venta)}</strong>.</p></div>`;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">2</span> Comisiones Est.</h4><p class="${textClasses}">La muestra generó un ingreso por comisiones de <strong class="${strongClasses}">${formatMoney(agg.comisionTotal)}</strong>.</p></div>`;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">3</span> Efectividad</h4><p class="${textClasses}">Se logró vender el <strong class="${strongClasses}">${agg.eficaciaLotes.toFixed(1)}%</strong> de todos los lotes disponibles en el catálogo.</p></div>`;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">4</span> Delta</h4><p class="${textClasses}">Las pujas incrementaron el valor de salida en <strong class="${strongClasses}">${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</strong>, un margen del <strong class="${sobreColor} font-extrabold">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</strong>.</p></div>`;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">5</span> Ticket Promedio</h4><p class="${textClasses}">El valor promedio de venta por cada lote adjudicado fue de <strong class="${strongClasses}">${formatMoney(agg.ticketPromedio)}</strong>.</p></div>`;
+        // SECCIÓN 1: Resultados Financieros
+        html += `
+        <div>
+            <h3 class="text-lg font-black text-gray-900 mb-4 border-b border-gray-200 pb-2">1. Resultados Financieros</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-premium-success">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Venta Total Adjudicada</p>
+                    <p class="text-2xl font-black text-gray-900">${formatMoney(agg.venta)}</p>
+                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Suma de operaciones válidas.</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-premium-highlight">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Comisiones (12% + IVA)</p>
+                    <p class="text-2xl font-black text-gray-900">${formatMoney(agg.comisionTotal)}</p>
+                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Ingresos estimados para la firma.</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-gray-800">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Ticket Promedio</p>
+                    <p class="text-2xl font-black text-gray-900">${formatMoney(agg.ticketPromedio)}</p>
+                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Valor promedio por lote vendido.</p>
+                </div>
+            </div>
+        </div>
+        `;
+
+        // SECCIÓN 2: Rendimiento de Catálogo
+        html += `
+        <div>
+            <h3 class="text-lg font-black text-gray-900 mb-4 border-b border-gray-200 pb-2">2. Rendimiento de Catálogo</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-gray-400">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Colocación Base</p>
+                    <p class="text-2xl font-black text-gray-900">${agg.lotes.toLocaleString('es-CL')} <span class="text-sm font-semibold text-gray-400">/ ${agg.lotesDisponibles.toLocaleString('es-CL')} lotes</span></p>
+                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Volumen físico subastado.</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-premium-success">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Efectividad Total</p>
+                    <p class="text-2xl font-black text-gray-900">${agg.eficaciaLotes.toFixed(1)}%</p>
+                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Porcentaje de catálogo vendido.</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-premium-highlight">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Incremento sobre Mínimo</p>
+                    <p class="text-2xl font-black text-gray-900">${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</p>
+                    <p class="text-[10px] text-gray-400 mt-2 font-medium">Margen final: <span class="${sobreColor} font-bold">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</span></p>
+                </div>
+            </div>
+        </div>
+        `;
+
+        // SECCIÓN 3: Tracción de Clientes
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">6</span> Tasa de Cierre</h4><p class="${textClasses}">El <strong class="${strongClasses}">${tasaExito.toFixed(1)}%</strong> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
-        html += `<div class="${cardClasses} flex flex-col justify-between"><h4 class="${titleClasses}"><span class="${badgeClasses}">7</span> Fuga</h4><p class="${textClasses} mb-4">Hubo <strong class="text-premium-danger font-extrabold">${agg.perdedoresCount} clientes</strong> que pagaron garantía pero no lograron comprar nada.</p><button onclick="window.abrirModalFuga()" class="w-full py-2 bg-white border border-slate-200 text-premium-text font-bold rounded-lg text-xs hover:bg-slate-50 transition shadow-sm no-print uppercase tracking-widest">Ver listado</button></div>`;
         let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">8</span> Clientes Nuevos</h4><p class="${textClasses}">El <strong class="${strongClasses}">${agg.pctVentaNuevos.toFixed(1)}%</strong> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">9</span> Volúmen</h4><p class="${textClasses}">Un total de <strong class="${strongClasses}">${multi} clientes</strong> operaron en volumen y compraron más de un lote.</p></div>`;
         let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">10</span> Limpieza</h4><p class="${textClasses}">Se aislaron automáticamente <strong class="${strongClasses}">${falsos} pujas</strong> internas o pruebas de sistema.</p></div>`;
+        
+        html += `
+        <div>
+            <h3 class="text-lg font-black text-gray-900 mb-4 border-b border-gray-200 pb-2">3. Tracción de Clientes y Audiencia</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-center">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Participación</p>
+                    <p class="text-xl font-black text-gray-900">${agg.garantias.toLocaleString('es-CL')} <span class="text-xs text-gray-400 font-medium">garantías pagadas</span></p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-center">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Tasa de Cierre</p>
+                    <p class="text-xl font-black text-premium-success">${tasaExito.toFixed(1)}% <span class="text-xs text-gray-400 font-medium">adjudicó un lote</span></p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Fuga</p>
+                        <p class="text-xl font-black text-premium-danger">${agg.perdedoresCount.toLocaleString('es-CL')} <span class="text-xs text-gray-400 font-medium">sin compra</span></p>
+                    </div>
+                    <button onclick="window.abrirModalFuga()" class="mt-3 text-[9px] w-full bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-700 py-1.5 rounded font-bold uppercase tracking-wider transition">Ver Listado</button>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-center">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Nuevos</p>
+                    <p class="text-xl font-black text-premium-highlight">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="text-xs text-gray-400 font-medium">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></p>
+                </div>
+            </div>
+            
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 text-sm font-medium text-gray-700 flex items-center justify-between shadow-sm">
+                    <span>⚡ <strong class="text-gray-900">Compradores Volumen:</strong> Hubo <strong class="text-premium-highlight">${multi} clientes</strong> que se adjudicaron más de un lote en la muestra.</span>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm font-medium text-gray-500 flex items-center justify-between shadow-sm">
+                    <span>🛡️ <strong class="text-gray-700">Auditoría:</strong> Se aislaron automáticamente <strong class="text-gray-700">${falsos} pujas internas</strong> o pruebas de sistema.</span>
+                </div>
+            </div>
+        </div>
+        `;
 
-        if(document.getElementById('conclusiones-content')) document.getElementById('conclusiones-content').innerHTML = html;
-    } catch (e) {}
+        html += `</div>`;
+        // --- FIN NUEVO REPORTE ---
+
+        document.getElementById('conclusiones-content').innerHTML = html;
+        document.getElementById('conclusiones-content').className = "text-premium-text";
+    } catch (e) { console.error(e); }
 };
 
 window.renderPanelAutos = function(){
@@ -1278,7 +1353,7 @@ window.renderPanelAutos = function(){
         } catch(ec) {}
         const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term));
         if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
-            return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-extrabold text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-extrabold text-premium-success">${formatMoney(a.monto)}</td></tr>`;
+            return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-black text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(a.monto)}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin vehículos en la selección actual.</td></tr>';
     } catch (e) {}
 };
@@ -1292,7 +1367,7 @@ window.abrirModalFuga = function() {
                 let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
                 let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
                 let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
-                html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-extrabold">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
+                html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
             });
         } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted font-medium">No hay registros.</td></tr>'; }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; document.getElementById('modal-fuga').classList.remove('hidden'); document.getElementById('modal-fuga').classList.add('flex');
@@ -1314,13 +1389,30 @@ window.exportarFugaExcel = function() {
 
 window.abrirModalPujadores = function(loteEncoded, nodeId){
     try {
-        const loteStr=decodeURIComponent(loteEncoded); const node=nodeRematesMap[nodeId]; let todasPujas=[]; node.remates.forEach(r=>{ if(r.posturasPorLote && r.posturasPorLote[loteStr]) todasPujas=todasPujas.concat(r.posturasPorLote[loteStr]); });
-        let adjudicado=null; node.remates.forEach(r=>{ let adj=r.adjudicaciones.find(a=>a.loteStr===loteStr); if(adj) adjudicado=adj; }); currentAdjudicadoModal = adjudicado; currentModalPujas=todasPujas.sort((a,b)=>b.monto-a.monto);
-        if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').innerText="Lote Seleccionado"; if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adj: ${adjudicado && !adjudicado.esFalso?formatMoney(adjudicado.monto):'FALSO'} | Min: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
-        if(document.getElementById('modal-total-pujas')) document.getElementById('modal-total-pujas').innerText=todasPujas.length; if(document.getElementById('modal-unicos-reales')) document.getElementById('modal-unicos-reales').innerText=[...new Set(todasPujas.filter(p=>!p.esFalso).map(p=>p.nombreNorm))].length; if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
-        currentFiltroModal='todos'; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold';
-        renderModalTabla(); document.getElementById('modal-pujadores').classList.remove('hidden'); document.getElementById('modal-pujadores').classList.add('flex');
-    } catch(e) {}
+        const loteStr = decodeURIComponent(loteEncoded); 
+        let remate = db.remates.find(r => r.id === nodeId);
+        if(!remate) return;
+
+        let todasPujas = remate.posturasPorLote ? (remate.posturasPorLote[loteStr] || []) : [];
+        let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null; 
+        
+        currentAdjudicadoModal = adjudicado; 
+        currentModalPujas = todasPujas.sort((a,b)=>b.monto-a.monto);
+        
+        if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').innerText="Lote Seleccionado"; 
+        if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adj: ${adjudicado && !adjudicado.esFalso?formatMoney(adjudicado.monto):'FALSO'} | Min: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
+        if(document.getElementById('modal-total-pujas')) document.getElementById('modal-total-pujas').innerText=todasPujas.length; 
+        if(document.getElementById('modal-unicos-reales')) document.getElementById('modal-unicos-reales').innerText=[...new Set(todasPujas.filter(p=>!p.esFalso).map(p=>p.nombreNorm))].length; 
+        if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
+        
+        currentFiltroModal='todos'; 
+        if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold'; 
+        if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; 
+        if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold';
+        
+        renderModalTabla(); 
+        document.getElementById('modal-pujadores').classList.remove('hidden'); document.getElementById('modal-pujadores').classList.add('flex');
+    } catch(e) { console.error("Error modal pujas:", e); }
 };
 
 function renderModalTabla(){
@@ -1329,8 +1421,8 @@ function renderModalTabla(){
         if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso); if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
-            let badge = p.esFalso ? '<span class="text-[9px] font-extrabold text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
-            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${window.formatExcelDate(p.fecha)}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-extrabold ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
+            let badge = p.esFalso ? '<span class="text-[9px] font-black text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
+            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${window.formatExcelDate(p.fecha)}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-black ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin pujas registradas</td></tr>';
     } catch(e) {}
 }
@@ -1361,7 +1453,7 @@ function procesarDatosClientes(){
 window.renderPanelClientesData = function(filtered,isFiltered=false){ 
     try {
         if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="pl-4 font-bold text-xs md:text-sm text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-premium-muted font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-extrabold text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-extrabold ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
+        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="pl-4 font-bold text-xs md:text-sm text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-premium-muted font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-black text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-black ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
         if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#E30000'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
     } catch(e) {}
 };
@@ -1373,7 +1465,7 @@ window.abrirFichaCliente = function(nombreStr){
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
         if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?window.formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+(Number(b.monto)||0),0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+(Number(b.monto)||0),0)); 
-        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?window.formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-extrabold text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
+        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?window.formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
 };
@@ -1386,7 +1478,7 @@ window.buscarPatente = function(){
         if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-10 text-center text-premium-muted text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr>'; return; } 
         let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData?.timestamp,remate:window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
         if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-10 text-center font-bold text-sm text-premium-danger">Sin resultados</td></tr>`; return; } 
-        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?window.formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.remate ? res.remate : '-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-extrabold text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
+        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?window.formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.remate ? res.remate : '-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) {}
 };
 </script>
