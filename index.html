@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.1 (Dual-Chart)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.2 (Tooltip Pro)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[200] hidden flex-col items-center justify-center transition-all">
@@ -174,6 +174,7 @@
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar()"></div>
 
+            <!-- SIDEBAR NAVEGACIÓN -->
             <aside id="sidebar" class="absolute md:relative z-40 w-[220px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 border-r border-gray-200 bg-white flex flex-col shrink-0 no-print">
                 <div class="p-3 flex-1 overflow-y-auto space-y-1">
                     <div class="flex justify-between items-center mb-4 px-2 mt-2">
@@ -181,9 +182,7 @@
                         <button onclick="window.toggleSidebar()" class="md:hidden text-gray-400 hover:text-gray-800 p-1 bg-gray-100 rounded">✕</button>
                     </div>
                     <div id="nav-mod-remates" class="nav-item nav-active" onclick="window.cambiarSeccion('remates')">Resumen General</div>
-                    
                     <div id="nav-mod-comparativa" class="nav-item nav-inactive" onclick="window.cambiarSeccion('comparativa')">Comparativa Histórica</div>
-                    
                     <div id="nav-mod-autos" class="nav-item nav-inactive" onclick="window.cambiarSeccion('autos')">Análisis Vehicular</div>
                     <div id="nav-mod-clientes" class="nav-item nav-inactive" onclick="window.cambiarSeccion('clientes')">Gestión de Clientes</div>
                     <div id="nav-mod-conclusiones" class="nav-item nav-inactive" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
@@ -200,6 +199,7 @@
                 </div>
             </aside>
 
+            <!-- ÁREA DE TRABAJO -->
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
                 <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/95 no-print p-6">
@@ -463,22 +463,22 @@
     <!-- MODAL ARBOL DE SELECCION (ADMIN MATRICES) -->
     <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200">
-            <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-50">
-                <div><h3 class="text-lg font-black tracking-tight text-gray-900">Administrar Matrices</h3><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Selección específica de datos</p></div>
-                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-gray-800 bg-white border border-gray-300 rounded p-1 shadow-sm transition">✕</button>
+            <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-900 text-white rounded-t-xl">
+                <div><h3 class="text-lg font-black tracking-tight">Gestor de Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1">Control absoluto de la muestra</p></div>
+                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded p-1 shadow-sm transition">✕</button>
             </div>
             
-            <div class="bg-white border-b border-gray-200 p-3">
-                <input type="text" id="search-arbol" placeholder="🔍 Buscar por mes (ej. Enero) o matriz..." class="w-full bg-gray-50 border border-gray-300 rounded px-3 py-2 text-sm focus:border-gray-900 focus:bg-white transition outline-none shadow-inner" onkeyup="window.filtrarModalArbol()">
+            <div class="bg-gray-50 border-b border-gray-200 p-4">
+                <input type="text" id="search-arbol" placeholder="🔍 Buscar por mes (ej. Enero) o matriz..." class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:border-gray-900 focus:bg-white transition outline-none shadow-inner" onkeyup="window.filtrarModalArbol()">
             </div>
             
             <div id="arbol-tabs-container"></div>
             
             <div class="flex justify-between items-center bg-gray-100 border-b border-gray-200 p-3 z-10 shadow-inner">
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Acciones Masivas:</span>
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Acciones Rápidas:</span>
                 <div class="flex gap-2">
                     <button onclick="window.toggleArbolAll(true)" class="bg-white border border-gray-300 text-gray-800 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-gray-50 transition shadow-sm">✔ Marcar Todas</button>
-                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar Todo</button>
+                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar</button>
                 </div>
             </div>
 
@@ -486,7 +486,7 @@
                 <!-- Se llena con JS -->
             </div>
             <div class="p-4 border-t border-gray-200 bg-gray-50">
-                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar Cambios</button>
+                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar y Ver Resultados</button>
             </div>
         </div>
     </div>
@@ -730,6 +730,13 @@ window.actualizarFiltrosGlobales = function() {
     window.updateMacroFilter();
 };
 
+window.applyModalSelection = function() {
+    let periodElement = document.getElementById('macro-period');
+    if(periodElement) periodElement.value = 'MANUAL';
+    window.updateAdminButtonCount();
+    window.actualizarVistaActual();
+};
+
 window.updateMacroFilter = function(forceCustom = false) {
     let seg = document.getElementById('macro-segment').value;
     let yr = document.getElementById('macro-year').value;
@@ -775,7 +782,7 @@ window.seleccionarUltimoRemate = function() {
     
     if (segSelect) segSelect.value = ultimo.tipo || 'Siniestrados';
     if (yearSelect) yearSelect.value = ultimo.fechaData?.year ? Number(ultimo.fechaData.year).toString() : new Date().getFullYear().toString();
-    if (periodSelect) periodSelect.value = 'CUSTOM';
+    if (periodSelect) periodSelect.value = 'MANUAL';
     
     checkedNodes = [ultimo.id];
     
@@ -784,7 +791,6 @@ window.seleccionarUltimoRemate = function() {
     window.actualizarVistaActual();
 };
 
-// --- LOGICA MODAL MATRICES MASIVA ---
 window.switchModalYear = function(y) {
     currentModalYearTab = y;
     window.abrirModalArbol();
@@ -804,7 +810,7 @@ window.toggleArbolAll = function(check) {
     } else {
         checkedNodes = [];
     }
-    window.updateMacroFilter(true);
+    window.applyModalSelection();
     window.abrirModalArbol();
 };
 
@@ -924,14 +930,14 @@ window.toggleArbolMes = function(year, mesIndex, isChecked) {
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
     
-    window.updateMacroFilter(true);
+    window.applyModalSelection();
     window.abrirModalArbol(); 
 };
 
 window.toggleArbolRemate = function(id, isChecked) {
     if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    window.updateMacroFilter(true);
+    window.applyModalSelection();
     window.abrirModalArbol(); 
 };
 
@@ -1275,7 +1281,7 @@ window.renderDashboard = function(){
         } catch(e){}
 
         try {
-            let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = [];
+            let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = []; let cMatrices = [];
             let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
             
             let distinctMonths = new Set(allRemates.map(r => r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0)).size;
@@ -1289,20 +1295,22 @@ window.renderDashboard = function(){
                     let labelStr = document.getElementById('macro-year').value === 'ALL' ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
                     
                     let mk = `${y}-${m}`; 
-                    if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: labelStr, rawD: r.fechaData?.timestamp||0 };
+                    if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: labelStr, rawD: r.fechaData?.timestamp||0, count: 0 };
+                    
+                    monthMap[mk].count++;
                     if(r.tipo === 'Siniestrados') monthMap[mk].siniestros += (Number(r.ventaTotal) || 0);
                     if(r.tipo === 'Retail') monthMap[mk].retail += (Number(r.ventaTotal) || 0);
                     monthMap[mk].nuevos += (Number(r.nuevos) || 0); monthMap[mk].antiguos += (Number(r.antiguos) || 0);
                 });
                 Object.values(monthMap).sort((a,b)=>a.rawD - b.rawD).forEach(v => {
-                    chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos);
+                    chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos); cMatrices.push(v.count);
                 });
             } else {
                 allRemates.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0)).forEach(r => {
                     chartLabels.push(window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp));
                     cSiniestros.push(r.tipo === 'Siniestrados' ? (Number(r.ventaTotal) || 0) : 0);
                     cRetail.push(r.tipo === 'Retail' ? (Number(r.ventaTotal) || 0) : 0);
-                    cNuevos.push(Number(r.nuevos) || 0); cRecurrentes.push(Number(r.antiguos) || 0);
+                    cNuevos.push(Number(r.nuevos) || 0); cRecurrentes.push(Number(r.antiguos) || 0); cMatrices.push(1);
                 });
             }
 
@@ -1313,7 +1321,23 @@ window.renderDashboard = function(){
             const canvasVentas = document.getElementById('dash-chartVentas');
             if(canvasVentas) {
                 if(dashChartVentasInst) dashChartVentasInst.destroy();
-                dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: datasetsVentas }, options: { responsive: true, maintainAspectRatio: false } });
+                dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), { 
+                    type: 'bar', 
+                    data: { labels: chartLabels, datasets: datasetsVentas }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    afterBody: function(context) {
+                                        return '\nRemates Consolidados: ' + cMatrices[context[0].dataIndex];
+                                    }
+                                }
+                            }
+                        }
+                    } 
+                });
             }
 
             const canvasClientes = document.getElementById('dash-chartClientes');
@@ -1369,7 +1393,8 @@ window.renderComparativa = function() {
         let chartLabels = [];
         let dataVenta = [];
         let dataComision = [];
-        let dataLotes = []; // NUEVO EJE PARA LOTES
+        let dataLotes = [];
+        let dataMatrices = [];
 
         sortedKeys.forEach(k => {
             let g = groups[k];
@@ -1377,7 +1402,8 @@ window.renderComparativa = function() {
             chartLabels.push(g.label);
             dataVenta.push(agg.venta);
             dataComision.push(agg.comisionTotal);
-            dataLotes.push(agg.lotes); // Agregamos los lotes
+            dataLotes.push(agg.lotes); 
+            dataMatrices.push(g.remates.length);
             
             tableHtml += `
             <tr class="hover:bg-gray-50 transition border-b border-gray-100">
@@ -1408,6 +1434,15 @@ window.renderComparativa = function() {
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                afterBody: function(context) {
+                                    return '\nRemates Consolidados: ' + dataMatrices[context[0].dataIndex];
+                                }
+                            }
+                        }
+                    },
                     scales: { 
                         y: { type: 'linear', display: true, position: 'left', beginAtZero: true },
                         y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
@@ -1429,9 +1464,10 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-5 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-5 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
+// === NUEVO DISEÑO ESTRUCTURADO DE DATOS ===
 window.renderConclusiones = function() {
     try {
         if(currentModule !== 'conclusiones') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
