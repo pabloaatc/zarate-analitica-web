@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v4.0 (Global)</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v4.1 (Stable)</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -118,7 +118,7 @@
         </header>
 
         <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
-        <div id="paraguas-bar" class="bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 md:px-6 py-3 flex justify-between items-center shrink-0 z-20 shadow-sm no-print">
+        <div id="paraguas-bar" class="bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 md:px-6 py-3 flex justify-between items-center shrink-0 z-20 sticky top-0 shadow-sm no-print">
             <div class="flex items-center gap-2 md:gap-4 flex-wrap">
                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden lg:inline">Filtro Global:</span>
                 
@@ -157,8 +157,9 @@
                 </select>
             </div>
 
-            <button onclick="window.abrirModalArbol()" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-xs font-bold px-3 py-2 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 transition shrink-0 ml-2">
-                <span>⚙️</span> <span class="hidden md:inline">Específico</span>
+            <!-- BOTÓN ADMIN MATRICES (EL NUEVO "ESPECÍFICO") -->
+            <button onclick="window.abrirModalArbol()" class="flex items-center gap-2 bg-gray-900 text-white border border-gray-800 text-xs font-bold px-4 py-2 rounded-xl shadow-md hover:bg-black hover:shadow-lg transition shrink-0 ml-2">
+                <span>🗂️</span> <span class="hidden md:inline">Administrar Matrices (<span id="count-matrices-btn">0</span>)</span>
             </button>
         </div>
 
@@ -350,7 +351,7 @@
                 <!-- MODULE: CLIENTES -->
                 <div id="module-clientes" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Clientes</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Directorio y comportamiento de cartera</p></div>
+                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Gestión de Clientes</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Directorio y comportamiento de cartera</p></div>
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             <select id="filter-client-type" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-auto focus:border-premium-highlight shadow-sm transition" onchange="window.filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
                             <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-72 focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="window.filtrarClientes()">
@@ -439,11 +440,11 @@
     </div> <!-- FIN APP CONTENT -->
 
     <!-- MODAL ARBOL DE SELECCION (EL NUEVO MENU ESCONDIDO) -->
-    <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg flex items-center justify-center p-4">
+    <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
-            <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
-                <div><h3 class="text-xl font-black tracking-tight text-premium-text">Selección Específica</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5">Activa o desactiva matrices individuales</p></div>
-                <button onclick="window.cerrarModalArbol()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button>
+            <div class="p-5 md:p-6 border-b border-slate-700 flex justify-between items-start bg-gray-900">
+                <div><h3 class="text-xl font-black tracking-tight text-white">Gestor de Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1.5">Activa o desactiva matrices para ajustar la muestra</p></div>
+                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded-lg p-1.5 shadow-sm transition">✕</button>
             </div>
             <div class="flex-1 overflow-y-auto p-4 bg-white" id="arbol-container">
                 <!-- Se llena con JS -->
@@ -455,7 +456,7 @@
     </div>
 
     <!-- OTROS MODALES (PUJADORES Y MULTILOTE) -->
-    <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg flex items-center justify-center p-4">
+    <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
                 <div><h3 class="text-xl font-black tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5" id="modal-subtitulo"></p></div>
@@ -475,7 +476,7 @@
         </div>
     </div>
 
-    <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg flex items-center justify-center p-4">
+    <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
                 <div><h3 class="text-xl font-black tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
@@ -487,7 +488,7 @@
         </div>
     </div>
 
-    <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg flex items-center justify-center p-4">
+    <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50"><div><h3 class="text-xl font-black tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="window.cerrarModalMulti()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button></div>
             <div class="flex-1 overflow-y-auto overflow-x-auto p-2 bg-white"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-4">Inversión</th></tr></thead><tbody id="modal-tabla-multilote" class="divide-y divide-slate-50"></tbody></table></div>
@@ -662,6 +663,11 @@ async function initApp() {
 
 // === NUEVA ARQUITECTURA DE FILTROS MACRO ===
 
+window.updateAdminButtonCount = function() {
+    const btnCount = document.getElementById('count-matrices-btn');
+    if (btnCount) btnCount.innerText = checkedNodes.length;
+};
+
 window.actualizarFiltrosGlobales = function() {
     if(!db.remates || !db.remates.length) return;
     let segments = new Set(); let years = new Set();
@@ -711,6 +717,7 @@ window.updateMacroFilter = function(forceCustom = false) {
         document.getElementById('macro-period').value = 'CUSTOM';
     }
     
+    window.updateAdminButtonCount();
     window.actualizarVistaActual();
 };
 
@@ -772,7 +779,7 @@ window.abrirModalArbol = function() {
     document.getElementById('modal-arbol').classList.add('flex');
 };
 
-window.cerrarModalArbol = function() { document.getElementById('modal-arbol').classList.add('hidden'); };
+window.cerrarModalArbol = function() { document.getElementById('modal-arbol').classList.add('hidden'); document.getElementById('modal-arbol').classList.remove('flex'); };
 
 window.toggleArbolMes = function(mesIndex, isChecked) {
     let seg = document.getElementById('macro-segment').value;
@@ -799,113 +806,52 @@ window.toggleArbolRemate = function(id, isChecked) {
     window.abrirModalArbol(); 
 };
 
-window.sortTable = function(thElement, type) {
-    try {
-        const table = thElement.closest('table'); const tbody = table.querySelector('tbody'); if(!tbody) return;
-        const rows = Array.from(tbody.querySelectorAll('tr')); if(rows.length === 0 || (rows.length === 1 && rows[0].innerText.includes('Sin'))) return;
-        const colIndex = Array.from(thElement.parentNode.children).indexOf(thElement);
-        let asc = thElement.getAttribute('data-asc') === 'true'; asc = !asc; thElement.setAttribute('data-asc', asc);
-        Array.from(thElement.parentNode.children).forEach(th => { th.innerHTML = th.innerHTML.replace(' 🔼', '').replace(' 🔽', '').replace(' ↕️', ' ↕️'); if(!th.innerHTML.includes('↕️')) th.innerHTML += ' ↕️'; });
-        thElement.innerHTML = thElement.innerHTML.replace(' ↕️', asc ? ' 🔼' : ' 🔽');
-        rows.sort((a, b) => {
-            let valA = parseValueForSort(a.children[colIndex].innerText || a.children[colIndex].textContent, type);
-            let valB = parseValueForSort(b.children[colIndex].innerText || b.children[colIndex].textContent, type);
-            if (valA < valB) return asc ? -1 : 1; if (valA > valB) return asc ? 1 : -1; return 0;
-        });
-        tbody.innerHTML = ''; rows.forEach(row => tbody.appendChild(row));
-    } catch(e) {}
-};
-
-window.iniciarProcesamiento = async function(files){
-    const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
-    if(!validFiles.length) return;
-    
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const loadingText = document.getElementById('loading-text');
-    loadingOverlay.classList.remove('hidden'); loadingOverlay.classList.add('flex');
-    
-    let successCount = 0; let upsertQueue = [];
-    
-    for(let i = 0; i < validFiles.length; i++){ 
-        loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
-        await new Promise(r => setTimeout(r, 20)); 
-        try { 
-            const data = await parseExcel(validFiles[i]); 
-            if(data) { 
-                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
-                if (existsIdx >= 0) { data._dbId = db.remates[existsIdx]._dbId; data.id = db.remates[existsIdx].id; db.remates[existsIdx] = data; } 
-                else { data._dbId = Math.floor(Math.random() * 2000000000); db.remates.push(data); }
-                upsertQueue.push({ id: data._dbId, payload: data });
-                successCount++; 
-            }
-        } catch(err) { console.error("Error:", err); } 
-    }
-    
-    if(successCount === 0) {
-        loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
-        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`; return;
-    }
-
-    loadingText.innerText = "Sincronizando Cruces..."; await new Promise(r => setTimeout(r, 20));
-
-    db.remates.sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
-    let clientesGlobales=[]; let adjudicatariosGlobales=[];
-    
-    db.remates.forEach(remate=>{ 
-        let nuevos=0, antiguos=0; 
-        remate.garantiasEmailsReales.forEach(email=>{ if(clientesGlobales.includes(email)) antiguos++; else { nuevos++; clientesGlobales.push(email); } }); 
-        remate.nuevos=nuevos; remate.antiguos=antiguos; 
-        let ganadoresNuevos=0, ventaNuevos=0, ventaAntiguos=0; let statusCliente={}; 
-        const ganadoresUnicos=[...new Set(remate.adjudicaciones.filter(a=>!a.esFalso).map(a=>a.clienteReal))]; 
-        ganadoresUnicos.forEach(cliente=>{ if(adjudicatariosGlobales.includes(cliente)){ statusCliente[cliente]='antiguo'; } else { ganadoresNuevos++; adjudicatariosGlobales.push(cliente); statusCliente[cliente]='nuevo'; } }); 
-        remate.adjudicaciones.forEach(a=>{ if(!a.esFalso) { if(statusCliente[a.clienteReal]==='nuevo') ventaNuevos+=a.monto; else ventaAntiguos+=a.monto; }}); 
-        remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
-    });
-    
-    try { 
-        for (let i = 0; i < upsertQueue.length; i++) {
-            loadingText.innerText = `Subiendo a la Nube (${i+1}/${upsertQueue.length})...`;
-            const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
-            if (error) throw error;
-            await new Promise(r => setTimeout(r, 50)); 
-        }
-        document.getElementById('db-status').classList.replace('text-premium-highlight', 'text-premium-success'); 
-        document.getElementById('db-status').innerText = `En Línea (${db.remates.length})`;
-    } catch (e) { 
-        document.getElementById('db-status').classList.replace('text-premium-success', 'text-premium-danger'); 
-        let errorMsg = e.message || "Desconocido";
-        if (errorMsg.includes("row-level security")) errorMsg = "Bloqueado (Revisar Correo)";
-        if (errorMsg.includes("Failed to fetch")) errorMsg = "Conexión interrumpida";
-        document.getElementById('db-status').innerText = `Error: ${errorMsg.substring(0, 22)}`; 
-    }
-    
-    document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
-    window.actualizarFiltrosGlobales(); 
-    procesarDatosClientes(); 
-    window.actualizarVistaActual(); 
-    loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
-};
-
-function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
-
 function buildAgg(rematesList){
     const agg={ venta:0,comisionTotal:0,lotes:0,lotesDisponibles:0,inscritos:0,garantias:0,ganadoresUnicosCount:0,nuevos:0,antiguos:0,ventaSiniestros:0,ventaRetail:0,ganadoresNuevos:0,ventaGanadoresNuevos:0,ventaGanadoresAntiguos:0,adjudicaciones:[], sumMontoValido: 0, sumMinimoValido: 0, garantiasLista: [] };
     let uniqueGanadoresSet=new Set();
     rematesList.forEach(r=>{
-        agg.venta+=r.ventaTotal; agg.comisionTotal+=r.comisionTotal||0; agg.lotes+=r.lotesCount; agg.lotesDisponibles+=r.lotesDisponibles; agg.inscritos+=r.inscritos; agg.garantias+=r.garantias; agg.nuevos+=r.nuevos; agg.antiguos+=r.antiguos; agg.ganadoresNuevos+=(r.ganadoresNuevos||0); agg.ventaGanadoresNuevos+=(r.ventaNuevos||0); agg.ventaGanadoresAntiguos+=(r.ventaAntiguos||0);
+        agg.venta += (Number(r.ventaTotal) || 0);
+        agg.comisionTotal += (Number(r.comisionTotal) || 0);
+        agg.lotes += (Number(r.lotesCount) || 0);
+        agg.lotesDisponibles += (Number(r.lotesDisponibles) || 0);
+        agg.inscritos += (Number(r.inscritos) || 0);
+        agg.garantias += (Number(r.garantias) || 0);
+        agg.nuevos += (Number(r.nuevos) || 0);
+        agg.antiguos += (Number(r.antiguos) || 0);
+        agg.ganadoresNuevos += (Number(r.ganadoresNuevos) || 0);
+        agg.ventaGanadoresNuevos += (Number(r.ventaNuevos) || 0);
+        agg.ventaGanadoresAntiguos += (Number(r.ventaAntiguos) || 0);
         
-        // Adj with original remate info
-        r.adjudicaciones.forEach(a => {
-            let aCopy = {...a, origen: window.formatearNombreRemate(r.fileName, r.fechaData.timestamp)};
-            agg.adjudicaciones.push(aCopy);
-            if(!a.esFalso) uniqueGanadoresSet.add(a.clienteReal);
-            if(a.minimo > 0 && a.monto > 0 && !a.esFalso && !a.esChatarra) { agg.sumMontoValido += a.monto; agg.sumMinimoValido += a.minimo; }
-        });
+        if(r.adjudicaciones && Array.isArray(r.adjudicaciones)) {
+            r.adjudicaciones.forEach(a => {
+                let aCopy = {...a, origen: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)};
+                agg.adjudicaciones.push(aCopy);
+                if(!a.esFalso) uniqueGanadoresSet.add(a.clienteReal);
+                if((Number(a.minimo) > 0) && (Number(a.monto) > 0) && !a.esFalso && !a.esChatarra) { 
+                    agg.sumMontoValido += Number(a.monto); 
+                    agg.sumMinimoValido += Number(a.minimo); 
+                }
+            });
+        }
 
-        if(r.garantiasListaDetallada) { r.garantiasListaDetallada.forEach(g => { if(!agg.garantiasLista.some(x => x.nombreNorm === g.nombreNorm)) agg.garantiasLista.push(g); }); }
-        if(r.tipo==='Siniestrados') agg.ventaSiniestros+=r.ventaTotal; if(r.tipo==='Retail') agg.ventaRetail+=r.ventaTotal;
+        if(r.garantiasListaDetallada && Array.isArray(r.garantiasListaDetallada)) { 
+            r.garantiasListaDetallada.forEach(g => { 
+                if(!agg.garantiasLista.some(x => x.nombreNorm === g.nombreNorm)) agg.garantiasLista.push(g); 
+            }); 
+        }
+        if(r.tipo === 'Siniestrados') agg.ventaSiniestros += (Number(r.ventaTotal) || 0); 
+        if(r.tipo === 'Retail') agg.ventaRetail += (Number(r.ventaTotal) || 0);
     });
-    agg.ganadoresUnicosCount=uniqueGanadoresSet.size; agg.perdedoresCount=Math.max(0,agg.garantias-agg.ganadoresUnicosCount); agg.conversion=agg.inscritos?(agg.garantias/agg.inscritos*100):0; agg.ticketPromedio=agg.lotes?(agg.venta/agg.lotes):0; agg.eficaciaLotes=agg.lotesDisponibles?(agg.lotes/agg.lotesDisponibles*100):0; agg.pctVentaNuevos=agg.venta?(agg.ventaGanadoresNuevos/agg.venta*100):0; agg.deltaPujaTotal = agg.sumMontoValido - agg.sumMinimoValido; agg.deltaPujaPromedio = agg.lotes ? (agg.deltaPujaTotal / agg.lotes) : 0; agg.sobreprecioReal = agg.sumMinimoValido > 0 ? ((agg.sumMontoValido / agg.sumMinimoValido) * 100) - 100 : 0; agg.fugaList = agg.garantiasLista.filter(g => !uniqueGanadoresSet.has(g.nombreNorm));
+    agg.ganadoresUnicosCount = uniqueGanadoresSet.size; 
+    agg.perdedoresCount = Math.max(0, agg.garantias - agg.ganadoresUnicosCount); 
+    agg.conversion = agg.inscritos ? (agg.garantias/agg.inscritos*100) : 0; 
+    agg.ticketPromedio = agg.lotes ? (agg.venta/agg.lotes) : 0; 
+    agg.eficaciaLotes = agg.lotesDisponibles ? (agg.lotes/agg.lotesDisponibles*100) : 0; 
+    agg.pctVentaNuevos = agg.venta ? (agg.ventaGanadoresNuevos/agg.venta*100) : 0; 
+    agg.deltaPujaTotal = agg.sumMontoValido - agg.sumMinimoValido; 
+    agg.deltaPujaPromedio = agg.lotes ? (agg.deltaPujaTotal / agg.lotes) : 0; 
+    agg.sobreprecioReal = agg.sumMinimoValido > 0 ? ((agg.sumMontoValido / agg.sumMinimoValido) * 100) - 100 : 0; 
+    agg.fugaList = agg.garantiasLista.filter(g => !uniqueGanadoresSet.has(g.nombreNorm));
     return agg;
 }
 
@@ -935,14 +881,6 @@ window.actualizarVistaActual = function() {
     } catch(e) { console.error(e); }
 };
 
-window.limpiarBase = async function(){ 
-    if(!confirm("¿Borrar todos los datos de la nube? Esto es irreversible.")) return;
-    db = {remates:[]}; checkedNodes = []; clientDB = []; document.getElementById('empty-state').classList.remove('hidden'); 
-    try { await supabaseClient.from('app_state').delete().gte('id', 0); } catch (e) { }
-    window.actualizarFiltrosGlobales(); location.reload(); 
-};
-
-// MOTOR DASHBOARD MACRO
 window.renderDashboard = function(){ 
     try {
         if(currentModule!=='remates') return; 
@@ -989,7 +927,6 @@ window.renderDashboard = function(){
                 let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
                 let dSignL = deltaLote >= 0 ? '+' : ''; 
                 let dColorL = deltaLote >= 0 ? 'text-premium-success' : 'text-premium-danger';
-                // Find node id for modal
                 let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData.timestamp) === l.origen)?.id || checkedNodes[0];
                 return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
                     <td class="font-bold text-premium-muted w-32 pl-6 truncate text-[10px] md:text-xs uppercase" title="${l.origen}">${l.origen}</td>
@@ -1006,7 +943,6 @@ window.renderDashboard = function(){
             }).join('');
         }
 
-        // GENERACIÓN DE GRÁFICOS INTELIGENTES (Micro vs Macro)
         let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = [];
         let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         
@@ -1018,9 +954,9 @@ window.renderDashboard = function(){
             allRemates.forEach(r => {
                 let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
                 if(!monthMap[m]) monthMap[m] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: monthNamesShort[m] };
-                if(r.tipo === 'Siniestrados') monthMap[m].siniestros += r.ventaTotal;
-                if(r.tipo === 'Retail') monthMap[m].retail += r.ventaTotal;
-                monthMap[m].nuevos += r.nuevos; monthMap[m].antiguos += r.antiguos;
+                if(r.tipo === 'Siniestrados') monthMap[m].siniestros += (Number(r.ventaTotal) || 0);
+                if(r.tipo === 'Retail') monthMap[m].retail += (Number(r.ventaTotal) || 0);
+                monthMap[m].nuevos += (Number(r.nuevos) || 0); monthMap[m].antiguos += (Number(r.antiguos) || 0);
             });
             Object.keys(monthMap).sort((a,b)=>a-b).forEach(k => {
                 let v = monthMap[k];
@@ -1029,9 +965,9 @@ window.renderDashboard = function(){
         } else {
             allRemates.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0)).forEach(r => {
                 chartLabels.push(window.formatearNombreRemate(r.fileName, r.fechaData.timestamp));
-                cSiniestros.push(r.tipo === 'Siniestrados' ? r.ventaTotal : 0);
-                cRetail.push(r.tipo === 'Retail' ? r.ventaTotal : 0);
-                cNuevos.push(r.nuevos); cRecurrentes.push(r.antiguos);
+                cSiniestros.push(r.tipo === 'Siniestrados' ? (Number(r.ventaTotal) || 0) : 0);
+                cRetail.push(r.tipo === 'Retail' ? (Number(r.ventaTotal) || 0) : 0);
+                cNuevos.push(Number(r.nuevos) || 0); cRecurrentes.push(Number(r.antiguos) || 0);
             });
         }
 
@@ -1068,7 +1004,7 @@ window.renderConclusiones = function() {
         const strongClasses = "text-premium-text font-black";
 
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">1</span> Venta Total</h4><p class="${textClasses}">Las operaciones válidas sumaron una venta adjudicada de <strong class="${strongClasses}">${formatMoney(agg.venta)}</strong>.</p></div>`;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">2</span> Comisiones Est.</h4><p class="${textClasses}">El remate generó un ingreso por comisiones de <strong class="${strongClasses}">${formatMoney(agg.comisionTotal)}</strong>.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">2</span> Comisiones Est.</h4><p class="${textClasses}">La muestra generó un ingreso por comisiones de <strong class="${strongClasses}">${formatMoney(agg.comisionTotal)}</strong>.</p></div>`;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">3</span> Efectividad</h4><p class="${textClasses}">Se logró vender el <strong class="${strongClasses}">${agg.eficaciaLotes.toFixed(1)}%</strong> de todos los lotes disponibles en el catálogo.</p></div>`;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">4</span> Delta</h4><p class="${textClasses}">Las pujas incrementaron el valor de salida en <strong class="${strongClasses}">${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</strong>, un margen del <strong class="${sobreColor} font-black">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</strong>.</p></div>`;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">5</span> Ticket Promedio</h4><p class="${textClasses}">El valor promedio de venta por cada lote adjudicado fue de <strong class="${strongClasses}">${formatMoney(agg.ticketPromedio)}</strong>.</p></div>`;
@@ -1170,7 +1106,8 @@ function procesarDatosClientes(){
                 if(adj.esFalso) return; const c=adj.clienteReal; 
                 if(!mapBI[c]) mapBI[c]={nombre:c, rut: adj.rut||'-', email: adj.email||'-', compras:[],totalGastado:0,lotesSiniestrados:0,lotesRetail:0,tipos:new Set()}; 
                 mapBI[c].compras.push({fecha:r.fechaData.timestamp,monto:adj.monto, tipo: r.tipo, lote: adj.numeroLote? 'Lote '+adj.numeroLote : (adj.loteStr?adj.loteStr.substring(0,10):''), remate: window.formatearNombreRemate(r.fileName, r.fechaData.timestamp)}); 
-                mapBI[c].totalGastado+=adj.monto; if(r.tipo==='Siniestrados') mapBI[c].lotesSiniestrados++; else mapBI[c].lotesRetail++; mapBI[c].tipos.add(r.tipo); 
+                mapBI[c].totalGastado += (Number(adj.monto) || 0); 
+                if(r.tipo==='Siniestrados') mapBI[c].lotesSiniestrados++; else mapBI[c].lotesRetail++; mapBI[c].tipos.add(r.tipo); 
             }); 
         }); 
         clientDB=Object.values(mapBI).map(c=>{ 
@@ -1194,7 +1131,7 @@ window.abrirFichaCliente = function(nombreStr){
     try {
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
-        if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?window.formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+b.monto,0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+b.monto,0)); 
+        if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?window.formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+(Number(b.monto)||0),0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+(Number(b.monto)||0),0)); 
         if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?window.formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
