@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.4 (Stable UI)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.5 (Strict Core)</div>
 
     <!-- OVERLAY GIGANTE DE SINCRONIZACIÓN INICIAL -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] flex-col items-center justify-center transition-all backdrop-blur-sm flex">
@@ -123,7 +123,7 @@
             <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1 relative">
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:inline mr-2">Filtro Global</span>
                 
-                <select id="macro-segment" onchange="window.renderApp()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
+                <select id="macro-segment" onchange="window.aplicarCambioSegmento()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
                 <!-- SUPER FILTRO DE TIEMPO PERSONALIZADO -->
@@ -136,7 +136,7 @@
                     <!-- CONTENIDO DEL SUPER FILTRO -->
                     <div id="dropdown-menu" onclick="event.stopPropagation()" class="hidden absolute top-full mt-1.5 left-0 bg-white border border-gray-200 rounded-lg shadow-2xl w-80 z-50 flex-col overflow-hidden">
                         
-                        <!-- 1. AÑOS EN COLUMNAS (BOTONES/PILLS) -->
+                        <!-- 1. AÑOS EN COLUMNAS -->
                         <div class="p-3 border-b border-gray-200 bg-white">
                             <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2">1. Selecciona Año(s):</span>
                             <div id="dropdown-years-grid" class="flex gap-2 flex-wrap">
@@ -146,18 +146,18 @@
 
                         <!-- 2. ATAJOS RÁPIDOS -->
                         <div class="p-3 bg-gray-50 border-b border-gray-200">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">2. Filtro Rápido:</span>
-                                <button type="button" onclick="window.quickSelect('NADA')" class="text-[10px] text-red-500 hover:text-red-700 underline font-bold transition">Desmarcar Todo</button>
-                            </div>
+                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2 flex justify-between">
+                                <span>2. Filtro Rápido:</span>
+                                <button onclick="window.quickSelect('NADA')" class="text-red-500 hover:text-red-700 underline">Desmarcar Todo</button>
+                            </span>
                             <div class="grid grid-cols-4 gap-1.5">
-                                <button type="button" onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
-                                <button type="button" onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
-                                <button type="button" onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
-                                <button type="button" onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
-                                <button type="button" onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
-                                <button type="button" onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
-                                <button type="button" onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
+                                <button onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
+                                <button onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
+                                <button onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
+                                <button onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
+                                <button onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
+                                <button onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
+                                <button onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
                             </div>
                         </div>
 
@@ -217,7 +217,7 @@
 
             <!-- ÁREA DE TRABAJO -->
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
-                <!-- EMPTY STATE -->
+                <!-- EMPTY STATE CENTRALIZADO -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-300 shadow-sm">
                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -524,7 +524,7 @@
             <div class="px-5 py-2.5 bg-white flex flex-wrap gap-5 text-[10px] border-b border-gray-200 uppercase tracking-widest font-bold items-center">
                 <div><span class="text-gray-400">Total Pujas:</span> <span class="text-gray-900 text-xs ml-1" id="modal-total-pujas">0</span></div>
                 <div><span class="text-gray-400">Pujadores Únicos:</span> <span class="text-blue-700 text-xs ml-1" id="modal-unicos-reales">0</span></div>
-                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded bg-black text-white shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition">Solo Reales</button></div>
+                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded bg-black text-white shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded text-gray-50 hover:text-gray-900 hover:bg-gray-100 transition">Solo Reales</button></div>
             </div>
             <div class="flex-1 overflow-x-auto overflow-y-auto p-0 bg-white">
                 <table class="w-full text-left">
@@ -573,7 +573,7 @@ let currentGestorYearTab = null;
 // ESTADO FILTRO GLOBAL Y MEMORIA DE EXPANSIÓN
 window.globalSelectedYears = [];
 window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
-window.expandedDropMonths = new Set(); // Guarda los meses abiertos en el dropdown
+window.expandedDropMonths = new Set(); 
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#6B7280'; 
@@ -759,7 +759,7 @@ async function initApp() {
     }
     
     if(db.remates && db.remates.length > 0) { 
-        window.actualizarFiltrosGlobales(true); // isInitialLoad = true
+        window.actualizarFiltrosGlobales(true); 
     }
 }
 
@@ -778,13 +778,12 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
     
     if(isInitialLoad) {
-        // Encontrar el año máximo para el inicio inteligente
         let years = new Set();
         db.remates.forEach(r => {
             let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
             if(!isNaN(y)) years.add(y);
         });
-        let maxYear = Math.max(...Array.from(years));
+        let maxYear = years.size > 0 ? Math.max(...Array.from(years)) : new Date().getFullYear();
         window.globalSelectedYears = [maxYear];
         window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
         
@@ -803,7 +802,7 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
 };
 
 window.aplicarCambioSegmento = function() {
-    window.quickSelect('TODO'); // Al cambiar Siniestrados/Retail, forzamos recargar las selecciones actuales
+    window.quickSelect('TODO'); 
     window.renderApp();
 }
 
@@ -834,8 +833,8 @@ window.renderDropdownUI = function() {
         let isChecked = window.globalSelectedYears.includes(Number(y)) ? 'checked' : '';
         let activeClass = isChecked ? 'bg-black text-white shadow-md border-black' : 'bg-white text-gray-500 hover:text-gray-900 border-gray-200';
         yearsHtml += `
-        <label class="flex items-center gap-2 cursor-pointer rounded px-3 py-1.5 transition flex-1 sm:flex-none justify-center ${activeClass}">
-            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)"> 
+        <label class="flex items-center gap-2 cursor-pointer rounded px-3 py-1.5 transition flex-1 sm:flex-none justify-center border ${activeClass}">
+            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)" ${isChecked}> 
             <span class="text-xs font-bold">${y}</span>
         </label>`;
     });
@@ -858,7 +857,6 @@ window.renderDropdownUI = function() {
     let html = '';
 
     Object.keys(byYear).sort((a,b)=>b-a).forEach(y => {
-        // Solo renderizar el arbol si el año esta seleccionado en las columnas de arriba!
         if(!window.globalSelectedYears.includes(Number(y))) return;
 
         html += `<div class="mb-4 dropdown-year-group"><div class="sticky top-0 bg-white py-1 mb-2 z-10"><span class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-1 block">Año ${y}</span></div>`;
@@ -1006,7 +1004,6 @@ window.filterDropdown = function() {
             let contentDiv = group.querySelector('div[id^="drop-"]');
             if(term.length > 1 && contentDiv) {
                 contentDiv.classList.remove('hidden');
-                // Auto expandir icono si forzamos por busqueda
                 let svg = group.querySelector('svg');
                 if(svg) svg.classList.add('rotate-180');
             }
@@ -1189,8 +1186,8 @@ window.cerrarModalGestor = function(e) {
     let searchEl = document.getElementById('search-gestor');
     if(searchEl) searchEl.value = '';
     window.updateDropdownLabel();
-    window.renderDropdownUI(); // Sincroniza el arbol pequeño con los cambios del grande
-    window.applyDropdown(); // Aplica y recarga
+    window.renderDropdownUI(); 
+    window.applyDropdown(); 
 };
 
 window.toggleGestorMes = function(year, mesIndex, isChecked) {
@@ -1438,21 +1435,34 @@ window.cambiarSeccion = function(mod){
         document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active':'nav-item nav-inactive'; 
         document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mt-6':'nav-item nav-inactive mt-6'; 
         
-        ['module-remates', 'module-comparativa', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
-        
         window.renderApp();
         if(window.innerWidth < 768) { window.toggleSidebar(); }
     } catch(e) { console.error(e); }
 };
 
-window.actualizarVistaActual = function() { 
+window.renderApp = function() { 
     try {
+        const emptyState = document.getElementById('empty-state');
+        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
+
+        if (checkedNodes.length === 0) {
+            emptyState.classList.remove('hidden');
+            return;
+        } else {
+            emptyState.classList.add('hidden');
+            const currentEl = document.getElementById(`module-${currentModule}`);
+            if(currentEl) currentEl.classList.remove('hidden');
+        }
+
         if (currentModule === 'remates') window.renderDashboard(); 
         else if (currentModule === 'comparativa') window.renderComparativa();
         else if (currentModule === 'autos') window.renderPanelAutos(); 
         else if (currentModule === 'conclusiones') window.renderConclusiones(); 
-        else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); } }
-        else if (currentModule === 'buscador') { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); window.buscarPatente(); }
+        else if (currentModule === 'clientes') { procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); }
+        else if (currentModule === 'buscador') { window.buscarPatente(); }
     } catch(e) { console.error(e); }
 };
 
@@ -1467,7 +1477,7 @@ window.limpiarBase = async function(){
         if(error) throw error;
         db = {remates:[]}; checkedNodes = []; clientDB = []; 
         document.getElementById('empty-state').classList.remove('hidden'); 
-        window.actualizarFiltrosGlobales(); 
+        window.actualizarFiltrosGlobales(true); 
         location.reload(); 
     } catch (e) { 
         alert("Error al vaciar la base de datos de la nube.\nRevisa tus permisos de Administrador o tu conexión.\n\nDetalle: " + e.message);
@@ -1478,10 +1488,6 @@ window.limpiarBase = async function(){
 window.renderDashboard = function(){ 
     try {
         if(currentModule!=='remates') return; 
-        const emptyState = document.getElementById('empty-state'); const dashboard = document.getElementById('module-remates');
-        
-        if(checkedNodes.length === 0){ emptyState.classList.remove('hidden'); dashboard.classList.add('hidden'); return; } 
-        emptyState.classList.add('hidden'); dashboard.classList.remove('hidden'); 
         
         let allRemates = getSelectedRemates(); 
         globalAgg = buildAgg(allRemates);
@@ -1633,11 +1639,6 @@ window.renderDashboard = function(){
 window.renderComparativa = function() {
     try {
         if(currentModule !== 'comparativa') return; 
-        const emptyState = document.getElementById('empty-state'); const compMod = document.getElementById('module-comparativa');
-        
-        if(checkedNodes.length === 0){ emptyState.classList.remove('hidden'); compMod.classList.add('hidden'); return; } 
-        emptyState.classList.add('hidden'); compMod.classList.remove('hidden');
-        
         let allRemates = getSelectedRemates();
         let groupMode = document.getElementById('comp-groupby').value;
         let groups = {};
@@ -1762,10 +1763,7 @@ window.cerrarModalMulti = function(e) {
 // === DISEÑO ESTRUCTURADO DE DATOS ===
 window.renderConclusiones = function() {
     try {
-        if(currentModule !== 'conclusiones') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
-        if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
-        emptyState.classList.add('hidden'); container.classList.remove('hidden');
-
+        if(currentModule !== 'conclusiones') return; 
         let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates); let html = ''; globalAgg = agg; if(!clientDB.length) procesarDatosClientes(); 
 
         let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-green-700' : 'text-red-600';
@@ -1876,9 +1874,7 @@ window.renderConclusiones = function() {
 
 window.renderPanelAutos = function(){
     try {
-        if(currentModule !== 'autos') return; const emptyState=document.getElementById('empty-state'); const autosMod=document.getElementById('module-autos');
-        if(checkedNodes.length===0){ emptyState.classList.remove('hidden'); autosMod.classList.add('hidden'); return; }
-        emptyState.classList.add('hidden'); autosMod.classList.remove('hidden');
+        if(currentModule !== 'autos') return; 
         let autos = []; let allRemates = getSelectedRemates(); allRemates.forEach(r => { r.adjudicaciones.forEach(a => { if(!a.esFalso && !a.esChatarra) autos.push({...a, remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)}); }); });
         let marcasMap = {}; let modelosMap = {}; autos.forEach(a => { if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') marcasMap[a.categoria] = (marcasMap[a.categoria]||0) + 1; if(a.modeloStr && a.modeloStr.trim() !== '') modelosMap[a.modeloStr] = (modelosMap[a.modeloStr]||0) + 1; });
         const marcasSorted = Object.entries(marcasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
