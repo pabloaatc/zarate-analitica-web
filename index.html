@@ -8,12 +8,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { 
             theme: { 
                 extend: { 
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
+                    fontFamily: { 
+                        /* Usando fuentes nativas del sistema para un look cuadrado, limpio y profesional */
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'] 
+                    }, 
                     colors: { 
                         premium: { 
                             bg: '#F2F2F7', panel: '#FFFFFF', text: '#1D1D1F', muted: '#86868B', 
@@ -26,7 +28,7 @@
         }
     </script>
     <style>
-        body { background-color: #F2F2F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
+        body { background-color: #F2F2F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         
         .glass-panel { 
             background: #FFFFFF; border: 1px solid rgba(229, 229, 234, 0.8); border-radius: 1.5rem; 
@@ -64,7 +66,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v4.2 (Anti-Bug)</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v4.3 (Clean UI)</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -78,7 +80,7 @@
         <div class="bg-white/95 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl border border-white w-full max-w-[360px] text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-accent to-orange-400"></div>
             <div class="w-14 h-14 rounded-2xl bg-premium-accent flex items-center justify-center font-bold text-white text-2xl mx-auto mb-4 shadow-lg">Z</div>
-            <h2 class="text-xl font-bold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
+            <h2 class="text-xl font-extrabold text-premium-text mb-1 tracking-tight">Zárate Analítica</h2>
             <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6 font-semibold">Control Directivo</p>
             
             <form id="login-form" onsubmit="window.handleLogin(event)" class="text-left">
@@ -105,7 +107,7 @@
             <div class="flex items-center gap-3">
                 <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition p-1 bg-gray-50 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
                 <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base shadow-sm">Z</div>
-                <div class="hidden sm:block"><h1 class="font-black text-sm text-premium-text tracking-tight">Zárate Analítica</h1></div>
+                <div class="hidden sm:block"><h1 class="font-extrabold text-sm text-premium-text tracking-tight">Zárate Analítica</h1></div>
             </div>
             
             <div class="flex items-center gap-3 md:gap-4">
@@ -120,14 +122,14 @@
         <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
         <div id="paraguas-bar" class="bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 md:px-6 py-3 flex justify-between items-center shrink-0 z-20 sticky top-0 shadow-sm no-print">
             <div class="flex items-center gap-2 md:gap-4 flex-wrap">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden lg:inline">Filtro Global:</span>
+                <span class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest hidden lg:inline">Filtro Global:</span>
                 
                 <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
                 <span class="text-gray-300 font-light text-xl hidden sm:inline">/</span>
                 <select id="macro-year" onchange="window.updateMacroFilter()" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
                 <span class="text-gray-300 font-light text-xl hidden sm:inline">/</span>
                 
-                <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs font-black text-blue-700 outline-none cursor-pointer hover:bg-blue-100 transition shadow-sm">
+                <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs font-extrabold text-blue-700 outline-none cursor-pointer hover:bg-blue-100 transition shadow-sm">
                     <option value="ALL">Todo el Año</option>
                     <optgroup label="Semestres">
                         <option value="S1">1er Semestre (Ene-Jun)</option>
@@ -157,10 +159,15 @@
                 </select>
             </div>
 
-            <!-- BOTÓN ADMIN MATRICES -->
-            <button onclick="window.abrirModalArbol()" class="flex items-center gap-2 bg-gray-900 text-white border border-gray-800 text-xs font-bold px-4 py-2 rounded-xl shadow-md hover:bg-black hover:shadow-lg transition shrink-0 ml-2">
-                <span>🗂️</span> <span class="hidden md:inline">Administrar Matrices (<span id="count-matrices-btn">0</span>)</span>
-            </button>
+            <!-- BOTONES SUPERIORES DERECHOS -->
+            <div class="flex items-center gap-2 shrink-0 ml-2">
+                <button onclick="window.seleccionarUltimoRemate()" class="flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-4 py-2 rounded-xl shadow-sm hover:shadow-md hover:bg-blue-100 transition shrink-0">
+                    <span>⚡</span> <span class="hidden md:inline">Último Remate</span>
+                </button>
+                <button onclick="window.abrirModalArbol()" class="flex items-center gap-2 bg-gray-900 text-white border border-gray-800 text-xs font-bold px-4 py-2 rounded-xl shadow-md hover:bg-black hover:shadow-lg transition shrink-0">
+                    <span>🗂️</span> <span class="hidden md:inline">Administrar Matrices (<span id="count-matrices-btn">0</span>)</span>
+                </button>
+            </div>
         </div>
 
         <div class="flex-1 flex overflow-hidden relative">
@@ -209,22 +216,22 @@
                         <!-- HEADER DINÁMICO -->
                         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 border-b border-premium-border pb-5">
                             <div class="w-full xl:w-auto overflow-hidden">
-                                <h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text truncate" id="dash-titulo">-</h2>
+                                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text truncate" id="dash-titulo">-</h2>
                                 <p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2" id="dash-subtitulo">-</p>
                             </div>
                             
                             <div class="flex gap-2 md:gap-3 flex-wrap justify-end shrink-0 w-full xl:w-auto">
                                 <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
                                     <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Ticket Promedio</p>
-                                    <p class="text-xl md:text-2xl font-black text-premium-text tracking-tight" id="dash-kpi-ticket">$0</p>
+                                    <p class="text-xl md:text-2xl font-extrabold text-premium-text tracking-tight" id="dash-kpi-ticket">$0</p>
                                 </div>
                                 <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
                                     <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Comisión Est.</p>
-                                    <p class="text-xl md:text-2xl font-black text-premium-highlight tracking-tight" id="dash-kpi-comision">$0</p>
+                                    <p class="text-xl md:text-2xl font-extrabold text-premium-highlight tracking-tight" id="dash-kpi-comision">$0</p>
                                 </div>
                                 <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center border-b-4 border-b-premium-success min-w-[150px] hover:shadow-md transition">
                                     <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Venta Total</p>
-                                    <p class="text-xl md:text-2xl font-black text-premium-success tracking-tight" id="dash-kpi-venta">$0</p>
+                                    <p class="text-xl md:text-2xl font-extrabold text-premium-success tracking-tight" id="dash-kpi-venta">$0</p>
                                 </div>
                             </div>
                         </div>
@@ -238,18 +245,13 @@
                                     <span class="bg-white px-2 py-1 rounded border border-slate-200 text-xs shadow-sm">📊</span> Efectividad Consolidada
                                 </h4>
                                 <div class="space-y-4 flex-1">
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Disponibles (Base)</span><span class="font-black text-lg text-premium-text" id="dash-kpi-lotes-disp">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Disponibles (Base)</span><span class="font-extrabold text-lg text-premium-text" id="dash-kpi-lotes-disp">0</span></div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Vendidos</span><span class="font-black text-lg text-premium-text" id="dash-kpi-lotes">0</span></div>
-                                    <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-premium-muted font-semibold">Delta Puja Global</span>
-                                        <span class="font-black text-lg text-premium-highlight" id="dash-kpi-delta">$0</span>
-                                    </div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Vendidos</span><span class="font-extrabold text-lg text-premium-text" id="dash-kpi-lotes">0</span></div>
                                 </div>
                                 <div class="mt-8 pt-5 border-t border-slate-200 flex justify-between items-end">
-                                    <span class="text-[10px] text-premium-muted uppercase font-black tracking-widest">Efectividad</span>
-                                    <span class="font-black text-5xl text-premium-success tracking-tighter" id="dash-kpi-eficacia">0%</span>
+                                    <span class="text-[10px] text-premium-muted uppercase font-extrabold tracking-widest">Efectividad</span>
+                                    <span class="font-extrabold text-5xl text-premium-success tracking-tighter" id="dash-kpi-eficacia">0%</span>
                                 </div>
                             </div>
 
@@ -260,20 +262,20 @@
                                     <span class="bg-white px-2 py-1 rounded border border-slate-200 text-xs shadow-sm">👥</span> Comportamiento de Clientes
                                 </h4>
                                 <div class="space-y-4 flex-1">
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Garantías Pagadas</span><span class="font-black text-lg text-premium-text" id="dash-kpi-garantias">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Garantías Pagadas</span><span class="font-extrabold text-lg text-premium-text" id="dash-kpi-garantias">0</span></div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Adjudicatarios (Ganadores)</span><span class="font-black text-lg text-premium-success" id="dash-kpi-ganadores">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Adjudicatarios (Ganadores)</span><span class="font-extrabold text-lg text-premium-success" id="dash-kpi-ganadores">0</span></div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Fuga (No adjudicaron)</span><span class="font-black text-lg text-premium-danger" id="dash-kpi-perdedores">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Fuga (No adjudicaron)</span><span class="font-extrabold text-lg text-premium-danger" id="dash-kpi-perdedores">0</span></div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm text-premium-muted font-semibold truncate pr-2">Nuevos Adjudicatarios</span>
-                                        <div class="shrink-0 flex items-center gap-2"><span class="font-black text-lg text-premium-highlight" id="dash-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted font-bold tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200" id="dash-kpi-1racompra-pct"></span></div>
+                                        <div class="shrink-0 flex items-center gap-2"><span class="font-extrabold text-lg text-premium-highlight" id="dash-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted font-bold tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200" id="dash-kpi-1racompra-pct"></span></div>
                                     </div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm text-premium-muted font-semibold truncate pr-2">Compras Volumen (>1 lote)</span>
-                                        <div class="flex items-center gap-3 shrink-0"><span class="font-black text-lg text-premium-text" id="dash-kpi-multilote">0</span><button onclick="window.abrirModalMultiLote()" class="text-[9px] text-white bg-premium-text hover:bg-black px-2 py-1 rounded font-bold transition no-print shadow-sm uppercase tracking-wider">Ver lista</button></div>
+                                        <div class="flex items-center gap-3 shrink-0"><span class="font-extrabold text-lg text-premium-text" id="dash-kpi-multilote">0</span><button onclick="window.abrirModalMultiLote()" class="text-[9px] text-white bg-premium-text hover:bg-black px-2 py-1 rounded font-bold transition no-print shadow-sm uppercase tracking-wider">Ver lista</button></div>
                                     </div>
                                 </div>
                             </div>
@@ -323,7 +325,7 @@
                 <!-- MODULE: MODELOS Y VEHICULOS -->
                 <div id="module-autos" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Estructura del catálogo adjudicado</p></div>
+                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Análisis de Vehículos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Estructura del catálogo adjudicado</p></div>
                         <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text w-full md:w-72 focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="window.renderPanelAutos()">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -351,23 +353,23 @@
                 <!-- MODULE: CLIENTES -->
                 <div id="module-clientes" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Clientes</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Directorio y comportamiento de cartera</p></div>
+                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Gestión de Clientes</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Directorio y comportamiento de cartera</p></div>
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             <select id="filter-client-type" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-auto focus:border-premium-highlight shadow-sm transition" onchange="window.filtrarClientes()"><option value="todos">Segmentos: Todos</option><option value="siniestrados">Solo Siniestrados</option><option value="retail">Solo Retail</option><option value="ambos">Cartera Cruzada</option></select>
                             <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-premium-text outline-none w-full sm:w-72 focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all shadow-sm" onkeyup="window.filtrarClientes()">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Total Clientes</p><p class="text-2xl md:text-3xl font-black mt-2 text-premium-text" id="bi-kpi-total">0</p></div>
-                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Inversión Prom.</p><p class="text-2xl md:text-3xl font-black text-premium-success mt-2" id="bi-kpi-ltv">$0</p></div>
-                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Cruces</p><p class="text-2xl md:text-3xl font-black text-premium-highlight mt-2" id="bi-kpi-hibridos">0</p></div>
-                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">En Riesgo</p><p class="text-2xl md:text-3xl font-black text-premium-danger mt-2" id="bi-kpi-inactivos">0</p></div>
+                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Total Clientes</p><p class="text-2xl md:text-3xl font-extrabold mt-2 text-premium-text" id="bi-kpi-total">0</p></div>
+                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Inversión Prom.</p><p class="text-2xl md:text-3xl font-extrabold text-premium-success mt-2" id="bi-kpi-ltv">$0</p></div>
+                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">Cruces</p><p class="text-2xl md:text-3xl font-extrabold text-premium-highlight mt-2" id="bi-kpi-hibridos">0</p></div>
+                        <div class="glass-panel p-5"><p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest">En Riesgo</p><p class="text-2xl md:text-3xl font-extrabold text-premium-danger mt-2" id="bi-kpi-inactivos">0</p></div>
                     </div>
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <div id="bi-ficha-cliente" class="glass-panel p-6 xl:col-span-3 hidden border-l-8 border-l-premium-highlight">
                             <div class="flex flex-col md:flex-row justify-between items-start mb-5 gap-3">
                                 <div>
-                                    <h3 class="text-xl md:text-2xl font-black text-premium-text tracking-tight" id="ficha-nombre">-</h3>
+                                    <h3 class="text-xl md:text-2xl font-extrabold text-premium-text tracking-tight" id="ficha-nombre">-</h3>
                                     <div class="flex flex-wrap gap-4 mt-2 text-[10px] text-premium-muted uppercase tracking-widest font-bold">
                                         <span>RUT: <span id="ficha-rut" class="text-premium-text"></span></span>
                                         <span>Email: <span id="ficha-email" class="text-premium-text lowercase"></span></span>
@@ -413,7 +415,7 @@
                 <!-- MODULE: DATOS (CONCLUSIONES IA) -->
                 <div id="module-conclusiones" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Datos Directivos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Conclusiones macro legibles</p></div>
+                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Datos Directivos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Conclusiones macro legibles</p></div>
                         <button onclick="window.print()" class="px-5 py-2.5 bg-white border border-slate-200 shadow-sm rounded-xl text-xs font-bold hover:bg-slate-50 hover:shadow-md transition w-full md:w-auto uppercase tracking-wider text-premium-text">🖨️ Imprimir Resumen</button>
                     </div>
                     <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 text-premium-text"></div>
@@ -422,7 +424,7 @@
                 <!-- MODULE: BUSCADOR -->
                 <div id="module-buscador" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Buscador Global</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Motor de búsqueda histórico</p></div>
+                        <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-premium-text">Buscador Global</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Motor de búsqueda histórico</p></div>
                         <input type="text" id="search-patente" placeholder="Buscar lote, patente, rut o nombre..." class="bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-premium-text w-full md:w-80 shadow-inner focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all" onkeyup="window.buscarPatente()">
                     </div>
                     <div class="glass-panel p-4 overflow-hidden">
@@ -443,7 +445,7 @@
     <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-700 flex justify-between items-start bg-gray-900">
-                <div><h3 class="text-xl font-black tracking-tight text-white">Gestor de Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1.5">Activa o desactiva matrices para ajustar la muestra</p></div>
+                <div><h3 class="text-xl font-extrabold tracking-tight text-white">Gestor de Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1.5">Activa o desactiva matrices para ajustar la muestra</p></div>
                 <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded-lg p-1.5 shadow-sm transition">✕</button>
             </div>
             <div class="flex-1 overflow-y-auto p-4 bg-white" id="arbol-container">
@@ -459,7 +461,7 @@
     <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
-                <div><h3 class="text-xl font-black tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5" id="modal-subtitulo"></p></div>
+                <div><h3 class="text-xl font-extrabold tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5" id="modal-subtitulo"></p></div>
                 <button onclick="window.cerrarModal()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button>
             </div>
             <div class="px-5 md:px-6 py-3 bg-white flex flex-wrap gap-5 text-[10px] border-b border-slate-200 uppercase tracking-widest font-extrabold items-center">
@@ -479,7 +481,7 @@
     <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
-                <div><h3 class="text-xl font-black tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
+                <div><h3 class="text-xl font-extrabold tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
                 <div class="flex items-center gap-3 w-full sm:w-auto"><button onclick="window.exportarFugaExcel()" class="text-[10px] font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 transition shadow-sm flex-1 sm:flex-none uppercase tracking-widest text-premium-text">⬇️ Exportar Excel</button><button onclick="window.cerrarModalFuga()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition shrink-0">✕</button></div>
             </div>
             <div class="flex-1 overflow-x-auto overflow-y-auto p-2 bg-white">
@@ -490,7 +492,7 @@
 
     <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
-            <div class="p-5 md:p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50"><div><h3 class="text-xl font-black tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="window.cerrarModalMulti()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button></div>
+            <div class="p-5 md:p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50"><div><h3 class="text-xl font-extrabold tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="window.cerrarModalMulti()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button></div>
             <div class="flex-1 overflow-y-auto overflow-x-auto p-2 bg-white"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-4">Inversión</th></tr></thead><tbody id="modal-tabla-multilote" class="divide-y divide-slate-50"></tbody></table></div>
         </div>
     </div>
@@ -510,7 +512,7 @@ let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#86868B'; 
-    Chart.defaults.font.family = 'Inter'; 
+    Chart.defaults.font.family = 'sans-serif'; 
     Chart.defaults.font.size = 10;
 }
 
@@ -720,6 +722,27 @@ window.updateMacroFilter = function(forceCustom = false) {
     window.actualizarVistaActual();
 };
 
+window.seleccionarUltimoRemate = function() {
+    if (!db.remates || db.remates.length === 0) return;
+    
+    const rematesOrdenados = [...db.remates].sort((a,b) => (b.fechaData?.timestamp||0) - (a.fechaData?.timestamp||0));
+    const ultimo = rematesOrdenados[0];
+
+    let segSelect = document.getElementById('macro-segment');
+    let yearSelect = document.getElementById('macro-year');
+    let periodSelect = document.getElementById('macro-period');
+    
+    if (segSelect) segSelect.value = ultimo.tipo || 'Siniestrados';
+    if (yearSelect) yearSelect.value = ultimo.fechaData?.year ? Number(ultimo.fechaData.year) : new Date().getFullYear();
+    if (periodSelect) periodSelect.value = 'CUSTOM';
+    
+    checkedNodes = [ultimo.id];
+    
+    window.updateAdminButtonCount();
+    window.cambiarSeccion('remates');
+    window.actualizarVistaActual();
+};
+
 window.abrirModalArbol = function() {
     const container = document.getElementById('arbol-container');
     let html = '';
@@ -753,7 +776,7 @@ window.abrirModalArbol = function() {
             <div class="flex justify-between items-center p-3 bg-white border-b border-gray-100">
                 <label class="flex items-center gap-3 cursor-pointer w-full">
                     <input type="checkbox" onchange="window.toggleArbolMes(${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''} scale-110">
-                    <span class="font-black text-gray-900 text-sm uppercase tracking-wide">${monthNames[m]}</span>
+                    <span class="font-extrabold text-gray-900 text-sm uppercase tracking-wide">${monthNames[m]}</span>
                     <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded ml-auto">${rematesMes.length} matrices</span>
                 </label>
             </div>
@@ -1081,7 +1104,6 @@ window.renderDashboard = function(){
         let allRemates = getSelectedRemates(); 
         globalAgg = buildAgg(allRemates);
         
-        // Blindaje al titulo
         let titulo = "Selección Activa";
         try {
             let selectPeriodo = document.getElementById('macro-period');
@@ -1108,15 +1130,6 @@ window.renderDashboard = function(){
         try { document.getElementById('dash-kpi-lotes').innerText = globalAgg.lotes.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-eficacia').innerText = `${globalAgg.eficaciaLotes.toFixed(1)}%`; } catch(e){}
         
-        try {
-            let dSign = globalAgg.deltaPujaTotal >= 0 ? '+' : '';
-            const elDelta = document.getElementById('dash-kpi-delta');
-            if(elDelta) {
-                elDelta.innerText = dSign + formatMoney(globalAgg.deltaPujaTotal);
-                elDelta.className = globalAgg.deltaPujaTotal >= 0 ? "font-black text-lg text-premium-success" : "font-black text-lg text-premium-danger";
-            }
-        } catch(e){}
-        
         try { document.getElementById('dash-kpi-garantias').innerText = globalAgg.garantias.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-ganadores').innerText = globalAgg.ganadoresUnicosCount.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-perdedores').innerText = globalAgg.perdedoresCount.toLocaleString('es-CL'); } catch(e){}
@@ -1138,14 +1151,14 @@ window.renderDashboard = function(){
                     let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData?.timestamp) === l.origen)?.id || checkedNodes[0];
                     return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
                         <td class="font-bold text-premium-muted w-32 pl-6 truncate text-[10px] md:text-xs uppercase" title="${l.origen}">${l.origen}</td>
-                        <td class="font-black text-premium-text w-16 whitespace-nowrap text-xs">Lote ${l.numeroLote||'-'}</td>
+                        <td class="font-extrabold text-premium-text w-16 whitespace-nowrap text-xs">Lote ${l.numeroLote||'-'}</td>
                         <td class="max-w-[300px]">
                             <div class="font-bold text-premium-text truncate text-xs" title="${l.loteStr}">${l.loteStr}</div>
                             <div class="text-[10px] text-premium-muted uppercase tracking-widest font-semibold truncate mt-1" title="${l.clienteReal}">👤 ${l.clienteReal}</div>
                         </td>
                         <td class="text-center"><span class="bg-slate-100 border border-slate-200 text-premium-text px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
                         <td class="text-right text-premium-muted font-medium">${formatMoney(l.minimo)}</td>
-                        <td class="text-right font-black text-premium-success">${formatMoney(l.monto)}</td>
+                        <td class="text-right font-extrabold text-premium-success">${formatMoney(l.monto)}</td>
                         <td class="text-right pr-6 font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td>
                     </tr>`;
                 }).join('');
@@ -1212,7 +1225,7 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-premium-text">${nombre}</td><td class="text-center font-black text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-premium-text">${nombre}</td><td class="text-center font-extrabold text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-extrabold text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
 window.renderConclusiones = function() {
@@ -1229,16 +1242,16 @@ window.renderConclusiones = function() {
         const titleClasses = "font-extrabold text-sm text-premium-text mb-3 flex items-center gap-2";
         const badgeClasses = "bg-slate-100 px-2 py-0.5 rounded-md text-[10px] text-premium-muted border border-slate-200";
         const textClasses = "text-xs md:text-sm text-slate-600 leading-relaxed font-medium";
-        const strongClasses = "text-premium-text font-black";
+        const strongClasses = "text-premium-text font-extrabold";
 
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">1</span> Venta Total</h4><p class="${textClasses}">Las operaciones válidas sumaron una venta adjudicada de <strong class="${strongClasses}">${formatMoney(agg.venta)}</strong>.</p></div>`;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">2</span> Comisiones Est.</h4><p class="${textClasses}">La muestra generó un ingreso por comisiones de <strong class="${strongClasses}">${formatMoney(agg.comisionTotal)}</strong>.</p></div>`;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">3</span> Efectividad</h4><p class="${textClasses}">Se logró vender el <strong class="${strongClasses}">${agg.eficaciaLotes.toFixed(1)}%</strong> de todos los lotes disponibles en el catálogo.</p></div>`;
-        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">4</span> Delta</h4><p class="${textClasses}">Las pujas incrementaron el valor de salida en <strong class="${strongClasses}">${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</strong>, un margen del <strong class="${sobreColor} font-black">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</strong>.</p></div>`;
+        html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">4</span> Delta</h4><p class="${textClasses}">Las pujas incrementaron el valor de salida en <strong class="${strongClasses}">${sobreSigno}${formatMoney(agg.deltaPujaTotal)}</strong>, un margen del <strong class="${sobreColor} font-extrabold">${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%</strong>.</p></div>`;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">5</span> Ticket Promedio</h4><p class="${textClasses}">El valor promedio de venta por cada lote adjudicado fue de <strong class="${strongClasses}">${formatMoney(agg.ticketPromedio)}</strong>.</p></div>`;
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">6</span> Tasa de Cierre</h4><p class="${textClasses}">El <strong class="${strongClasses}">${tasaExito.toFixed(1)}%</strong> de los clientes que dejaron su garantía terminaron adjudicándose un lote.</p></div>`;
-        html += `<div class="${cardClasses} flex flex-col justify-between"><h4 class="${titleClasses}"><span class="${badgeClasses}">7</span> Fuga</h4><p class="${textClasses} mb-4">Hubo <strong class="text-premium-danger font-black">${agg.perdedoresCount} clientes</strong> que pagaron garantía pero no lograron comprar nada.</p><button onclick="window.abrirModalFuga()" class="w-full py-2 bg-white border border-slate-200 text-premium-text font-bold rounded-lg text-xs hover:bg-slate-50 transition shadow-sm no-print uppercase tracking-widest">Ver listado</button></div>`;
+        html += `<div class="${cardClasses} flex flex-col justify-between"><h4 class="${titleClasses}"><span class="${badgeClasses}">7</span> Fuga</h4><p class="${textClasses} mb-4">Hubo <strong class="text-premium-danger font-extrabold">${agg.perdedoresCount} clientes</strong> que pagaron garantía pero no lograron comprar nada.</p><button onclick="window.abrirModalFuga()" class="w-full py-2 bg-white border border-slate-200 text-premium-text font-bold rounded-lg text-xs hover:bg-slate-50 transition shadow-sm no-print uppercase tracking-widest">Ver listado</button></div>`;
         let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
         html += `<div class="${cardClasses}"><h4 class="${titleClasses}"><span class="${badgeClasses}">8</span> Clientes Nuevos</h4><p class="${textClasses}">El <strong class="${strongClasses}">${agg.pctVentaNuevos.toFixed(1)}%</strong> de las ventas se le hizo a clientes que compraban por primera vez.</p></div>`;
         let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
@@ -1265,7 +1278,7 @@ window.renderPanelAutos = function(){
         } catch(ec) {}
         const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term));
         if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
-            return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-black text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(a.monto)}</td></tr>`;
+            return `<tr><td class="pl-4 font-bold text-premium-muted max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="text-center font-bold text-premium-text">Lote ${a.numeroLote||'-'}</td><td class="max-w-[200px] truncate"><span class="font-extrabold text-premium-text">${a.categoria}</span> <span class="text-premium-muted font-medium">${a.modeloStr}</span></td><td class="text-right text-premium-muted font-medium">${formatMoney(a.minimo)}</td><td class="text-right pr-4 font-extrabold text-premium-success">${formatMoney(a.monto)}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin vehículos en la selección actual.</td></tr>';
     } catch (e) {}
 };
@@ -1279,7 +1292,7 @@ window.abrirModalFuga = function() {
                 let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
                 let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
                 let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
-                html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
+                html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-extrabold">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
             });
         } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted font-medium">No hay registros.</td></tr>'; }
         if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; document.getElementById('modal-fuga').classList.remove('hidden'); document.getElementById('modal-fuga').classList.add('flex');
@@ -1316,8 +1329,8 @@ function renderModalTabla(){
         if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso); if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
         if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
-            let badge = p.esFalso ? '<span class="text-[9px] font-black text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
-            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${window.formatExcelDate(p.fecha)}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-black ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
+            let badge = p.esFalso ? '<span class="text-[9px] font-extrabold text-premium-danger border border-premium-danger/20 bg-red-50 px-2 py-0.5 rounded">FALSO</span>' : '<span class="text-[9px] font-bold text-premium-success border border-premium-success/20 bg-green-50 px-2 py-0.5 rounded">REAL</span>'; if(esAdj) badge+=' <span class="text-[9px] font-bold text-white bg-premium-success px-2 py-0.5 rounded ml-2">ADJUDICADO</span>';
+            return `<tr class="${esAdj?'bg-green-50/30':''} ${p.esFalso?'opacity-50':''}"><td class="pl-4 text-[10px] md:text-xs font-bold text-premium-muted">${i+1}</td><td class="text-[10px] md:text-xs font-medium text-premium-muted hidden sm:table-cell">${window.formatExcelDate(p.fecha)}</td><td class="font-bold text-[10px] md:text-xs text-premium-text max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right text-[10px] md:text-xs font-extrabold ${esAdj?'text-premium-success':'text-premium-text'}">${formatMoney(p.monto)}</td><td class="text-center pr-4">${badge}</td></tr>`;
         }).join('') || '<tr><td colspan="5" class="p-8 text-center text-premium-muted font-medium">Sin pujas registradas</td></tr>';
     } catch(e) {}
 }
@@ -1348,7 +1361,7 @@ function procesarDatosClientes(){
 window.renderPanelClientesData = function(filtered,isFiltered=false){ 
     try {
         if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="pl-4 font-bold text-xs md:text-sm text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-premium-muted font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-black text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-black ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
+        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-slate-50 border-b border-premium-border"><td class="pl-4 font-bold text-xs md:text-sm text-premium-text max-w-[150px] truncate">${c.nombre}</td><td class="text-center text-xs md:text-sm text-premium-muted font-bold">${c.frecuencia}</td><td class="text-right text-xs md:text-sm font-extrabold text-premium-success">${formatMoney(c.totalGastado)}</td><td class="text-center text-xs md:text-sm font-extrabold ${c.color} hidden sm:table-cell pr-4">${c.segmento}</td></tr>`).join(''); }
         if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#1D1D1F','#0066CC','#1B8233','#E30000'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right'}}}}); } } 
     } catch(e) {}
 };
@@ -1360,7 +1373,7 @@ window.abrirFichaCliente = function(nombreStr){
         const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
         if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?window.formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+(Number(b.monto)||0),0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+(Number(b.monto)||0),0)); 
-        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?window.formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
+        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${h.fecha?window.formatExcelDate(h.fecha):'-'}</td><td class="truncate text-[10px] md:text-xs max-w-[150px] font-bold text-premium-text">${h.remate ? h.remate : '-'}</td><td class="text-[10px] md:text-xs text-premium-muted font-bold">${h.tipo}</td><td class="font-bold text-[10px] md:text-xs text-premium-highlight">${h.lote}</td><td class="text-right pr-4 text-[10px] md:text-xs font-extrabold text-premium-success">${formatMoney(h.monto)}</td></tr>`).join(''); 
         if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
     } catch(e) {}
 };
@@ -1373,7 +1386,7 @@ window.buscarPatente = function(){
         if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="p-10 text-center text-premium-muted text-sm font-medium">Ingrese un parámetro mínimo de 3 caracteres.</td></tr>'; return; } 
         let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term)){ resultados.push({fecha:r.fechaData?.timestamp,remate:window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
         if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="p-10 text-center font-bold text-sm text-premium-danger">Sin resultados</td></tr>`; return; } 
-        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?window.formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.remate ? res.remate : '-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-black text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
+        tbody.innerHTML=resultados.map(res=>`<tr><td class="pl-4 text-[10px] md:text-xs font-medium text-premium-muted">${res.fecha?window.formatExcelDate(res.fecha):'-'}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.remate ? res.remate : '-'}</td><td class="text-center text-[10px] md:text-xs font-bold text-premium-text">Lote ${res.numeroLote||'-'}</td><td class="text-premium-muted text-[10px] md:text-xs max-w-[150px] truncate hidden sm:table-cell font-medium">${res.lote}</td><td class="font-bold text-[10px] md:text-xs truncate max-w-[150px] text-premium-text">${res.cliente}</td><td class="text-right pr-4 text-[10px] md:text-xs font-extrabold text-premium-success">${formatMoney(res.monto)}</td></tr>`).join(''); 
     } catch(e) {}
 };
 </script>
