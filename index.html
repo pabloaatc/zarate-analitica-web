@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.0 (Matrix Core)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.1 (Dual-Chart)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[200] hidden flex-col items-center justify-center transition-all">
@@ -125,13 +125,11 @@
                 <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition"></select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
-                <!-- Año ahora puede ser ALL para cruzar datos -->
                 <select id="macro-year" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition">
                     <option value="ALL">🌐 Todos los Años</option>
                 </select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
-                <!-- Periodo limpio sin Custom -->
                 <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded px-2.5 py-1.5 text-xs font-bold text-blue-800 outline-none cursor-pointer hover:bg-blue-100 transition">
                     <option value="ALL">Todo el Año</option>
                     <optgroup label="Semestres">
@@ -161,13 +159,11 @@
                     <option value="MANUAL" hidden class="bg-gray-800 text-white">📌 Selección Manual</option>
                 </select>
 
-                <!-- EL CORAZÓN: GESTOR DE MATRICES RE-UBICADO -->
                 <button onclick="window.abrirModalArbol()" class="ml-2 flex items-center gap-1.5 bg-gray-900 text-white border border-gray-900 text-[11px] font-bold px-4 py-1.5 rounded shadow-sm hover:bg-black transition shrink-0">
                     <span>🗂️</span> Gestor de Matrices (<span id="count-matrices-btn">0</span>)
                 </button>
             </div>
 
-            <!-- BOTON ULTIMO REMATE -->
             <div class="flex items-center shrink-0 ml-4">
                 <button onclick="window.seleccionarUltimoRemate()" class="flex items-center gap-1.5 bg-white text-blue-700 border border-blue-200 text-[11px] font-bold px-3 py-1.5 rounded hover:bg-blue-50 transition shrink-0 shadow-sm">
                     <span>⚡ Último Remate</span>
@@ -178,7 +174,6 @@
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar()"></div>
 
-            <!-- SIDEBAR NAVEGACIÓN -->
             <aside id="sidebar" class="absolute md:relative z-40 w-[220px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 border-r border-gray-200 bg-white flex flex-col shrink-0 no-print">
                 <div class="p-3 flex-1 overflow-y-auto space-y-1">
                     <div class="flex justify-between items-center mb-4 px-2 mt-2">
@@ -205,15 +200,14 @@
                 </div>
             </aside>
 
-            <!-- ÁREA DE TRABAJO -->
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
                 <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-300 shadow-sm">
-                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o usa el Gestor de Matrices para comenzar a analizar.</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o cambia el filtro en la barra superior para comenzar a analizar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
@@ -321,8 +315,30 @@
                             </select>
                         </div>
                     </div>
-                    <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Evolución de Venta Adjudicada</h4><div class="relative h-64 md:h-80 w-full"><canvas id="comp-chart"></canvas></div></div>
-                    <div class="glass-panel p-5 overflow-hidden"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tabla de Consolidación Histórica</h4><div class="overflow-x-auto max-h-[600px] rounded-md border border-gray-200"><table class="w-full text-left whitespace-nowrap bg-white"><thead class="sticky top-0 bg-gray-50 shadow-sm border-b border-gray-200 z-10"><tr><th class="pl-4 py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Periodo ↕️</th><th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Matrices ↕️</th><th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Lotes Vendidos ↕️</th><th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'percent')">Efectividad ↕️</th><th class="py-3 text-right cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Venta Total ↕️</th><th class="py-3 text-right pr-4 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Comisiones Est. ↕️</th></tr></thead><tbody id="comp-table-body" class="divide-y divide-gray-100"></tbody></table></div></div>
+                    
+                    <div class="glass-panel p-5">
+                        <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Evolución de Venta y Lotes (Doble Eje)</h4>
+                        <div class="relative h-64 md:h-96 w-full"><canvas id="comp-chart"></canvas></div>
+                    </div>
+                    
+                    <div class="glass-panel p-5 overflow-hidden">
+                        <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tabla de Consolidación Histórica</h4>
+                        <div class="overflow-x-auto max-h-[600px] rounded-md border border-gray-200">
+                            <table class="w-full text-left whitespace-nowrap bg-white">
+                                <thead class="sticky top-0 bg-gray-50 shadow-sm border-b border-gray-200 z-10">
+                                    <tr>
+                                        <th class="pl-4 py-3 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'string')">Periodo ↕️</th>
+                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Matrices ↕️</th>
+                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'number')">Lotes Vendidos ↕️</th>
+                                        <th class="py-3 text-center cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'percent')">Efectividad ↕️</th>
+                                        <th class="py-3 text-right cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Venta Total ↕️</th>
+                                        <th class="py-3 text-right pr-4 cursor-pointer hover:text-gray-900 transition" onclick="window.sortTable(this, 'money')">Comisiones Est. ↕️</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comp-table-body" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- MODULE: MODELOS Y VEHICULOS -->
@@ -444,25 +460,25 @@
         </div>
     </div> <!-- FIN APP CONTENT -->
 
-    <!-- MODAL ARBOL DE SELECCION (GESTOR MATRICES) -->
+    <!-- MODAL ARBOL DE SELECCION (ADMIN MATRICES) -->
     <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4">
         <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl border border-gray-200">
-            <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-900 text-white rounded-t-xl">
-                <div><h3 class="text-lg font-black tracking-tight">Gestor de Matrices</h3><p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1">Control absoluto de la muestra</p></div>
-                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded p-1 shadow-sm transition">✕</button>
+            <div class="p-5 border-b border-gray-200 flex justify-between items-start bg-gray-50">
+                <div><h3 class="text-lg font-black tracking-tight text-gray-900">Administrar Matrices</h3><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Selección específica de datos</p></div>
+                <button onclick="window.cerrarModalArbol()" class="text-gray-400 hover:text-gray-800 bg-white border border-gray-300 rounded p-1 shadow-sm transition">✕</button>
             </div>
             
-            <div class="bg-gray-50 border-b border-gray-200 p-4">
-                <input type="text" id="search-arbol" placeholder="🔍 Buscar matriz o fecha rápida..." class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition outline-none shadow-sm" onkeyup="window.filtrarModalArbol()">
+            <div class="bg-white border-b border-gray-200 p-3">
+                <input type="text" id="search-arbol" placeholder="🔍 Buscar por mes (ej. Enero) o matriz..." class="w-full bg-gray-50 border border-gray-300 rounded px-3 py-2 text-sm focus:border-gray-900 focus:bg-white transition outline-none shadow-inner" onkeyup="window.filtrarModalArbol()">
             </div>
             
             <div id="arbol-tabs-container"></div>
             
             <div class="flex justify-between items-center bg-gray-100 border-b border-gray-200 p-3 z-10 shadow-inner">
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Acciones Rápidas:</span>
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Acciones Masivas:</span>
                 <div class="flex gap-2">
                     <button onclick="window.toggleArbolAll(true)" class="bg-white border border-gray-300 text-gray-800 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-gray-50 transition shadow-sm">✔ Marcar Todas</button>
-                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar</button>
+                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar Todo</button>
                 </div>
             </div>
 
@@ -470,7 +486,7 @@
                 <!-- Se llena con JS -->
             </div>
             <div class="p-4 border-t border-gray-200 bg-gray-50">
-                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar y Ver Resultados</button>
+                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm">Aplicar Cambios</button>
             </div>
         </div>
     </div>
@@ -707,28 +723,20 @@ window.actualizarFiltrosGlobales = function() {
     segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
     
     let yrOptions = `<option value="ALL" ${currentYr === 'ALL' ? 'selected' : ''}>🌐 Todos los Años</option>`;
+    yrOptions += `<option value="CUSTOM" hidden ${currentYr === 'CUSTOM' ? 'selected' : ''}>⚙️ Año Mix</option>`;
     yrOptions += Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==currentYr?'selected':''}>Año ${y}</option>`).join('');
     yearSelect.innerHTML = yrOptions;
     
     window.updateMacroFilter();
 };
 
-window.applyModalSelection = function() {
-    // Cuando el usuario usa el Gestor, bloqueamos el periodo visualmente a "Manual"
-    let periodElement = document.getElementById('macro-period');
-    if(periodElement) periodElement.value = 'MANUAL';
-    
-    window.updateAdminButtonCount();
-    window.actualizarVistaActual();
-};
-
-window.updateMacroFilter = function() {
+window.updateMacroFilter = function(forceCustom = false) {
     let seg = document.getElementById('macro-segment').value;
     let yr = document.getElementById('macro-year').value;
     let periodElement = document.getElementById('macro-period');
     let period = periodElement ? periodElement.value : 'ALL';
     
-    if(period !== 'MANUAL') {
+    if(!forceCustom) {
         let allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
         if(period === 'S1') allowedMonths = [0,1,2,3,4,5];
         else if(period === 'S2') allowedMonths = [6,7,8,9,10,11];
@@ -746,6 +754,9 @@ window.updateMacroFilter = function() {
             let matchM = allowedMonths.includes(rM);
             return matchSeg && matchYr && matchM;
         }).map(r => r.id);
+    } else {
+        if(periodElement) periodElement.value = 'CUSTOM';
+        document.getElementById('macro-year').value = 'CUSTOM';
     }
     
     window.updateAdminButtonCount();
@@ -764,7 +775,7 @@ window.seleccionarUltimoRemate = function() {
     
     if (segSelect) segSelect.value = ultimo.tipo || 'Siniestrados';
     if (yearSelect) yearSelect.value = ultimo.fechaData?.year ? Number(ultimo.fechaData.year).toString() : new Date().getFullYear().toString();
-    if (periodSelect) periodSelect.value = 'MANUAL';
+    if (periodSelect) periodSelect.value = 'CUSTOM';
     
     checkedNodes = [ultimo.id];
     
@@ -773,7 +784,7 @@ window.seleccionarUltimoRemate = function() {
     window.actualizarVistaActual();
 };
 
-// --- LOGICA MODAL GESTOR MATRICES ---
+// --- LOGICA MODAL MATRICES MASIVA ---
 window.switchModalYear = function(y) {
     currentModalYearTab = y;
     window.abrirModalArbol();
@@ -793,17 +804,20 @@ window.toggleArbolAll = function(check) {
     } else {
         checkedNodes = [];
     }
-    window.applyModalSelection();
+    window.updateMacroFilter(true);
     window.abrirModalArbol();
 };
 
 window.filtrarModalArbol = function() {
     let term = document.getElementById('search-arbol').value.toLowerCase();
     document.querySelectorAll('.arbol-mes-group').forEach(mesGroup => {
+        let monthTitle = mesGroup.querySelector('.font-bold').innerText.toLowerCase();
+        let monthMatches = monthTitle.includes(term);
         let hasVisibleChild = false;
+
         mesGroup.querySelectorAll('.arbol-remate-item').forEach(remateItem => {
             let text = remateItem.innerText.toLowerCase();
-            if(text.includes(term)) {
+            if(monthMatches || text.includes(term)) {
                 remateItem.style.display = 'flex';
                 hasVisibleChild = true;
             } else {
@@ -884,7 +898,6 @@ window.abrirModalArbol = function() {
     }
 
     contentContainer.innerHTML = contentHtml;
-    // Apply search filter if there was any text typed
     window.filtrarModalArbol();
     
     document.getElementById('modal-arbol').classList.remove('hidden');
@@ -894,7 +907,6 @@ window.abrirModalArbol = function() {
 window.cerrarModalArbol = function() { 
     document.getElementById('modal-arbol').classList.add('hidden'); 
     document.getElementById('modal-arbol').classList.remove('flex'); 
-    // Clear search
     let searchEl = document.getElementById('search-arbol');
     if(searchEl) searchEl.value = '';
 };
@@ -912,14 +924,14 @@ window.toggleArbolMes = function(year, mesIndex, isChecked) {
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
     
-    window.applyModalSelection();
+    window.updateMacroFilter(true);
     window.abrirModalArbol(); 
 };
 
 window.toggleArbolRemate = function(id, isChecked) {
     if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    window.applyModalSelection();
+    window.updateMacroFilter(true);
     window.abrirModalArbol(); 
 };
 
@@ -1202,7 +1214,9 @@ window.renderDashboard = function(){
             let selectPeriodo = document.getElementById('macro-period');
             let selectYear = document.getElementById('macro-year');
             if (selectPeriodo) {
-                if (selectPeriodo.value === 'MANUAL') {
+                if (selectPeriodo.value === 'CUSTOM') {
+                    titulo = "Selección Personalizada";
+                } else if (selectPeriodo.value === 'MANUAL') {
                     titulo = "Selección Manual (Gestor de Matrices)";
                 } else if (selectPeriodo.selectedIndex >= 0 && selectPeriodo.options[selectPeriodo.selectedIndex]) {
                     let yT = selectYear.value === 'ALL' ? 'Histórico Completo' : selectYear.value;
@@ -1271,11 +1285,10 @@ window.renderDashboard = function(){
                 let monthMap = {};
                 allRemates.forEach(r => {
                     let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-                    // If multiple years are selected, append year to label to differentiate
                     let y = r.fechaData?.year ? String(r.fechaData.year).slice(-2) : 'XX';
                     let labelStr = document.getElementById('macro-year').value === 'ALL' ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
                     
-                    let mk = `${y}-${m}`; // unique key
+                    let mk = `${y}-${m}`; 
                     if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: labelStr, rawD: r.fechaData?.timestamp||0 };
                     if(r.tipo === 'Siniestrados') monthMap[mk].siniestros += (Number(r.ventaTotal) || 0);
                     if(r.tipo === 'Retail') monthMap[mk].retail += (Number(r.ventaTotal) || 0);
@@ -1356,6 +1369,7 @@ window.renderComparativa = function() {
         let chartLabels = [];
         let dataVenta = [];
         let dataComision = [];
+        let dataLotes = []; // NUEVO EJE PARA LOTES
 
         sortedKeys.forEach(k => {
             let g = groups[k];
@@ -1363,6 +1377,7 @@ window.renderComparativa = function() {
             chartLabels.push(g.label);
             dataVenta.push(agg.venta);
             dataComision.push(agg.comisionTotal);
+            dataLotes.push(agg.lotes); // Agregamos los lotes
             
             tableHtml += `
             <tr class="hover:bg-gray-50 transition border-b border-gray-100">
@@ -1385,11 +1400,19 @@ window.renderComparativa = function() {
                 data: { 
                     labels: chartLabels, 
                     datasets: [
-                        { label: 'Venta Total Adjudicada', data: dataVenta, borderColor: '#111827', backgroundColor: '#111827', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 4 },
-                        { label: 'Comisiones Estimadas', data: dataComision, borderColor: '#2563EB', backgroundColor: '#2563EB', borderWidth: 2, borderDash: [5, 5], tension: 0.3, pointBackgroundColor: '#2563EB', pointRadius: 3 }
+                        { label: 'Venta Total Adjudicada', data: dataVenta, type: 'line', borderColor: '#111827', backgroundColor: '#111827', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 4, yAxisID: 'y' },
+                        { label: 'Comisiones Estimadas', data: dataComision, type: 'line', borderColor: '#2563EB', backgroundColor: '#2563EB', borderWidth: 2, borderDash: [5, 5], tension: 0.3, pointBackgroundColor: '#2563EB', pointRadius: 3, yAxisID: 'y' },
+                        { label: 'Lotes Vendidos', data: dataLotes, type: 'bar', backgroundColor: '#16A34A', borderRadius: 4, yAxisID: 'y1' }
                     ] 
                 }, 
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    scales: { 
+                        y: { type: 'linear', display: true, position: 'left', beginAtZero: true },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
+                    } 
+                } 
             });
         }
     } catch(e) { console.error(e); }
@@ -1406,7 +1429,7 @@ window.filtrarLotesMain = function() {
     }
 };
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-5 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-5 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
 window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
 window.renderConclusiones = function() {
