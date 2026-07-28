@@ -29,51 +29,42 @@
         body { background-color: #F2F2F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
         
         .glass-panel { 
-            background: #FFFFFF; 
-            border: 1px solid rgba(229, 229, 234, 0.8); 
-            border-radius: 1.5rem; 
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: #FFFFFF; border: 1px solid rgba(229, 229, 234, 0.8); border-radius: 1.5rem; 
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
-        .glass-panel:hover { 
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); 
-            transform: translateY(-2px);
-        }
+        .glass-panel:hover { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
 
-        .upload-area { border: 1.5px dashed #D1D1D6; background-color: #FAFAFA; border-radius: 999px; transition: all 0.2s; cursor: pointer; }
-        .upload-area:hover, .upload-area.dragover { border-color: #000000; background-color: #F0F0F0; }
-        
-        .nav-item { padding: 0.6rem 0.8rem; border-radius: 0.75rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #86868B;}
+        .nav-item { padding: 0.75rem 1rem; border-radius: 0.75rem; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #86868B;}
         .nav-item:hover { background-color: #EAEAEB; color: #1D1D1F; }
         .nav-active { background-color: #1D1D1F !important; color: #FFFFFF !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         
-        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1em; height: 1.1em; border: 1.5px solid #C7C7CC; border-radius: 0.25em; display: grid; place-content: center; transition: all 0.2s; cursor: pointer;}
-        input[type="checkbox"]::before { content: ""; width: 0.6em; height: 0.6em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
+        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.2em; height: 1.2em; border: 1.5px solid #C7C7CC; border-radius: 0.35em; display: grid; place-content: center; transition: all 0.2s; cursor: pointer;}
+        input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
         input[type="checkbox"]:checked { background-color: #1D1D1F; border-color: #1D1D1F; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; } 
+        ::-webkit-scrollbar { width: 6px; height: 6px; } 
         ::-webkit-scrollbar-track { background: transparent; } 
-        ::-webkit-scrollbar-thumb { background: #D1D1D6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #D1D1D6; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #86868B; }
 
         .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); }
         
-        thead th { background-color: #FFFFFF; border-bottom: 1px solid #E5E5EA; color: #86868B; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; padding-bottom: 0.75rem; }
+        thead th { background-color: #f8fafc; border-bottom: 1px solid #E5E5EA; color: #86868B; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; padding-bottom: 0.75rem; padding-top: 0.75rem; }
         tbody tr { border-bottom: 1px solid #F5F5F7; transition: background-color 0.2s; }
         tbody tr:hover { background-color: #FAFAFA; }
         tbody td { font-size: 0.8rem; color: #1D1D1F; padding: 0.85rem 0.5rem; }
         
         @media print {
-            aside, header, .no-print { display: none !important; }
+            aside, header, #paraguas-bar, .no-print { display: none !important; }
             main { padding: 0 !important; background: white !important; }
             .glass-panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; transform: none !important; }
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden relative">
+<body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v3.5 (Quarters)</div>
+    <div class="fixed bottom-2 right-3 text-[9px] text-premium-muted font-mono z-50 pointer-events-none no-print tracking-wider">v4.0 (Global)</div>
 
     <!-- OVERLAY DE CARGA EN VIVO -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[200] hidden flex-col items-center justify-center transition-all">
@@ -91,137 +82,148 @@
             <p class="text-[10px] text-premium-muted uppercase tracking-widest mb-6 font-semibold">Control Directivo</p>
             
             <form id="login-form" onsubmit="window.handleLogin(event)" class="text-left">
-                <div class="mb-4">
-                    <input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all font-medium" required placeholder="Correo Electrónico">
-                </div>
-                <div class="mb-6">
-                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all font-medium" required placeholder="Contraseña">
-                </div>
+                <div class="mb-4"><input type="email" id="email" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent transition-all font-medium" required placeholder="Correo Electrónico"></div>
+                <div class="mb-6"><input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-accent transition-all font-medium" required placeholder="Contraseña"></div>
                 <div id="login-error" class="hidden text-premium-danger text-[10px] font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
-                <button type="submit" id="btn-login" class="w-full bg-premium-accent hover:bg-gray-800 text-white font-semibold py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
-                    Iniciar Sesión
-                </button>
+                <button type="submit" id="btn-login" class="w-full bg-premium-accent hover:bg-gray-800 text-white font-semibold py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">Iniciar Sesión</button>
             </form>
-
             <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
-                <div class="mb-2 text-center">
-                    <span class="bg-premium-success/10 text-premium-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Invitación Aceptada</span>
-                </div>
-                <p class="text-xs text-premium-muted mb-6 text-center leading-relaxed font-medium">¡Bienvenido! Crea tu contraseña definitiva para ingresar a Zárate Analítica.</p>
-                <div class="mb-6">
-                    <input type="password" id="new-password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-success focus:ring-2 focus:ring-premium-success/20 transition-all font-medium" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6">
-                </div>
+                <div class="mb-2 text-center"><span class="bg-premium-success/10 text-premium-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Invitación Aceptada</span></div>
+                <p class="text-xs text-premium-muted mb-6 text-center leading-relaxed font-medium">¡Bienvenido! Crea tu contraseña definitiva.</p>
+                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-premium-success transition-all font-medium" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
                 <div id="invite-error" class="hidden text-premium-danger text-[10px] font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></div>
-                <button type="submit" id="btn-invite" class="w-full bg-premium-success hover:bg-green-700 text-white font-semibold py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">
-                    Guardar y Entrar
-                </button>
+                <button type="submit" id="btn-invite" class="w-full bg-premium-success hover:bg-green-700 text-white font-semibold py-3 px-4 text-sm rounded-xl transition-all shadow-md flex justify-center items-center">Guardar y Entrar</button>
             </form>
         </div>
     </div>
     
     <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
-        <!-- HEADER -->
-        <header class="bg-white/90 backdrop-blur-md border-b border-premium-border z-20 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 no-print sticky top-0 shadow-sm">
+        
+        <!-- HEADER MAESTRO -->
+        <header class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex items-center justify-between shrink-0 z-30 relative shadow-sm no-print">
             <div class="flex items-center gap-3">
-                <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
-                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base md:text-lg shadow-md">Z</div>
-                <div class="hidden sm:block">
-                    <h1 class="font-bold text-sm text-premium-text tracking-tight">Control de Gestión</h1>
-                    <p class="text-[9px] text-premium-muted uppercase tracking-wider font-semibold" id="db-status">Conectando...</p>
-                </div>
+                <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted hover:text-premium-text transition p-1 bg-gray-50 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                <div class="w-8 h-8 rounded-lg bg-premium-accent flex items-center justify-center font-bold text-white text-base shadow-sm">Z</div>
+                <div class="hidden sm:block"><h1 class="font-black text-sm text-premium-text tracking-tight">Zárate Analítica</h1></div>
             </div>
             
             <div class="flex items-center gap-3 md:gap-4">
-                <div id="admin-controls" class="hidden items-center gap-2 md:gap-4">
-                    <button onclick="window.limpiarBase()" class="hidden md:block text-[10px] text-premium-danger font-bold px-3 py-1.5 rounded-full hover:bg-red-50 transition border border-red-100 shadow-sm" title="Vaciar datos de la nube">Vaciar Base</button>
-                    <div class="upload-area px-3 md:px-4 py-1.5 flex items-center gap-2 md:gap-3 shadow-sm">
-                        <label for="file-input" class="font-bold text-[12px] md:text-[11px] text-premium-text cursor-pointer"><span class="md:hidden">📄</span><span class="hidden md:inline">📄 Archivos</span></label>
-                        <span class="text-premium-border hidden md:inline">|</span>
-                        <label for="folder-input" class="font-bold text-[11px] text-premium-text cursor-pointer hidden md:inline">📁 Carpeta</label>
-                        <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="window.iniciarProcesamiento(this.files)">
-                        <input type="file" id="folder-input" class="hidden" webkitdirectory directory onchange="window.iniciarProcesamiento(this.files)">
-                    </div>
-                </div>
-                
+                <span class="text-[9px] text-premium-muted uppercase tracking-widest font-extrabold hidden md:inline" id="db-status">Conectando...</span>
                 <div class="h-4 w-px bg-premium-border hidden sm:block"></div>
-                <button onclick="window.handleLogout()" class="flex items-center gap-2 text-xs font-semibold text-premium-muted hover:text-premium-text transition" title="Cerrar Sesión">
-                    <span id="user-display-email" class="text-[10px] bg-premium-bg px-2 py-1 rounded-md hidden md:inline border border-premium-border"></span> 
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <button onclick="window.handleLogout()" class="flex items-center gap-2 text-xs font-semibold text-premium-muted hover:text-premium-text transition bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-xl border border-gray-200">
+                    <span id="user-display-email" class="hidden sm:inline"></span> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
         </header>
 
+        <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
+        <div id="paraguas-bar" class="bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 md:px-6 py-3 flex justify-between items-center shrink-0 z-20 shadow-sm no-print">
+            <div class="flex items-center gap-2 md:gap-4 flex-wrap">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden lg:inline">Filtro Global:</span>
+                
+                <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
+                <span class="text-gray-300 font-light text-xl hidden sm:inline">/</span>
+                <select id="macro-year" onchange="window.updateMacroFilter()" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
+                <span class="text-gray-300 font-light text-xl hidden sm:inline">/</span>
+                
+                <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs font-black text-blue-700 outline-none cursor-pointer hover:bg-blue-100 transition shadow-sm">
+                    <option value="ALL">Todo el Año</option>
+                    <optgroup label="Semestres">
+                        <option value="S1">1er Semestre (Ene-Jun)</option>
+                        <option value="S2">2do Semestre (Jul-Dic)</option>
+                    </optgroup>
+                    <optgroup label="Trimestres">
+                        <option value="Q1">Q1 (Ene-Mar)</option>
+                        <option value="Q2">Q2 (Abr-Jun)</option>
+                        <option value="Q3">Q3 (Jul-Sep)</option>
+                        <option value="Q4">Q4 (Oct-Dic)</option>
+                    </optgroup>
+                    <optgroup label="Meses">
+                        <option value="M0">Enero</option>
+                        <option value="M1">Febrero</option>
+                        <option value="M2">Marzo</option>
+                        <option value="M3">Abril</option>
+                        <option value="M4">Mayo</option>
+                        <option value="M5">Junio</option>
+                        <option value="M6">Julio</option>
+                        <option value="M7">Agosto</option>
+                        <option value="M8">Septiembre</option>
+                        <option value="M9">Octubre</option>
+                        <option value="M10">Noviembre</option>
+                        <option value="M11">Diciembre</option>
+                    </optgroup>
+                    <option value="CUSTOM" hidden>Selección Personalizada</option>
+                </select>
+            </div>
+
+            <button onclick="window.abrirModalArbol()" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-xs font-bold px-3 py-2 rounded-xl shadow-sm hover:shadow-md hover:bg-gray-50 transition shrink-0 ml-2">
+                <span>⚙️</span> <span class="hidden md:inline">Específico</span>
+            </button>
+        </div>
+
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-premium-accent/20 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar()"></div>
 
-            <aside id="sidebar" class="absolute md:relative z-40 w-[260px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white overflow-y-auto p-4 flex flex-col shrink-0 no-print shadow-2xl md:shadow-none">
-                <div class="flex justify-between items-center mb-6 px-2 mt-2">
-                    <div class="text-[9px] font-extrabold text-premium-muted uppercase tracking-widest">Módulos</div>
-                    <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted p-1 hover:bg-slate-100 rounded font-bold">✕</button>
+            <!-- SIDEBAR ULTRA LIMPIO (SOLO NAVEGACIÓN Y CARGA) -->
+            <aside id="sidebar" class="absolute md:relative z-40 w-[240px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-premium-border bg-white flex flex-col shrink-0 no-print shadow-2xl md:shadow-none">
+                <div class="p-4 flex-1 overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6 px-1 mt-2">
+                        <div class="text-[9px] font-extrabold text-premium-muted uppercase tracking-widest">Módulos</div>
+                        <button onclick="window.toggleSidebar()" class="md:hidden text-premium-muted p-1 hover:bg-slate-100 rounded font-bold">✕</button>
+                    </div>
+                    <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="window.cambiarSeccion('remates')">Resumen General</div>
+                    <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('autos')">Análisis Vehicular</div>
+                    <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('clientes')">Gestión de Clientes</div>
+                    <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('conclusiones')">Datos Directivos</div>
+                    <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
                 </div>
-                <div id="nav-mod-remates" class="nav-item nav-active mb-1" onclick="window.cambiarSeccion('remates')">Resumen de Remates</div>
-                <div id="nav-mod-autos" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('autos')">Análisis de Vehículos</div>
-                <div id="nav-mod-clientes" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('clientes')">Clientes</div>
-                <div id="nav-mod-conclusiones" class="nav-item nav-inactive mb-1" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
-                <div id="nav-mod-buscador" class="nav-item nav-inactive mb-8" onclick="window.cambiarSeccion('buscador')">Buscador Global</div>
-                
-                <div id="calendar-container" class="mt-2">
-                    <div class="text-[10px] font-extrabold text-premium-muted uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
-                        <span>Filtro de Periodos</span>
-                        <div class="flex gap-3">
-                            <button onclick="window.seleccionarUltimoRemate()" class="text-premium-highlight hover:text-blue-700 transition flex items-center gap-1 font-bold" title="Ir al remate más reciente">⚡Último Remate</button>
-                            <button onclick="window.limpiarSeleccion()" class="hover:text-premium-text text-premium-muted transition font-bold">Limpiar</button>
-                        </div>
-                    </div>
+
+                <!-- CONTROLES ADMIN EN EL SIDEBAR -->
+                <div id="admin-controls" class="hidden flex-col gap-2 p-4 border-t border-gray-100 bg-gray-50/50">
+                    <label for="file-input" class="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-blue-50 hover:border-blue-300 transition cursor-pointer shadow-sm">
+                        <p class="text-xl mb-1">📁</p>
+                        <p class="text-[10px] font-extrabold text-gray-600 uppercase tracking-widest">Subir Excel</p>
+                    </label>
+                    <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="window.iniciarProcesamiento(this.files)">
                     
-                    <div class="px-2 space-y-3">
-                        <div class="flex gap-2">
-                            <select id="cal-segment" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="window.onCalSegmentChange(this.value)"></select>
-                            <select id="cal-year" class="bg-premium-bg border border-premium-border text-xs text-premium-text font-bold rounded-md px-2 py-1.5 outline-none focus:border-premium-highlight w-full transition shadow-sm" onchange="window.onCalYearChange(this.value)"></select>
-                        </div>
-                        <!-- NUEVA GRILLA DE TRIMESTRES Y MESES -->
-                        <div id="cal-months" class="grid grid-cols-4 gap-1.5"></div>
-                        <div id="cal-matrices" class="flex flex-col pt-2 border-t border-premium-border/50"></div>
-                    </div>
+                    <button onclick="window.limpiarBase()" class="text-[10px] text-red-500 font-extrabold py-2 mt-1 rounded-lg hover:bg-red-50 hover:text-red-700 transition w-full text-center tracking-widest uppercase">Vaciar Base Completa</button>
                 </div>
             </aside>
 
+            <!-- ÁREA DE TRABAJO -->
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
                 <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/90 backdrop-blur-md no-print p-6">
                     <div class="w-20 h-20 rounded-[2rem] bg-white flex items-center justify-center mb-5 border border-premium-border shadow-xl shadow-slate-200/50">
                         <svg class="w-8 h-8 text-premium-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
-                    <p class="font-bold text-xl text-premium-text tracking-tight text-center">Área de Trabajo Principal</p>
-                    <p class="text-sm text-premium-muted mt-2 text-center max-w-sm font-medium">Seleccione una matriz en el panel lateral o arrastre nuevos archivos para comenzar el análisis.</p>
+                    <p class="font-bold text-xl text-premium-text tracking-tight text-center">Sin Datos Seleccionados</p>
+                    <p class="text-sm text-premium-muted mt-2 text-center max-w-sm font-medium">Sube archivos Excel o cambia el filtro en la barra superior para comenzar.</p>
                 </div>
 
-                <!-- MODULE: REMATES -->
+                <!-- MODULE: REMATES (AHORA UNIFICADO) -->
                 <div id="module-remates" class="hidden space-y-6 md:space-y-8 max-w-[1400px] mx-auto pb-10">
-                    <div id="single-view" class="space-y-6 md:space-y-8 hidden">
-                        <!-- HEADER DE MÓDULO CON MINI-CARDS -->
+                    <div id="dashboard-view" class="space-y-6 md:space-y-8">
+                        <!-- HEADER DINÁMICO -->
                         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 border-b border-premium-border pb-5">
                             <div class="w-full xl:w-auto overflow-hidden">
-                                <h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text truncate" id="sv-titulo">-</h2>
-                                <p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2" id="sv-subtitulo">-</p>
+                                <h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text truncate" id="dash-titulo">-</h2>
+                                <p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2" id="dash-subtitulo">-</p>
                             </div>
                             
-                            <!-- TARJETAS SUPERIORES ELEGANTES -->
                             <div class="flex gap-2 md:gap-3 flex-wrap justify-end shrink-0 w-full xl:w-auto">
                                 <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
                                     <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Ticket Promedio</p>
-                                    <p class="text-xl md:text-2xl font-black text-premium-text tracking-tight" id="sv-kpi-ticket-top">$0</p>
+                                    <p class="text-xl md:text-2xl font-black text-premium-text tracking-tight" id="dash-kpi-ticket">$0</p>
                                 </div>
                                 <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center min-w-[130px] hover:shadow-md transition">
                                     <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Comisión Est.</p>
-                                    <p class="text-xl md:text-2xl font-black text-premium-highlight tracking-tight" id="sv-kpi-comision-top">$0</p>
+                                    <p class="text-xl md:text-2xl font-black text-premium-highlight tracking-tight" id="dash-kpi-comision">$0</p>
                                 </div>
                                 <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex flex-col justify-center border-b-4 border-b-premium-success min-w-[150px] hover:shadow-md transition">
-                                    <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Venta Adjudicada</p>
-                                    <p class="text-xl md:text-2xl font-black text-premium-success tracking-tight" id="sv-kpi-venta">$0</p>
+                                    <p class="text-[9px] text-premium-muted uppercase font-extrabold tracking-widest mb-0.5">Venta Total</p>
+                                    <p class="text-xl md:text-2xl font-black text-premium-success tracking-tight" id="dash-kpi-venta">$0</p>
                                 </div>
                             </div>
                         </div>
@@ -232,16 +234,21 @@
                             <div class="glass-panel p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
                                 <div class="absolute top-0 right-0 w-40 h-40 bg-premium-success/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                                 <h4 class="font-extrabold text-lg mb-6 text-premium-text tracking-tight flex items-center gap-2">
-                                    <span class="bg-premium-bg px-2 py-1 rounded border border-slate-200 text-xs">📊</span> Efectividad del Remate
+                                    <span class="bg-white px-2 py-1 rounded border border-slate-200 text-xs shadow-sm">📊</span> Efectividad Consolidada
                                 </h4>
                                 <div class="space-y-4 flex-1">
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Disponibles (Base)</span><span class="font-black text-lg text-premium-text" id="sv-kpi-lotes-disp">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Disponibles (Base)</span><span class="font-black text-lg text-premium-text" id="dash-kpi-lotes-disp">0</span></div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Vendidos</span><span class="font-black text-lg text-premium-text" id="sv-kpi-lotes">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Lotes Vendidos</span><span class="font-black text-lg text-premium-text" id="dash-kpi-lotes">0</span></div>
+                                    <div class="w-full h-px bg-slate-200/60"></div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-premium-muted font-semibold">Delta Puja Global</span>
+                                        <span class="font-black text-lg text-premium-highlight" id="dash-kpi-delta">$0</span>
+                                    </div>
                                 </div>
                                 <div class="mt-8 pt-5 border-t border-slate-200 flex justify-between items-end">
-                                    <span class="text-[10px] text-premium-muted uppercase font-black tracking-widest">Tasa Final</span>
-                                    <span class="font-black text-5xl text-premium-success tracking-tighter" id="sv-kpi-eficacia-resumen">0%</span>
+                                    <span class="text-[10px] text-premium-muted uppercase font-black tracking-widest">Efectividad</span>
+                                    <span class="font-black text-5xl text-premium-success tracking-tighter" id="dash-kpi-eficacia">0%</span>
                                 </div>
                             </div>
 
@@ -249,25 +256,37 @@
                             <div class="glass-panel p-6 md:p-8 flex flex-col h-full bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
                                 <div class="absolute top-0 right-0 w-40 h-40 bg-premium-highlight/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                                 <h4 class="font-extrabold text-lg mb-6 text-premium-text tracking-tight flex items-center gap-2">
-                                    <span class="bg-premium-bg px-2 py-1 rounded border border-slate-200 text-xs">👥</span> Comportamiento de Clientes
+                                    <span class="bg-white px-2 py-1 rounded border border-slate-200 text-xs shadow-sm">👥</span> Comportamiento de Clientes
                                 </h4>
                                 <div class="space-y-4 flex-1">
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Garantías Pagadas</span><span class="font-black text-lg text-premium-text" id="sv-kpi-garantias">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Garantías Pagadas</span><span class="font-black text-lg text-premium-text" id="dash-kpi-garantias">0</span></div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Adjudicatarios (Ganadores)</span><span class="font-black text-lg text-premium-success" id="sv-kpi-ganadores">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Adjudicatarios (Ganadores)</span><span class="font-black text-lg text-premium-success" id="dash-kpi-ganadores">0</span></div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
-                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Fuga (No adjudicaron)</span><span class="font-black text-lg text-premium-danger" id="sv-kpi-perdedores">0</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-sm text-premium-muted font-semibold">Fuga (No adjudicaron)</span><span class="font-black text-lg text-premium-danger" id="dash-kpi-perdedores">0</span></div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm text-premium-muted font-semibold truncate pr-2">Nuevos Adjudicatarios</span>
-                                        <div class="shrink-0 flex items-center gap-2"><span class="font-black text-lg text-premium-highlight" id="sv-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted font-bold tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200" id="sv-kpi-1racompra-pct"></span></div>
+                                        <div class="shrink-0 flex items-center gap-2"><span class="font-black text-lg text-premium-highlight" id="dash-kpi-1racompra">0</span><span class="text-[9px] text-premium-muted font-bold tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200" id="dash-kpi-1racompra-pct"></span></div>
                                     </div>
                                     <div class="w-full h-px bg-slate-200/60"></div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm text-premium-muted font-semibold truncate pr-2">Compras Volumen (>1 lote)</span>
-                                        <div class="flex items-center gap-3 shrink-0"><span class="font-black text-lg text-premium-text" id="sv-kpi-multilote">0</span><button onclick="window.abrirModalMultiLote()" class="text-[9px] text-white bg-premium-text hover:bg-black px-2 py-1 rounded font-bold transition no-print shadow-sm uppercase tracking-wider">Ver lista</button></div>
+                                        <div class="flex items-center gap-3 shrink-0"><span class="font-black text-lg text-premium-text" id="dash-kpi-multilote">0</span><button onclick="window.abrirModalMultiLote()" class="text-[9px] text-white bg-premium-text hover:bg-black px-2 py-1 rounded font-bold transition no-print shadow-sm uppercase tracking-wider">Ver lista</button></div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- GRÁFICOS DINÁMICOS -->
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8 mt-4 no-print">
+                            <div class="glass-panel p-6 md:p-8">
+                                <h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6">Composición de Ventas</h4>
+                                <div class="relative h-56 md:h-72 w-full"><canvas id="dash-chartVentas"></canvas></div>
+                            </div>
+                            <div class="glass-panel p-6 md:p-8">
+                                <h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6">Tracción de Clientes</h4>
+                                <div class="relative h-56 md:h-72 w-full"><canvas id="dash-chartClientes"></canvas></div>
                             </div>
                         </div>
 
@@ -275,7 +294,7 @@
                         <div class="glass-panel p-6 md:p-8 overflow-hidden w-full bg-white">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 pb-4">
                                 <h4 class="font-extrabold text-lg text-premium-text tracking-tight flex items-center gap-2">
-                                    <span class="bg-premium-bg px-2 py-1 rounded border border-slate-200 text-xs">🚗</span> Detalle de Lotes Adjudicados
+                                    <span class="bg-gray-50 px-2 py-1 rounded border border-slate-200 text-xs shadow-sm">🚗</span> Detalle Global de Lotes Adjudicados
                                 </h4>
                                 <input type="text" id="search-lotes-main" placeholder="Buscar lote, modelo o cliente..." class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-premium-highlight focus:ring-2 focus:ring-premium-highlight/20 transition-all w-full sm:w-72 shadow-inner font-medium text-premium-text placeholder:text-slate-400" onkeyup="window.filtrarLotesMain()">
                             </div>
@@ -284,7 +303,8 @@
                                 <table class="w-full text-left bg-white">
                                     <thead class="sticky top-0 bg-slate-50 shadow-sm z-10 border-b border-slate-200">
                                         <tr>
-                                            <th class="pl-6 py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
+                                            <th class="pl-6 py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
+                                            <th class="py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
                                             <th class="py-4 cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'string')">Detalle del Vehículo ↕️</th>
                                             <th class="py-4 text-center cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'number')">Pujas ↕️</th>
                                             <th class="py-4 text-right cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
@@ -292,37 +312,9 @@
                                             <th class="py-4 text-right pr-6 hidden sm:table-cell cursor-pointer hover:text-premium-text transition" onclick="window.sortTable(this, 'money')">Delta ↕️</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="sv-tabla-top-lotes" class="divide-y divide-slate-100"></tbody>
+                                    <tbody id="dash-tabla-lotes" class="divide-y divide-slate-100"></tbody>
                                 </table>
                             </div>
-                        </div>
-                    </div>
-
-                    <div id="compare-view" class="space-y-6 md:space-y-8 hidden">
-                        <div class="border-b border-premium-border pb-5">
-                            <h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Análisis Comparativo</h2>
-                            <p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Consolidación de múltiples periodos</p>
-                        </div>
-                        <div class="glass-panel overflow-x-auto w-full p-4">
-                            <table class="w-full text-left whitespace-nowrap">
-                                <thead>
-                                    <tr>
-                                        <th class="pl-4 cursor-pointer" onclick="window.sortTable(this, 'string')">Matriz Analizada ↕️</th>
-                                        <th class="text-right cursor-pointer" onclick="window.sortTable(this, 'money')">Venta ↕️</th>
-                                        <th class="text-right cursor-pointer hidden sm:table-cell" onclick="window.sortTable(this, 'money')">Comisión ↕️</th>
-                                        <th class="text-center cursor-pointer" onclick="window.sortTable(this, 'number')">L. Vend. ↕️</th>
-                                        <th class="text-center cursor-pointer" onclick="window.sortTable(this, 'percent')">Efectividad ↕️</th>
-                                        <th class="text-center cursor-pointer" onclick="window.sortTable(this, 'number')">Garantías ↕️</th>
-                                        <th class="text-center cursor-pointer hidden sm:table-cell" onclick="window.sortTable(this, 'number')">Nuevos ↕️</th>
-                                        <th class="text-right pr-4 cursor-pointer" onclick="window.sortTable(this, 'money')">Sobreprecio ↕️</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="cv-tabla-comparativa"></tbody>
-                            </table>
-                        </div>
-                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-4 no-print">
-                            <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6">Composición de Ventas</h4><div class="relative h-56 md:h-72 w-full"><canvas id="cv-chartVentas"></canvas></div></div>
-                            <div class="glass-panel p-6"><h4 class="font-extrabold text-xs text-premium-muted uppercase tracking-widest mb-6">Evolución de Clientes</h4><div class="relative h-56 md:h-72 w-full"><canvas id="cv-chartGarantias"></canvas></div></div>
                         </div>
                     </div>
                 </div>
@@ -420,7 +412,7 @@
                 <!-- MODULE: DATOS (CONCLUSIONES IA) -->
                 <div id="module-conclusiones" class="hidden space-y-6 md:space-y-8 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-premium-border pb-5 no-print">
-                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Datos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Conclusiones directas legibles</p></div>
+                        <div><h2 class="text-3xl md:text-4xl font-black tracking-tight text-premium-text">Datos Directivos</h2><p class="text-xs font-bold text-premium-muted uppercase tracking-widest mt-2">Conclusiones macro legibles</p></div>
                         <button onclick="window.print()" class="px-5 py-2.5 bg-white border border-slate-200 shadow-sm rounded-xl text-xs font-bold hover:bg-slate-50 hover:shadow-md transition w-full md:w-auto uppercase tracking-wider text-premium-text">🖨️ Imprimir Resumen</button>
                     </div>
                     <div id="conclusiones-content" class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 text-premium-text"></div>
@@ -446,8 +438,24 @@
         </div>
     </div> <!-- FIN APP CONTENT -->
 
-    <!-- MODALES -->
-    <div id="modal-pujadores" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+    <!-- MODAL ARBOL DE SELECCION (EL NUEVO MENU ESCONDIDO) -->
+    <div id="modal-arbol" class="fixed inset-0 z-[100] hidden modal-bg flex items-center justify-center p-4">
+        <div class="bg-white max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
+            <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
+                <div><h3 class="text-xl font-black tracking-tight text-premium-text">Selección Específica</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5">Activa o desactiva matrices individuales</p></div>
+                <button onclick="window.cerrarModalArbol()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 bg-white" id="arbol-container">
+                <!-- Se llena con JS -->
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50">
+                <button onclick="window.cerrarModalArbol()" class="w-full bg-black text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition shadow-md">Aplicar y Ver Resumen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTROS MODALES (PUJADORES Y MULTILOTE) -->
+    <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
                 <div><h3 class="text-xl font-black tracking-tight text-premium-text" id="modal-titulo">Registro de Pujas</h3><p class="text-[10px] text-premium-muted uppercase font-bold tracking-widest mt-1.5" id="modal-subtitulo"></p></div>
@@ -467,7 +475,7 @@
         </div>
     </div>
 
-    <div id="modal-fuga" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+    <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
                 <div><h3 class="text-xl font-black tracking-tight text-premium-danger">Clientes que NO adjudicaron</h3></div>
@@ -479,7 +487,7 @@
         </div>
     </div>
 
-    <div id="modal-multilote" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+    <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg flex items-center justify-center p-4">
         <div class="bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[1.5rem] shadow-2xl">
             <div class="p-5 md:p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50"><div><h3 class="text-xl font-black tracking-tight text-premium-text">Compradores > 1 Lote</h3></div><button onclick="window.cerrarModalMulti()" class="text-premium-muted hover:text-premium-text bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm transition">✕</button></div>
             <div class="flex-1 overflow-y-auto overflow-x-auto p-2 bg-white"><table class="w-full text-left whitespace-nowrap"><thead class="sticky top-0 bg-white shadow-sm"><tr><th class="pl-4">Cliente</th><th class="text-center">Volumen</th><th class="text-right pr-4">Inversión</th></tr></thead><tbody id="modal-tabla-multilote" class="divide-y divide-slate-50"></tbody></table></div>
@@ -494,6 +502,16 @@ const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 let sessionUser = null;
+let db = { remates: [] };
+let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
+let dashChartVentasInst=null, dashChartClientesInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
+let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
+
+if(typeof Chart !== 'undefined') { 
+    Chart.defaults.color = '#86868B'; 
+    Chart.defaults.font.family = 'Inter'; 
+    Chart.defaults.font.size = 10;
+}
 
 window.toggleSidebar = function() {
     const sidebar = document.getElementById('sidebar');
@@ -511,7 +529,6 @@ async function checkSession() {
     try {
         const timeoutP = new Promise((_, r) => setTimeout(() => r(new Error("Timeout Supabase")), 7000));
         const sessionP = supabaseClient.auth.getSession();
-        
         const { data, error } = await Promise.race([sessionP, timeoutP]);
         if (error) throw error;
         
@@ -522,15 +539,9 @@ async function checkSession() {
             
             const esAdmin = sessionUser.email.toLowerCase() === 'pabloaat@gmail.com';
             const adminControls = document.getElementById('admin-controls');
-            
             if (adminControls) {
-                if (esAdmin) {
-                    adminControls.classList.remove('hidden');
-                    adminControls.classList.add('flex');
-                } else {
-                    adminControls.classList.add('hidden');
-                    adminControls.classList.remove('flex');
-                }
+                if (esAdmin) { adminControls.classList.remove('hidden'); adminControls.classList.add('flex'); } 
+                else { adminControls.classList.add('hidden'); adminControls.classList.remove('flex'); }
             }
             
             document.getElementById('login-screen').style.display = 'none';
@@ -550,8 +561,6 @@ async function checkSession() {
         document.getElementById('app-content').classList.remove('flex');
         const err = document.getElementById('login-error');
         if(err) { err.innerText = "Error: " + e.message; err.classList.remove('hidden'); }
-        const btn = document.getElementById('btn-login');
-        if(btn) { btn.innerHTML = "Iniciar Sesión"; btn.disabled = false; }
     }
 }
 
@@ -559,27 +568,20 @@ window.handleLogin = async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-login');
     const err = document.getElementById('login-error');
-    
     btn.innerHTML = "Validando..."; btn.disabled = true; err.classList.add('hidden');
     
     try {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Servidor no responde.")), 7000));
-        const loginPromise = supabaseClient.auth.signInWithPassword({ email, password });
-        
-        const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (data && !data.session) throw new Error("Cuenta inactiva.");
-        
         btn.innerHTML = "Abriendo...";
         await checkSession();
     } catch (ex) {
         let msj = ex.message || "Error desconocido";
         if(msj.includes("Email not confirmed")) msj = "Cuenta requiere confirmación en BD.";
         if(msj.includes("Invalid login")) msj = "Credenciales incorrectas.";
-        if(msj.includes("Failed to fetch")) msj = "Conexión bloqueada por red.";
-        
         err.innerText = msj; err.classList.remove('hidden');
         btn.innerHTML = "Iniciar Sesión"; btn.disabled = false;
     }
@@ -590,15 +592,12 @@ window.handleSetPassword = async function(e) {
     const btn = document.getElementById('btn-invite');
     const err = document.getElementById('invite-error');
     const newPassword = document.getElementById('new-password').value;
-    
     btn.innerHTML = "Guardando..."; btn.disabled = true; err.classList.add('hidden');
     
     try {
         const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
         if (error) throw error;
-        
         window.history.replaceState(null, null, ' ');
-        
         btn.innerHTML = "¡Listo!";
         await checkSession(); 
     } catch (ex) {
@@ -622,22 +621,6 @@ window.onload = () => {
 
 window.handleLogout = async function() { await supabaseClient.auth.signOut(); window.location.reload(); };
 
-let db = { remates: [] };
-let nodeRematesMap = {}; let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
-let cvChartVentasInst=null, cvChartGarantiasInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null;
-let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
-
-let calSegment = 'Siniestrados';
-let calYear = new Date().getFullYear();
-let calSelectedMonths = new Set();
-
-if(typeof Chart !== 'undefined') { 
-    Chart.defaults.color = '#86868B'; 
-    Chart.defaults.font.family = 'Inter'; 
-    Chart.defaults.font.size = 10;
-}
-
-// FORMATEADOR ESTRICTO CON TRY/CATCH Y PARÉNTESIS
 window.formatearNombreRemate = function(fileName, timestamp) {
     try {
         if(!fileName || typeof fileName !== 'string') fileName = "Matriz Desconocida";
@@ -662,14 +645,11 @@ async function initApp() {
     const statusLabel = document.getElementById('db-status');
     try {
         statusLabel.innerText = "Sincronizando...";
-        
         const { data, error } = await supabaseClient.from('app_state').select('*');
         if (data && data.length > 0) {
             if (data.length === 1 && data[0].payload && data[0].payload.remates) { db = data[0].payload; } 
             else { db.remates = data.map(row => { let r = row.payload; r._dbId = row.id; return r; }); }
-            
             db.remates.forEach(r => { if (!r.id) r.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); });
-
             statusLabel.innerText = `En Línea (${db.remates.length})`; statusLabel.classList.replace('text-premium-muted', 'text-premium-success');
         } else {
             statusLabel.innerText = "Base Vacía";
@@ -677,8 +657,147 @@ async function initApp() {
     } catch (e) {
         statusLabel.innerText = "Error BD"; statusLabel.classList.replace('text-premium-muted', 'text-premium-danger');
     }
-    if(db.remates && db.remates.length > 0) { window.actualizarSidebar(); }
+    if(db.remates && db.remates.length > 0) { window.actualizarFiltrosGlobales(); }
 }
+
+// === NUEVA ARQUITECTURA DE FILTROS MACRO ===
+
+window.actualizarFiltrosGlobales = function() {
+    if(!db.remates || !db.remates.length) return;
+    let segments = new Set(); let years = new Set();
+    db.remates.forEach(r => {
+        segments.add(r.tipo || 'Desconocido');
+        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        if(!isNaN(y)) years.add(y);
+    });
+    
+    let segSelect = document.getElementById('macro-segment');
+    let yearSelect = document.getElementById('macro-year');
+    
+    let currentSeg = segSelect.value || Array.from(segments)[0];
+    let currentYr = yearSelect.value || Math.max(...Array.from(years));
+    
+    segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
+    yearSelect.innerHTML = Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==currentYr?'selected':''}>Año ${y}</option>`).join('');
+    
+    window.updateMacroFilter();
+};
+
+window.updateMacroFilter = function(forceCustom = false) {
+    let seg = document.getElementById('macro-segment').value;
+    let yr = Number(document.getElementById('macro-year').value);
+    let period = document.getElementById('macro-period').value;
+    
+    if(!forceCustom) {
+        let allowedMonths = [];
+        if(period === 'ALL') allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+        else if(period === 'S1') allowedMonths = [0,1,2,3,4,5];
+        else if(period === 'S2') allowedMonths = [6,7,8,9,10,11];
+        else if(period === 'Q1') allowedMonths = [0,1,2];
+        else if(period === 'Q2') allowedMonths = [3,4,5];
+        else if(period === 'Q3') allowedMonths = [6,7,8];
+        else if(period === 'Q4') allowedMonths = [9,10,11];
+        else if(period.startsWith('M')) allowedMonths = [Number(period.substring(1))];
+        
+        checkedNodes = db.remates.filter(r => {
+            let matchSeg = seg === 'Todos' || r.tipo === seg;
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            let matchYr = rYr === yr;
+            let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+            let matchM = allowedMonths.includes(rM);
+            return matchSeg && matchYr && matchM;
+        }).map(r => r.id);
+    } else {
+        document.getElementById('macro-period').value = 'CUSTOM';
+    }
+    
+    window.actualizarVistaActual();
+};
+
+window.abrirModalArbol = function() {
+    const container = document.getElementById('arbol-container');
+    let html = '';
+    
+    let seg = document.getElementById('macro-segment').value;
+    let yr = Number(document.getElementById('macro-year').value);
+    
+    let rematesFiltrados = db.remates.filter(r => {
+        let matchSeg = seg === 'Todos' || r.tipo === seg;
+        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        let matchYr = rYr === yr;
+        return matchSeg && matchYr;
+    });
+
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    let byMonth = {};
+    
+    rematesFiltrados.forEach(r => {
+        let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+        if(!byMonth[m]) byMonth[m] = [];
+        byMonth[m].push(r);
+    });
+
+    Object.keys(byMonth).sort((a,b)=>a-b).forEach(m => {
+        let rematesMes = byMonth[m].sort((a,b)=>a.fechaData.timestamp - b.fechaData.timestamp);
+        let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
+        let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
+        
+        html += `
+        <div class="mb-3 border border-gray-200 rounded-xl overflow-hidden bg-gray-50/50 transition shadow-sm">
+            <div class="flex justify-between items-center p-3 bg-white border-b border-gray-100">
+                <label class="flex items-center gap-3 cursor-pointer w-full">
+                    <input type="checkbox" onchange="window.toggleArbolMes(${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''} scale-110">
+                    <span class="font-black text-gray-900 text-sm uppercase tracking-wide">${monthNames[m]}</span>
+                    <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded ml-auto">${rematesMes.length} matrices</span>
+                </label>
+            </div>
+            <div class="p-3 flex flex-col gap-3">
+                ${rematesMes.map(r => {
+                    let isChecked = checkedNodes.includes(r.id);
+                    return `
+                    <label class="flex items-center gap-3 cursor-pointer group ml-2">
+                        <input type="checkbox" onchange="window.toggleArbolRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''}>
+                        <span class="text-xs font-semibold text-gray-600 group-hover:text-black transition">${window.formatearNombreRemate(r.fileName, r.fechaData.timestamp)}</span>
+                    </label>
+                    `;
+                }).join('')}
+            </div>
+        </div>`;
+    });
+    
+    if(rematesFiltrados.length === 0) html = '<p class="text-center text-xs font-bold text-gray-400 p-6">No hay matrices en este año y segmento.</p>';
+
+    container.innerHTML = html;
+    document.getElementById('modal-arbol').classList.remove('hidden');
+    document.getElementById('modal-arbol').classList.add('flex');
+};
+
+window.cerrarModalArbol = function() { document.getElementById('modal-arbol').classList.add('hidden'); };
+
+window.toggleArbolMes = function(mesIndex, isChecked) {
+    let seg = document.getElementById('macro-segment').value;
+    let yr = Number(document.getElementById('macro-year').value);
+    
+    let idsInMonth = db.remates.filter(r => {
+        let matchSeg = seg === 'Todos' || r.tipo === seg;
+        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+        return matchSeg && rYr === yr && rM === mesIndex;
+    }).map(r => r.id);
+    
+    if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
+    else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
+    
+    window.updateMacroFilter(true);
+    window.abrirModalArbol(); 
+};
+
+window.toggleArbolRemate = function(id, isChecked) {
+    if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
+    else { checkedNodes = checkedNodes.filter(n => n !== id); }
+    window.updateMacroFilter(true);
+    window.abrirModalArbol(); 
+};
 
 window.sortTable = function(thElement, type) {
     try {
@@ -697,130 +816,37 @@ window.sortTable = function(thElement, type) {
     } catch(e) {}
 };
 
-function parseValueForSort(str, type) {
-    if(!str || str.trim()==='-' || str.trim()==='' || str.trim() === 'Desconocido' || str.trim().includes('Sin Registro')) return -9999999999;
-    str = str.trim();
-    if(type === 'money') { let isNeg = str.includes('-'); let numStr = str.replace(/[^\d,]/g, ''); if(!numStr) return -9999999999; let num = parseFloat(numStr.replace(',','.')) || 0; if(str.includes('MM')) num *= 1000000; return isNeg ? -num : num; }
-    if(type === 'percent') { let isNeg = str.includes('-'); let num = parseFloat(str.replace(/[^\d,]/g, '').replace(',','.')) || 0; return isNeg ? -num : num; }
-    if(type === 'number') { let isNeg = str.includes('-'); let num = parseFloat(str.replace(/[^\d]/g, '')) || 0; return isNeg ? -num : num; }
-    if(type === 'date') { let parts = str.split(' ')[0].split('-'); if(parts.length === 3) { return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).getTime(); } return 0; }
-    return str.toLowerCase();
-}
-
-const dropZone=document.getElementById('drop-zone');
-document.body.addEventListener('dragover', e=>{e.preventDefault(); dropZone.classList.add('dragover');}); document.body.addEventListener('dragleave', e=>{e.preventDefault(); dropZone.classList.remove('dragover');});
-document.body.addEventListener('drop', async e=>{ 
-    e.preventDefault(); dropZone.classList.remove('dragover'); 
-    const items=e.dataTransfer.items; const allFiles=[]; 
-    if(items){ const promises=[]; for(let i=0;i<items.length;i++){ const item=items[i].webkitGetAsEntry(); if(item) promises.push(traverseFileTree(item, allFiles)); } await Promise.all(promises); } 
-    else { allFiles.push(...e.dataTransfer.files); } window.iniciarProcesamiento(allFiles);
-});
-
-function traverseFileTree(item, filesArray){ 
-    return new Promise(resolve=>{ 
-        if(item.isFile){ item.file(file=>{filesArray.push(file); resolve();}); } 
-        else if(item.isDirectory){ const dirReader=item.createReader(); const entries=[]; const readEntries=()=>{ dirReader.readEntries(async results=>{ if(!results.length){ for(let entry of entries) await traverseFileTree(entry, filesArray); resolve(); } else { entries.push(...results); readEntries(); } }); }; readEntries(); } 
-    }); 
-}
-
-window.formatExcelDate = function(excelDate) {
-    if(!excelDate) return '-';
-    let d;
-    try {
-        if(typeof excelDate === 'number') { 
-            if(excelDate > 1000000) { d = new Date(excelDate); } 
-            else { d = new Date(Math.round((excelDate - 25569) * 86400 * 1000)); d.setMinutes(d.getMinutes() + d.getTimezoneOffset()); }
-        } else if(typeof excelDate === 'string') { 
-            let parts = excelDate.trim().split(' ')[0].split(/[-/]/);
-            if (parts.length === 3) {
-                if (parts[0].length === 4) return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`;
-                else return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].padStart(4,'20')}`; 
-            }
-            return excelDate.replace(/-/g, '/');
-        } else { return String(excelDate); }
-        
-        if (isNaN(d.getTime())) return '-';
-        let dd = String(d.getDate()).padStart(2, '0');
-        let mm = String(d.getMonth() + 1).padStart(2, '0');
-        let yyyy = d.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
-    } catch(e) { return '-'; }
-};
-
-function esClienteFalso(nombre, email=''){
-    const txt = (String(nombre||'')+' '+String(email||'')).toLowerCase().trim();
-    if(txt.length<=2 && txt !== '') return true; if(txt.includes('@zarate') || txt.includes('zarate.cl') || txt.includes('@plataforma')) return true; if(txt.includes('rz rz') || txt.includes('rzrz') || txt.includes('test') || txt.includes('prueba')) return true; if(/^\s*(rz|zz|aa|qq)\s*$/.test(txt)) return true; if(/^\s*99\.999\.999-9\s*$/.test(txt) || /^\s*11\.111\.111/.test(txt)) return true; if(/([a-z])\1{3,}/.test(txt.replace(/\s/g,'')) && txt.length<10) return true; return false;
-}
-
-function extraerMarcaModelo(loteStr) {
-    let txt = loteStr.toUpperCase(); if (txt.includes(':')) txt = txt.split(':')[1];
-    txt = txt.replace(/\bLOTE\s*\d+\b/g, '').replace(/\bN[°º]?\s*\d+\b/g, ''); txt = txt.replace(/\b\d\.\d\b/g, '').replace(/\b\d,\d\b/g, ''); txt = txt.replace(/\b20\d{2}\b/g, '').replace(/\b19\d{2}\b/g, ''); 
-    const marcasConocidas = ['MERCEDES BENZ','LAND ROVER','GREAT WALL','ALFA ROMEO','ASTON MARTIN','CHEVROLET','NISSAN','KIA','HYUNDAI','SUZUKI','TOYOTA','PEUGEOT','FORD','MITSUBISHI','MAZDA','SSANGYONG','BMW','AUDI','VOLKSWAGEN','SUBARU','RENAULT','CHRYSLER','DODGE','JEEP','HONDA','VOLVO','FIAT','CHERY','MG','CHANGAN','JAC','GEELY','MAHINDRA','MAXUS','OPEL','DFSK','DATSUN','LEXUS','PORSCHE','MINI','RAM','SEAT','SKODA','CITROEN','BYD','BAIC','HAVAL','LIFAN','ZX','FOTON','KTM','IVECO'];
-    const ignorarCar = ['AUTOMOVIL','VEHICULO','CAMIONETA','STATION','WAGON','JEEP','FURGON','MOTO','MOTOCICLETA','BUS','MINIBUS','CAMION','MAQUINARIA','CHATARRA','RESTOS','AUT','MT','AT','M/T','A/T','4X4','4X2','GLX','GLS','EX','LX','DX','TX','MPI','HB','SEDAN','SPORT','MOTORS','NEW','MEC','MECANICO','AUTOMATICO','DAKAR','CORE','PREMIER','LIMITED','LITE', 'HDI', 'TDI', 'CDI', 'CRDI', 'AWD', 'FWD', 'CVT'];
-    let marca = "SIN MARCA"; let modelo = "";
-    for(let m of marcasConocidas) { if(txt.includes(m)) { marca = m; let resto = txt.substring(txt.indexOf(m) + m.length).trim(); let words = resto.split(/[\s-]+/).filter(w => w.length > 1 && !w.match(/^\d+$/) && !ignorarCar.includes(w)); modelo = words.slice(0, 2).join(' '); break; } }
-    if(marca === "SIN MARCA") { let words = txt.split(/[\s-]+/).filter(w => w.length > 1 && !w.match(/^\d+$/) && !ignorarCar.includes(w)); if(words.length > 0) { marca = words[0]; modelo = words.slice(1, 3).join(' '); } }
-    if (marca === "KIA MOTORS" || txt.includes("KIA MOTORS")) marca = "KIA"; return { categoria: marca, modeloStr: modelo };
-}
-
-const normalizarCliente = (nombre)=>{ if(!nombre) return 'DESCONOCIDO'; let n=String(nombre).toUpperCase().trim(); if(n.includes('CROVETTO')) return 'CROVETTO (GRUPO)'; n=n.replace(/\b\d{1,2}\.?\d{3}\.?\d{3}-?[0-9Kk]\b/g,''); n=n.replace(/\b(SPA|LTDA|LIMITADA|EIRL|E\.I\.R\.L|S\.A\.?|SOCIEDAD|COMERCIAL)\b/g,''); return n.replace(/\s+/g,' ').replace(/[-_.,]+$/, '').trim() || 'DESCONOCIDO'; };
-const formatMoney = (num) => { 
-    if(!num || isNaN(num)) return '$0'; 
-    if(Math.abs(num) >= 1e6) { 
-        return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num / 1e6)) + ' MM'; 
-    } 
-    return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num)); 
-};
-const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
-const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
-
-function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
-
 window.iniciarProcesamiento = async function(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
     
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingText = document.getElementById('loading-text');
-    loadingOverlay.classList.remove('hidden');
-    loadingOverlay.classList.add('flex');
+    loadingOverlay.classList.remove('hidden'); loadingOverlay.classList.add('flex');
     
-    let successCount = 0;
-    let upsertQueue = [];
+    let successCount = 0; let upsertQueue = [];
     
     for(let i = 0; i < validFiles.length; i++){ 
         loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
         await new Promise(r => setTimeout(r, 20)); 
-        
         try { 
             const data = await parseExcel(validFiles[i]); 
             if(data) { 
                 const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
-                if (existsIdx >= 0) {
-                    data._dbId = db.remates[existsIdx]._dbId;
-                    data.id = db.remates[existsIdx].id;
-                    db.remates[existsIdx] = data; 
-                } else {
-                    data._dbId = Math.floor(Math.random() * 2000000000);
-                    db.remates.push(data);
-                }
+                if (existsIdx >= 0) { data._dbId = db.remates[existsIdx]._dbId; data.id = db.remates[existsIdx].id; db.remates[existsIdx] = data; } 
+                else { data._dbId = Math.floor(Math.random() * 2000000000); db.remates.push(data); }
                 upsertQueue.push({ id: data._dbId, payload: data });
                 successCount++; 
             }
-        } catch(err) {
-            console.error("Error leyendo archivo:", validFiles[i].name, err);
-        } 
+        } catch(err) { console.error("Error:", err); } 
     }
     
     if(successCount === 0) {
-        loadingOverlay.classList.remove('flex');
-        loadingOverlay.classList.add('hidden');
-        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`;
-        return;
+        loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
+        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`; return;
     }
 
-    loadingText.innerText = "Sincronizando Cruces de Clientes...";
-    await new Promise(r => setTimeout(r, 20));
+    loadingText.innerText = "Sincronizando Cruces..."; await new Promise(r => setTimeout(r, 20));
 
     db.remates.sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
     let clientesGlobales=[]; let adjudicatariosGlobales=[];
@@ -829,13 +855,10 @@ window.iniciarProcesamiento = async function(files){
         let nuevos=0, antiguos=0; 
         remate.garantiasEmailsReales.forEach(email=>{ if(clientesGlobales.includes(email)) antiguos++; else { nuevos++; clientesGlobales.push(email); } }); 
         remate.nuevos=nuevos; remate.antiguos=antiguos; 
-        
         let ganadoresNuevos=0, ventaNuevos=0, ventaAntiguos=0; let statusCliente={}; 
         const ganadoresUnicos=[...new Set(remate.adjudicaciones.filter(a=>!a.esFalso).map(a=>a.clienteReal))]; 
-        
         ganadoresUnicos.forEach(cliente=>{ if(adjudicatariosGlobales.includes(cliente)){ statusCliente[cliente]='antiguo'; } else { ganadoresNuevos++; adjudicatariosGlobales.push(cliente); statusCliente[cliente]='nuevo'; } }); 
         remate.adjudicaciones.forEach(a=>{ if(!a.esFalso) { if(statusCliente[a.clienteReal]==='nuevo') ventaNuevos+=a.monto; else ventaAntiguos+=a.monto; }}); 
-        
         remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
     });
     
@@ -846,7 +869,6 @@ window.iniciarProcesamiento = async function(files){
             if (error) throw error;
             await new Promise(r => setTimeout(r, 50)); 
         }
-        
         document.getElementById('db-status').classList.replace('text-premium-highlight', 'text-premium-success'); 
         document.getElementById('db-status').innerText = `En Línea (${db.remates.length})`;
     } catch (e) { 
@@ -857,90 +879,29 @@ window.iniciarProcesamiento = async function(files){
         document.getElementById('db-status').innerText = `Error: ${errorMsg.substring(0, 22)}`; 
     }
     
-    document.getElementById('file-input').value = ""; 
-    document.getElementById('folder-input').value = "";
-    
-    window.actualizarSidebar(); 
+    document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
+    window.actualizarFiltrosGlobales(); 
     procesarDatosClientes(); 
     window.actualizarVistaActual(); 
-    
-    loadingOverlay.classList.remove('flex');
-    loadingOverlay.classList.add('hidden');
+    loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
 };
 
+function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
 
-async function parseExcel(file){
-    const buffer=await file.arrayBuffer(); const wb=XLSX.read(buffer,{type:'array'}); const sheets={}; wb.SheetNames.forEach(n=>sheets[n.toLowerCase()]=n);
-    const getSheet=(kw)=>{ const name=Object.keys(sheets).find(k=>kw.some(w=>k.includes(w)) && !k.includes('no adjud')); return name ? wb.Sheets[sheets[name]] : null; };
-    const sAdjudicados=getSheet(['adjudic']); const sPosturas=getSheet(['postura']); const sGarantias=getSheet(['garantía','garantia']); const sInscritos=getSheet(['inscrit']);
-    if(!sAdjudicados) throw new Error("Matriz no encontrada.");
-    const rawAdjud=XLSX.utils.sheet_to_json(sAdjudicados,{header:1,raw:false}); const fechaInfo=extraerFechaInfo(file, rawAdjud);
-    let numRemateMatch = file.name.match(/(?:REMATE|ZARATE).*?(\d{3,5})/i) || file.name.match(/\b(\d{4})\b/); let numRemate = numRemateMatch ? (numRemateMatch[1] || numRemateMatch[0]) : '-';
-    let correosReales=[]; let garantiasListaDetallada=[]; 
-    if(sGarantias){
-        const data=XLSX.utils.sheet_to_json(sGarantias,{header:1});
-        if(data.length){
-            const {index:headerIdx, headers:h}=findHeaderRow(data,['email','correo','rut','nombre']); let iEmail=h.findIndex(x=>x.includes('email')||x.includes('correo')); let iRut=h.findIndex(x=>x.includes('rut')); let iNom=h.findIndex(x=>x.includes('nombre')||x.includes('razon')); let idCol = iEmail >= 0 ? iEmail : (iRut >= 0 ? iRut : iNom);
-            if(idCol >= 0){
-                for(let i=headerIdx+1;i<data.length;i++){
-                    let row=data[i]; if(!row||!row.length) continue;
-                    let identifier=String(row[idCol]||'').toLowerCase().trim(); let nom=String(row[iNom]||'').trim(); let rutV = iRut >=0 ? String(row[iRut]||'').trim() : ''; let emailV = iEmail>=0 ? String(row[iEmail]||'').trim() : '';
-                    if(!esClienteFalso(nom,identifier) && identifier.length>3) { correosReales.push(identifier); let nomNorm = normalizarCliente(nom); if(!garantiasListaDetallada.some(g=>g.nombreNorm === nomNorm)){ garantiasListaDetallada.push({ nombreNorm: nomNorm, nombre: nom, rut: rutV, email: emailV, numRemate: numRemate, fechaRemate: fechaInfo.timestamp }); } }
-                }
-            }
-        }
-    }
-    correosReales=[...new Set(correosReales)];
-
-    let ventaTotal=0, minimoTotal=0, comisionTotal=0, lotesCount=0, lotesFalsosCount=0; let tempAdjud=[];
-    {
-        const data=XLSX.utils.sheet_to_json(sAdjudicados,{header:1});
-        const {index:headerIdx, headers:h}=findHeaderRow(data,['lote','descrip','mínimo','minimo','base','monto','total','indemnizado','patente','vehículo']);
-        let iLote=h.findIndex(x=>x.includes('lote') || x.includes('descrip') || x.includes('patente') || x.includes('detalle')); let iNumeroLote = h.findIndex(x => x === 'n°' || x === 'número' || x === 'numero' || x.includes('nº') || x === 'n'); let iMinimo=h.findIndex(x=>x.includes('indemnizado') || x.includes('base') || x === 'minimo' || x.includes('mínimo')); let iMonto=h.findIndex(x=>x.includes('monto') || x.includes('total') || x.includes('precio') || x.includes('adjudic')); let iNombre=h.findIndex(x=>x.includes('nombre') || x.includes('cliente') || x.includes('comprador')); let iRut=h.findIndex(x=>x.includes('rut')); let iEmail=h.findIndex(x=>x.includes('email'));
-        if (iLote < 0) iLote = 1; if (iMonto < 0) iMonto = h.length - 1; 
-        for(let i=headerIdx+1;i<data.length;i++){
-            let row=data[i]; if(!row||!row.length) continue;
-            let loteStr=String(row[iLote]||'').toUpperCase().trim(); if(!loteStr) continue;
-            let numeroLote = iNumeroLote >= 0 ? String(row[iNumeroLote]||'').trim() : ''; let minimo = iMinimo >= 0 ? Number(String(row[iMinimo]||'').replace(/[^0-9]/g,""))||0 : 0; let monto = iMonto >= 0 ? Number(String(row[iMonto]||'').replace(/[^0-9]/g,""))||0 : 0; let comision = monto > 0 ? (monto * 0.12) * 1.19 : 0; let nombreRaw=iNombre >= 0 ? String(row[iNombre]||'').trim() : 'DESCONOCIDO'; let rutRaw=iRut >= 0 ? String(row[iRut]||'').trim() : ''; let emailRaw=iEmail >= 0 ? String(row[iEmail]||'').trim() : ''; 
-            let esFalso=esClienteFalso(nombreRaw, emailRaw); let clienteReal = esFalso ? 'FALSO' : normalizarCliente(nombreRaw); let esChatarra = loteStr.toLowerCase().includes('chatarra') || loteStr.toLowerCase().includes('restos');
-            if(monto/1e6 > 500) continue; 
-            if(monto>0 || esFalso){ if (!esFalso && monto>0) { ventaTotal+=monto; comisionTotal+=comision; lotesCount++; } else if (esFalso) { lotesFalsosCount++; } tempAdjud.push({ numeroLote, loteStr, minimo, monto, comision, clienteReal, esFalso, nombreRaw, esChatarra, rut: rutRaw, email: emailRaw }); }
-        }
-    }
-
-    let posturasPorLote={};
-    if(sPosturas){
-        const dataPostRaw=XLSX.utils.sheet_to_json(sPosturas,{header:1}); 
-        if(dataPostRaw.length){
-            const {index:headerIdx, headers:h}=findHeaderRow(dataPostRaw,['lote','postura']); let iLote=h.findIndex(x=>x.includes('lote')); let iRut=h.findIndex(x=>x.includes('rut')); let iNombre=h.findIndex(x=>x.includes('nombre') || x.includes('cliente')); let iPostura=h.findIndex(x=>x.includes('postura') || x.includes('monto')); let iFecha=h.findIndex(x=>x.includes('fecha'));
-            for(let i=headerIdx+1;i<dataPostRaw.length;i++){
-                let rowRaw=dataPostRaw[i]; if(!rowRaw||!rowRaw.length) continue;
-                let loteStr=String(rowRaw[iLote]||'').toUpperCase().trim(); if(!loteStr) continue;
-                let rut=String(rowRaw[iRut]||'').trim(); let nombre=String(rowRaw[iNombre]||'').trim(); let monto=Number(String(rowRaw[iPostura]||'').replace(/[^0-9]/g,""))||0; let fecha = formatExcelDate(rowRaw[iFecha]); let esFalso=esClienteFalso(nombre, rut);
-                if(!posturasPorLote[loteStr]) posturasPorLote[loteStr]=[]; posturasPorLote[loteStr].push({ rut, nombre, nombreNorm: normalizarCliente(nombre), monto, fecha, esFalso });
-            }
-        }
-    }
-
-    let isRetail=file.name.toUpperCase().includes('RETAIL') || file.name.toUpperCase().includes('MIX') || file.name.toUpperCase().includes('HOGAR'); if(!isRetail && lotesCount>150) isRetail=true; const tipo=isRetail?'Retail':'Siniestrados'; let inscritos=sInscritos ? Math.max(0, XLSX.utils.sheet_to_json(sInscritos).length) : 0; if(inscritos<correosReales.length) inscritos=Math.round(correosReales.length/0.8);
-
-    const adjudicaciones=tempAdjud.map(r=>{
-        let pujas=posturasPorLote[r.loteStr]||[]; let pujasReales=pujas.filter(p=>!p.esFalso); let pujadoresUnicosReales=[...new Set(pujasReales.map(p=>p.nombreNorm))];
-        let exData = extraerMarcaModelo(r.loteStr); let categoria = isRetail ? 'RETAIL' : exData.categoria; let modeloStr = isRetail ? '' : exData.modeloStr; let añoStr = "";
-        if(!isRetail) { const matchAño=r.loteStr.match(/\b(199\d|20[0-2]\d)\b/); if(matchAño) añoStr=matchAño[1]; }
-        return { ...r, pujas, pujadoresRealesCount: pujadoresUnicosReales.length, pujadoresTotales: pujas.length, categoria, modeloStr, añoStr, kmStr:"" };
-    });
-
-    return { id: 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36), fileName:file.name, tipo, fechaData:fechaInfo, inscritos, garantias:correosReales.length, garantiasEmailsReales:correosReales, garantiasListaDetallada, ventaTotal, minimoTotal, comisionTotal, lotesCount, lotesDisponibles: lotesCount + lotesFalsosCount, adjudicaciones, posturasPorLote, ganadoresNuevos:0, ventaNuevos:0, ventaAntiguos:0, ganadoresUnicosCount:0 };
-}
-
-function buildAgg(rematesList,id,label){
-    const agg={ id,label,venta:0,comisionTotal:0,lotes:0,lotesDisponibles:0,inscritos:0,garantias:0,ganadoresUnicosCount:0,nuevos:0,antiguos:0,ventaSiniestros:0,ventaRetail:0,ganadoresNuevos:0,ventaGanadoresNuevos:0,ventaGanadoresAntiguos:0,adjudicaciones:[], sumMontoValido: 0, sumMinimoValido: 0, garantiasLista: [] };
+function buildAgg(rematesList){
+    const agg={ venta:0,comisionTotal:0,lotes:0,lotesDisponibles:0,inscritos:0,garantias:0,ganadoresUnicosCount:0,nuevos:0,antiguos:0,ventaSiniestros:0,ventaRetail:0,ganadoresNuevos:0,ventaGanadoresNuevos:0,ventaGanadoresAntiguos:0,adjudicaciones:[], sumMontoValido: 0, sumMinimoValido: 0, garantiasLista: [] };
     let uniqueGanadoresSet=new Set();
     rematesList.forEach(r=>{
-        agg.venta+=r.ventaTotal; agg.comisionTotal+=r.comisionTotal||0; agg.lotes+=r.lotesCount; agg.lotesDisponibles+=r.lotesDisponibles; agg.inscritos+=r.inscritos; agg.garantias+=r.garantias; agg.nuevos+=r.nuevos; agg.antiguos+=r.antiguos; agg.ganadoresNuevos+=(r.ganadoresNuevos||0); agg.ventaGanadoresNuevos+=(r.ventaNuevos||0); agg.ventaGanadoresAntiguos+=(r.ventaAntiguos||0); agg.adjudicaciones=agg.adjudicaciones.concat(r.adjudicaciones);
-        r.adjudicaciones.forEach(a=>{ if(!a.esFalso) uniqueGanadoresSet.add(a.clienteReal); });
-        r.adjudicaciones.forEach(a=>{ if(a.minimo > 0 && a.monto > 0 && !a.esFalso && !a.esChatarra) { agg.sumMontoValido += a.monto; agg.sumMinimoValido += a.minimo; } });
+        agg.venta+=r.ventaTotal; agg.comisionTotal+=r.comisionTotal||0; agg.lotes+=r.lotesCount; agg.lotesDisponibles+=r.lotesDisponibles; agg.inscritos+=r.inscritos; agg.garantias+=r.garantias; agg.nuevos+=r.nuevos; agg.antiguos+=r.antiguos; agg.ganadoresNuevos+=(r.ganadoresNuevos||0); agg.ventaGanadoresNuevos+=(r.ventaNuevos||0); agg.ventaGanadoresAntiguos+=(r.ventaAntiguos||0);
+        
+        // Adj with original remate info
+        r.adjudicaciones.forEach(a => {
+            let aCopy = {...a, origen: window.formatearNombreRemate(r.fileName, r.fechaData.timestamp)};
+            agg.adjudicaciones.push(aCopy);
+            if(!a.esFalso) uniqueGanadoresSet.add(a.clienteReal);
+            if(a.minimo > 0 && a.monto > 0 && !a.esFalso && !a.esChatarra) { agg.sumMontoValido += a.monto; agg.sumMinimoValido += a.minimo; }
+        });
+
         if(r.garantiasListaDetallada) { r.garantiasListaDetallada.forEach(g => { if(!agg.garantiasLista.some(x => x.nombreNorm === g.nombreNorm)) agg.garantiasLista.push(g); }); }
         if(r.tipo==='Siniestrados') agg.ventaSiniestros+=r.ventaTotal; if(r.tipo==='Retail') agg.ventaRetail+=r.ventaTotal;
     });
@@ -959,196 +920,9 @@ window.cambiarSeccion = function(mod){
         
         ['module-remates', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
         
-        if(mod==='remates'){ document.getElementById('module-remates').classList.remove('hidden'); window.renderDashboard(); } 
-        else if(mod==='conclusiones'){ document.getElementById('module-conclusiones').classList.remove('hidden'); window.renderConclusiones(); }
-        else if(mod==='autos'){ document.getElementById('module-autos').classList.remove('hidden'); window.renderPanelAutos(); }
-        else if(mod==='clientes'){ if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); window.renderPanelClientesData(clientDB,false); } } 
-        else { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); window.buscarPatente(); } 
+        window.actualizarVistaActual();
         if(window.innerWidth < 768) { window.toggleSidebar(); }
     } catch(e) { console.error(e); }
-};
-
-window.actualizarSidebar = function(){ 
-    try {
-        if(!db.remates || !db.remates.length) return;
-        let segments = new Set(); let years = new Set(); nodeRematesMap = {}; 
-        db.remates.forEach(r => { 
-            if (!r.fechaData || !r.fechaData.year) {
-                r.fechaData = { 
-                    year: r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getFullYear() : new Date().getFullYear(), 
-                    timestamp: r.fechaData?.timestamp || Date.now() 
-                };
-            }
-            segments.add(r.tipo || 'Desconocido'); 
-            years.add(Number(r.fechaData.year)); 
-            nodeRematesMap[r.id] = { label: window.formatearNombreRemate(r.fileName, r.fechaData.timestamp), remates: [r] }; 
-        });
-        if(segments.size > 0 && !segments.has(calSegment) && calSegment !== 'Todos') calSegment = Array.from(segments)[0];
-        
-        let validYears = Array.from(years).filter(y => !isNaN(y));
-        if(validYears.length > 0 && (!calYear || isNaN(calYear) || !validYears.includes(calYear))) {
-            calYear = Math.max(...validYears);
-        }
-        
-        const segHtml = `<option value="Todos" ${'Todos'===calSegment?'selected':''}>📊 Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===calSegment?'selected':''}>🚗 ${s}</option>`).join('');
-        const yearHtml = validYears.sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==calYear?'selected':''}>Año ${y}</option>`).join('');
-        document.getElementById('cal-segment').innerHTML = segHtml; document.getElementById('cal-year').innerHTML = yearHtml;
-        window.renderCalendar();
-    } catch(e) { console.error(e); }
-};
-
-window.onCalSegmentChange = function(val) { calSegment = val; window.renderCalendar(); };
-window.onCalYearChange = function(val) { calYear = Number(val); window.renderCalendar(); };
-
-window.renderCalendar = function() {
-    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
-    let monthsWithData = new Set();
-    
-    db.remates.forEach(r => { 
-        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-        if((calSegment === 'Todos' || r.tipo === calSegment) && y === Number(calYear)) { 
-            monthsWithData.add(new Date(r.fechaData.timestamp).getMonth()); 
-        } 
-    });
-    
-    let gridHtml = '';
-    for(let q = 0; q < 4; q++) {
-        let qHasData = monthsWithData.has(q*3) || monthsWithData.has(q*3 + 1) || monthsWithData.has(q*3 + 2);
-        let qIsFullySelected = qHasData && 
-            (!monthsWithData.has(q*3) || calSelectedMonths.has(q*3)) &&
-            (!monthsWithData.has(q*3+1) || calSelectedMonths.has(q*3+1)) &&
-            (!monthsWithData.has(q*3+2) || calSelectedMonths.has(q*3+2));
-
-        let qClasses = "py-1.5 text-center text-[10px] uppercase tracking-widest rounded-md font-black transition select-none flex items-center justify-center ";
-        if (!qHasData) { qClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
-        else if (qIsFullySelected) { qClasses += "bg-premium-highlight text-white shadow-sm cursor-pointer hover:bg-blue-700"; } 
-        else { qClasses += "bg-slate-200 text-premium-text hover:bg-slate-300 cursor-pointer shadow-sm"; }
-        
-        gridHtml += `<div class="${qClasses}" ${qHasData ? `onclick="window.toggleQuarter(${q})"` : ''}>${quarters[q]}</div>`;
-
-        for (let m = 0; m < 3; m++) {
-            let monthIdx = q * 3 + m;
-            let hasData = monthsWithData.has(monthIdx);
-            let isSelected = calSelectedMonths.has(monthIdx);
-            let mClasses = "py-1.5 text-center text-xs rounded-md font-bold transition select-none ";
-            
-            if(!hasData && !isSelected) { mClasses += "bg-premium-bg text-premium-muted/40 cursor-not-allowed"; } 
-            else if (isSelected) { mClasses += "bg-premium-text text-white shadow-sm cursor-pointer hover:bg-black"; } 
-            else { mClasses += "bg-white border border-slate-200 text-premium-text hover:border-premium-text cursor-pointer shadow-sm"; }
-            
-            gridHtml += `<div class="${mClasses}" ${hasData || isSelected ? `onclick="window.toggleCalMonth(${monthIdx})"` : ''}>${monthNames[monthIdx]}</div>`;
-        }
-    }
-    document.getElementById('cal-months').innerHTML = gridHtml;
-    
-    let rematesToShow = []; calSelectedMonths.forEach(m => { rematesToShow = rematesToShow.concat(getRematesForMonth(m)); });
-    rematesToShow.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
-    
-    let listHtml = '';
-    if(rematesToShow.length > 0) {
-        listHtml += `<div class="text-[10px] font-extrabold text-premium-muted uppercase tracking-widest mb-3 mt-4 flex justify-between"><span>Detalle del Mes</span><span>${rematesToShow.length} Matrices</span></div>`;
-        rematesToShow.forEach(r => {
-            let isChecked = checkedNodes.includes(r.id);
-            let tituloSidebar = window.formatearNombreRemate(r.fileName, r.fechaData.timestamp);
-            listHtml += `
-            <div class="flex items-start gap-3 cursor-pointer mb-2 group hover:bg-slate-50 p-2 rounded-xl transition border border-transparent hover:border-slate-200" onclick="window.toggleNode('${r.id}')">
-                <input type="checkbox" class="mt-1 shrink-0 pointer-events-none" ${isChecked?'checked':''}>
-                <div class="flex flex-col min-w-0 pointer-events-none">
-                    <span class="text-[11px] font-bold text-premium-text truncate group-hover:text-premium-highlight transition leading-tight" title="${tituloSidebar}">${tituloSidebar}</span>
-                    <span class="text-[9px] text-premium-muted font-semibold mt-0.5">${r.tipo}</span>
-                </div>
-            </div>`;
-        });
-    }
-    document.getElementById('cal-matrices').innerHTML = listHtml;
-};
-
-function getRematesForMonth(m) {
-    return db.remates.filter(r => {
-        let matchSeg = calSegment === 'Todos' || r.tipo === calSegment;
-        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-        let matchYear = y === Number(calYear);
-        let monthIndex = (r.fechaData && r.fechaData.timestamp) ? new Date(r.fechaData.timestamp).getMonth() : new Date().getMonth(); 
-        return matchSeg && matchYear && monthIndex === m;
-    });
-}
-
-window.toggleQuarter = function(q) {
-    let monthsWithData = new Set();
-    db.remates.forEach(r => { 
-        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-        if((calSegment === 'Todos' || r.tipo === calSegment) && y === Number(calYear)) { 
-            monthsWithData.add(new Date(r.fechaData.timestamp).getMonth()); 
-        } 
-    });
-
-    let qMonths = [q*3, q*3+1, q*3+2].filter(m => monthsWithData.has(m));
-    if (qMonths.length === 0) return;
-
-    let allSelected = qMonths.every(m => calSelectedMonths.has(m));
-
-    if (allSelected) {
-        qMonths.forEach(m => {
-            calSelectedMonths.delete(m);
-            const toRemove = getRematesForMonth(m).map(r => r.id);
-            checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
-        });
-    } else {
-        qMonths.forEach(m => {
-            calSelectedMonths.add(m);
-            const toAdd = getRematesForMonth(m).map(r => r.id);
-            toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
-        });
-    }
-    window.renderCalendar(); 
-    window.actualizarVistaActual();
-};
-
-window.toggleCalMonth = function(m) {
-    if(calSelectedMonths.has(m)) {
-        calSelectedMonths.delete(m);
-        const toRemove = getRematesForMonth(m).map(r => r.id);
-        checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
-    } else {
-        calSelectedMonths.add(m);
-        const toAdd = getRematesForMonth(m).map(r => r.id);
-        toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
-    }
-    window.renderCalendar(); window.actualizarVistaActual();
-};
-
-window.toggleNode = function(id){ 
-    if(checkedNodes.includes(id)) checkedNodes=checkedNodes.filter(n=>n!==id); else checkedNodes.push(id); 
-    window.renderCalendar(); window.actualizarVistaActual(); 
-};
-
-window.limpiarSeleccion = function(){ 
-    checkedNodes=[]; calSelectedMonths.clear(); window.renderCalendar(); window.actualizarVistaActual(); 
-};
-
-window.seleccionarUltimoRemate = function() {
-    if (!db.remates || db.remates.length === 0) return;
-    
-    const rematesOrdenados = [...db.remates].sort((a,b) => (b.fechaData?.timestamp||0) - (a.fechaData?.timestamp||0));
-    const ultimo = rematesOrdenados[0];
-
-    calSegment = ultimo.tipo || 'Siniestrados';
-    calYear = ultimo.fechaData?.year ? Number(ultimo.fechaData.year) : new Date().getFullYear();
-    
-    window.actualizarSidebar(); 
-
-    checkedNodes = [ultimo.id];
-    
-    const monthIndex = ultimo.fechaData?.timestamp ? new Date(ultimo.fechaData.timestamp).getMonth() : new Date().getMonth();
-    calSelectedMonths.clear();
-    calSelectedMonths.add(monthIndex);
-    
-    window.renderCalendar();
-    window.cambiarSeccion('remates');
-    window.actualizarVistaActual();
-    
-    if(window.innerWidth < 768) { window.toggleSidebar(); }
 };
 
 window.actualizarVistaActual = function() { 
@@ -1157,72 +931,71 @@ window.actualizarVistaActual = function() {
         else if (currentModule === 'autos') window.renderPanelAutos(); 
         else if (currentModule === 'conclusiones') window.renderConclusiones(); 
         else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); } }
+        else if (currentModule === 'buscador') { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); window.buscarPatente(); }
     } catch(e) { console.error(e); }
 };
 
 window.limpiarBase = async function(){ 
-    if(!confirm("¿Borrar todos los datos de la nube?")) return;
-    db = {remates:[]}; checkedNodes = []; clientDB = []; calSelectedMonths.clear(); document.getElementById('empty-state').classList.remove('hidden'); 
+    if(!confirm("¿Borrar todos los datos de la nube? Esto es irreversible.")) return;
+    db = {remates:[]}; checkedNodes = []; clientDB = []; document.getElementById('empty-state').classList.remove('hidden'); 
     try { await supabaseClient.from('app_state').delete().gte('id', 0); } catch (e) { }
-    window.actualizarSidebar(); location.reload(); 
+    window.actualizarFiltrosGlobales(); location.reload(); 
 };
 
+// MOTOR DASHBOARD MACRO
 window.renderDashboard = function(){ 
     try {
-        if(currentModule!=='remates') return; const emptyState=document.getElementById('empty-state'); const dashboard=document.getElementById('module-remates'); const singleView=document.getElementById('single-view'); const compareView=document.getElementById('compare-view'); 
-        if(checkedNodes.length===0){ emptyState.classList.remove('hidden'); dashboard.classList.add('hidden'); return; } 
+        if(currentModule!=='remates') return; 
+        const emptyState = document.getElementById('empty-state'); const dashboard = document.getElementById('module-remates');
+        
+        if(checkedNodes.length === 0){ emptyState.classList.remove('hidden'); dashboard.classList.add('hidden'); return; } 
         emptyState.classList.add('hidden'); dashboard.classList.remove('hidden'); 
-        let allRemates = getSelectedRemates(); globalAgg = buildAgg(allRemates, 'G', 'Selección Global');
-        if(checkedNodes.length===1){ singleView.classList.remove('hidden'); compareView.classList.add('hidden'); renderSingleView(checkedNodes[0]); } else { singleView.classList.add('hidden'); compareView.classList.remove('hidden'); setTimeout(()=>{ renderCompareView(checkedNodes); },50); } 
-    } catch(e) { console.error(e); }
-};
-
-window.filtrarLotesMain = function() {
-    const term = (document.getElementById('search-lotes-main').value || '').toLowerCase();
-    const tbody = document.getElementById('sv-tabla-top-lotes');
-    if(!tbody) return;
-    const rows = tbody.getElementsByTagName('tr');
-    for(let i=0; i<rows.length; i++) {
-        const text = rows[i].innerText.toLowerCase();
-        rows[i].style.display = text.includes(term) ? '' : 'none';
-    }
-};
-
-function renderSingleView(nodeId){
-    try {
-        const node=nodeRematesMap[nodeId]; const agg=buildAgg(node.remates,nodeId,node.label);
-        if(document.getElementById('sv-titulo')) document.getElementById('sv-titulo').innerText=agg.label; if(document.getElementById('sv-subtitulo')) document.getElementById('sv-subtitulo').innerText=`${node.remates.length} matrices consolidadas`;
         
-        if(document.getElementById('sv-kpi-ticket-top')) document.getElementById('sv-kpi-ticket-top').innerText=formatMoney(agg.ticketPromedio); 
-        if(document.getElementById('sv-kpi-comision-top')) document.getElementById('sv-kpi-comision-top').innerText=formatMoney(agg.comisionTotal); 
-        if(document.getElementById('sv-kpi-venta')) document.getElementById('sv-kpi-venta').innerText=formatMoney(agg.venta); 
+        let allRemates = getSelectedRemates(); globalAgg = buildAgg(allRemates);
         
-        if(document.getElementById('sv-kpi-lotes-disp')) document.getElementById('sv-kpi-lotes-disp').innerText=agg.lotesDisponibles.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-lotes')) document.getElementById('sv-kpi-lotes').innerText=agg.lotes.toLocaleString('es-CL'); if(document.getElementById('sv-kpi-eficacia-resumen')) document.getElementById('sv-kpi-eficacia-resumen').innerText=`${agg.eficaciaLotes.toFixed(1)}%`; 
+        let selectPeriodo = document.getElementById('macro-period');
+        let titulo = selectPeriodo.options[selectPeriodo.selectedIndex].text;
+        if(selectPeriodo.value === 'CUSTOM') titulo = "Selección Personalizada";
+        if(checkedNodes.length === 1) titulo = window.formatearNombreRemate(allRemates[0].fileName, allRemates[0].fechaData.timestamp);
         
-        if(document.getElementById('sv-kpi-garantias')) document.getElementById('sv-kpi-garantias').innerText=agg.garantias.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-ganadores')) document.getElementById('sv-kpi-ganadores').innerText=agg.ganadoresUnicosCount.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-perdedores')) document.getElementById('sv-kpi-perdedores').innerText=agg.perdedoresCount.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-1racompra')) document.getElementById('sv-kpi-1racompra').innerText=agg.ganadoresNuevos.toLocaleString('es-CL'); 
-        if(document.getElementById('sv-kpi-1racompra-pct')) document.getElementById('sv-kpi-1racompra-pct').innerText=`(${agg.pctVentaNuevos.toFixed(1)}% de venta)`;
+        document.getElementById('dash-titulo').innerText = titulo; 
+        document.getElementById('dash-subtitulo').innerText = `${checkedNodes.length} Matrices Consolidadas`;
         
-        const mapC={}; agg.adjudicaciones.forEach(a=>{ if(a.esFalso) return; if(!mapC[a.clienteReal]) mapC[a.clienteReal]={lotes:0,total:0}; mapC[a.clienteReal].lotes++; mapC[a.clienteReal].total+=a.monto; }); let multi=0; Object.values(mapC).forEach(c=>{ if(c.lotes>1) multi++; }); 
-        if(document.getElementById('sv-kpi-multilote')) document.getElementById('sv-kpi-multilote').innerText=multi; globalMapCMulti = mapC;
+        document.getElementById('dash-kpi-ticket').innerText = formatMoney(globalAgg.ticketPromedio); 
+        document.getElementById('dash-kpi-comision').innerText = formatMoney(globalAgg.comisionTotal); 
+        document.getElementById('dash-kpi-venta').innerText = formatMoney(globalAgg.venta); 
         
-        const lotesTabla=[...agg.adjudicaciones].filter(a=>!a.esFalso && a.monto > 0).sort((a,b)=> {
-            let numA = parseInt(a.numeroLote) || 0;
-            let numB = parseInt(b.numeroLote) || 0;
-            return numA - numB;
-        });
+        document.getElementById('dash-kpi-lotes-disp').innerText = globalAgg.lotesDisponibles.toLocaleString('es-CL'); 
+        document.getElementById('dash-kpi-lotes').innerText = globalAgg.lotes.toLocaleString('es-CL'); 
+        document.getElementById('dash-kpi-eficacia').innerText = `${globalAgg.eficaciaLotes.toFixed(1)}%`; 
         
-        if(document.getElementById('sv-tabla-top-lotes')) {
-            document.getElementById('sv-tabla-top-lotes').innerHTML=lotesTabla.map(l=>{
+        let dSign = globalAgg.deltaPujaTotal >= 0 ? '+' : '';
+        document.getElementById('dash-kpi-delta').innerText = dSign + formatMoney(globalAgg.deltaPujaTotal);
+        document.getElementById('dash-kpi-delta').className = globalAgg.deltaPujaTotal >= 0 ? "font-black text-lg text-premium-success" : "font-black text-lg text-premium-danger";
+        
+        document.getElementById('dash-kpi-garantias').innerText = globalAgg.garantias.toLocaleString('es-CL'); 
+        document.getElementById('dash-kpi-ganadores').innerText = globalAgg.ganadoresUnicosCount.toLocaleString('es-CL'); 
+        document.getElementById('dash-kpi-perdedores').innerText = globalAgg.perdedoresCount.toLocaleString('es-CL'); 
+        document.getElementById('dash-kpi-1racompra').innerText = globalAgg.ganadoresNuevos.toLocaleString('es-CL'); 
+        document.getElementById('dash-kpi-1racompra-pct').innerText = `(${globalAgg.pctVentaNuevos.toFixed(1)}% de venta)`;
+        
+        const mapC={}; globalAgg.adjudicaciones.forEach(a=>{ if(a.esFalso) return; if(!mapC[a.clienteReal]) mapC[a.clienteReal]={lotes:0,total:0}; mapC[a.clienteReal].lotes++; mapC[a.clienteReal].total+=a.monto; }); let multi=0; Object.values(mapC).forEach(c=>{ if(c.lotes>1) multi++; }); 
+        document.getElementById('dash-kpi-multilote').innerText = multi; globalMapCMulti = mapC;
+        
+        const lotesTabla=[...globalAgg.adjudicaciones].filter(a=>!a.esFalso && a.monto > 0).sort((a,b)=> (parseInt(a.numeroLote)||0) - (parseInt(b.numeroLote)||0));
+        
+        if(document.getElementById('dash-tabla-lotes')) {
+            document.getElementById('dash-tabla-lotes').innerHTML = lotesTabla.map(l=>{
                 let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
                 let dSignL = deltaLote >= 0 ? '+' : ''; 
-                let dColorL = deltaLote >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
-                return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${nodeId}')">
-                    <td class="font-semibold text-premium-muted w-20 pl-6 whitespace-nowrap">Lote ${l.numeroLote||'-'}</td>
+                let dColorL = deltaLote >= 0 ? 'text-premium-success' : 'text-premium-danger';
+                // Find node id for modal
+                let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData.timestamp) === l.origen)?.id || checkedNodes[0];
+                return `<tr class="cursor-pointer hover:bg-slate-50 transition" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
+                    <td class="font-bold text-premium-muted w-32 pl-6 truncate text-[10px] md:text-xs uppercase" title="${l.origen}">${l.origen}</td>
+                    <td class="font-black text-premium-text w-16 whitespace-nowrap text-xs">Lote ${l.numeroLote||'-'}</td>
                     <td class="max-w-[300px]">
-                        <div class="font-bold text-premium-text truncate text-sm" title="${l.loteStr}">${l.loteStr}</div>
+                        <div class="font-bold text-premium-text truncate text-xs" title="${l.loteStr}">${l.loteStr}</div>
                         <div class="text-[10px] text-premium-muted uppercase tracking-widest font-semibold truncate mt-1" title="${l.clienteReal}">👤 ${l.clienteReal}</div>
                     </td>
                     <td class="text-center"><span class="bg-slate-100 border border-slate-200 text-premium-text px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
@@ -1232,29 +1005,51 @@ function renderSingleView(nodeId){
                 </tr>`;
             }).join('');
         }
+
+        // GENERACIÓN DE GRÁFICOS INTELIGENTES (Micro vs Macro)
+        let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = [];
+        let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         
-    } catch (e) {}
-}
+        let distinctMonths = new Set(allRemates.map(r => r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0)).size;
+        let groupMode = (distinctMonths > 1 && checkedNodes.length > 3) ? 'month' : 'remate';
 
-function renderCompareView(nodesList){ 
-    try {
-        const compareData=nodesList.map(id=>buildAgg(nodeRematesMap[id].remates,id,nodeRematesMap[id].label)); 
-        if(document.getElementById('cv-tabla-comparativa')) {
-            document.getElementById('cv-tabla-comparativa').innerHTML=compareData.map(d=>{
-                let dSign = d.deltaPujaTotal >= 0 ? '+' : ''; let dColor = d.deltaPujaTotal >= 0 ? 'text-premium-highlight' : 'text-premium-danger';
-                return `<tr><td class="pl-4 font-bold text-premium-text max-w-[150px] truncate" title="${d.label}">${d.label}</td><td class="text-right font-black text-premium-success">${formatMoney(d.venta)}</td><td class="text-right text-premium-muted hidden sm:table-cell font-medium">${formatMoney(d.comisionTotal)}</td><td class="text-center font-bold text-premium-text">${d.lotes}</td><td class="text-center font-black text-premium-success">${d.eficaciaLotes.toFixed(1)}%</td><td class="text-center font-bold text-premium-text">${d.garantias}</td><td class="text-center text-premium-muted hidden sm:table-cell font-medium">${d.nuevos}</td><td class="text-right pr-4 font-black ${dColor}">${dSign}${formatMoney(d.deltaPujaTotal)}</td></tr>`;
-            }).join(''); 
+        if(groupMode === 'month') {
+            let monthMap = {};
+            allRemates.forEach(r => {
+                let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+                if(!monthMap[m]) monthMap[m] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: monthNamesShort[m] };
+                if(r.tipo === 'Siniestrados') monthMap[m].siniestros += r.ventaTotal;
+                if(r.tipo === 'Retail') monthMap[m].retail += r.ventaTotal;
+                monthMap[m].nuevos += r.nuevos; monthMap[m].antiguos += r.antiguos;
+            });
+            Object.keys(monthMap).sort((a,b)=>a-b).forEach(k => {
+                let v = monthMap[k];
+                chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos);
+            });
+        } else {
+            allRemates.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0)).forEach(r => {
+                chartLabels.push(window.formatearNombreRemate(r.fileName, r.fechaData.timestamp));
+                cSiniestros.push(r.tipo === 'Siniestrados' ? r.ventaTotal : 0);
+                cRetail.push(r.tipo === 'Retail' ? r.ventaTotal : 0);
+                cNuevos.push(r.nuevos); cRecurrentes.push(r.antiguos);
+            });
         }
-        const labels=compareData.map(d=>d.label); 
-        try {
-            if(cvChartVentasInst) cvChartVentasInst.destroy(); if(document.getElementById('cv-chartVentas')) { cvChartVentasInst=new Chart(document.getElementById('cv-chartVentas').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Venta Siniestrados',data:compareData.map(d=>d.ventaSiniestros),backgroundColor:'#0066CC',borderRadius:4},{label:'Venta Retail',data:compareData.map(d=>d.ventaRetail),backgroundColor:'#1D1D1F',borderRadius:4}] },options:{responsive:true,maintainAspectRatio:false}}); }
-            if(cvChartGarantiasInst) cvChartGarantiasInst.destroy(); if(document.getElementById('cv-chartGarantias')) { cvChartGarantiasInst=new Chart(document.getElementById('cv-chartGarantias').getContext('2d'),{type:'bar',data:{labels:labels,datasets:[{label:'Nuevos',data:compareData.map(d=>d.nuevos),backgroundColor:'#1D1D1F',borderRadius:4},{label:'Recurrentes',data:compareData.map(d=>d.antiguos),backgroundColor:'#D1D1D6',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'#F5F5F7'}}}}}); }
-        } catch(ec) {}
-    } catch (e) {}
-}
 
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-premium-text">${nombre}</td><td class="text-center font-black text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); };
-window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); };
+        const showRetail = cRetail.some(val => val > 0);
+        let datasetsVentas = [{label:'Venta Siniestrados', data: cSiniestros, backgroundColor: '#0066CC', borderRadius:4}];
+        if(showRetail) datasetsVentas.push({label:'Venta Retail', data: cRetail, backgroundColor: '#1D1D1F', borderRadius:4});
+
+        if(dashChartVentasInst) dashChartVentasInst.destroy();
+        dashChartVentasInst = new Chart(document.getElementById('dash-chartVentas').getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: datasetsVentas }, options: { responsive: true, maintainAspectRatio: false } });
+
+        if(dashChartClientesInst) dashChartClientesInst.destroy();
+        dashChartClientesInst = new Chart(document.getElementById('dash-chartClientes').getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: [{label:'Nuevos', data: cNuevos, backgroundColor: '#1D1D1F', borderRadius:4}, {label:'Recurrentes', data: cRecurrentes, backgroundColor: '#D1D1D6', borderRadius:4}] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
+
+    } catch(e) { console.error(e); }
+};
+
+window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-premium-text">${nombre}</td><td class="text-center font-black text-premium-highlight">${data.lotes}</td><td class="text-right pr-4 font-black text-premium-success">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-premium-muted font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
+window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
 window.renderConclusiones = function() {
     try {
@@ -1262,13 +1057,7 @@ window.renderConclusiones = function() {
         if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
         emptyState.classList.add('hidden'); container.classList.remove('hidden');
 
-        let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates, 'G', 'Selección Global'); let html = ''; globalAgg = agg; if(!clientDB.length) procesarDatosClientes(); 
-
-        if(checkedNodes.length > 1) {
-            let ref1 = buildAgg(nodeRematesMap[checkedNodes[0]].remates, 'R1', nodeRematesMap[checkedNodes[0]].label); let ref2 = buildAgg(nodeRematesMap[checkedNodes[1]].remates, 'R2', nodeRematesMap[checkedNodes[1]].label);
-            let varVenta = ref1.venta > 0 ? ((ref2.venta - ref1.venta) / ref1.venta * 100) : 0; let signoVar = varVenta >= 0 ? '+' : '';
-            html += `<div class="glass-panel p-5 md:p-6 border-l-4 border-l-premium-highlight md:col-span-2 bg-slate-50"><h3 class="text-sm font-black text-premium-text mb-2">Desviación Interperíodo: ${nodeRematesMap[checkedNodes[0]].label} vs ${nodeRematesMap[checkedNodes[1]].label}</h3><p class="text-xs text-premium-muted leading-relaxed font-medium">Al comparar <strong class="text-premium-text">${nodeRematesMap[checkedNodes[0]].label}</strong> con <strong class="text-premium-text">${nodeRematesMap[checkedNodes[1]].label}</strong>, se observa una variación en la venta total del <strong class="text-premium-highlight">${signoVar}${varVenta.toFixed(1)}%</strong>. El volumen físico pasó de ${ref1.lotes} a ${ref2.lotes} lotes vendidos.</p></div>`;
-        }
+        let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates); let html = ''; globalAgg = agg; if(!clientDB.length) procesarDatosClientes(); 
 
         let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-premium-success' : 'text-premium-danger';
 
@@ -1329,10 +1118,10 @@ window.abrirModalFuga = function() {
                 html += `<tr><td class="pl-4 font-bold text-xs text-premium-text">${nombreRemate}</td><td class="text-premium-danger text-xs font-black">${textoDias}</td><td class="font-bold text-xs text-premium-text truncate max-w-[150px]">${f.nombre}</td><td class="text-xs text-premium-muted font-medium truncate max-w-[150px]">${f.email||'-'}</td></tr>`; 
             });
         } else { html = '<tr><td colspan="4" class="p-8 text-center text-premium-muted font-medium">No hay registros.</td></tr>'; }
-        if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; if(document.getElementById('modal-fuga')) document.getElementById('modal-fuga').classList.remove('hidden');
+        if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; document.getElementById('modal-fuga').classList.remove('hidden'); document.getElementById('modal-fuga').classList.add('flex');
     } catch (e) {}
 };
-window.cerrarModalFuga = function() { document.getElementById('modal-fuga').classList.add('hidden'); };
+window.cerrarModalFuga = function() { document.getElementById('modal-fuga').classList.add('hidden'); document.getElementById('modal-fuga').classList.remove('flex'); };
 
 window.exportarFugaExcel = function() {
     try {
@@ -1353,7 +1142,7 @@ window.abrirModalPujadores = function(loteEncoded, nodeId){
         if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').innerText="Lote Seleccionado"; if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adj: ${adjudicado && !adjudicado.esFalso?formatMoney(adjudicado.monto):'FALSO'} | Min: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
         if(document.getElementById('modal-total-pujas')) document.getElementById('modal-total-pujas').innerText=todasPujas.length; if(document.getElementById('modal-unicos-reales')) document.getElementById('modal-unicos-reales').innerText=[...new Set(todasPujas.filter(p=>!p.esFalso).map(p=>p.nombreNorm))].length; if(document.getElementById('modal-falsas')) document.getElementById('modal-falsas').innerText=todasPujas.filter(p=>p.esFalso).length;
         currentFiltroModal='todos'; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className='px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold';
-        renderModalTabla(); if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.remove('hidden');
+        renderModalTabla(); document.getElementById('modal-pujadores').classList.remove('hidden'); document.getElementById('modal-pujadores').classList.add('flex');
     } catch(e) {}
 };
 
@@ -1370,7 +1159,7 @@ function renderModalTabla(){
 }
 
 window.filtrarModal = function(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1 rounded-md text-white bg-premium-text shadow-sm transition font-bold':'px-3 py-1 rounded-md text-premium-muted hover:text-premium-text hover:bg-slate-50 transition font-bold'; if(document.getElementById('btn-filtro-falsos')) document.getElementById('btn-filtro-falsos').className=tipo==='falsos'?'px-3 py-1 rounded text-premium-text bg-white shadow-sm border border-premium-border font-bold':'px-3 py-1 rounded text-premium-muted hover:text-premium-text transition font-bold'; renderModalTabla(); };
-window.cerrarModal = function(){ if(document.getElementById('modal-pujadores')) document.getElementById('modal-pujadores').classList.add('hidden'); };
+window.cerrarModal = function(){ document.getElementById('modal-pujadores').classList.add('hidden'); document.getElementById('modal-pujadores').classList.remove('flex'); };
 
 function procesarDatosClientes(){ 
     try {
