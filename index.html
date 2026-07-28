@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.2 (Tooltip Pro)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.3 (UX Fix)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[200] hidden flex-col items-center justify-center transition-all">
@@ -86,13 +86,6 @@
                 <div class="mb-6"><input type="password" id="password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-black transition-all" required placeholder="Contraseña"></div>
                 <div id="login-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
                 <button type="submit" id="btn-login" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Iniciar Sesión</button>
-            </form>
-            <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
-                <div class="mb-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Invitación Aceptada</span></div>
-                <p class="text-xs text-gray-500 mb-6 text-center leading-relaxed font-medium mt-4">¡Bienvenido! Crea tu contraseña definitiva.</p>
-                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-green-600 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
-                <div id="invite-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
-                <button type="submit" id="btn-invite" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Guardar y Entrar</button>
             </form>
         </div>
     </div>
@@ -204,10 +197,10 @@
                 <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-300 shadow-sm">
-                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o cambia el filtro en la barra superior para comenzar a analizar.</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o usa el Gestor de Matrices para comenzar a analizar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
@@ -272,8 +265,21 @@
                         </div>
 
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2 no-print">
-                            <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Composición de Ventas</h4><div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartVentas"></canvas></div></div>
-                            <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4><div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartClientes"></canvas></div></div>
+                            <div class="glass-panel p-5">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest">Composición de Ventas y Lotes</h4>
+                                    <select id="dash-groupby" onchange="window.renderDashboard()" class="bg-gray-50 border border-gray-200 rounded px-2 py-1 text-[10px] font-bold text-gray-700 outline-none cursor-pointer">
+                                        <option value="auto">Agrupación Automática</option>
+                                        <option value="remate">Matriz por Matriz</option>
+                                        <option value="month">Mes a Mes</option>
+                                    </select>
+                                </div>
+                                <div class="relative h-64 md:h-80 w-full"><canvas id="dash-chartVentas"></canvas></div>
+                            </div>
+                            <div class="glass-panel p-5">
+                                <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4>
+                                <div class="relative h-64 md:h-80 w-full"><canvas id="dash-chartClientes"></canvas></div>
+                            </div>
                         </div>
 
                         <div class="glass-panel p-5 overflow-hidden w-full bg-white">
@@ -308,10 +314,11 @@
                         <div class="flex items-center gap-3 w-full md:w-auto">
                             <span class="text-xs font-bold text-gray-500 hidden sm:inline">Agrupar por:</span>
                             <select id="comp-groupby" onchange="window.renderComparativa()" class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-bold text-gray-900 focus:border-blue-600 transition w-full sm:w-auto shadow-sm">
-                                <option value="year">Años Completos</option>
-                                <option value="semester">Semestres</option>
+                                <option value="remate" selected>Matriz por Matriz</option>
+                                <option value="month">Mes a Mes</option>
                                 <option value="quarter">Trimestres (Q1-Q4)</option>
-                                <option value="month" selected>Mes a Mes</option>
+                                <option value="semester">Semestres</option>
+                                <option value="year">Años Completos</option>
                             </select>
                         </div>
                     </div>
@@ -431,10 +438,10 @@
                     </div>
                 </div>
 
-                <!-- MODULE: DATOS (REPORTE EJECUTIVO) -->
+                <!-- MODULE: DATOS -->
                 <div id="module-conclusiones" class="hidden space-y-5 md:space-y-6 max-w-[1000px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
-                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Datos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Reporte Ejecutivo Estructurado</p></div>
+                        <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Datos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Reporte Financiero Estructurado</p></div>
                         <button onclick="window.print()" class="px-4 py-2 bg-white border border-gray-300 shadow-sm rounded-md text-xs font-bold hover:bg-gray-50 transition w-full md:w-auto uppercase tracking-wider text-gray-800">🖨️ Imprimir Reporte</button>
                     </div>
                     <div id="conclusiones-content"></div>
@@ -478,7 +485,7 @@
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Acciones Rápidas:</span>
                 <div class="flex gap-2">
                     <button onclick="window.toggleArbolAll(true)" class="bg-white border border-gray-300 text-gray-800 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-gray-50 transition shadow-sm">✔ Marcar Todas</button>
-                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar</button>
+                    <button onclick="window.toggleArbolAll(false)" class="bg-white border border-gray-300 text-red-600 text-[10px] font-bold px-3 py-1.5 rounded hover:bg-red-50 transition shadow-sm">✖ Limpiar Todo</button>
                 </div>
             </div>
 
@@ -1281,11 +1288,18 @@ window.renderDashboard = function(){
         } catch(e){}
 
         try {
-            let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = []; let cMatrices = [];
+            let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = []; let cMatrices = []; let cLotes = [];
             let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
             
             let distinctMonths = new Set(allRemates.map(r => r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0)).size;
-            let groupMode = (distinctMonths > 1 && checkedNodes.length > 3) ? 'month' : 'remate';
+            
+            let forcedMode = document.getElementById('dash-groupby') ? document.getElementById('dash-groupby').value : 'auto';
+            let groupMode = 'remate';
+            if (forcedMode === 'auto') {
+                groupMode = (distinctMonths > 1 && checkedNodes.length > 4) ? 'month' : 'remate';
+            } else {
+                groupMode = forcedMode;
+            }
 
             if(groupMode === 'month') {
                 let monthMap = {};
@@ -1295,34 +1309,39 @@ window.renderDashboard = function(){
                     let labelStr = document.getElementById('macro-year').value === 'ALL' ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
                     
                     let mk = `${y}-${m}`; 
-                    if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: labelStr, rawD: r.fechaData?.timestamp||0, count: 0 };
+                    if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, lotes: 0, label: labelStr, rawD: r.fechaData?.timestamp||0, count: 0 };
                     
                     monthMap[mk].count++;
+                    monthMap[mk].lotes += (Number(r.lotesCount) || 0);
                     if(r.tipo === 'Siniestrados') monthMap[mk].siniestros += (Number(r.ventaTotal) || 0);
                     if(r.tipo === 'Retail') monthMap[mk].retail += (Number(r.ventaTotal) || 0);
                     monthMap[mk].nuevos += (Number(r.nuevos) || 0); monthMap[mk].antiguos += (Number(r.antiguos) || 0);
                 });
                 Object.values(monthMap).sort((a,b)=>a.rawD - b.rawD).forEach(v => {
-                    chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos); cMatrices.push(v.count);
+                    chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos); cMatrices.push(v.count); cLotes.push(v.lotes);
                 });
             } else {
                 allRemates.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0)).forEach(r => {
                     chartLabels.push(window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp));
                     cSiniestros.push(r.tipo === 'Siniestrados' ? (Number(r.ventaTotal) || 0) : 0);
                     cRetail.push(r.tipo === 'Retail' ? (Number(r.ventaTotal) || 0) : 0);
-                    cNuevos.push(Number(r.nuevos) || 0); cRecurrentes.push(Number(r.antiguos) || 0); cMatrices.push(1);
+                    cNuevos.push(Number(r.nuevos) || 0); cRecurrentes.push(Number(r.antiguos) || 0); cMatrices.push(1); cLotes.push(Number(r.lotesCount) || 0);
                 });
             }
 
             const showRetail = cRetail.some(val => val > 0);
-            let datasetsVentas = [{label:'Venta Siniestrados', data: cSiniestros, backgroundColor: '#2563EB', borderRadius:4}];
-            if(showRetail) datasetsVentas.push({label:'Venta Retail', data: cRetail, backgroundColor: '#111827', borderRadius:4});
+            let datasetsVentas = [
+                {label:'Venta Siniestrados', data: cSiniestros, type: 'line', borderColor: '#2563EB', backgroundColor: '#2563EB', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#2563EB', pointRadius: 4, yAxisID: 'y'}
+            ];
+            if(showRetail) datasetsVentas.push({label:'Venta Retail', data: cRetail, type: 'line', borderColor: '#111827', backgroundColor: '#111827', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 4, yAxisID: 'y'});
+            
+            datasetsVentas.push({label:'Lotes Vendidos', data: cLotes, type: 'bar', backgroundColor: '#16A34A', borderRadius: 4, yAxisID: 'y1'});
 
             const canvasVentas = document.getElementById('dash-chartVentas');
             if(canvasVentas) {
                 if(dashChartVentasInst) dashChartVentasInst.destroy();
                 dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), { 
-                    type: 'bar', 
+                    type: 'line', 
                     data: { labels: chartLabels, datasets: datasetsVentas }, 
                     options: { 
                         responsive: true, 
@@ -1335,7 +1354,11 @@ window.renderDashboard = function(){
                                     }
                                 }
                             }
-                        }
+                        },
+                        scales: { 
+                            y: { type: 'linear', display: true, position: 'left', beginAtZero: true },
+                            y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
+                        } 
                     } 
                 });
             }
@@ -1371,7 +1394,10 @@ window.renderComparativa = function() {
             
             let key = ''; let label = '';
             
-            if(groupMode === 'year') {
+            if(groupMode === 'remate') {
+                key = `R-${d?.timestamp || 0}-${r.id}`; 
+                label = window.formatearNombreRemate(r.fileName, d?.timestamp);
+            } else if(groupMode === 'year') {
                 key = `${y}`; label = `Año ${y}`;
             } else if(groupMode === 'semester') {
                 let s = m < 6 ? 1 : 2;
@@ -1384,11 +1410,17 @@ window.renderComparativa = function() {
                 label = `${monthNamesShort[m]} ${y}`;
             }
             
-            if(!groups[key]) groups[key] = { label, key, remates: [] };
+            if(!groups[key]) groups[key] = { label, key, remates: [], timestamp: d?.timestamp || 0 };
             groups[key].remates.push(r);
         });
 
-        let sortedKeys = Object.keys(groups).sort();
+        let sortedKeys;
+        if(groupMode === 'remate') {
+            sortedKeys = Object.keys(groups).sort((a,b) => groups[a].timestamp - groups[b].timestamp);
+        } else {
+            sortedKeys = Object.keys(groups).sort();
+        }
+
         let tableHtml = '';
         let chartLabels = [];
         let dataVenta = [];
