@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.8 (Data Rescue Engine)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.9 (Smart Parser)</div>
 
     <!-- OVERLAY GIGANTE DE SINCRONIZACIÓN INICIAL -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] flex-col items-center justify-center transition-all backdrop-blur-sm flex">
@@ -87,13 +87,6 @@
                 <div class="mb-6"><input type="password" id="password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-black transition-all" required placeholder="Contraseña"></div>
                 <div id="login-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
                 <button type="submit" id="btn-login" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Iniciar Sesión</button>
-            </form>
-            <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
-                <div class="mb-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Invitación Aceptada</span></div>
-                <p class="text-xs text-gray-500 mb-6 text-center leading-relaxed font-medium mt-4">¡Bienvenido! Crea tu contraseña definitiva.</p>
-                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-green-600 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
-                <div id="invite-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
-                <button type="submit" id="btn-invite" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Guardar y Entrar</button>
             </form>
         </div>
     </div>
@@ -574,22 +567,6 @@ let currentGestorYearTab = null;
 window.globalSelectedYears = [];
 window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
 window.expandedDropMonths = new Set(); 
-
-// Alias de seguridad
-window.actualizarVistaActual = function() { window.renderApp(); };
-
-const parseMontoCLP = (val) => {
-    if(!val) return 0;
-    if(typeof val === 'number') return val;
-    let str = String(val).trim().toUpperCase();
-    if(str.includes('MM')) {
-        let n = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
-        return (n || 0) * 1000000;
-    }
-    let parts = str.split(',');
-    let intPart = parts[0].replace(/[^\d-]/g, '');
-    return parseInt(intPart) || 0;
-};
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#6B7280'; 
@@ -1203,7 +1180,7 @@ window.cerrarModalGestor = function(e) {
     if(searchEl) searchEl.value = '';
     window.updateDropdownLabel();
     window.renderDropdownUI(); 
-    window.renderApp(); 
+    window.applyDropdown(); 
 };
 
 window.toggleGestorMes = function(year, mesIndex, isChecked) {
@@ -1317,28 +1294,39 @@ window.parseExcel = function(file) {
                 let garantiasSet = new Set();
 
                 parsedData.forEach(rowNorm => {
-                    let lote = rowNorm['lote'] || rowNorm['nlote'] || rowNorm['nrolote'] || rowNorm['item'] || rowNorm['numero'] || rowNorm['id'] || rowNorm['n'];
+                    let textLote = String(rowNorm['lote'] || '').trim();
+                    let isLoteText = textLote.length > 3 && /[a-zA-Z]/.test(textLote);
+
+                    let numVal = rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'] || rowNorm['item'] || rowNorm['id'] || rowNorm['n'];
+                    if (!numVal && !isLoteText) numVal = textLote;
+                    
+                    let detalleVal = isLoteText ? textLote : (rowNorm['vehiculo'] || rowNorm['detalle'] || rowNorm['descripcion'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['patente'] || rowNorm['modelo']);
+                    
                     let adjudicatario = rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombre'] || rowNorm['comprador'] || rowNorm['ganador'] || rowNorm['razonsocial'];
-                    let monto = rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'] || rowNorm['montoadjudicado'] || rowNorm['valoradjudicado'] || rowNorm['montofinal'] || rowNorm['valorfinal'] || rowNorm['precioadjudicado'];
-                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'] || rowNorm['valorminimo'] || rowNorm['pbase'];
+                    
+                    let monto = rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'] || rowNorm['montoadjudicado'] || rowNorm['valoradjudicado'];
+                    
+                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'];
+                    
                     let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'];
                     let rut = rowNorm['rut'] || rowNorm['rutcliente'] || rowNorm['nrorut'];
-                    let detalle = rowNorm['detalle'] || rowNorm['vehiculo'] || rowNorm['descripcion'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['patente'] || rowNorm['ppu'] || rowNorm['producto'] || rowNorm['modelo'] || rowNorm['observacion'];
+                    
+                    let extraDesc = String(rowNorm['descripcion'] || '') + " " + String(rowNorm['estado'] || '');
 
-                    if (lote) {
-                        lotesSet.add(String(lote).trim());
+                    if (numVal || detalleVal) {
+                        lotesSet.add(String(numVal || detalleVal).trim());
                         
                         let montoNum = parseMontoCLP(monto);
                         let minNum = parseMontoCLP(minimo);
                         
                         let esFalso = esClienteFalso(adjudicatario, email);
-                        let esChatarra = String(detalle).toLowerCase().includes('chatarra') || String(detalle).toLowerCase().includes('restos');
+                        let esChatarra = extraDesc.toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('restos');
                         
-                        let { categoria, modeloStr } = extraerMarcaModelo(String(detalle));
+                        let { categoria, modeloStr } = extraerMarcaModelo(String(detalleVal));
 
                         let adjObj = {
-                            loteStr: String(detalle),
-                            numeroLote: String(lote).replace(/\D/g, ''),
+                            loteStr: String(detalleVal),
+                            numeroLote: String(numVal || '').replace(/\D/g, ''),
                             clienteReal: normalizarCliente(adjudicatario),
                             nombreRaw: String(adjudicatario),
                             monto: montoNum,
@@ -1368,7 +1356,7 @@ window.parseExcel = function(file) {
                                     email: String(email),
                                     rut: String(rut),
                                     fechaRemate: fechaData.timestamp,
-                                    numRemate: String(lote)
+                                    numRemate: String(numVal)
                                 });
                             }
                         }
@@ -1513,7 +1501,6 @@ window.iniciarProcesamiento = async function(files){
         if(fileInput) fileInput.value = "";
         
         window.actualizarFiltrosGlobales(true); 
-        window.renderApp(); 
 
     } catch (e) { 
         document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
