@@ -33,7 +33,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v12.0 (Sincronización Total + Motor V2.1)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v10.0 (Zárate Engine Exitoso)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -51,7 +51,7 @@
                 <div class="w-12 h-12 bg-[#111827] text-white rounded-xl flex items-center justify-center font-black text-xl shadow-sm">Z</div>
                 <div>
                     <h1 class="text-[18px] font-bold text-[#111827] leading-none">Zárate Analítica</h1>
-                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v12.0</p>
+                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v10.0</p>
                 </div>
             </div>
             
@@ -177,14 +177,14 @@
             <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#F3F4F6] w-full pb-[80px] md:pb-6 relative">
                 
                 <!-- EMPTY STATE -->
-                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6 transition-all duration-200">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
                     <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global o el Gestor de Remates para comenzar a analizar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
-                <div id="module-remates" class="hidden space-y-5 max-w-[1400px] mx-auto transition-all duration-200">
+                <div id="module-remates" class="hidden space-y-5 max-w-[1400px] mx-auto">
                     <div>
                         <h2 class="text-[22px] font-black tracking-tight text-gray-900" id="dash-titulo">-</h2>
                         <p class="text-[13px] text-gray-500" id="dash-subtitulo">Control operativo • 0 seleccionados</p>
@@ -247,7 +247,7 @@
                         <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                             <div class="flex justify-between items-center mb-3">
                                 <div class="text-[12px] font-bold uppercase tracking-widest text-gray-800">Ventas y Lotes en el Tiempo</div>
-                                <select id="dash-groupby" onchange="window.actualizarEstadoApp()" class="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-[11px] font-bold text-gray-700 outline-none cursor-pointer">
+                                <select id="dash-groupby" onchange="window.renderApp()" class="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-[11px] font-bold text-gray-700 outline-none cursor-pointer">
                                     <option value="auto">Agrupación Automática</option>
                                     <option value="remate">Matriz por Matriz</option>
                                     <option value="month">Mes a Mes</option>
@@ -289,7 +289,7 @@
                 </div>
 
                 <!-- MODULE: COMPARATIVA HISTÓRICA -->
-                <div id="module-comparativa" class="hidden space-y-5 max-w-[1400px] mx-auto transition-all duration-200">
+                <div id="module-comparativa" class="hidden space-y-5 max-w-[1400px] mx-auto">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4">
                         <div>
                             <h2 class="text-[22px] font-black tracking-tight text-gray-900">Comparativa Histórica</h2>
@@ -297,7 +297,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500 hidden sm:inline">Agrupar por</span>
-                            <select id="comp-groupby" onchange="window.actualizarEstadoApp()" class="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-medium shadow-sm outline-none">
+                            <select id="comp-groupby" onchange="window.actualizarVistaActual()" class="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-medium shadow-sm outline-none">
                                 <option value="remate" selected>Remate Exacto</option>
                                 <option value="month">Mes a Mes</option>
                                 <option value="quarter">Trimestres (Q1-Q4)</option>
@@ -332,7 +332,7 @@
                 </div>
 
                 <!-- MODULE: MODELOS Y VEHICULOS -->
-                <div id="module-autos" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
+                <div id="module-autos" class="hidden space-y-5 max-w-[1200px] mx-auto">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
                             <h2 class="text-[22px] font-black tracking-tight text-gray-900">Análisis Vehicular</h2>
@@ -372,7 +372,7 @@
                 </div>
 
                 <!-- MODULE: CLIENTES -->
-                <div id="module-clientes" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
+                <div id="module-clientes" class="hidden space-y-5 max-w-[1200px] mx-auto">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
                             <h2 class="text-[22px] font-black tracking-tight text-gray-900">Gestión de Clientes</h2>
@@ -391,7 +391,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-2 gap-3">
                         <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
                             <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Clientes</div>
                             <div class="mt-1 text-[20px] font-black text-gray-900" id="bi-kpi-total">0</div>
@@ -399,10 +399,6 @@
                         <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
                             <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Prom.</div>
                             <div class="mt-1 text-[20px] font-black text-emerald-600" id="bi-kpi-ltv">$0</div>
-                        </div>
-                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inactivos > 90d</div>
-                            <div class="mt-1 text-[20px] font-black text-red-500" id="bi-kpi-inactivos">0</div>
                         </div>
                     </div>
                     
@@ -458,7 +454,7 @@
                 </div>
 
                 <!-- MODULE: DATOS (CONCLUSIONES) -->
-                <div id="module-conclusiones" class="hidden space-y-6 max-w-[1000px] mx-auto pb-10 transition-all duration-200">
+                <div id="module-conclusiones" class="hidden space-y-6 max-w-[1000px] mx-auto pb-10">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
                             <h2 class="text-[22px] font-black tracking-tight text-gray-900">Datos y Reportes</h2>
@@ -470,7 +466,7 @@
                 </div>
 
                 <!-- MODULE: BUSCADOR -->
-                <div id="module-buscador" class="hidden space-y-5 max-w-[1200px] mx-auto pb-10 transition-all duration-200">
+                <div id="module-buscador" class="hidden space-y-5 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col gap-2 border-b border-gray-200 pb-4 no-print">
                         <h2 class="text-[22px] font-black tracking-tight text-gray-900">Buscador Global</h2>
                         <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex items-center gap-3">
@@ -654,18 +650,8 @@ if(typeof Chart !== 'undefined') {
     Chart.defaults.font.size = 11;
 }
 
-// === CEREBRO DE SINCRONIZACIÓN CENTRAL ===
-window.actualizarEstadoApp = function(keepGestorScroll = false) {
-    window.renderDropdownUI();
-    window.updateDropdownLabel();
-    window.updateAdminButtonCount();
-    window.renderApp();
-    
-    // Si el modal del gestor está abierto, lo actualiza por debajo sin cerrarlo
-    const modalGestor = document.getElementById('modal-gestor');
-    if(modalGestor && !modalGestor.classList.contains('hidden')) {
-        window.abrirModalGestor(keepGestorScroll);
-    }
+window.actualizarVistaActual = function() { 
+    window.renderApp(); 
 };
 
 window.toggleSidebar = function(e) {
@@ -1116,7 +1102,7 @@ window.applyDropdown = function() {
         menu.classList.add('hidden'); 
         menu.classList.remove('flex'); 
     }
-    // No hace falta actualizarEstadoApp aquí porque ya se actualiza en tiempo real
+    // La app ya se actualiza en tiempo real
 };
 
 window.updateDropdownLabel = function() {
@@ -1157,11 +1143,15 @@ window.seleccionarUltimoRemate = function() {
 
 window.switchGestorYear = function(y) {
     currentGestorYearTab = y;
+    
     const container = document.getElementById('gestor-content-container');
     const scrollPos = container ? container.scrollTop : 0;
     
     window.abrirModalGestor(true);
-    if(container) { container.scrollTop = scrollPos; }
+    
+    if(container) { 
+        container.scrollTop = scrollPos; 
+    }
 };
 
 window.toggleGestorAll = function(check) {
@@ -1414,31 +1404,24 @@ window.parseExcel = function(file) {
                 const workbook = XLSX.read(data, {type: 'array'});
                 
                 // 1. PESTAÑA PRINCIPAL (ADJUDICACIONES)
-                let sheetName = workbook.SheetNames.find(s => s.toLowerCase().includes('adjudicaciones')) || workbook.SheetNames[0];
+                let sheetName = workbook.SheetNames.find(s => String(s).toLowerCase().includes('adjudicaciones')) || workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
                 const rowsArr = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
 
                 let fechaData = extraerFechaInfo(file, rowsArr);
                 let tipo = file.name.toLowerCase().includes('retail') ? 'Retail' : 'Siniestrados';
 
-                // 2. ESCÁNER INTELIGENTE (PUNTAJE)
+                // 2. ESCÁNER INTELIGENTE
                 let headerRowIdx = 0;
                 let foundHeaders = [];
-                let maxScore = 0;
                 
                 for(let i=0; i<Math.min(rowsArr.length, 20); i++){
+                    if(!rowsArr[i] || !Array.isArray(rowsArr[i])) continue;
                     let rowStr = rowsArr[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                    let score = 0;
-                    if(rowStr.includes('rut')) score++;
-                    if(rowStr.includes('nombre') || rowStr.includes('cliente')) score++;
-                    if(rowStr.includes('monto') || rowStr.includes('adjudicad') || rowStr.includes('total')) score++;
-                    if(rowStr.includes('lote') || rowStr.includes('numero')) score++;
-                    if(rowStr.includes('patente') || rowStr.includes('descripci') || rowStr.includes('vehiculo')) score++;
-                    
-                    if(score > maxScore) {
-                        maxScore = score;
+                    if(rowStr.includes('rut') && (rowStr.includes('nombre') || rowStr.includes('cliente')) && (rowStr.includes('adjudicad') || rowStr.includes('monto') || rowStr.includes('total'))) {
                         headerRowIdx = i;
                         foundHeaders = rowsArr[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                        break;
                     }
                 }
                 
@@ -1449,7 +1432,7 @@ window.parseExcel = function(file) {
                 let parsedData = [];
                 for(let i = headerRowIdx + 1; i < rowsArr.length; i++) {
                     let rowData = rowsArr[i];
-                    if(rowData.join('').trim() === '') continue; 
+                    if(!rowData || !Array.isArray(rowData) || rowData.join('').trim() === '') continue; 
                     let obj = {};
                     for(let j = 0; j < foundHeaders.length; j++) {
                         let key = foundHeaders[j] || ('col' + j);
@@ -1478,251 +1461,257 @@ window.parseExcel = function(file) {
                 let garantiasSet = new Set();
 
                 parsedData.forEach(rowNorm => {
-                    let adjudicatario = rowNorm['nombre'] || rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombresorazonsocial'] || rowNorm['razonsocial'] || '';
-                    let montoRaw = rowNorm['montoadjudicado'] || rowNorm['totaladjudicado'] || rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'] || 0;
-                    let minimoRaw = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'] || rowNorm['montoestimado'] || 0;
-                    
-                    let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'] || '';
-                    let rut = rowNorm['rut'] || rowNorm['nrorut'] || rowNorm['rutcliente'] || '';
-                    let patenteVal = String(rowNorm['patente'] || '').trim();
-                    
-                    let textLote = String(rowNorm['lote'] || '').trim();
-                    let numVal = String(rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'] || rowNorm['item'] || rowNorm['id'] || '').replace(/\D/g, '');
-                    
-                    // En el V10 evitamos 'descripcion' porque contiene 'SINIESTRADO'. Buscamos auto en el Lote o Vehiculo.
-                    let detalleVal = rowNorm['vehiculo'] || rowNorm['detalle'] || rowNorm['bien'];
-                    
-                    // Si no hay columna vehiculo dedicada, sacamos el auto desde el Lote.
-                    if (!detalleVal && textLote) {
-                        detalleVal = textLote;
-                    }
-
-                    // Limpiamos la separación si viene "Lote X: MARCA MODELO"
-                    if (typeof detalleVal === 'string' && detalleVal.includes(':')) {
-                        let parts = detalleVal.split(':');
-                        if (!patenteVal) patenteVal = parts[0].trim();
-                        detalleVal = parts[1].trim();
-                    }
-
-                    // 3. LIMPIEZA DE HTML (Por si acaso)
-                    if (typeof detalleVal === 'string' && detalleVal.includes('<table')) {
-                        detalleVal = detalleVal.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-                    }
-
-                    let extraDesc = String(rowNorm['descripcion'] || '') + " " + String(rowNorm['estado'] || '');
-
-                    if (numVal || detalleVal) {
-                        lotesSet.add(String(numVal || detalleVal).trim());
+                    try {
+                        let adjudicatario = rowNorm['nombre'] || rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombresorazonsocial'] || rowNorm['razonsocial'] || '';
+                        let montoRaw = rowNorm['montoadjudicado'] || rowNorm['totaladjudicado'] || rowNorm['monto'] || rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['adjudicado'] || obj['total'] || obj['precio'] || 0;
+                        let minimoRaw = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || 0;
                         
-                        let parseMoney = (val) => {
-                            if(!val) return 0;
-                            if(typeof val === 'number') return val;
-                            let str = String(val).trim().toUpperCase();
-                            if(str.includes('MM')) {
-                                let n = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
-                                return (n || 0) * 1000000;
-                            }
-                            let intPart = str.split(',')[0].replace(/[^\d-]/g, '');
-                            return parseInt(intPart, 10) || 0;
-                        };
-
-                        let montoNum = parseMoney(montoRaw);
-                        let minNum = parseMoney(minimoRaw);
+                        let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'] || '';
+                        let rut = rowNorm['rut'] || rowNorm['nrorut'] || rowNorm['rutcliente'] || '';
+                        let patenteVal = String(rowNorm['patente'] || '').trim();
                         
-                        let esFalso = esClienteFalso(adjudicatario, email);
-                        let esChatarra = extraDesc.toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('restos');
+                        let textLote = String(rowNorm['lote'] || '').trim();
+                        let numVal = String(rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'] || rowNorm['item'] || rowNorm['id'] || '').replace(/\D/g, '');
                         
-                        let { categoria, modeloStr } = extraerMarcaModelo(String(detalleVal));
+                        // PRIORIDAD AL LOTE O VEHÍCULO, NUNCA A LA DESCRIPCIÓN DIRECTA PORQUE TRAE EL ESTADO
+                        let detalleVal = rowNorm['vehiculo'] || rowNorm['detalle'] || rowNorm['bien'];
+                        
+                        // Si no hay detalle en columnas, usamos el Lote si trae información
+                        if (!detalleVal && textLote && textLote.length > 5) {
+                            detalleVal = textLote;
+                        }
+                        
+                        if (!detalleVal && rowNorm['descripcion']) {
+                            detalleVal = rowNorm['descripcion'];
+                        }
 
-                        let adjObj = {
-                            loteStr: String(detalleVal).replace(/<[^>]+>/g, '').trim(),
-                            patente: patenteVal,
-                            numeroLote: numVal,
-                            clienteReal: normalizarCliente(adjudicatario),
-                            nombreRaw: String(adjudicatario),
-                            monto: montoNum,
-                            minimo: minNum,
-                            esFalso: esFalso,
-                            esChatarra: esChatarra,
-                            rut: String(rut),
-                            email: String(email),
-                            categoria: categoria,
-                            modeloStr: modeloStr,
-                            pujadoresRealesCount: 1 
-                        };
-                        remate.adjudicaciones.push(adjObj);
+                        // Limpieza de separación "Lote X: MARCA MODELO"
+                        if (typeof detalleVal === 'string' && detalleVal.includes(':')) {
+                            let parts = detalleVal.split(':');
+                            if (!patenteVal && parts[0].length < 15) patenteVal = parts[0].trim();
+                            detalleVal = parts[1].trim();
+                        }
 
-                        if (!esFalso && montoNum > 0) {
-                            remate.ventaTotal += montoNum;
-                            remate.lotesCount++;
-                            if (email && !remate.garantiasEmailsReales.includes(String(email).trim())) {
-                                remate.garantiasEmailsReales.push(String(email).trim());
-                            }
-                            let clienteKey = normalizarCliente(adjudicatario) + String(email).trim().toLowerCase();
-                            if (!garantiasSet.has(clienteKey)) {
-                                garantiasSet.add(clienteKey);
-                                remate.garantiasListaDetallada.push({
-                                    nombreNorm: normalizarCliente(adjudicatario),
-                                    nombre: String(adjudicatario),
-                                    email: String(email),
-                                    rut: String(rut),
-                                    fechaRemate: fechaData.timestamp,
-                                    numRemate: String(numVal)
-                                });
+                        // LIMPIEZA DE HTML (Por si acaso)
+                        if (typeof detalleVal === 'string' && detalleVal.includes('<table')) {
+                            detalleVal = detalleVal.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+                        }
+
+                        let extraDesc = String(rowNorm['descripcion'] || '') + " " + String(rowNorm['estado'] || '');
+
+                        if (numVal || detalleVal) {
+                            lotesSet.add(String(numVal || detalleVal).trim());
+                            
+                            let parseMoney = (val) => {
+                                if(!val) return 0;
+                                if(typeof val === 'number') return val;
+                                let str = String(val).trim().toUpperCase();
+                                if(str.includes('MM')) {
+                                    let n = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
+                                    return (n || 0) * 1000000;
+                                }
+                                let intPart = str.split(',')[0].replace(/[^\d-]/g, '');
+                                return parseInt(intPart, 10) || 0;
+                            };
+
+                            let montoNum = parseMoney(montoRaw);
+                            let minNum = parseMoney(minimoRaw);
+                            
+                            let esFalso = esClienteFalso(adjudicatario, email);
+                            let esChatarra = extraDesc.toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('restos');
+                            
+                            let { categoria, modeloStr } = extraerMarcaModelo(String(detalleVal));
+
+                            let adjObj = {
+                                loteStr: String(detalleVal).replace(/<[^>]+>/g, '').trim(),
+                                patente: patenteVal,
+                                numeroLote: String(numVal || '').replace(/\D/g, ''),
+                                clienteReal: normalizarCliente(adjudicatario),
+                                nombreRaw: String(adjudicatario),
+                                monto: montoNum,
+                                minimo: minNum,
+                                esFalso: esFalso,
+                                esChatarra: esChatarra,
+                                rut: String(rut),
+                                email: String(email),
+                                categoria: categoria,
+                                modeloStr: modeloStr,
+                                pujadoresRealesCount: 1 
+                            };
+                            remate.adjudicaciones.push(adjObj);
+
+                            if (!esFalso && montoNum > 0) {
+                                remate.ventaTotal += montoNum;
+                                remate.lotesCount++;
+                                if (email && !remate.garantiasEmailsReales.includes(String(email).trim())) {
+                                    remate.garantiasEmailsReales.push(String(email).trim());
+                                }
+                                let clienteKey = normalizarCliente(adjudicatario) + String(email).trim().toLowerCase();
+                                if (!garantiasSet.has(clienteKey)) {
+                                    garantiasSet.add(clienteKey);
+                                    remate.garantiasListaDetallada.push({
+                                        nombreNorm: normalizarCliente(adjudicatario),
+                                        nombre: String(adjudicatario),
+                                        email: String(email),
+                                        rut: String(rut),
+                                        fechaRemate: fechaData.timestamp,
+                                        numRemate: String(numVal)
+                                    });
+                                }
                             }
                         }
-                    }
+                    } catch(e) {}
                 });
 
                 remate.lotesDisponibles = lotesSet.size > 0 ? lotesSet.size : remate.adjudicaciones.length;
 
                 // 4. PESTAÑA GARANTÍAS
-                let sheetGarantiasName = workbook.SheetNames.find(s => s.toLowerCase() === 'garantías' || s.toLowerCase() === 'garantias');
+                let sheetGarantiasName = workbook.SheetNames.find(s => String(s).toLowerCase() === 'garantías' || String(s).toLowerCase() === 'garantias');
                 if (sheetGarantiasName) {
-                    const wsGarantias = workbook.Sheets[sheetGarantiasName];
-                    const rowsGarantias = XLSX.utils.sheet_to_json(wsGarantias, {header: 1, defval: ""});
-                    let garantiasCount = 0;
-                    let headerGIdx = -1;
-                    let gHeaders = [];
-                    for(let i=0; i<Math.min(rowsGarantias.length, 15); i++){
-                        let rowStr = rowsGarantias[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                        if((rowStr.includes('rut') || rowStr.includes('cliente') || rowStr.includes('nombre')) && 
-                           (rowStr.includes('monto') || rowStr.includes('garantia') || rowStr.includes('email'))) {
-                            headerGIdx = i;
-                            gHeaders = rowsGarantias[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
-                            break;
-                        }
-                    }
-                    if(headerGIdx !== -1) {
-                        for(let i = headerGIdx + 1; i < rowsGarantias.length; i++) {
-                            let rowData = rowsGarantias[i];
-                            if(rowData.join('').trim() === '') continue;
-                            let obj = {};
-                            for(let j = 0; j < gHeaders.length; j++) {
-                                obj[gHeaders[j] || ('col' + j)] = rowData[j];
-                            }
-                            let email = obj['email'] || obj['correo'];
-                            let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['titular'] || obj['razonsocial'];
-                            let rut = obj['rut'] || obj['rutcliente'];
-                            
-                            if(nombre && !esClienteFalso(nombre, email)) {
-                                garantiasCount++;
-                                remate.garantiasListaDetallada.push({
-                                    nombreNorm: normalizarCliente(nombre),
-                                    nombre: String(nombre),
-                                    email: String(email),
-                                    rut: String(rut),
-                                    fechaRemate: fechaData.timestamp,
-                                    numRemate: ""
-                                });
+                    try {
+                        const wsGarantias = workbook.Sheets[sheetGarantiasName];
+                        const rowsGarantias = XLSX.utils.sheet_to_json(wsGarantias, {header: 1, defval: ""});
+                        let garantiasCount = 0;
+                        let headerGIdx = -1;
+                        let gHeaders = [];
+                        for(let i=0; i<Math.min(rowsGarantias.length, 15); i++){
+                            if(!rowsGarantias[i] || !Array.isArray(rowsGarantias[i])) continue;
+                            let rowStr = rowsGarantias[i].map(c => String(c).toLowerCase().trim()).join(' ');
+                            if((rowStr.includes('rut') || rowStr.includes('cliente') || rowStr.includes('nombre')) && 
+                               (rowStr.includes('monto') || rowStr.includes('garantia') || rowStr.includes('email'))) {
+                                headerGIdx = i;
+                                gHeaders = rowsGarantias[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                                break;
                             }
                         }
-                    }
-                    if(garantiasCount > remate.garantiasListaDetallada.length) {
-                        remate.garantias = garantiasCount;
-                    } else {
-                        remate.garantias = remate.garantiasListaDetallada.length;
-                    }
+                        if(headerGIdx !== -1) {
+                            for(let i = headerGIdx + 1; i < rowsGarantias.length; i++) {
+                                let rowData = rowsGarantias[i];
+                                if(!rowData || !Array.isArray(rowData) || rowData.join('').trim() === '') continue;
+                                let obj = {};
+                                for(let j = 0; j < gHeaders.length; j++) {
+                                    obj[gHeaders[j] || ('col' + j)] = rowData[j];
+                                }
+                                let email = obj['email'] || obj['correo'];
+                                let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['titular'] || obj['razonsocial'];
+                                let rut = obj['rut'] || obj['rutcliente'];
+                                
+                                if(nombre && !esClienteFalso(nombre, email)) {
+                                    garantiasCount++;
+                                    remate.garantiasListaDetallada.push({
+                                        nombreNorm: normalizarCliente(nombre),
+                                        nombre: String(nombre),
+                                        email: String(email),
+                                        rut: String(rut),
+                                        fechaRemate: fechaData.timestamp,
+                                        numRemate: ""
+                                    });
+                                }
+                            }
+                        }
+                        if(garantiasCount > remate.garantiasListaDetallada.length) {
+                            remate.garantias = garantiasCount;
+                        } else {
+                            remate.garantias = remate.garantiasListaDetallada.length;
+                        }
+                    } catch(e) {}
                 } else {
                     remate.garantias = remate.garantiasListaDetallada.length;
                 }
 
                 // 5. PESTAÑA POSTURAS (PUJAS) 
-                let sheetPosturasName = workbook.SheetNames.find(s => s.toLowerCase().includes('posturas') || s.toLowerCase().includes('pujas'));
+                let sheetPosturasName = workbook.SheetNames.find(s => String(s).toLowerCase().includes('posturas') || String(s).toLowerCase().includes('pujas'));
                 if (sheetPosturasName) {
-                    const wsPosturas = workbook.Sheets[sheetPosturasName];
-                    const rowsPosturas = XLSX.utils.sheet_to_json(wsPosturas, {header: 1, defval: ""});
-                    
-                    let pMaxScore = 0;
-                    let pHeaderIdx = -1;
-                    let pHeaders = [];
-                    
-                    for(let i=0; i<Math.min(rowsPosturas.length, 20); i++){
-                        let rowStr = rowsPosturas[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                        let score = 0;
-                        if(rowStr.includes('rut') || rowStr.includes('nombre') || rowStr.includes('cliente')) score++;
-                        if(rowStr.includes('postura') || rowStr.includes('monto') || rowStr.includes('oferta')) score++;
-                        if(rowStr.includes('lote') || rowStr.includes('numero') || rowStr.includes('vehiculo')) score++;
+                    try {
+                        const wsPosturas = workbook.Sheets[sheetPosturasName];
+                        const rowsPosturas = XLSX.utils.sheet_to_json(wsPosturas, {header: 1, defval: ""});
+                        let headerPIdx = -1;
+                        let pHeaders = [];
                         
-                        if(score > pMaxScore) {
-                            pMaxScore = score;
-                            pHeaderIdx = i;
-                            pHeaders = rowsPosturas[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                        for(let i=0; i<Math.min(rowsPosturas.length, 20); i++){
+                            if(!rowsPosturas[i] || !Array.isArray(rowsPosturas[i])) continue;
+                            let rowStr = rowsPosturas[i].map(c => String(c).toLowerCase().trim()).join(' ');
+                            if((rowStr.includes('rut') || rowStr.includes('nombre') || rowStr.includes('cliente')) && 
+                               (rowStr.includes('postura') || rowStr.includes('monto') || rowStr.includes('oferta'))) {
+                                headerPIdx = i;
+                                pHeaders = rowsPosturas[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                                break;
+                            }
                         }
-                    }
-                    
-                    if(pHeaderIdx !== -1) {
-                        let parseMoney = (val) => {
-                            if(!val) return 0;
-                            if(typeof val === 'number') return val;
-                            let str = String(val).trim().toUpperCase();
-                            if(str.includes('M')) {
-                                let n = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
-                                return (n || 0) * 1000000;
-                            }
-                            let intPart = str.split(',')[0].replace(/[^\d-]/g, '');
-                            return parseInt(intPart, 10) || 0;
-                        };
-
-                        for(let i = pHeaderIdx + 1; i < rowsPosturas.length; i++) {
-                            let rowData = rowsPosturas[i];
-                            if(rowData.join('').trim() === '') continue;
-                            
-                            let obj = {};
-                            for(let j = 0; j < pHeaders.length; j++) {
-                                obj[pHeaders[j] || ('col' + j)] = rowData[j];
-                            }
-                            
-                            let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['adjudicatario'] || obj['razonsocial'];
-                            let montoRaw = obj['postura'] || obj['monto'] || obj['oferta'] || obj['valor'];
-                            let monto = parseMoney(montoRaw);
-                            let email = obj['email'] || obj['correo'] || '';
-                            let rut = obj['rut'] || obj['rutcliente'] || '';
-                            
-                            let loteRaw = String(obj['lote'] || obj['detalle'] || obj['descripcion'] || '').replace(/<[^>]+>/g, '').trim();
-                            let numP = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
-                            
-                            // A veces en posturas dice "1 GYWX83-5: CHEVROLET SAIL", extraemos el número
-                            if (!numP && loteRaw) {
-                                let matchLoteP = loteRaw.match(/^(\d+)\s/);
-                                if(matchLoteP) {
-                                    numP = matchLoteP[1];
+                        
+                        if(headerPIdx !== -1) {
+                            let parseMoney = (val) => {
+                                if(!val) return 0;
+                                if(typeof val === 'number') return val;
+                                let str = String(val).trim().toUpperCase();
+                                if(str.includes('M')) {
+                                    let n = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
+                                    return (n || 0) * 1000000;
                                 }
-                            }
+                                let intPart = str.split(',')[0].replace(/[^\d-]/g, '');
+                                return parseInt(intPart, 10) || 0;
+                            };
 
-                            if(monto > 0 && nombre) {
-                                let isFalso = esClienteFalso(nombre, email);
-                                let puja = {
-                                    nombre: String(nombre),
-                                    nombreNorm: normalizarCliente(nombre),
-                                    monto: monto,
-                                    email: email,
-                                    rut: rut,
-                                    esFalso: isFalso,
-                                    fecha: fechaData.timestamp
-                                };
+                            for(let i = headerPIdx + 1; i < rowsPosturas.length; i++) {
+                                let rowData = rowsPosturas[i];
+                                if(!rowData || !Array.isArray(rowData) || rowData.join('').trim() === '') continue;
                                 
-                                // Búsqueda Inteligente del Lote
-                                let matchAdj = remate.adjudicaciones.find(a => {
-                                    let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
-                                    let matchNum = a.numeroLote && numP && a.numeroLote === numP;
-                                    return matchStr || matchNum;
-                                });
+                                let obj = {};
+                                for(let j = 0; j < pHeaders.length; j++) {
+                                    obj[pHeaders[j] || ('col' + j)] = rowData[j];
+                                }
+                                
+                                let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['adjudicatario'];
+                                let montoRaw = obj['postura'] || obj['monto'] || obj['oferta'] || obj['valor'];
+                                let monto = parseMoney(montoRaw);
+                                let email = obj['email'] || obj['correo'] || '';
+                                let rut = obj['rut'] || obj['rutcliente'] || '';
+                                
+                                let loteRaw = String(obj['lote'] || obj['detalle'] || obj['descripcion'] || '').replace(/<[^>]+>/g, '').trim();
+                                let numVal = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
+                                
+                                // Si en el lote dice "1 ET1190-K", intentamos extraer el numero inicial
+                                if (!numVal && loteRaw) {
+                                    let matchLoteP = loteRaw.match(/^(\d+)\s/);
+                                    if(matchLoteP) {
+                                        numVal = matchLoteP[1];
+                                    }
+                                }
 
-                                if (matchAdj) {
-                                    let loteKey = matchAdj.loteStr;
-                                    if (!remate.posturasPorLote[loteKey]) remate.posturasPorLote[loteKey] = [];
-                                    remate.posturasPorLote[loteKey].push(puja);
-                                } else if (loteRaw) {
-                                    if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
-                                    remate.posturasPorLote[loteRaw].push(puja);
-                                } else if (numP) {
-                                    if (!remate.posturasPorLote[numP]) remate.posturasPorLote[numP] = [];
-                                    remate.posturasPorLote[numP].push(puja);
+                                if(monto > 0 && nombre) {
+                                    let isFalso = esClienteFalso(nombre, email);
+                                    let puja = {
+                                        nombre: String(nombre),
+                                        nombreNorm: normalizarCliente(nombre),
+                                        monto: monto,
+                                        email: email,
+                                        rut: rut,
+                                        esFalso: isFalso,
+                                        fecha: fechaData.timestamp
+                                    };
+                                    
+                                    // Búsqueda Inteligente del Lote
+                                    let matchAdj = remate.adjudicaciones.find(a => {
+                                        let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
+                                        let matchNum = a.numeroLote && numVal && a.numeroLote === numVal;
+                                        return matchStr || matchNum;
+                                    });
+
+                                    if (matchAdj) {
+                                        let loteKey = matchAdj.loteStr;
+                                        if (!remate.posturasPorLote[loteKey]) remate.posturasPorLote[loteKey] = [];
+                                        remate.posturasPorLote[loteKey].push(puja);
+                                    } else if (loteRaw) {
+                                        if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
+                                        remate.posturasPorLote[loteRaw].push(puja);
+                                    } else if (numVal) {
+                                        if (!remate.posturasPorLote[numVal]) remate.posturasPorLote[numVal] = [];
+                                        remate.posturasPorLote[numVal].push(puja);
+                                    }
                                 }
                             }
                         }
-                    }
+                    } catch(e) {}
                 }
 
                 remate.inscritos = remate.garantias + Math.floor(remate.garantias * 0.1); 
