@@ -13,8 +13,8 @@
 <body class="p-8">
 
     <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h1 class="text-2xl font-black text-gray-900 mb-2">Zárate Analítica | Motor de Prueba</h1>
-        <p class="text-sm text-gray-500 mb-6">Fase 1: Validación de lectura de Excel (Adjudicaciones, Garantías y Posturas).</p>
+        <h1 class="text-2xl font-black text-gray-900 mb-2">Zárate Analítica | Motor de Prueba v2.0</h1>
+        <p class="text-sm text-gray-500 mb-6">Escáner flexible con diagnóstico integrado.</p>
 
         <!-- PANEL DE CARGA -->
         <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center mb-8">
@@ -28,7 +28,7 @@
         <!-- TABLA DE RESULTADOS CRUDOS -->
         <div class="overflow-x-auto border border-gray-200 rounded-lg">
             <table class="w-full text-left text-sm whitespace-nowrap">
-                <thead class="bg-gray-100 text-gray-600 font-bold uppercase tracking-wider text-xs">
+                <thead class="bg-gray-100 text-gray-600 font-bold uppercase tracking-wider text-[11px]">
                     <tr>
                         <th class="px-4 py-3">Matriz</th>
                         <th class="px-4 py-3">Lote / Detalle</th>
@@ -45,6 +45,12 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- PANEL DE DIAGNÓSTICO (DEBUG) -->
+        <div id="debug-panel" class="hidden mt-8 bg-red-50 border border-red-200 rounded-lg p-4">
+            <h3 class="font-bold text-red-800 mb-2 text-sm">⚠️ Panel de Diagnóstico (Copia esto si falla)</h3>
+            <pre id="debug-text" class="text-[11px] text-red-700 whitespace-pre-wrap overflow-auto max-h-96"></pre>
+        </div>
     </div>
 
 <script>
@@ -55,6 +61,11 @@ const formatMoney = (num) => {
 async function procesarArchivos(files) {
     const statusText = document.getElementById('status-text');
     const tablaBody = document.getElementById('tabla-body');
+    const debugPanel = document.getElementById('debug-panel');
+    const debugText = document.getElementById('debug-text');
+    
+    debugPanel.classList.add('hidden');
+    debugText.innerText = "";
     
     if(!files.length) return;
     statusText.innerText = "Leyendo archivo... espere.";
@@ -62,15 +73,35 @@ async function procesarArchivos(files) {
     
     try {
         let todosLosLotes = [];
+        let debugInfoArray = [];
 
         for(let i=0; i<files.length; i++) {
             const data = await parseZarateExcel(files[i]);
+            debugInfoArray.push(data.debug);
             todosLosLotes = todosLosLotes.concat(data.adjudicaciones.map(adj => ({...adj, matriz: data.fileName})));
         }
 
         // Renderizar Tabla
         if(todosLosLotes.length === 0) {
-            tablaBody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-red-500 font-bold">No se encontraron lotes válidos. Revisa las columnas del Excel.</td></tr>`;
+            tablaBody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-red-500 font-bold">El sistema no pudo encontrar compras válidas. Revisa el diagnóstico abajo.</td></tr>`;
+            
+            // Mostrar info de debug
+            debugPanel.classList.remove('hidden');
+            let debugStr = debugInfoArray.map(d => `
+Archivo: ${d.fileName}
+Pestaña principal leída: ${d.sheetName}
+Fila detectada como cabecera: ${d.headerRowIndex} (Puntaje de certeza: ${d.maxScore})
+Columnas encontradas: ${JSON.stringify(d.detectedHeaders)}
+
+--- Muestra de los primeros 2 registros crudos encontrados ---
+Fila 1: ${JSON.stringify(d.sampleData[0] || {})}
+Fila 2: ${JSON.stringify(d.sampleData[1] || {})}
+-------------------------------------------------------------------
+`).join('\n');
+            debugText.innerText = debugStr;
+            
+            statusText.innerText = "Lectura fallida (0 lotes).";
+            statusText.className = "mt-4 text-sm font-bold text-red-600";
         } else {
             tablaBody.innerHTML = todosLosLotes.map(lote => `
                 <tr class="hover:bg-gray-50">
@@ -81,19 +112,19 @@ async function procesarArchivos(files) {
                     <td class="px-4 py-3 text-gray-500">${lote.patente || '-'}</td>
                     <td class="px-4 py-3">
                         <div class="font-bold">${lote.nombreRaw}</div>
-                        <div class="text-xs text-gray-500">${lote.rut || '-'}</div>
+                        <div class="text-[10px] text-gray-500">${lote.rut || '-'}</div>
                     </td>
                     <td class="px-4 py-3 text-right font-black text-emerald-600">${formatMoney(lote.monto)}</td>
                     <td class="px-4 py-3 text-center font-bold">${lote.pujasCount}</td>
                 </tr>
             `).join('');
+            
+            statusText.innerText = `¡Lectura exitosa! Se encontraron ${todosLosLotes.length} lotes vendidos.`;
+            statusText.className = "mt-4 text-sm font-bold text-emerald-600";
         }
-        
-        statusText.innerText = "¡Lectura exitosa!";
-        statusText.className = "mt-4 text-sm font-bold text-emerald-600";
 
     } catch (e) {
-        statusText.innerText = "Error: " + e.message;
+        statusText.innerText = "Error crítico: " + e.message;
         statusText.className = "mt-4 text-sm font-bold text-red-600";
         console.error(e);
     }
@@ -108,43 +139,83 @@ function parseZarateExcel(file) {
                 const workbook = XLSX.read(data, {type: 'array'});
                 
                 // --- 1. LEER ADJUDICACIONES ---
-                let sheetAdj = workbook.SheetNames.find(s => s.toLowerCase().includes('adjudicaciones')) || workbook.SheetNames[0];
-                const rowsAdj = XLSX.utils.sheet_to_json(workbook.Sheets[sheetAdj], {header: 1, defval: ""});
+                let sheetAdjName = workbook.SheetNames.find(s => s.toLowerCase().includes('adjudicaciones')) || workbook.SheetNames[0];
+                const rowsAdj = XLSX.utils.sheet_to_json(workbook.Sheets[sheetAdjName], {header: 1, defval: ""});
                 
+                // SISTEMA DE PUNTAJE PARA ENCONTRAR CABECERAS
+                let maxScore = 0;
                 let headerIdx = 0;
                 let headers = [];
-                for(let i=0; i<Math.min(rowsAdj.length, 15); i++){
+                
+                for(let i=0; i<Math.min(rowsAdj.length, 20); i++){
                     let rowStr = rowsAdj[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                    if(rowStr.includes('rut') && rowStr.includes('nombre') && (rowStr.includes('adjudicad') || rowStr.includes('monto'))) {
+                    let score = 0;
+                    if(rowStr.includes('rut')) score++;
+                    if(rowStr.includes('nombre') || rowStr.includes('cliente') || rowStr.includes('adjudicatario')) score++;
+                    if(rowStr.includes('monto') || rowStr.includes('adjudicad') || rowStr.includes('total')) score++;
+                    if(rowStr.includes('lote') || rowStr.includes('numero')) score++;
+                    if(rowStr.includes('patente') || rowStr.includes('descripci') || rowStr.includes('vehiculo')) score++;
+                    
+                    if(score > maxScore) {
+                        maxScore = score;
                         headerIdx = i;
                         headers = rowsAdj[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
-                        break;
                     }
                 }
 
                 let adjudicaciones = [];
+                let debugLog = {
+                    fileName: file.name,
+                    sheetName: sheetAdjName,
+                    detectedHeaders: headers,
+                    headerRowIndex: headerIdx + 1, // Visual +1 for humans
+                    maxScore: maxScore,
+                    sampleData: []
+                };
+
                 for(let i = headerIdx + 1; i < rowsAdj.length; i++) {
                     if(rowsAdj[i].join('').trim() === '') continue;
+                    
                     let obj = {};
-                    for(let j=0; j<headers.length; j++) obj[headers[j] || ('col'+j)] = rowsAdj[i][j];
+                    for(let j=0; j<headers.length; j++) {
+                        if(headers[j]) obj[headers[j]] = rowsAdj[i][j];
+                    }
+                    
+                    if (debugLog.sampleData.length < 2) {
+                        debugLog.sampleData.push(obj);
+                    }
                     
                     let detalleVal = obj['descripcion'] || obj['vehiculo'] || obj['detalle'] || obj['bien'] || obj['lote'] || '';
                     if (typeof detalleVal === 'string' && detalleVal.includes('<table')) {
                         detalleVal = detalleVal.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
                     }
 
-                    let numVal = String(obj['numero'] || obj['nrolote'] || obj['nlote'] || '').replace(/\D/g, '');
-                    let nombre = obj['nombre'] || obj['adjudicatario'] || obj['cliente'] || '';
-                    let montoRaw = obj['montoadjudicado'] || obj['totaladjudicado'] || obj['monto'] || obj['adjudicado'];
-                    let monto = typeof montoRaw === 'number' ? montoRaw : parseInt(String(montoRaw).replace(/[^\d]/g, ''), 10) || 0;
+                    let numVal = String(obj['numero'] || obj['nrolote'] || obj['nlote'] || obj['item'] || obj['id'] || '').replace(/\D/g, '');
+                    let nombre = obj['nombre'] || obj['adjudicatario'] || obj['cliente'] || obj['nombresorazonsocial'] || obj['razonsocial'] || '';
+                    let montoRaw = obj['montoadjudicado'] || obj['totaladjudicado'] || obj['monto'] || obj['adjudicado'] || obj['total'] || obj['valor'] || obj['precio'] || 0;
+                    let rut = obj['rut'] || obj['nrorut'] || obj['rutcliente'] || '';
+                    let patente = obj['patente'] || '';
+
+                    let monto = 0;
+                    if (typeof montoRaw === 'number') {
+                        monto = montoRaw;
+                    } else if (typeof montoRaw === 'string') {
+                        let str = montoRaw.trim().toUpperCase();
+                        if(str.includes('MM')) {
+                            let n = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
+                            monto = (n || 0) * 1000000;
+                        } else {
+                            monto = parseInt(str.split(',')[0].replace(/[^\d-]/g, ''), 10) || 0;
+                        }
+                    }
                     
                     if(monto > 0 && nombre) {
                         adjudicaciones.push({
                             numeroLote: numVal,
                             loteStr: detalleVal,
-                            patente: String(obj['patente'] || '').trim(),
+                            patente: String(patente).trim(),
                             nombreRaw: nombre,
-                            rut: obj['rut'] || '',
+                            rut: rut,
                             monto: monto,
                             pujasCount: 1 // Base
                         });
@@ -152,19 +223,26 @@ function parseZarateExcel(file) {
                 }
 
                 // --- 2. LEER POSTURAS ---
-                let sheetPost = workbook.SheetNames.find(s => s.toLowerCase().includes('posturas') || s.toLowerCase().includes('pujas'));
-                let posturasPorLote = {};
+                let sheetPostName = workbook.SheetNames.find(s => s.toLowerCase().includes('posturas') || s.toLowerCase().includes('pujas'));
                 
-                if (sheetPost) {
-                    const rowsPost = XLSX.utils.sheet_to_json(workbook.Sheets[sheetPost], {header: 1, defval: ""});
+                if (sheetPostName) {
+                    const rowsPost = XLSX.utils.sheet_to_json(workbook.Sheets[sheetPostName], {header: 1, defval: ""});
+                    
+                    let pMaxScore = 0;
                     let pHeaderIdx = -1;
                     let pHeaders = [];
-                    for(let i=0; i<Math.min(rowsPost.length, 15); i++){
+                    
+                    for(let i=0; i<Math.min(rowsPost.length, 20); i++){
                         let rowStr = rowsPost[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                        if((rowStr.includes('rut') || rowStr.includes('nombre')) && (rowStr.includes('postura') || rowStr.includes('monto'))) {
+                        let score = 0;
+                        if(rowStr.includes('rut') || rowStr.includes('nombre')) score++;
+                        if(rowStr.includes('postura') || rowStr.includes('monto') || rowStr.includes('oferta')) score++;
+                        if(rowStr.includes('lote') || rowStr.includes('numero') || rowStr.includes('vehiculo')) score++;
+                        
+                        if(score > pMaxScore) {
+                            pMaxScore = score;
                             pHeaderIdx = i;
                             pHeaders = rowsPost[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
-                            break;
                         }
                     }
                     
@@ -172,15 +250,19 @@ function parseZarateExcel(file) {
                         for(let i = pHeaderIdx + 1; i < rowsPost.length; i++) {
                             if(rowsPost[i].join('').trim() === '') continue;
                             let obj = {};
-                            for(let j=0; j<pHeaders.length; j++) obj[pHeaders[j] || ('col'+j)] = rowsPost[i][j];
+                            for(let j=0; j<pHeaders.length; j++) {
+                                if(pHeaders[j]) obj[pHeaders[j]] = rowsPost[i][j];
+                            }
                             
                             let loteP = String(obj['lote'] || obj['descripcion'] || obj['vehiculo'] || '').replace(/<[^>]+>/g, '').trim();
                             let numP = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
                             
+                            if(!loteP && !numP) continue;
+
                             // Buscar a qué adjudicación pertenece esta puja
                             let matchAdj = adjudicaciones.find(a => {
-                                let mStr = a.loteStr && loteP.includes(a.loteStr);
-                                let mNum = a.numeroLote && (loteP.startsWith(a.numeroLote + " ") || a.numeroLote === numP);
+                                let mStr = a.loteStr && loteP && loteP.includes(a.loteStr);
+                                let mNum = a.numeroLote && numP && (loteP.startsWith(a.numeroLote + " ") || a.numeroLote === numP);
                                 return mStr || mNum;
                             });
 
@@ -191,7 +273,7 @@ function parseZarateExcel(file) {
                     }
                 }
 
-                resolve({ fileName: file.name, adjudicaciones: adjudicaciones });
+                resolve({ fileName: file.name, adjudicaciones: adjudicaciones, debug: debugLog });
             } catch(error) { reject(error); }
         };
         reader.readAsArrayBuffer(file);
