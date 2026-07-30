@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.9 (Smart Parser)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.4 (Stable UI)</div>
 
     <!-- OVERLAY GIGANTE DE SINCRONIZACIÓN INICIAL -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] flex-col items-center justify-center transition-all backdrop-blur-sm flex">
@@ -87,6 +87,13 @@
                 <div class="mb-6"><input type="password" id="password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-black transition-all" required placeholder="Contraseña"></div>
                 <div id="login-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
                 <button type="submit" id="btn-login" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Iniciar Sesión</button>
+            </form>
+            <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
+                <div class="mb-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Invitación Aceptada</span></div>
+                <p class="text-xs text-gray-500 mb-6 text-center leading-relaxed font-medium mt-4">¡Bienvenido! Crea tu contraseña definitiva.</p>
+                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-green-600 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
+                <div id="invite-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
+                <button type="submit" id="btn-invite" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Guardar y Entrar</button>
             </form>
         </div>
     </div>
@@ -116,7 +123,7 @@
             <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1 relative">
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:inline mr-2">Filtro Global</span>
                 
-                <select id="macro-segment" onchange="window.aplicarCambioSegmento()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
+                <select id="macro-segment" onchange="window.renderApp()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
                 <!-- SUPER FILTRO DE TIEMPO PERSONALIZADO -->
@@ -129,7 +136,7 @@
                     <!-- CONTENIDO DEL SUPER FILTRO -->
                     <div id="dropdown-menu" onclick="event.stopPropagation()" class="hidden absolute top-full mt-1.5 left-0 bg-white border border-gray-200 rounded-lg shadow-2xl w-80 z-50 flex-col overflow-hidden">
                         
-                        <!-- 1. AÑOS EN COLUMNAS -->
+                        <!-- 1. AÑOS EN COLUMNAS (BOTONES/PILLS) -->
                         <div class="p-3 border-b border-gray-200 bg-white">
                             <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2">1. Selecciona Año(s):</span>
                             <div id="dropdown-years-grid" class="flex gap-2 flex-wrap">
@@ -139,10 +146,10 @@
 
                         <!-- 2. ATAJOS RÁPIDOS -->
                         <div class="p-3 bg-gray-50 border-b border-gray-200">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2 flex justify-between">
-                                <span>2. Filtro Rápido:</span>
-                                <button type="button" onclick="window.quickSelect('NADA')" class="text-red-500 hover:text-red-700 underline font-bold transition">Desmarcar Todo</button>
-                            </span>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">2. Filtro Rápido:</span>
+                                <button type="button" onclick="window.quickSelect('NADA')" class="text-[10px] text-red-500 hover:text-red-700 underline font-bold transition">Desmarcar Todo</button>
+                            </div>
                             <div class="grid grid-cols-4 gap-1.5">
                                 <button type="button" onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
                                 <button type="button" onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
@@ -210,7 +217,7 @@
 
             <!-- ÁREA DE TRABAJO -->
             <main class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-premium-bg w-full">
-                <!-- EMPTY STATE CENTRALIZADO -->
+                <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-premium-bg/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-300 shadow-sm">
                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -517,7 +524,7 @@
             <div class="px-5 py-2.5 bg-white flex flex-wrap gap-5 text-[10px] border-b border-gray-200 uppercase tracking-widest font-bold items-center">
                 <div><span class="text-gray-400">Total Pujas:</span> <span class="text-gray-900 text-xs ml-1" id="modal-total-pujas">0</span></div>
                 <div><span class="text-gray-400">Pujadores Únicos:</span> <span class="text-blue-700 text-xs ml-1" id="modal-unicos-reales">0</span></div>
-                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded bg-black text-white shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded text-gray-50 hover:text-gray-900 hover:bg-gray-100 transition">Solo Reales</button></div>
+                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded bg-black text-white shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition">Solo Reales</button></div>
             </div>
             <div class="flex-1 overflow-x-auto overflow-y-auto p-0 bg-white">
                 <table class="w-full text-left">
@@ -566,7 +573,7 @@ let currentGestorYearTab = null;
 // ESTADO FILTRO GLOBAL Y MEMORIA DE EXPANSIÓN
 window.globalSelectedYears = [];
 window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
-window.expandedDropMonths = new Set(); 
+window.expandedDropMonths = new Set(); // Guarda los meses abiertos en el dropdown
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#6B7280'; 
@@ -752,7 +759,7 @@ async function initApp() {
     }
     
     if(db.remates && db.remates.length > 0) { 
-        window.actualizarFiltrosGlobales(true); 
+        window.actualizarFiltrosGlobales(true); // isInitialLoad = true
     }
 }
 
@@ -771,6 +778,7 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
     
     if(isInitialLoad) {
+        // Encontrar el año máximo para el inicio inteligente
         let years = new Set();
         db.remates.forEach(r => {
             let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
@@ -795,7 +803,7 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
 };
 
 window.aplicarCambioSegmento = function() {
-    window.quickSelect('TODO'); 
+    window.quickSelect('TODO'); // Al cambiar Siniestrados/Retail, forzamos recargar las selecciones actuales
     window.renderApp();
 }
 
@@ -826,8 +834,8 @@ window.renderDropdownUI = function() {
         let isChecked = window.globalSelectedYears.includes(Number(y)) ? 'checked' : '';
         let activeClass = isChecked ? 'bg-black text-white shadow-md border-black' : 'bg-white text-gray-500 hover:text-gray-900 border-gray-200';
         yearsHtml += `
-        <label class="flex items-center gap-2 cursor-pointer rounded px-3 py-1.5 transition flex-1 sm:flex-none justify-center border ${activeClass}">
-            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)" ${isChecked}> 
+        <label class="flex items-center gap-2 cursor-pointer rounded px-3 py-1.5 transition flex-1 sm:flex-none justify-center ${activeClass}">
+            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)"> 
             <span class="text-xs font-bold">${y}</span>
         </label>`;
     });
@@ -850,6 +858,7 @@ window.renderDropdownUI = function() {
     let html = '';
 
     Object.keys(byYear).sort((a,b)=>b-a).forEach(y => {
+        // Solo renderizar el arbol si el año esta seleccionado en las columnas de arriba!
         if(!window.globalSelectedYears.includes(Number(y))) return;
 
         html += `<div class="mb-4 dropdown-year-group"><div class="sticky top-0 bg-white py-1 mb-2 z-10"><span class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-1 block">Año ${y}</span></div>`;
@@ -997,6 +1006,7 @@ window.filterDropdown = function() {
             let contentDiv = group.querySelector('div[id^="drop-"]');
             if(term.length > 1 && contentDiv) {
                 contentDiv.classList.remove('hidden');
+                // Auto expandir icono si forzamos por busqueda
                 let svg = group.querySelector('svg');
                 if(svg) svg.classList.add('rotate-180');
             }
@@ -1179,8 +1189,8 @@ window.cerrarModalGestor = function(e) {
     let searchEl = document.getElementById('search-gestor');
     if(searchEl) searchEl.value = '';
     window.updateDropdownLabel();
-    window.renderDropdownUI(); 
-    window.applyDropdown(); 
+    window.renderDropdownUI(); // Sincroniza el arbol pequeño con los cambios del grande
+    window.applyDropdown(); // Aplica y recarga
 };
 
 window.toggleGestorMes = function(year, mesIndex, isChecked) {
@@ -1228,154 +1238,6 @@ function parseValueForSort(str, type) {
     if(type === 'number') { let isNeg = str.includes('-'); let num = parseFloat(str.replace(/[^\d]/g, '')) || 0; return isNeg ? -num : num; }
     if(type === 'date') { let parts = str.split(' ')[0].split('-'); if(parts.length === 3) { return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).getTime(); } return 0; }
     return str.toLowerCase();
-}
-
-window.parseExcel = function(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                const rowsArr = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
-
-                let fechaData = extraerFechaInfo(file, rowsArr);
-                let tipo = file.name.toLowerCase().includes('retail') ? 'Retail' : 'Siniestrados';
-
-                let headerRowIdx = 0;
-                let foundHeaders = [];
-                
-                for(let i=0; i<Math.min(rowsArr.length, 15); i++){
-                    let rowStr = rowsArr[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                    if((rowStr.includes('lote') || rowStr.includes('item') || rowStr.includes('n°')) && 
-                       (rowStr.includes('monto') || rowStr.includes('precio') || rowStr.includes('valor') || rowStr.includes('adjudica') || rowStr.includes('total'))) {
-                        headerRowIdx = i;
-                        foundHeaders = rowsArr[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
-                        break;
-                    }
-                }
-                
-                if(foundHeaders.length === 0 && rowsArr.length > 0) {
-                    foundHeaders = rowsArr[0].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
-                }
-
-                let parsedData = [];
-                for(let i = headerRowIdx + 1; i < rowsArr.length; i++) {
-                    let rowData = rowsArr[i];
-                    if(rowData.join('').trim() === '') continue;
-                    let obj = {};
-                    for(let j = 0; j < foundHeaders.length; j++) {
-                        let key = foundHeaders[j] || ('col' + j);
-                        obj[key] = rowData[j];
-                    }
-                    parsedData.push(obj);
-                }
-
-                let remate = {
-                    fileName: file.name,
-                    fechaData: fechaData,
-                    tipo: tipo,
-                    ventaTotal: 0,
-                    comisionTotal: 0,
-                    lotesCount: 0,
-                    lotesDisponibles: 0,
-                    inscritos: 0,
-                    garantias: 0,
-                    garantiasEmailsReales: [],
-                    garantiasListaDetallada: [],
-                    adjudicaciones: [],
-                    posturasPorLote: {}
-                };
-
-                let lotesSet = new Set();
-                let garantiasSet = new Set();
-
-                parsedData.forEach(rowNorm => {
-                    let textLote = String(rowNorm['lote'] || '').trim();
-                    let isLoteText = textLote.length > 3 && /[a-zA-Z]/.test(textLote);
-
-                    let numVal = rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'] || rowNorm['item'] || rowNorm['id'] || rowNorm['n'];
-                    if (!numVal && !isLoteText) numVal = textLote;
-                    
-                    let detalleVal = isLoteText ? textLote : (rowNorm['vehiculo'] || rowNorm['detalle'] || rowNorm['descripcion'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['patente'] || rowNorm['modelo']);
-                    
-                    let adjudicatario = rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombre'] || rowNorm['comprador'] || rowNorm['ganador'] || rowNorm['razonsocial'];
-                    
-                    let monto = rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'] || rowNorm['montoadjudicado'] || rowNorm['valoradjudicado'];
-                    
-                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'];
-                    
-                    let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'];
-                    let rut = rowNorm['rut'] || rowNorm['rutcliente'] || rowNorm['nrorut'];
-                    
-                    let extraDesc = String(rowNorm['descripcion'] || '') + " " + String(rowNorm['estado'] || '');
-
-                    if (numVal || detalleVal) {
-                        lotesSet.add(String(numVal || detalleVal).trim());
-                        
-                        let montoNum = parseMontoCLP(monto);
-                        let minNum = parseMontoCLP(minimo);
-                        
-                        let esFalso = esClienteFalso(adjudicatario, email);
-                        let esChatarra = extraDesc.toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('restos');
-                        
-                        let { categoria, modeloStr } = extraerMarcaModelo(String(detalleVal));
-
-                        let adjObj = {
-                            loteStr: String(detalleVal),
-                            numeroLote: String(numVal || '').replace(/\D/g, ''),
-                            clienteReal: normalizarCliente(adjudicatario),
-                            nombreRaw: String(adjudicatario),
-                            monto: montoNum,
-                            minimo: minNum,
-                            esFalso: esFalso,
-                            esChatarra: esChatarra,
-                            rut: String(rut),
-                            email: String(email),
-                            categoria: categoria,
-                            modeloStr: modeloStr,
-                            pujadoresRealesCount: 1 
-                        };
-                        remate.adjudicaciones.push(adjObj);
-
-                        if (!esFalso && montoNum > 0) {
-                            remate.ventaTotal += montoNum;
-                            remate.lotesCount++;
-                            if (email && !remate.garantiasEmailsReales.includes(String(email).trim())) {
-                                remate.garantiasEmailsReales.push(String(email).trim());
-                            }
-                            let clienteKey = normalizarCliente(adjudicatario) + String(email).trim().toLowerCase();
-                            if (!garantiasSet.has(clienteKey)) {
-                                garantiasSet.add(clienteKey);
-                                remate.garantiasListaDetallada.push({
-                                    nombreNorm: normalizarCliente(adjudicatario),
-                                    nombre: String(adjudicatario),
-                                    email: String(email),
-                                    rut: String(rut),
-                                    fechaRemate: fechaData.timestamp,
-                                    numRemate: String(numVal)
-                                });
-                            }
-                        }
-                    }
-                });
-
-                remate.lotesDisponibles = lotesSet.size > 0 ? lotesSet.size : remate.adjudicaciones.length;
-                remate.garantias = remate.garantiasListaDetallada.length;
-                remate.inscritos = remate.garantias + Math.floor(remate.garantias * 0.1); 
-                remate.comisionTotal = remate.ventaTotal * 0.12; 
-
-                resolve(remate);
-            } catch(error) {
-                console.error(error);
-                reject(error);
-            }
-        };
-        reader.readAsArrayBuffer(file);
-    });
 }
 
 const dropZone=document.getElementById('drop-zone');
@@ -1443,6 +1305,7 @@ const formatMoney = (num) => {
     return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num)); 
 };
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
+const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
 window.iniciarProcesamiento = async function(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
@@ -1453,63 +1316,60 @@ window.iniciarProcesamiento = async function(files){
     loadingOverlay.classList.remove('hidden'); loadingOverlay.classList.add('flex');
     loadingText.innerText = `Analizando Matrices...`;
     
-    try {
-        let successCount = 0; let upsertQueue = [];
-        
-        for(let i = 0; i < validFiles.length; i++){ 
-            await new Promise(r => setTimeout(r, 20)); 
-            try { 
-                const data = await parseExcel(validFiles[i]); 
-                if(data) { 
-                    const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
-                    if (existsIdx >= 0) { data._dbId = db.remates[existsIdx]._dbId; data.id = db.remates[existsIdx].id; db.remates[existsIdx] = data; } 
-                    else { data._dbId = Math.floor(Math.random() * 2000000000); db.remates.push(data); }
-                    upsertQueue.push({ id: data._dbId, payload: data });
-                    successCount++; 
-                }
-            } catch(err) { console.error("Error leyendo excel:", err); } 
-        }
-        
-        if(successCount === 0) {
-            document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error Archivos`; 
-            return;
-        }
+    let successCount = 0; let upsertQueue = [];
+    
+    for(let i = 0; i < validFiles.length; i++){ 
+        await new Promise(r => setTimeout(r, 20)); 
+        try { 
+            const data = await parseExcel(validFiles[i]); 
+            if(data) { 
+                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
+                if (existsIdx >= 0) { data._dbId = db.remates[existsIdx]._dbId; data.id = db.remates[existsIdx].id; db.remates[existsIdx] = data; } 
+                else { data._dbId = Math.floor(Math.random() * 2000000000); db.remates.push(data); }
+                upsertQueue.push({ id: data._dbId, payload: data });
+                successCount++; 
+            }
+        } catch(err) { console.error("Error:", err); } 
+    }
+    
+    if(successCount === 0) {
+        loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
+        document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error Archivos`; return;
+    }
 
-        loadingText.innerText = "Subiendo a la Nube..."; await new Promise(r => setTimeout(r, 20));
+    loadingText.innerText = "Subiendo a la Nube..."; await new Promise(r => setTimeout(r, 20));
 
-        db.remates.sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
-        let clientesGlobales=[]; let adjudicatariosGlobales=[];
-        
-        db.remates.forEach(remate=>{ 
-            let nuevos=0, antiguos=0; 
-            remate.garantiasEmailsReales.forEach(email=>{ if(clientesGlobales.includes(email)) antiguos++; else { nuevos++; clientesGlobales.push(email); } }); 
-            remate.nuevos=nuevos; remate.antiguos=antiguos; 
-            let ganadoresNuevos=0, ventaNuevos=0, ventaAntiguos=0; let statusCliente={}; 
-            const ganadoresUnicos=[...new Set(remate.adjudicaciones.filter(a=>!a.esFalso).map(a=>a.clienteReal))]; 
-            ganadoresUnicos.forEach(cliente=>{ if(adjudicatariosGlobales.includes(cliente)){ statusCliente[cliente]='antiguo'; } else { ganadoresNuevos++; adjudicatariosGlobales.push(cliente); statusCliente[cliente]='nuevo'; } }); 
-            remate.adjudicaciones.forEach(a=>{ if(!a.esFalso) { if(statusCliente[a.clienteReal]==='nuevo') ventaNuevos+=a.monto; else ventaAntiguos+=a.monto; }}); 
-            remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
-        });
-        
+    db.remates.sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
+    let clientesGlobales=[]; let adjudicatariosGlobales=[];
+    
+    db.remates.forEach(remate=>{ 
+        let nuevos=0, antiguos=0; 
+        remate.garantiasEmailsReales.forEach(email=>{ if(clientesGlobales.includes(email)) antiguos++; else { nuevos++; clientesGlobales.push(email); } }); 
+        remate.nuevos=nuevos; remate.antiguos=antiguos; 
+        let ganadoresNuevos=0, ventaNuevos=0, ventaAntiguos=0; let statusCliente={}; 
+        const ganadoresUnicos=[...new Set(remate.adjudicaciones.filter(a=>!a.esFalso).map(a=>a.clienteReal))]; 
+        ganadoresUnicos.forEach(cliente=>{ if(adjudicatariosGlobales.includes(cliente)){ statusCliente[cliente]='antiguo'; } else { ganadoresNuevos++; adjudicatariosGlobales.push(cliente); statusCliente[cliente]='nuevo'; } }); 
+        remate.adjudicaciones.forEach(a=>{ if(!a.esFalso) { if(statusCliente[a.clienteReal]==='nuevo') ventaNuevos+=a.monto; else ventaAntiguos+=a.monto; }}); 
+        remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
+    });
+    
+    try { 
         for (let i = 0; i < upsertQueue.length; i++) {
             const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
             if (error) throw error;
         }
         document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> En Línea (${db.remates.length})`;
-        
-        let fileInput = document.getElementById('file-input');
-        if(fileInput) fileInput.value = "";
-        
-        window.actualizarFiltrosGlobales(true); 
-
     } catch (e) { 
         document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
-        alert("Error de guardado: " + e.message);
-        console.error(e);
-    } finally {
-        loadingOverlay.classList.remove('flex'); 
-        loadingOverlay.classList.add('hidden');
+        alert("Error de guardado en la nube: " + e.message);
     }
+    
+    document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
+    
+    window.actualizarFiltrosGlobales(true); 
+    procesarDatosClientes(); 
+    window.actualizarVistaActual(); 
+    loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
 };
 
 function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
@@ -1578,42 +1438,50 @@ window.cambiarSeccion = function(mod){
         document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active':'nav-item nav-inactive'; 
         document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mt-6':'nav-item nav-inactive mt-6'; 
         
+        ['module-remates', 'module-comparativa', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+        
         window.renderApp();
         if(window.innerWidth < 768) { window.toggleSidebar(); }
     } catch(e) { console.error(e); }
 };
 
-window.renderApp = function() { 
+window.actualizarVistaActual = function() { 
     try {
-        const emptyState = document.getElementById('empty-state');
-        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
-        });
-
-        if (checkedNodes.length === 0) {
-            emptyState.classList.remove('hidden');
-            emptyState.classList.add('flex');
-            return;
-        } else {
-            emptyState.classList.add('hidden');
-            emptyState.classList.remove('flex');
-            const currentEl = document.getElementById(`module-${currentModule}`);
-            if(currentEl) currentEl.classList.remove('hidden');
-        }
-
         if (currentModule === 'remates') window.renderDashboard(); 
         else if (currentModule === 'comparativa') window.renderComparativa();
         else if (currentModule === 'autos') window.renderPanelAutos(); 
         else if (currentModule === 'conclusiones') window.renderConclusiones(); 
-        else if (currentModule === 'clientes') { procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); }
-        else if (currentModule === 'buscador') { window.buscarPatente(); }
+        else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); } }
+        else if (currentModule === 'buscador') { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); window.buscarPatente(); }
     } catch(e) { console.error(e); }
+};
+
+window.limpiarBase = async function(){ 
+    if(!confirm("¿ESTÁS SEGURO? Esta acción borrará todas las matrices alojadas en la nube y no se puede deshacer.")) return;
+    
+    const btn = document.getElementById('btn-vaciar-base');
+    if(btn) btn.innerText = "Borrando nube...";
+
+    try { 
+        const { error } = await supabaseClient.from('app_state').delete().not('id', 'is', null); 
+        if(error) throw error;
+        db = {remates:[]}; checkedNodes = []; clientDB = []; 
+        document.getElementById('empty-state').classList.remove('hidden'); 
+        window.actualizarFiltrosGlobales(); 
+        location.reload(); 
+    } catch (e) { 
+        alert("Error al vaciar la base de datos de la nube.\nRevisa tus permisos de Administrador o tu conexión.\n\nDetalle: " + e.message);
+        if(btn) btn.innerText = "Vaciar Nube";
+    }
 };
 
 window.renderDashboard = function(){ 
     try {
         if(currentModule!=='remates') return; 
+        const emptyState = document.getElementById('empty-state'); const dashboard = document.getElementById('module-remates');
+        
+        if(checkedNodes.length === 0){ emptyState.classList.remove('hidden'); dashboard.classList.add('hidden'); return; } 
+        emptyState.classList.add('hidden'); dashboard.classList.remove('hidden'); 
         
         let allRemates = getSelectedRemates(); 
         globalAgg = buildAgg(allRemates);
@@ -1765,6 +1633,10 @@ window.renderDashboard = function(){
 window.renderComparativa = function() {
     try {
         if(currentModule !== 'comparativa') return; 
+        const emptyState = document.getElementById('empty-state'); const compMod = document.getElementById('module-comparativa');
+        
+        if(checkedNodes.length === 0){ emptyState.classList.remove('hidden'); compMod.classList.add('hidden'); return; } 
+        emptyState.classList.add('hidden'); compMod.classList.remove('hidden');
         
         let allRemates = getSelectedRemates();
         let groupMode = document.getElementById('comp-groupby').value;
@@ -1890,7 +1762,10 @@ window.cerrarModalMulti = function(e) {
 // === DISEÑO ESTRUCTURADO DE DATOS ===
 window.renderConclusiones = function() {
     try {
-        if(currentModule !== 'conclusiones') return; 
+        if(currentModule !== 'conclusiones') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
+        if(checkedNodes.length === 0) { emptyState.classList.remove('hidden'); container.classList.add('hidden'); return; }
+        emptyState.classList.add('hidden'); container.classList.remove('hidden');
+
         let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates); let html = ''; globalAgg = agg; if(!clientDB.length) procesarDatosClientes(); 
 
         let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-green-700' : 'text-red-600';
@@ -2001,7 +1876,9 @@ window.renderConclusiones = function() {
 
 window.renderPanelAutos = function(){
     try {
-        if(currentModule !== 'autos') return; 
+        if(currentModule !== 'autos') return; const emptyState=document.getElementById('empty-state'); const autosMod=document.getElementById('module-autos');
+        if(checkedNodes.length===0){ emptyState.classList.remove('hidden'); autosMod.classList.add('hidden'); return; }
+        emptyState.classList.add('hidden'); autosMod.classList.remove('hidden');
         let autos = []; let allRemates = getSelectedRemates(); allRemates.forEach(r => { r.adjudicaciones.forEach(a => { if(!a.esFalso && !a.esChatarra) autos.push({...a, remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)}); }); });
         let marcasMap = {}; let modelosMap = {}; autos.forEach(a => { if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') marcasMap[a.categoria] = (marcasMap[a.categoria]||0) + 1; if(a.modeloStr && a.modeloStr.trim() !== '') modelosMap[a.modeloStr] = (modelosMap[a.modeloStr]||0) + 1; });
         const marcasSorted = Object.entries(marcasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
