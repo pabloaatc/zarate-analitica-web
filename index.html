@@ -33,7 +33,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v11.0 (Meta UI + Escáner V2.1)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v12.0 (Sincronización Total + Motor V2.1)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -51,7 +51,7 @@
                 <div class="w-12 h-12 bg-[#111827] text-white rounded-xl flex items-center justify-center font-black text-xl shadow-sm">Z</div>
                 <div>
                     <h1 class="text-[18px] font-bold text-[#111827] leading-none">Zárate Analítica</h1>
-                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión</p>
+                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v12.0</p>
                 </div>
             </div>
             
@@ -177,14 +177,14 @@
             <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#F3F4F6] w-full pb-[80px] md:pb-6 relative">
                 
                 <!-- EMPTY STATE -->
-                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6 transition-all duration-200">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
                     <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global o el Gestor de Remates para comenzar a analizar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
-                <div id="module-remates" class="hidden space-y-5 max-w-[1400px] mx-auto">
+                <div id="module-remates" class="hidden space-y-5 max-w-[1400px] mx-auto transition-all duration-200">
                     <div>
                         <h2 class="text-[22px] font-black tracking-tight text-gray-900" id="dash-titulo">-</h2>
                         <p class="text-[13px] text-gray-500" id="dash-subtitulo">Control operativo • 0 seleccionados</p>
@@ -247,7 +247,7 @@
                         <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                             <div class="flex justify-between items-center mb-3">
                                 <div class="text-[12px] font-bold uppercase tracking-widest text-gray-800">Ventas y Lotes en el Tiempo</div>
-                                <select id="dash-groupby" onchange="window.renderApp()" class="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-[11px] font-bold text-gray-700 outline-none cursor-pointer">
+                                <select id="dash-groupby" onchange="window.actualizarEstadoApp()" class="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-[11px] font-bold text-gray-700 outline-none cursor-pointer">
                                     <option value="auto">Agrupación Automática</option>
                                     <option value="remate">Matriz por Matriz</option>
                                     <option value="month">Mes a Mes</option>
@@ -289,7 +289,7 @@
                 </div>
 
                 <!-- MODULE: COMPARATIVA HISTÓRICA -->
-                <div id="module-comparativa" class="hidden space-y-5 max-w-[1400px] mx-auto">
+                <div id="module-comparativa" class="hidden space-y-5 max-w-[1400px] mx-auto transition-all duration-200">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4">
                         <div>
                             <h2 class="text-[22px] font-black tracking-tight text-gray-900">Comparativa Histórica</h2>
@@ -297,7 +297,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500 hidden sm:inline">Agrupar por</span>
-                            <select id="comp-groupby" onchange="window.actualizarVistaActual()" class="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-medium shadow-sm outline-none">
+                            <select id="comp-groupby" onchange="window.actualizarEstadoApp()" class="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-medium shadow-sm outline-none">
                                 <option value="remate" selected>Remate Exacto</option>
                                 <option value="month">Mes a Mes</option>
                                 <option value="quarter">Trimestres (Q1-Q4)</option>
@@ -332,7 +332,7 @@
                 </div>
 
                 <!-- MODULE: MODELOS Y VEHICULOS -->
-                <div id="module-autos" class="hidden space-y-5 max-w-[1200px] mx-auto">
+                <div id="module-autos" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
                             <h2 class="text-[22px] font-black tracking-tight text-gray-900">Análisis Vehicular</h2>
@@ -372,7 +372,7 @@
                 </div>
 
                 <!-- MODULE: CLIENTES -->
-                <div id="module-clientes" class="hidden space-y-5 max-w-[1200px] mx-auto">
+                <div id="module-clientes" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
                             <h2 class="text-[22px] font-black tracking-tight text-gray-900">Gestión de Clientes</h2>
@@ -458,7 +458,7 @@
                 </div>
 
                 <!-- MODULE: DATOS (CONCLUSIONES) -->
-                <div id="module-conclusiones" class="hidden space-y-6 max-w-[1000px] mx-auto pb-10">
+                <div id="module-conclusiones" class="hidden space-y-6 max-w-[1000px] mx-auto pb-10 transition-all duration-200">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
                             <h2 class="text-[22px] font-black tracking-tight text-gray-900">Datos y Reportes</h2>
@@ -470,7 +470,7 @@
                 </div>
 
                 <!-- MODULE: BUSCADOR -->
-                <div id="module-buscador" class="hidden space-y-5 max-w-[1200px] mx-auto pb-10">
+                <div id="module-buscador" class="hidden space-y-5 max-w-[1200px] mx-auto pb-10 transition-all duration-200">
                     <div class="flex flex-col gap-2 border-b border-gray-200 pb-4 no-print">
                         <h2 class="text-[22px] font-black tracking-tight text-gray-900">Buscador Global</h2>
                         <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex items-center gap-3">
@@ -654,8 +654,18 @@ if(typeof Chart !== 'undefined') {
     Chart.defaults.font.size = 11;
 }
 
-window.actualizarVistaActual = function() { 
-    window.renderApp(); 
+// === CEREBRO DE SINCRONIZACIÓN CENTRAL ===
+window.actualizarEstadoApp = function(keepGestorScroll = false) {
+    window.renderDropdownUI();
+    window.updateDropdownLabel();
+    window.updateAdminButtonCount();
+    window.renderApp();
+    
+    // Si el modal del gestor está abierto, lo actualiza por debajo sin cerrarlo
+    const modalGestor = document.getElementById('modal-gestor');
+    if(modalGestor && !modalGestor.classList.contains('hidden')) {
+        window.abrirModalGestor(keepGestorScroll);
+    }
 };
 
 window.toggleSidebar = function(e) {
@@ -891,15 +901,11 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
         checkedNodes = initialRemates;
     }
     
-    window.renderDropdownUI();
-    window.updateDropdownLabel();
-    window.updateAdminButtonCount();
-    window.renderApp();
+    window.actualizarEstadoApp();
 };
 
 window.aplicarCambioSegmento = function() {
     window.quickSelect('TODO'); 
-    window.renderApp();
 }
 
 window.toggleDropdown = function(e) {
@@ -1034,7 +1040,7 @@ window.toggleTimeYear = function(y, checked) {
         
         checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
     }
-    window.renderDropdownUI();
+    window.actualizarEstadoApp();
 };
 
 window.toggleDropExpand = function(id) {
@@ -1065,15 +1071,7 @@ window.toggleDropMes = function(el, year, mesIndex) {
         checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); 
     }
     
-    let container = el.closest('.dropdown-month-group');
-    if(container) {
-        container.querySelectorAll('.dropdown-remate-item input[type="checkbox"]').forEach(cb => {
-            cb.checked = isChecked;
-        });
-    }
-    window.updateDropdownLabel();
-    window.updateAdminButtonCount();
-    window.renderApp();
+    window.actualizarEstadoApp(true);
 };
 
 window.toggleDropRemate = function(el, id) {
@@ -1083,9 +1081,7 @@ window.toggleDropRemate = function(el, id) {
         checkedNodes = checkedNodes.filter(n => n !== id); 
     }
     
-    window.updateDropdownLabel();
-    window.updateAdminButtonCount();
-    window.renderApp();
+    window.actualizarEstadoApp(true);
 };
 
 window.quickSelect = function(type) {
@@ -1111,7 +1107,7 @@ window.quickSelect = function(type) {
         }).map(r => r.id);
     }
     
-    window.renderDropdownUI();
+    window.actualizarEstadoApp();
 };
 
 window.applyDropdown = function() {
@@ -1120,10 +1116,7 @@ window.applyDropdown = function() {
         menu.classList.add('hidden'); 
         menu.classList.remove('flex'); 
     }
-
-    window.updateDropdownLabel();
-    window.updateAdminButtonCount();
-    window.renderApp();
+    // No hace falta actualizarEstadoApp aquí porque ya se actualiza en tiempo real
 };
 
 window.updateDropdownLabel = function() {
@@ -1158,24 +1151,17 @@ window.seleccionarUltimoRemate = function() {
     window.globalSelectedYears = [y];
     checkedNodes = [ultimo.id];
     
-    window.renderDropdownUI();
-    window.updateDropdownLabel();
-    window.updateAdminButtonCount();
     window.cambiarSeccion('remates');
-    window.renderApp();
+    window.actualizarEstadoApp();
 };
 
 window.switchGestorYear = function(y) {
     currentGestorYearTab = y;
-    
     const container = document.getElementById('gestor-content-container');
     const scrollPos = container ? container.scrollTop : 0;
     
     window.abrirModalGestor(true);
-    
-    if(container) { 
-        container.scrollTop = scrollPos; 
-    }
+    if(container) { container.scrollTop = scrollPos; }
 };
 
 window.toggleGestorAll = function(check) {
@@ -1195,12 +1181,7 @@ window.toggleGestorAll = function(check) {
         checkedNodes = [];
     }
     
-    const container = document.getElementById('gestor-content-container');
-    const scrollPos = container ? container.scrollTop : 0;
-    window.abrirModalGestor(true);
-    if(container) { 
-        container.scrollTop = scrollPos; 
-    }
+    window.actualizarEstadoApp(true);
 };
 
 window.filtrarModalGestor = function() {
@@ -1322,10 +1303,6 @@ window.cerrarModalGestor = function(e) {
     if(searchEl) {
         searchEl.value = '';
     }
-    
-    window.updateDropdownLabel();
-    window.renderDropdownUI(); 
-    window.renderApp(); 
 };
 
 window.toggleGestorMes = function(el, year, mesIndex) {
@@ -1346,17 +1323,8 @@ window.toggleGestorMes = function(el, year, mesIndex) {
     } else { 
         checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); 
     }
-
-    let container = el.closest('.gestor-mes-group');
-    if(container) {
-        container.querySelectorAll('.gestor-remate-item input[type="checkbox"]').forEach(cb => {
-            cb.checked = isChecked;
-        });
-    }
     
-    window.updateAdminButtonCount();
-    window.updateDropdownLabel();
-    window.renderApp();
+    window.actualizarEstadoApp(true);
 };
 
 window.toggleGestorRemate = function(el, id) {
@@ -1366,9 +1334,7 @@ window.toggleGestorRemate = function(el, id) {
         checkedNodes = checkedNodes.filter(n => n !== id); 
     }
     
-    window.updateAdminButtonCount();
-    window.updateDropdownLabel();
-    window.renderApp();
+    window.actualizarEstadoApp(true);
 };
 
 window.sortTable = function(thElement, type) {
@@ -1455,16 +1421,24 @@ window.parseExcel = function(file) {
                 let fechaData = extraerFechaInfo(file, rowsArr);
                 let tipo = file.name.toLowerCase().includes('retail') ? 'Retail' : 'Siniestrados';
 
-                // 2. ESCÁNER INTELIGENTE
+                // 2. ESCÁNER INTELIGENTE (PUNTAJE)
                 let headerRowIdx = 0;
                 let foundHeaders = [];
+                let maxScore = 0;
                 
                 for(let i=0; i<Math.min(rowsArr.length, 20); i++){
                     let rowStr = rowsArr[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                    if(rowStr.includes('rut') && rowStr.includes('nombre') && (rowStr.includes('adjudicad') || rowStr.includes('monto') || rowStr.includes('total'))) {
+                    let score = 0;
+                    if(rowStr.includes('rut')) score++;
+                    if(rowStr.includes('nombre') || rowStr.includes('cliente')) score++;
+                    if(rowStr.includes('monto') || rowStr.includes('adjudicad') || rowStr.includes('total')) score++;
+                    if(rowStr.includes('lote') || rowStr.includes('numero')) score++;
+                    if(rowStr.includes('patente') || rowStr.includes('descripci') || rowStr.includes('vehiculo')) score++;
+                    
+                    if(score > maxScore) {
+                        maxScore = score;
                         headerRowIdx = i;
                         foundHeaders = rowsArr[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
-                        break;
                     }
                 }
                 
@@ -1504,41 +1478,38 @@ window.parseExcel = function(file) {
                 let garantiasSet = new Set();
 
                 parsedData.forEach(rowNorm => {
-                    let adjudicatario = rowNorm['nombre'] || rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombresorazonsocial'];
-                    let monto = rowNorm['montoadjudicado'] || rowNorm['totaladjudicado'] || rowNorm['monto'] || rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['adjudicado'];
-                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'];
-                    let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'];
-                    let rut = rowNorm['rut'] || rowNorm['nrorut'] || rowNorm['rutcliente'];
+                    let adjudicatario = rowNorm['nombre'] || rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombresorazonsocial'] || rowNorm['razonsocial'] || '';
+                    let montoRaw = rowNorm['montoadjudicado'] || rowNorm['totaladjudicado'] || rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'] || 0;
+                    let minimoRaw = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'] || rowNorm['montoestimado'] || 0;
+                    
+                    let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'] || '';
+                    let rut = rowNorm['rut'] || rowNorm['nrorut'] || rowNorm['rutcliente'] || '';
                     let patenteVal = String(rowNorm['patente'] || '').trim();
-                    let numVal = rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'];
                     
                     let textLote = String(rowNorm['lote'] || '').trim();
-                    let isLoteText = textLote.length > 3 && /[a-zA-Z]/.test(textLote);
+                    let numVal = String(rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'] || rowNorm['item'] || rowNorm['id'] || '').replace(/\D/g, '');
                     
-                    // CORRECCIÓN VITAL: El vehículo viene en DESCRIPCIÓN en la tabla Adjudicaciones
-                    let detalleVal = rowNorm['descripcion'] || rowNorm['vehiculo'] || rowNorm['detalle'] || rowNorm['bien'];
+                    // En el V10 evitamos 'descripcion' porque contiene 'SINIESTRADO'. Buscamos auto en el Lote o Vehiculo.
+                    let detalleVal = rowNorm['vehiculo'] || rowNorm['detalle'] || rowNorm['bien'];
                     
-                    // Si Zárate no mandó la columna descripción, usamos el lote como último recurso
-                    if(!detalleVal) {
+                    // Si no hay columna vehiculo dedicada, sacamos el auto desde el Lote.
+                    if (!detalleVal && textLote) {
                         detalleVal = textLote;
                     }
-                    
-                    if (!numVal && textLote.match(/^\d+$/)) {
-                        numVal = textLote;
+
+                    // Limpiamos la separación si viene "Lote X: MARCA MODELO"
+                    if (typeof detalleVal === 'string' && detalleVal.includes(':')) {
+                        let parts = detalleVal.split(':');
+                        if (!patenteVal) patenteVal = parts[0].trim();
+                        detalleVal = parts[1].trim();
                     }
 
-                    // Limpieza de Estados: Si dice SINIESTRADO en detalleVal, y el lote tiene letras, los intercambiamos
-                    let detUpper = String(detalleVal).toUpperCase();
-                    if (['SINIESTRADO', 'USADO', 'RECUPERO', 'CHATARRA', 'RECHAZO'].includes(detUpper) && textLote.length > 5) {
-                         detalleVal = textLote; 
-                    }
-
-                    // LIMPIEZA DE HTML 
+                    // 3. LIMPIEZA DE HTML (Por si acaso)
                     if (typeof detalleVal === 'string' && detalleVal.includes('<table')) {
                         detalleVal = detalleVal.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
                     }
 
-                    let extraDesc = textLote + " " + String(rowNorm['estado'] || '');
+                    let extraDesc = String(rowNorm['descripcion'] || '') + " " + String(rowNorm['estado'] || '');
 
                     if (numVal || detalleVal) {
                         lotesSet.add(String(numVal || detalleVal).trim());
@@ -1555,8 +1526,8 @@ window.parseExcel = function(file) {
                             return parseInt(intPart, 10) || 0;
                         };
 
-                        let montoNum = parseMoney(monto);
-                        let minNum = parseMoney(minimo);
+                        let montoNum = parseMoney(montoRaw);
+                        let minNum = parseMoney(minimoRaw);
                         
                         let esFalso = esClienteFalso(adjudicatario, email);
                         let esChatarra = extraDesc.toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('chatarra') || String(detalleVal).toLowerCase().includes('restos');
@@ -1566,7 +1537,7 @@ window.parseExcel = function(file) {
                         let adjObj = {
                             loteStr: String(detalleVal).replace(/<[^>]+>/g, '').trim(),
                             patente: patenteVal,
-                            numeroLote: String(numVal || '').replace(/\D/g, ''),
+                            numeroLote: numVal,
                             clienteReal: normalizarCliente(adjudicatario),
                             nombreRaw: String(adjudicatario),
                             monto: montoNum,
@@ -1661,19 +1632,26 @@ window.parseExcel = function(file) {
                 if (sheetPosturasName) {
                     const wsPosturas = workbook.Sheets[sheetPosturasName];
                     const rowsPosturas = XLSX.utils.sheet_to_json(wsPosturas, {header: 1, defval: ""});
-                    let headerPIdx = -1;
+                    
+                    let pMaxScore = 0;
+                    let pHeaderIdx = -1;
                     let pHeaders = [];
                     
-                    for(let i=0; i<Math.min(rowsPosturas.length, 15); i++){
+                    for(let i=0; i<Math.min(rowsPosturas.length, 20); i++){
                         let rowStr = rowsPosturas[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                        if((rowStr.includes('rut') || rowStr.includes('nombre')) && (rowStr.includes('postura') || rowStr.includes('monto') || rowStr.includes('oferta'))) {
-                            headerPIdx = i;
+                        let score = 0;
+                        if(rowStr.includes('rut') || rowStr.includes('nombre') || rowStr.includes('cliente')) score++;
+                        if(rowStr.includes('postura') || rowStr.includes('monto') || rowStr.includes('oferta')) score++;
+                        if(rowStr.includes('lote') || rowStr.includes('numero') || rowStr.includes('vehiculo')) score++;
+                        
+                        if(score > pMaxScore) {
+                            pMaxScore = score;
+                            pHeaderIdx = i;
                             pHeaders = rowsPosturas[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
-                            break;
                         }
                     }
                     
-                    if(headerPIdx !== -1) {
+                    if(pHeaderIdx !== -1) {
                         let parseMoney = (val) => {
                             if(!val) return 0;
                             if(typeof val === 'number') return val;
@@ -1686,7 +1664,7 @@ window.parseExcel = function(file) {
                             return parseInt(intPart, 10) || 0;
                         };
 
-                        for(let i = headerPIdx + 1; i < rowsPosturas.length; i++) {
+                        for(let i = pHeaderIdx + 1; i < rowsPosturas.length; i++) {
                             let rowData = rowsPosturas[i];
                             if(rowData.join('').trim() === '') continue;
                             
@@ -1695,21 +1673,20 @@ window.parseExcel = function(file) {
                                 obj[pHeaders[j] || ('col' + j)] = rowData[j];
                             }
                             
-                            let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['adjudicatario'];
+                            let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['adjudicatario'] || obj['razonsocial'];
                             let montoRaw = obj['postura'] || obj['monto'] || obj['oferta'] || obj['valor'];
                             let monto = parseMoney(montoRaw);
                             let email = obj['email'] || obj['correo'] || '';
                             let rut = obj['rut'] || obj['rutcliente'] || '';
                             
                             let loteRaw = String(obj['lote'] || obj['detalle'] || obj['descripcion'] || '').replace(/<[^>]+>/g, '').trim();
-                            let numVal = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
+                            let numP = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
                             
-                            // Si la columna lote en posturas viene como "1 ET1190-K: MOTOR FORD...", intentamos extraer solo el número del principio si existe
-                            let numLoteP = numVal;
-                            if(!numLoteP && loteRaw) {
+                            // A veces en posturas dice "1 GYWX83-5: CHEVROLET SAIL", extraemos el número
+                            if (!numP && loteRaw) {
                                 let matchLoteP = loteRaw.match(/^(\d+)\s/);
                                 if(matchLoteP) {
-                                    numLoteP = matchLoteP[1];
+                                    numP = matchLoteP[1];
                                 }
                             }
 
@@ -1727,8 +1704,8 @@ window.parseExcel = function(file) {
                                 
                                 // Búsqueda Inteligente del Lote
                                 let matchAdj = remate.adjudicaciones.find(a => {
-                                    let matchStr = a.loteStr && loteRaw.includes(a.loteStr);
-                                    let matchNum = a.numeroLote && numLoteP && a.numeroLote === numLoteP;
+                                    let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
+                                    let matchNum = a.numeroLote && numP && a.numeroLote === numP;
                                     return matchStr || matchNum;
                                 });
 
@@ -1739,9 +1716,9 @@ window.parseExcel = function(file) {
                                 } else if (loteRaw) {
                                     if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
                                     remate.posturasPorLote[loteRaw].push(puja);
-                                } else if (numLoteP) {
-                                    if (!remate.posturasPorLote[numLoteP]) remate.posturasPorLote[numLoteP] = [];
-                                    remate.posturasPorLote[numLoteP].push(puja);
+                                } else if (numP) {
+                                    if (!remate.posturasPorLote[numP]) remate.posturasPorLote[numP] = [];
+                                    remate.posturasPorLote[numP].push(puja);
                                 }
                             }
                         }
@@ -1822,177 +1799,125 @@ function traverseFileTree(item, filesArray) {
     }); 
 }
 
-window.formatExcelDate = function(excelDate) {
-    if(!excelDate) return '-';
-    let d;
-    try {
-        if(typeof excelDate === 'number') { 
-            if(excelDate > 1000000) { 
-                d = new Date(excelDate); 
-            } else { 
-                d = new Date(Math.round((excelDate - 25569) * 86400 * 1000)); 
-                d.setMinutes(d.getMinutes() + d.getTimezoneOffset()); 
-            }
-        } else if(typeof excelDate === 'string') { 
-            let parts = excelDate.trim().split(' ')[0].split(/[-/]/);
-            if (parts.length === 3) {
-                if (parts[0].length === 4) {
-                    return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`;
-                } else {
-                    return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].padStart(4,'20')}`; 
+window.iniciarProcesamiento = async function(files) {
+    const validFiles = Array.from(files).filter(f => f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
+    if(!validFiles.length) return;
+    
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    loadingOverlay.classList.remove('hidden'); 
+    loadingOverlay.classList.add('flex');
+    
+    let successCount = 0; 
+    let upsertQueue = [];
+    
+    for(let i = 0; i < validFiles.length; i++) { 
+        loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
+        await new Promise(r => setTimeout(r, 20)); 
+        try { 
+            const data = await window.parseExcel(validFiles[i]);
+            if(data) { 
+                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
+                if (existsIdx >= 0) { 
+                    data._dbId = db.remates[existsIdx]._dbId; 
+                    data.id = db.remates[existsIdx].id; 
+                    db.remates[existsIdx] = data; 
+                } else { 
+                    data._dbId = Math.floor(Math.random() * 2000000000); 
+                    data.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+                    db.remates.push(data); 
                 }
+                upsertQueue.push({ id: data._dbId, payload: data });
+                successCount++; 
             }
-            return excelDate.replace(/-/g, '/');
-        } else { 
-            return String(excelDate); 
-        }
+        } catch(err) { 
+            console.error("Error:", err); 
+        } 
+    }
+    
+    if(successCount === 0) {
+        loadingOverlay.classList.remove('flex'); 
+        loadingOverlay.classList.add('hidden');
+        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`; 
+        return;
+    }
+
+    loadingText.innerText = "Sincronizando Cruces..."; 
+    await new Promise(r => setTimeout(r, 20));
+
+    db.remates.sort((a,b) => (a.fechaData?.timestamp || 0) - (b.fechaData?.timestamp || 0));
+    
+    let clientesGlobales = []; 
+    let adjudicatariosGlobales = [];
+    
+    db.remates.forEach(remate => { 
+        let nuevos = 0, antiguos = 0; 
         
-        if (isNaN(d.getTime())) return '-';
-        let dd = String(d.getDate()).padStart(2, '0');
-        let mm = String(d.getMonth() + 1).padStart(2, '0');
-        let yyyy = d.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
-    } catch(e) { 
-        return '-'; 
-    }
-};
-
-function esClienteFalso(nombre, email='') {
-    const txt = (String(nombre||'') + ' ' + String(email||'')).toLowerCase().trim();
-    if(txt.length <= 2 && txt !== '') return true; 
-    if(txt.includes('@zarate') || txt.includes('zarate.cl') || txt.includes('@plataforma')) return true; 
-    if(txt.includes('rz rz') || txt.includes('rzrz') || txt.includes('test') || txt.includes('prueba')) return true; 
-    if(/^\s*(rz|zz|aa|qq)\s*$/.test(txt)) return true; 
-    if(/^\s*99\.999\.999-9\s*$/.test(txt) || /^\s*11\.111\.111/.test(txt)) return true; 
-    if(/([a-z])\1{3,}/.test(txt.replace(/\s/g,'')) && txt.length < 10) return true; 
-    return false;
-}
-
-function extraerMarcaModelo(loteStr) {
-    let txt = loteStr.toUpperCase(); 
-    if (txt.includes(':')) txt = txt.split(':')[1];
-    
-    txt = txt.replace(/\bLOTE\s*\d+\b/g, '').replace(/\bN[°º]?\s*\d+\b/g, ''); 
-    txt = txt.replace(/\b\d\.\d\b/g, '').replace(/\b\d,\d\b/g, ''); 
-    txt = txt.replace(/\b20\d{2}\b/g, '').replace(/\b19\d{2}\b/g, ''); 
-    
-    const marcasConocidas = ['MERCEDES BENZ','LAND ROVER','GREAT WALL','ALFA ROMEO','ASTON MARTIN','CHEVROLET','NISSAN','KIA','HYUNDAI','SUZUKI','TOYOTA','PEUGEOT','FORD','MITSUBISHI','MAZDA','SSANGYONG','BMW','AUDI','VOLKSWAGEN','SUBARU','RENAULT','CHRYSLER','DODGE','JEEP','HONDA','VOLVO','FIAT','CHERY','MG','CHANGAN','JAC','GEELY','MAHINDRA','MAXUS','OPEL','DFSK','DATSUN','LEXUS','PORSCHE','MINI','RAM','SEAT','SKODA','CITROEN','BYD','BAIC','HAVAL','LIFAN','ZX','FOTON','KTM','IVECO', 'JETOUR', 'DFM', 'SAIC'];
-    const ignorarCar = ['SINIESTRADO','RECUPERO','USADO','RENOVACION','RECHAZO','PARTICULAR','PERDIDA','CONVENIDA','CIA','CÍA','AUTOMOVIL','VEHICULO','CAMIONETA','STATION','WAGON','JEEP','FURGON','MOTO','MOTOCICLETA','BUS','MINIBUS','CAMION','MAQUINARIA','CHATARRA','RESTOS','AUT','MT','AT','M/T','A/T','4X4','4X2','GLX','GLS','EX','LX','DX','TX','MPI','HB','SEDAN','SPORT','MOTORS','NEW','MEC','MECANICO','AUTOMATICO','DAKAR','CORE','PREMIER','LIMITED','LITE', 'HDI', 'TDI', 'CDI', 'CRDI', 'AWD', 'FWD', 'CVT'];
-    
-    let marca = "SIN MARCA"; 
-    let modelo = "";
-    
-    for(let m of marcasConocidas) { 
-        if(txt.includes(m)) { 
-            marca = m; 
-            let resto = txt.substring(txt.indexOf(m) + m.length).trim(); 
-            let words = resto.split(/[\s-]+/).filter(w => w.length > 1 && !w.match(/^\d+$/) && !ignorarCar.includes(w)); 
-            modelo = words.slice(0, 2).join(' '); 
-            break; 
-        } 
-    }
-    
-    if(marca === "SIN MARCA") { 
-        let words = txt.split(/[\s-]+/).filter(w => w.length > 1 && !w.match(/^\d+$/) && !ignorarCar.includes(w)); 
-        if(words.length > 0) { 
-            marca = words[0]; 
-            modelo = words.slice(1, 3).join(' '); 
-        } 
-    }
-    
-    if (marca === "KIA MOTORS" || txt.includes("KIA MOTORS")) {
-        marca = "KIA"; 
-    }
-    
-    return { categoria: marca, modeloStr: modelo };
-}
-
-const normalizarCliente = (nombre) => { 
-    if(!nombre) return 'DESCONOCIDO'; 
-    let n = String(nombre).toUpperCase().trim(); 
-    if(n.includes('CROVETTO')) return 'CROVETTO (GRUPO)'; 
-    n = n.replace(/\b\d{1,2}\.?\d{3}\.?\d{3}-?[0-9Kk]\b/g,''); 
-    n = n.replace(/\b(SPA|LTDA|LIMITADA|EIRL|E\.I\.R\.L|S\.A\.?|SOCIEDAD|COMERCIAL)\b/g,''); 
-    return n.replace(/\s+/g,' ').replace(/[-_.,]+$/, '').trim() || 'DESCONOCIDO'; 
-};
-
-const formatMoney = (num) => { 
-    if(!num || isNaN(num)) return '$0'; 
-    if(Math.abs(num) >= 1e6) { 
-        return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num / 1e6)) + ' M'; 
-    } 
-    return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num)); 
-};
-
-const extraerFechaInfo = (file, dataStrRows) => { 
-    let date = null; 
-    const match = file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); 
-    if(match) { 
-        date = match[1].length === 4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); 
-    } 
-    
-    if(!date || isNaN(date)) { 
-        if(dataStrRows && dataStrRows.length > 0) { 
-            const dateRegex = /\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; 
-            for(let i=0; i<Math.min(dataStrRows.length, 100); i++) { 
-                const row = dataStrRows[i]; 
-                if(!row) continue; 
-                for(let cell of row) { 
-                    if(typeof cell === 'string') { 
-                        const m = cell.match(dateRegex); 
-                        if(m) { 
-                            date = new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); 
-                            break; 
-                        } 
-                    } 
-                } 
-                if(date && !isNaN(date)) break; 
+        remate.garantiasEmailsReales.forEach(email => { 
+            if(clientesGlobales.includes(email)) {
+                antiguos++; 
+            } else { 
+                nuevos++; 
+                clientesGlobales.push(email); 
             } 
-        } 
-    } 
-    
-    if(!date || isNaN(date)) date = new Date(); 
-    
-    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; 
-    return { 
-        timestamp: date.getTime(), 
-        year: date.getFullYear(), 
-        semester: Math.floor(date.getMonth() / 6) + 1, 
-        quarter: Math.floor(date.getMonth() / 3) + 1, 
-        yearMonth: (date.getFullYear() * 100) + (date.getMonth() + 1), 
-        mesStr: meses[date.getMonth()] 
-    }; 
-};
-
-window.limpiarBase = async function() {
-    if(confirm("¿Estás seguro que deseas vaciar toda la base de datos de la nube? Esto es irreversible.")) {
-        try {
-            document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Borrando...';
-            
-            const { data, error: errFetch } = await supabaseClient.from('app_state').select('id');
-            if (errFetch) throw errFetch;
-            
-            if (data && data.length > 0) {
-                const ids = data.map(row => row.id);
-                for(let i=0; i<ids.length; i+=100) {
-                    const chunk = ids.slice(i, i+100);
-                    const { error } = await supabaseClient.from('app_state').delete().in('id', chunk);
-                    if(error) throw error;
+        }); 
+        
+        remate.nuevos = nuevos; 
+        remate.antiguos = antiguos; 
+        
+        let ganadoresNuevos = 0;
+        let ventaNuevos = 0;
+        let ventaAntiguos = 0; 
+        let statusCliente = {}; 
+        
+        const ganadoresUnicos = [...new Set(remate.adjudicaciones.filter(a => !a.esFalso).map(a => a.clienteReal))]; 
+        
+        ganadoresUnicos.forEach(cliente => { 
+            if(adjudicatariosGlobales.includes(cliente)) { 
+                statusCliente[cliente] = 'antiguo'; 
+            } else { 
+                ganadoresNuevos++; 
+                adjudicatariosGlobales.push(cliente); 
+                statusCliente[cliente] = 'nuevo'; 
+            } 
+        }); 
+        
+        remate.adjudicaciones.forEach(a => { 
+            if(!a.esFalso) { 
+                if(statusCliente[a.clienteReal] === 'nuevo') {
+                    ventaNuevos += a.monto; 
+                } else {
+                    ventaAntiguos += a.monto; 
                 }
             }
-            
-            db.remates = [];
-            window.actualizarFiltrosGlobales();
-            window.renderApp();
-            document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Base Vacía';
-            alert("Base de datos borrada con éxito.");
-        } catch(e) {
-            alert("Error al borrar: " + e.message);
-            document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> En Línea';
+        }); 
+        
+        remate.ganadoresNuevos = ganadoresNuevos; 
+        remate.ventaNuevos = ventaNuevos; 
+        remate.ventaAntiguos = ventaAntiguos; 
+        remate.ganadoresUnicosCount = ganadoresUnicos.length; 
+    });
+    
+    try { 
+        for (let i = 0; i < upsertQueue.length; i++) {
+            loadingText.innerText = `Subiendo a la Nube (${i+1}/${upsertQueue.length})...`;
+            const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
+            if (error) throw error;
+            await new Promise(r => setTimeout(r, 50)); 
         }
+        document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> En Línea (${db.remates.length})`;
+    } catch (e) { 
+        document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
+        alert("Error de guardado en la nube: " + e.message);
     }
+    
+    document.getElementById('file-input').value = ""; 
+    window.actualizarFiltrosGlobales(); 
+    procesarDatosClientes(); 
+    window.actualizarEstadoApp();
+    loadingOverlay.classList.remove('flex'); 
+    loadingOverlay.classList.add('hidden');
 };
-
 </script>
 </body>
 </html>
