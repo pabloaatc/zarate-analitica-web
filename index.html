@@ -33,7 +33,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v9.0 (Meta UI + Zárate Engine)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v9.1 (Meta UI + Zárate Engine)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -51,7 +51,7 @@
                 <div class="w-12 h-12 bg-[#111827] text-white rounded-xl flex items-center justify-center font-black text-xl shadow-sm">Z</div>
                 <div>
                     <h1 class="text-[18px] font-bold text-[#111827] leading-none">Zárate Analítica</h1>
-                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v9.0</p>
+                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v9.1</p>
                 </div>
             </div>
             
@@ -180,7 +180,7 @@
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global (arriba) o sube un Excel en el panel Admin para comenzar.</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global o el Gestor de Remates para comenzar a analizar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
@@ -383,7 +383,6 @@
                                 <option value="todos">Todos los segmentos</option>
                                 <option value="siniestrados">Solo Siniestros</option>
                                 <option value="retail">Solo Retail</option>
-                                <option value="ambos">Cartera Cruzada</option>
                             </select>
                             <div class="relative">
                                 <span class="absolute left-2.5 top-2.5 text-[12px] opacity-50">🔍</span>
@@ -392,10 +391,9 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition"><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Clientes</div><div class="mt-1 text-[20px] font-black text-gray-900" id="bi-kpi-total">0</div></div>
                         <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition"><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Prom.</div><div class="mt-1 text-[20px] font-black text-emerald-600" id="bi-kpi-ltv">$0</div></div>
-                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition"><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Híbridos (Cross)</div><div class="mt-1 text-[20px] font-black text-blue-600" id="bi-kpi-hibridos">0</div></div>
                         <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition"><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inactivos > 90d</div><div class="mt-1 text-[20px] font-black text-red-500" id="bi-kpi-inactivos">0</div></div>
                     </div>
                     
@@ -496,7 +494,7 @@
         </div>
     </div> <!-- FIN APP CONTENT -->
 
-    <!-- MODAL GESTOR MATRICES META -->
+    <!-- MODAL GESTOR MATRICES -->
     <div id="modal-gestor" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalGestor(event)">
         <div class="bg-white w-full max-w-[720px] max-h-[90vh] rounded-[16px] shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
             <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 shrink-0">
@@ -527,7 +525,7 @@
         </div>
     </div>
 
-    <!-- MODAL PUJAS META -->
+    <!-- MODAL PUJAS -->
     <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModal(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[480px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-5 flex justify-between items-start border-b border-gray-100 bg-gray-50 shrink-0">
@@ -556,7 +554,7 @@
         </div>
     </div>
 
-    <!-- MODAL FUGA META -->
+    <!-- MODAL FUGA -->
     <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalFuga(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[520px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-5 flex justify-between items-start border-b border-gray-100 bg-gray-50 shrink-0">
@@ -578,7 +576,7 @@
         </div>
     </div>
 
-    <!-- MODAL MULTILOTE META -->
+    <!-- MODAL MULTILOTE -->
     <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalMulti(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[420px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-4 flex justify-between items-center border-b border-gray-100 bg-gray-50 shrink-0">
@@ -1034,7 +1032,13 @@ window.seleccionarUltimoRemate = function() {
 
 window.switchGestorYear = function(y) {
     currentGestorYearTab = y;
-    window.abrirModalGestor();
+    
+    const container = document.getElementById('gestor-content-container');
+    const scrollPos = container ? container.scrollTop : 0;
+    
+    window.abrirModalGestor(true);
+    
+    if(container) { container.scrollTop = scrollPos; }
 };
 
 window.toggleGestorAll = function(check) {
@@ -1051,7 +1055,11 @@ window.toggleGestorAll = function(check) {
     } else {
         checkedNodes = [];
     }
-    window.abrirModalGestor();
+    
+    const container = document.getElementById('gestor-content-container');
+    const scrollPos = container ? container.scrollTop : 0;
+    window.abrirModalGestor(true);
+    if(container) { container.scrollTop = scrollPos; }
 };
 
 window.filtrarModalGestor = function() {
@@ -1074,9 +1082,11 @@ window.filtrarModalGestor = function() {
     });
 };
 
-window.abrirModalGestor = function() {
+window.abrirModalGestor = function(keepScroll = false) {
     const tabsContainer = document.getElementById('gestor-tabs-container');
     const contentContainer = document.getElementById('gestor-content-container');
+    
+    let currentScroll = keepScroll && contentContainer ? contentContainer.scrollTop : 0;
     
     let seg = document.getElementById('macro-segment').value;
     let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
@@ -1150,6 +1160,10 @@ window.abrirModalGestor = function() {
     
     document.getElementById('modal-gestor').classList.remove('hidden');
     document.getElementById('modal-gestor').classList.add('flex');
+    
+    if (keepScroll && contentContainer) {
+        contentContainer.scrollTop = currentScroll;
+    }
 };
 
 window.cerrarModalGestor = function(e) { 
@@ -1174,13 +1188,21 @@ window.toggleGestorMes = function(year, mesIndex, isChecked) {
     
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
-    window.abrirModalGestor(); 
+    
+    const container = document.getElementById('gestor-content-container');
+    const scrollPos = container ? container.scrollTop : 0;
+    window.abrirModalGestor(true); 
+    if(container) { container.scrollTop = scrollPos; }
 };
 
 window.toggleGestorRemate = function(id, isChecked) {
     if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    window.abrirModalGestor(); 
+    
+    const container = document.getElementById('gestor-content-container');
+    const scrollPos = container ? container.scrollTop : 0;
+    window.abrirModalGestor(true); 
+    if(container) { container.scrollTop = scrollPos; }
 };
 
 window.sortTable = function(thElement, type) {
@@ -1285,7 +1307,7 @@ window.parseExcel = function(file) {
                     
                     let detalleVal = isLoteText ? textLote : (rowNorm['vehiculo'] || rowNorm['descripcion'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['patente'] || rowNorm['modelo'] || rowNorm['detalle']);
                     
-                    // 3. LIMPIEZA DE HTML DE ZÁRATE: Extrae la Patente si viene en una tabla HTML
+                    // 3. LIMPIEZA DE HTML DE ZÁRATE
                     if (typeof detalleVal === 'string' && detalleVal.includes('<table')) {
                         detalleVal = detalleVal.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
                     }
@@ -1418,6 +1440,77 @@ window.parseExcel = function(file) {
                     remate.garantias = remate.garantiasListaDetallada.length;
                 }
 
+                // 6. INTENTA LEER LA PESTAÑA DE POSTURAS (PUJAS) SI EXISTE
+                let sheetPosturasName = workbook.SheetNames.find(s => s.toLowerCase() === 'posturas');
+                if (sheetPosturasName) {
+                    const wsPosturas = workbook.Sheets[sheetPosturasName];
+                    const rowsPosturas = XLSX.utils.sheet_to_json(wsPosturas, {header: 1, defval: ""});
+                    let headerPIdx = -1;
+                    let pHeaders = [];
+                    
+                    for(let i=0; i<Math.min(rowsPosturas.length, 15); i++){
+                        let rowStr = rowsPosturas[i].map(c => String(c).toLowerCase().trim()).join(' ');
+                        if((rowStr.includes('rut') || rowStr.includes('nombre') || rowStr.includes('cliente') || rowStr.includes('razon')) && 
+                           (rowStr.includes('postura') || rowStr.includes('monto') || rowStr.includes('oferta') || rowStr.includes('valor'))) {
+                            headerPIdx = i;
+                            pHeaders = rowsPosturas[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                            break;
+                        }
+                    }
+                    if(headerPIdx !== -1) {
+                        let parseMoney = (val) => {
+                            if(!val) return 0;
+                            if(typeof val === 'number') return val;
+                            let str = String(val).trim().toUpperCase();
+                            if(str.includes('M')) {
+                                let n = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
+                                return (n || 0) * 1000000;
+                            }
+                            let intPart = str.split(',')[0].replace(/[^\d-]/g, '');
+                            return parseInt(intPart, 10) || 0;
+                        };
+
+                        for(let i = headerPIdx + 1; i < rowsPosturas.length; i++) {
+                            let rowData = rowsPosturas[i];
+                            if(rowData.join('').trim() === '') continue;
+                            let obj = {};
+                            for(let j = 0; j < pHeaders.length; j++) {
+                                obj[pHeaders[j] || ('col' + j)] = rowData[j];
+                            }
+                            
+                            let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['adjudicatario'];
+                            let montoRaw = obj['postura'] || obj['monto'] || obj['oferta'] || obj['valor'];
+                            let monto = parseMoney(montoRaw);
+                            let email = obj['email'] || obj['correo'] || '';
+                            let rut = obj['rut'] || obj['rutcliente'] || '';
+                            let loteRaw = String(obj['lote'] || obj['detalle'] || obj['vehiculo'] || '').replace(/<[^>]+>/g, '').trim();
+                            let numVal = String(obj['numero'] || obj['nrolote'] || obj['nlote'] || '').replace(/\D/g, '');
+                            
+                            if(monto > 0 && nombre) {
+                                let isFalso = esClienteFalso(nombre, email);
+                                let puja = {
+                                    nombre: String(nombre),
+                                    nombreNorm: normalizarCliente(nombre),
+                                    monto: monto,
+                                    email: email,
+                                    rut: rut,
+                                    esFalso: isFalso,
+                                    fecha: fechaData.timestamp
+                                };
+                                
+                                if (loteRaw) {
+                                    if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
+                                    remate.posturasPorLote[loteRaw].push(puja);
+                                }
+                                if (numVal) {
+                                    if (!remate.posturasPorLote[numVal]) remate.posturasPorLote[numVal] = [];
+                                    remate.posturasPorLote[numVal].push(puja);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 remate.inscritos = remate.garantias + Math.floor(remate.garantias * 0.1); 
                 remate.comisionTotal = remate.ventaTotal * 0.12; 
 
@@ -1501,8 +1594,17 @@ window.limpiarBase = async function() {
     if(confirm("¿Estás seguro que deseas vaciar toda la base de datos de la nube? Esto es irreversible.")) {
         try {
             document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Borrando...';
-            const { error } = await supabaseClient.from('app_state').delete().neq('id', 'borrar-todo');
-            if(error) throw error;
+            
+            // Extracción segura de IDs para borrar individualmente en lugar de 'neq'
+            const { data, error: errFetch } = await supabaseClient.from('app_state').select('id');
+            if (errFetch) throw errFetch;
+            
+            if (data && data.length > 0) {
+                const ids = data.map(row => row.id);
+                const { error } = await supabaseClient.from('app_state').delete().in('id', ids);
+                if(error) throw error;
+            }
+            
             db.remates = [];
             window.actualizarFiltrosGlobales();
             window.renderApp();
@@ -1510,642 +1612,11 @@ window.limpiarBase = async function() {
             alert("Base de datos borrada con éxito.");
         } catch(e) {
             alert("Error al borrar: " + e.message);
+            document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> En Línea';
         }
     }
 };
 
-window.iniciarProcesamiento = async function(files){
-    const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
-    if(!validFiles.length) return;
-    
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const loadingText = document.getElementById('loading-text');
-    loadingOverlay.classList.remove('hidden'); loadingOverlay.classList.add('flex');
-    
-    let successCount = 0; let upsertQueue = [];
-    
-    for(let i = 0; i < validFiles.length; i++){ 
-        loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
-        await new Promise(r => setTimeout(r, 20)); 
-        try { 
-            const data = await window.parseExcel(validFiles[i]);
-            if(data) { 
-                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
-                if (existsIdx >= 0) { data._dbId = db.remates[existsIdx]._dbId; data.id = db.remates[existsIdx].id; db.remates[existsIdx] = data; } 
-                else { data._dbId = Math.floor(Math.random() * 2000000000); db.remates.push(data); }
-                upsertQueue.push({ id: data._dbId, payload: data });
-                successCount++; 
-            }
-        } catch(err) { console.error("Error:", err); } 
-    }
-    
-    if(successCount === 0) {
-        loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
-        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`; return;
-    }
-
-    loadingText.innerText = "Sincronizando Cruces..."; await new Promise(r => setTimeout(r, 20));
-
-    db.remates.sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
-    let clientesGlobales=[]; let adjudicatariosGlobales=[];
-    
-    db.remates.forEach(remate=>{ 
-        let nuevos=0, antiguos=0; 
-        remate.garantiasEmailsReales.forEach(email=>{ if(clientesGlobales.includes(email)) antiguos++; else { nuevos++; clientesGlobales.push(email); } }); 
-        remate.nuevos=nuevos; remate.antiguos=antiguos; 
-        let ganadoresNuevos=0, ventaNuevos=0, ventaAntiguos=0; let statusCliente={}; 
-        const ganadoresUnicos=[...new Set(remate.adjudicaciones.filter(a=>!a.esFalso).map(a=>a.clienteReal))]; 
-        ganadoresUnicos.forEach(cliente=>{ if(adjudicatariosGlobales.includes(cliente)){ statusCliente[cliente]='antiguo'; } else { ganadoresNuevos++; adjudicatariosGlobales.push(cliente); statusCliente[cliente]='nuevo'; } }); 
-        remate.adjudicaciones.forEach(a=>{ if(!a.esFalso) { if(statusCliente[a.clienteReal]==='nuevo') ventaNuevos+=a.monto; else ventaAntiguos+=a.monto; }}); 
-        remate.ganadoresNuevos=ganadoresNuevos; remate.ventaNuevos=ventaNuevos; remate.ventaAntiguos=ventaAntiguos; remate.ganadoresUnicosCount=ganadoresUnicos.length; 
-    });
-    
-    try { 
-        for (let i = 0; i < upsertQueue.length; i++) {
-            loadingText.innerText = `Subiendo a la Nube (${i+1}/${upsertQueue.length})...`;
-            const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
-            if (error) throw error;
-            await new Promise(r => setTimeout(r, 50)); 
-        }
-        document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> En Línea (${db.remates.length})`;
-    } catch (e) { 
-        document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
-        alert("Error de guardado en la nube: " + e.message);
-    }
-    
-    document.getElementById('file-input').value = ""; 
-    window.actualizarFiltrosGlobales(); 
-    procesarDatosClientes(); 
-    window.renderApp(); 
-    loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
-};
-
-function getSelectedRemates() { return db.remates.filter(r => checkedNodes.includes(r.id)); }
-
-function buildAgg(rematesList){
-    const agg={ venta:0,comisionTotal:0,lotes:0,lotesDisponibles:0,inscritos:0,garantias:0,ganadoresUnicosCount:0,nuevos:0,antiguos:0,ventaSiniestros:0,ventaRetail:0,ganadoresNuevos:0,ventaGanadoresNuevos:0,ventaGanadoresAntiguos:0,adjudicaciones:[], sumMontoValido: 0, sumMinimoValido: 0, garantiasLista: [] };
-    let uniqueGanadoresSet=new Set();
-    
-    rematesList.forEach(r=>{
-        try {
-            agg.venta += (Number(r.ventaTotal) || 0);
-            agg.comisionTotal += (Number(r.comisionTotal) || 0);
-            agg.lotes += (Number(r.lotesCount) || 0);
-            agg.lotesDisponibles += (Number(r.lotesDisponibles) || 0);
-            agg.inscritos += (Number(r.inscritos) || 0);
-            agg.garantias += (Number(r.garantias) || 0);
-            agg.nuevos += (Number(r.nuevos) || 0);
-            agg.antiguos += (Number(r.antiguos) || 0);
-            agg.ganadoresNuevos += (Number(r.ganadoresNuevos) || 0);
-            agg.ventaGanadoresNuevos += (Number(r.ventaNuevos) || 0);
-            agg.ventaGanadoresAntiguos += (Number(r.ventaAntiguos) || 0);
-            
-            if(r.adjudicaciones && Array.isArray(r.adjudicaciones)) {
-                r.adjudicaciones.forEach(a => {
-                    if(!a) return;
-                    let aCopy = {...a, origen: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)};
-                    agg.adjudicaciones.push(aCopy);
-                    if(!a.esFalso && a.clienteReal) uniqueGanadoresSet.add(a.clienteReal);
-                    if((Number(a.minimo) > 0) && (Number(a.monto) > 0) && !a.esFalso && !a.esChatarra) { 
-                        agg.sumMontoValido += Number(a.monto); 
-                        agg.sumMinimoValido += Number(a.minimo); 
-                    }
-                });
-            }
-
-            if(r.garantiasListaDetallada && Array.isArray(r.garantiasListaDetallada)) { 
-                r.garantiasListaDetallada.forEach(g => { 
-                    if(!agg.garantiasLista.some(x => x.nombreNorm === g.nombreNorm)) agg.garantiasLista.push(g); 
-                }); 
-            }
-            if(r.tipo === 'Siniestrados') agg.ventaSiniestros += (Number(r.ventaTotal) || 0); 
-            if(r.tipo === 'Retail') agg.ventaRetail += (Number(r.ventaTotal) || 0);
-        } catch(e) {}
-    });
-    
-    agg.ganadoresUnicosCount = uniqueGanadoresSet.size; 
-    agg.perdedoresCount = Math.max(0, agg.garantias - agg.ganadoresUnicosCount); 
-    agg.conversion = agg.inscritos ? (agg.garantias/agg.inscritos*100) : 0; 
-    agg.ticketPromedio = agg.lotes ? (agg.venta/agg.lotes) : 0; 
-    agg.eficaciaLotes = agg.lotesDisponibles ? (agg.lotes/agg.lotesDisponibles*100) : 0; 
-    agg.pctVentaNuevos = agg.venta ? (agg.ventaGanadoresNuevos/agg.venta*100) : 0; 
-    agg.deltaPujaTotal = agg.sumMontoValido - agg.sumMinimoValido; 
-    agg.deltaPujaPromedio = agg.lotes ? (agg.deltaPujaTotal / agg.lotes) : 0; 
-    agg.sobreprecioReal = agg.sumMinimoValido > 0 ? ((agg.sumMontoValido / agg.sumMinimoValido) * 100) - 100 : 0; 
-    agg.fugaList = agg.garantiasLista.filter(g => !uniqueGanadoresSet.has(g.nombreNorm));
-    return agg;
-}
-
-window.cambiarSeccion = function(mod){ 
-    try {
-        currentModule=mod; 
-        document.getElementById('nav-mod-remates').className=mod==='remates'?'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white':'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
-        document.getElementById('nav-mod-comparativa').className=mod==='comparativa'?'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white':'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
-        document.getElementById('nav-mod-autos').className=mod==='autos'?'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white':'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
-        document.getElementById('nav-mod-clientes').className=mod==='clientes'?'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white':'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
-        document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white':'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
-        document.getElementById('nav-mod-buscador').className=mod==='buscador'?'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 bg-[#111827] text-white':'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 hover:bg-gray-50 text-gray-700'; 
-        
-        window.renderApp();
-        if(window.innerWidth < 768) { window.toggleSidebar(); }
-    } catch(e) { console.error(e); }
-};
-
-window.renderApp = function() { 
-    try {
-        const emptyState = document.getElementById('empty-state');
-        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
-        });
-
-        if (checkedNodes.length === 0) {
-            emptyState.classList.remove('hidden');
-            emptyState.classList.add('flex');
-            return;
-        } else {
-            emptyState.classList.add('hidden');
-            emptyState.classList.remove('flex');
-            const currentEl = document.getElementById(`module-${currentModule}`);
-            if(currentEl) currentEl.classList.remove('hidden');
-        }
-
-        if (currentModule === 'remates') window.renderDashboard(); 
-        else if (currentModule === 'comparativa') window.renderComparativa();
-        else if (currentModule === 'autos') window.renderPanelAutos(); 
-        else if (currentModule === 'conclusiones') window.renderConclusiones(); 
-        else if (currentModule === 'clientes') { procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); }
-        else if (currentModule === 'buscador') { window.buscarPatente(); }
-    } catch(e) { console.error(e); }
-};
-
-window.renderDashboard = function(){ 
-    try {
-        if(currentModule!=='remates') return; 
-        
-        let allRemates = getSelectedRemates(); 
-        globalAgg = buildAgg(allRemates);
-        
-        let titulo = "Selección Activa";
-        try {
-            if(checkedNodes.length === 1 && allRemates.length === 1) {
-                titulo = window.formatearNombreRemate(allRemates[0].fileName, allRemates[0].fechaData?.timestamp);
-            } else {
-                titulo = "Dashboard de Remates";
-            }
-        } catch(e) { titulo = "Dashboard de Remates"; }
-        
-        const elTitulo = document.getElementById('dash-titulo'); if(elTitulo) elTitulo.innerText = titulo; 
-        const elSubtitulo = document.getElementById('dash-subtitulo'); if(elSubtitulo) elSubtitulo.innerText = `Control operativo • ${checkedNodes.length} seleccionados`;
-        
-        try { document.getElementById('dash-kpi-ticket').innerText = formatMoney(globalAgg.ticketPromedio); } catch(e){}
-        try { document.getElementById('dash-kpi-comision').innerText = formatMoney(globalAgg.comisionTotal); } catch(e){}
-        try { document.getElementById('dash-kpi-venta').innerText = formatMoney(globalAgg.venta); } catch(e){}
-        
-        try { document.getElementById('dash-kpi-lotes-disp').innerText = globalAgg.lotesDisponibles.toLocaleString('es-CL'); } catch(e){}
-        try { document.getElementById('dash-kpi-lotes').innerText = globalAgg.lotes.toLocaleString('es-CL'); } catch(e){}
-        try { document.getElementById('dash-kpi-eficacia').innerText = `${globalAgg.eficaciaLotes.toFixed(1)}% eficacia`; } catch(e){}
-        
-        try { document.getElementById('dash-kpi-garantias').innerText = globalAgg.garantias.toLocaleString('es-CL'); } catch(e){}
-        try { document.getElementById('dash-kpi-ganadores').innerText = globalAgg.ganadoresUnicosCount.toLocaleString('es-CL'); } catch(e){}
-        try { document.getElementById('dash-kpi-perdedores').innerText = globalAgg.perdedoresCount.toLocaleString('es-CL'); } catch(e){}
-        try { document.getElementById('dash-kpi-1racompra').innerText = globalAgg.ganadoresNuevos.toLocaleString('es-CL'); } catch(e){}
-        try { document.getElementById('dash-kpi-1racompra-pct').innerText = `${globalAgg.pctVentaNuevos.toFixed(1)}%`; } catch(e){}
-        
-        try {
-            const mapC={}; globalAgg.adjudicaciones.forEach(a=>{ if(a.esFalso) return; if(!mapC[a.clienteReal]) mapC[a.clienteReal]={lotes:0,total:0}; mapC[a.clienteReal].lotes++; mapC[a.clienteReal].total+=a.monto; }); let multi=0; Object.values(mapC).forEach(c=>{ if(c.lotes>1) multi++; }); 
-            document.getElementById('dash-kpi-multilote').innerText = multi; globalMapCMulti = mapC;
-        } catch(e){}
-        
-        try {
-            const lotesTabla=[...globalAgg.adjudicaciones].filter(a=>!a.esFalso && a.monto > 0).sort((a,b)=> (parseInt(a.numeroLote)||0) - (parseInt(b.numeroLote)||0));
-            if(document.getElementById('dash-tabla-lotes')) {
-                document.getElementById('dash-tabla-lotes').innerHTML = lotesTabla.map(l=>{
-                    let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
-                    let dSignL = deltaLote >= 0 ? '+' : ''; 
-                    let dColorL = deltaLote > 0 ? 'text-emerald-600' : (deltaLote < 0 ? 'text-red-500' : 'text-gray-500');
-                    let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData?.timestamp) === l.origen)?.id || checkedNodes[0];
-                    return `<tr class="hover:bg-gray-50 transition cursor-pointer" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
-                        <td class="px-4 py-2 font-medium truncate max-w-[120px]" title="${l.origen}">${l.origen}</td>
-                        <td class="px-3 py-2 text-center text-gray-500">Lote ${l.numeroLote||'-'}</td>
-                        <td class="px-3 py-2 max-w-[280px] truncate" title="${l.loteStr}">
-                            <span class="font-bold text-gray-900">${l.loteStr}</span>
-                            ${l.patente && l.patente !== '-' ? `<span class="text-gray-400 text-[10px] ml-1">(${l.patente})</span>` : ''}
-                            <span class="text-gray-400 block text-[10px]">👤 ${l.clienteReal}</span>
-                        </td>
-                        <td class="px-3 py-2 text-center"><span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
-                        <td class="px-3 py-2 text-right font-medium text-gray-500">${formatMoney(l.minimo)}</td>
-                        <td class="px-3 py-2 text-right font-semibold text-emerald-700">${formatMoney(l.monto)}</td>
-                        <td class="px-4 py-2 text-right font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td>
-                    </tr>`;
-                }).join('');
-            }
-        } catch(e){}
-
-        try {
-            let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = []; let cMatrices = []; let cLotes = [];
-            let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-            
-            let distinctMonths = new Set(allRemates.map(r => r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0)).size;
-            
-            let forcedMode = document.getElementById('dash-groupby') ? document.getElementById('dash-groupby').value : 'auto';
-            let groupMode = 'remate';
-            if (forcedMode === 'auto') {
-                groupMode = (distinctMonths > 1 && checkedNodes.length > 4) ? 'month' : 'remate';
-            } else {
-                groupMode = forcedMode;
-            }
-
-            if(groupMode === 'month') {
-                let monthMap = {};
-                allRemates.forEach(r => {
-                    let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-                    let y = r.fechaData?.year ? String(r.fechaData.year).slice(-2) : 'XX';
-                    let labelStr = window.globalSelectedYears.length > 1 ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
-                    
-                    let mk = `${y}-${m}`; 
-                    if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, lotes: 0, label: labelStr, rawD: r.fechaData?.timestamp||0, count: 0 };
-                    
-                    monthMap[mk].count++;
-                    monthMap[mk].lotes += (Number(r.lotesCount) || 0);
-                    if(r.tipo === 'Siniestrados') monthMap[mk].siniestros += (Number(r.ventaTotal) || 0);
-                    if(r.tipo === 'Retail') monthMap[mk].retail += (Number(r.ventaTotal) || 0);
-                    monthMap[mk].nuevos += (Number(r.nuevos) || 0); monthMap[mk].antiguos += (Number(r.antiguos) || 0);
-                });
-                Object.values(monthMap).sort((a,b)=>a.rawD - b.rawD).forEach(v => {
-                    chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos); cMatrices.push(v.count); cLotes.push(v.lotes);
-                });
-            } else {
-                allRemates.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0)).forEach(r => {
-                    chartLabels.push(window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp));
-                    cSiniestros.push(r.tipo === 'Siniestrados' ? (Number(r.ventaTotal) || 0) : 0);
-                    cRetail.push(r.tipo === 'Retail' ? (Number(r.ventaTotal) || 0) : 0);
-                    cNuevos.push(Number(r.nuevos) || 0); cRecurrentes.push(Number(r.antiguos) || 0); cMatrices.push(1); cLotes.push(Number(r.lotesCount) || 0);
-                });
-            }
-
-            const showRetail = cRetail.some(val => val > 0);
-            let datasetsVentas = [
-                {label:'Venta Siniestrados', data: cSiniestros, type: 'line', borderColor: '#111827', backgroundColor: '#111827', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 3, yAxisID: 'y'}
-            ];
-            if(showRetail) datasetsVentas.push({label:'Venta Retail', data: cRetail, type: 'line', borderColor: '#9CA3AF', backgroundColor: '#9CA3AF', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#9CA3AF', pointRadius: 3, yAxisID: 'y'});
-            
-            datasetsVentas.push({label:'Lotes Vendidos', data: cLotes, type: 'bar', backgroundColor: '#E5E7EB', borderRadius: 4, yAxisID: 'y1'});
-
-            const canvasVentas = document.getElementById('dash-chartVentas');
-            if(canvasVentas) {
-                if(dashChartVentasInst) dashChartVentasInst.destroy();
-                dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), { 
-                    type: 'line', 
-                    data: { labels: chartLabels, datasets: datasetsVentas }, 
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        plugins: {
-                            tooltip: { callbacks: { afterBody: function(context) { return '\nMatrices: ' + cMatrices[context[0].dataIndex]; } } },
-                            legend: { display: true, position: 'bottom', labels: { boxWidth: 10, usePointStyle: true } }
-                        },
-                        scales: { 
-                            y: { type: 'linear', display: true, position: 'left', beginAtZero: true, grid: { color: '#F3F4F6' } },
-                            y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
-                        } 
-                    } 
-                });
-            }
-
-            const canvasClientes = document.getElementById('dash-chartClientes');
-            if (canvasClientes) {
-                if(dashChartClientesInst) dashChartClientesInst.destroy();
-                dashChartClientesInst = new Chart(canvasClientes.getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: [{label:'Recurrentes', data: cRecurrentes, backgroundColor: '#111827', borderRadius:4}, {label:'Nuevos', data: cNuevos, backgroundColor: '#D1D5DB', borderRadius:4}] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10 } } }, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: '#F3F4F6' } } } } });
-            }
-        } catch(e) { console.error("Error graficos", e); }
-
-    } catch(e) { console.error(e); }
-};
-
-window.renderComparativa = function() {
-    try {
-        if(currentModule !== 'comparativa') return; 
-        
-        let allRemates = getSelectedRemates();
-        let groupMode = document.getElementById('comp-groupby').value;
-        let groups = {};
-        let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
-        allRemates.forEach(r => {
-            let d = r.fechaData;
-            let dateObj = d?.timestamp ? new Date(d.timestamp) : new Date();
-            let y = d?.year || dateObj.getFullYear();
-            let m = dateObj.getMonth(); 
-            
-            let key = ''; let label = '';
-            
-            if(groupMode === 'remate') {
-                key = `R-${d?.timestamp || 0}-${r.id}`; 
-                label = window.formatearNombreRemate(r.fileName, d?.timestamp);
-            } else if(groupMode === 'year') {
-                key = `${y}`; label = `Año ${y}`;
-            } else if(groupMode === 'semester') {
-                let s = m < 6 ? 1 : 2;
-                key = `${y}-S${s}`; label = `S${s} ${y}`;
-            } else if(groupMode === 'quarter') {
-                let q = Math.floor(m/3) + 1;
-                key = `${y}-Q${q}`; label = `Q${q} ${y}`;
-            } else {
-                key = `${y}-${String(m).padStart(2,'0')}`; 
-                label = `${monthNamesShort[m]} ${y}`;
-            }
-            
-            if(!groups[key]) groups[key] = { label, key, remates: [], timestamp: d?.timestamp || 0 };
-            groups[key].remates.push(r);
-        });
-
-        let sortedKeys;
-        if(groupMode === 'remate') {
-            sortedKeys = Object.keys(groups).sort((a,b) => groups[a].timestamp - groups[b].timestamp);
-        } else {
-            sortedKeys = Object.keys(groups).sort();
-        }
-
-        let tableHtml = '';
-        let chartLabels = [];
-        let dataVenta = [];
-        let dataComision = [];
-        let dataLotes = [];
-        let dataMatrices = [];
-
-        sortedKeys.forEach(k => {
-            let g = groups[k];
-            let agg = buildAgg(g.remates);
-            chartLabels.push(g.label);
-            dataVenta.push(agg.venta);
-            dataComision.push(agg.comisionTotal);
-            dataLotes.push(agg.lotes); 
-            dataMatrices.push(g.remates.length);
-            
-            tableHtml += `
-            <tr class="hover:bg-gray-50 transition border-b border-gray-100">
-                <td class="pl-4 py-3 font-medium text-gray-900">${g.label}</td>
-                <td class="text-center py-3 text-gray-500">${g.remates.length}</td>
-                <td class="text-center py-3 text-gray-900">${agg.lotes.toLocaleString('es-CL')}</td>
-                <td class="text-center py-3 font-semibold text-emerald-600">${agg.eficaciaLotes.toFixed(1)}%</td>
-                <td class="text-right py-3 font-bold text-gray-900">${formatMoney(agg.venta)}</td>
-                <td class="text-right pr-4 py-3 font-medium text-gray-500">${formatMoney(agg.comisionTotal)}</td>
-            </tr>`;
-        });
-
-        document.getElementById('comp-table-body').innerHTML = tableHtml;
-
-        const canvasComp = document.getElementById('comp-chart');
-        if(canvasComp) {
-            if(compChartInst) compChartInst.destroy();
-            compChartInst = new Chart(canvasComp.getContext('2d'), { 
-                type: 'line', 
-                data: { 
-                    labels: chartLabels, 
-                    datasets: [
-                        { label: 'Venta Total Adjudicada', data: dataVenta, type: 'line', borderColor: '#111827', backgroundColor: '#111827', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 3, yAxisID: 'y' },
-                        { label: 'Comisiones Estimadas', data: dataComision, type: 'line', borderColor: '#9CA3AF', backgroundColor: '#9CA3AF', borderWidth: 1.5, borderDash: [5, 5], tension: 0.3, pointBackgroundColor: '#9CA3AF', pointRadius: 2, yAxisID: 'y' },
-                        { label: 'Lotes Vendidos', data: dataLotes, type: 'bar', backgroundColor: '#E5E7EB', borderRadius: 4, yAxisID: 'y1' }
-                    ] 
-                }, 
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: {
-                        tooltip: { callbacks: { afterBody: function(context) { return '\nMatrices: ' + dataMatrices[context[0].dataIndex]; } } },
-                        legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true } }
-                    },
-                    scales: { 
-                        y: { type: 'linear', display: true, position: 'left', beginAtZero: true, grid: { color: '#F3F4F6'} },
-                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
-                    } 
-                } 
-            });
-        }
-    } catch(e) { console.error(e); }
-};
-
-window.filtrarLotesMain = function() {
-    const term = (document.getElementById('search-lotes-main').value || '').toLowerCase();
-    const tbody = document.getElementById('dash-tabla-lotes');
-    if(!tbody) return;
-    const rows = tbody.getElementsByTagName('tr');
-    for(let i=0; i<rows.length; i++) {
-        const text = rows[i].innerText.toLowerCase();
-        rows[i].style.display = text.includes(term) ? '' : 'none';
-    }
-};
-
-window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-5 py-2 font-bold text-gray-900">${nombre}</td><td class="text-center py-2 font-black text-gray-700">${data.lotes}</td><td class="text-right pr-5 py-2 font-black text-emerald-600">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
-window.cerrarModalMulti = function(e) { 
-    if(e && e.target.id !== 'modal-multilote') return;
-    document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); 
-};
-
-// === DISEÑO ESTRUCTURADO DE DATOS ===
-window.renderConclusiones = function() {
-    try {
-        if(currentModule !== 'conclusiones') return; 
-        let allRemates = getSelectedRemates(); const agg = buildAgg(allRemates); let html = ''; globalAgg = agg; if(!clientDB.length) procesarDatosClientes(); 
-
-        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; let sobreColor = agg.sobreprecioReal >= 0 ? 'text-emerald-600' : 'text-red-500';
-        let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        let pctNuevos = agg.garantias ? (agg.nuevos / agg.garantias * 100) : 0;
-        let multi = 0; const mapC={}; agg.adjudicaciones.forEach(a=>{ if(!a.esFalso) { mapC[a.clienteReal]=(mapC[a.clienteReal]||0)+1; } }); Object.values(mapC).forEach(v=>{ if(v>1) multi++; });
-        let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
-
-        // SECCIÓN 1: Resultados Financieros
-        html += `
-        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <div class="text-[13px] font-black mb-1">Resultados Financieros</div>
-            <div class="text-[12px] text-gray-500 mb-3">Análisis de rentabilidad y comisiones por periodo seleccionado</div>
-            <table class="w-full text-[12px]">
-                <tbody class="divide-y divide-gray-100">
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Venta Total Adjudicada</td><td class="py-2.5 font-bold text-lg">${formatMoney(agg.venta)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Suma operaciones válidas</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Comisiones Estimadas</td><td class="py-2.5 font-bold text-blue-600">${formatMoney(agg.comisionTotal)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Ingresos al 8/12%</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Ticket Promedio</td><td class="py-2.5 font-bold">${formatMoney(agg.ticketPromedio)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${agg.lotes} ops</td></tr>
-                </tbody>
-            </table>
-        </div>`;
-
-        // SECCIÓN 2: Rendimiento de Catálogo
-        html += `
-        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <div class="text-[13px] font-black mb-1">Rendimiento de Catálogo</div>
-            <div class="text-[12px] text-gray-500 mb-3">Efectividad y rotación por matriz</div>
-            <table class="w-full text-[12px]">
-                <tbody class="divide-y divide-gray-100">
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Efectividad Total</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${agg.eficaciaLotes.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Subastado exitosamente</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Volumen Físico</td><td class="py-2.5 font-bold">${agg.lotes.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">de ${agg.lotesDisponibles.toLocaleString('es-CL')} disp.</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Unidades procesadas</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Incremento sobre Mínimo</td><td class="py-2.5 font-bold">${sobreSigno}${formatMoney(agg.deltaPujaTotal)} <span class="${sobreColor} font-bold text-[10px] ml-1">(${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Margen pujas</td></tr>
-                </tbody>
-            </table>
-        </div>`;
-
-        // SECCIÓN 3: Tracción
-        html += `
-        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <div class="text-[13px] font-black mb-1">Tracción y Audiencia</div>
-            <div class="text-[12px] text-gray-500 mb-3">Comportamiento de audiencia y adquisición de clientes</div>
-            <table class="w-full text-[12px]">
-                <tbody class="divide-y divide-gray-100">
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Tasa de Cierre</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${tasaExito.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">De ${agg.garantias.toLocaleString('es-CL')} garantías</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Fuga de Clientes</td><td class="py-2.5 font-bold text-red-500">${agg.perdedoresCount.toLocaleString('es-CL')} <button onclick="window.abrirModalFuga()" class="ml-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-[10px] font-bold transition">VER</button></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pagaron garantía sin compra</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Clientes Nuevos</td><td class="py-2.5 font-bold">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Adquisición pura</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Limpieza Datos (Falsos)</td><td class="py-2.5 font-bold text-gray-400">${falsos}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pujas internas de prueba</td></tr>
-                </tbody>
-            </table>
-        </div>`;
-
-        document.getElementById('conclusiones-content').innerHTML = html;
-    } catch (e) { console.error(e); }
-};
-
-window.renderPanelAutos = function(){
-    try {
-        if(currentModule !== 'autos') return; 
-        let autos = []; let allRemates = getSelectedRemates(); allRemates.forEach(r => { r.adjudicaciones.forEach(a => { if(!a.esFalso && !a.esChatarra) autos.push({...a, remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)}); }); });
-        let marcasMap = {}; let modelosMap = {}; autos.forEach(a => { if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') marcasMap[a.categoria] = (marcasMap[a.categoria]||0) + 1; if(a.modeloStr && a.modeloStr.trim() !== '') modelosMap[a.modeloStr] = (modelosMap[a.modeloStr]||0) + 1; });
-        const marcasSorted = Object.entries(marcasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        try {
-            if(flotaMarcasInst) flotaMarcasInst.destroy(); if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { flotaMarcasInst=new Chart(document.getElementById('flota-marcas-chart').getContext('2d'),{type:'doughnut',data:{labels:marcasSorted.map(m=>m[0]),datasets:[{data:marcasSorted.map(m=>m[1]),backgroundColor:['#111827','#374151','#6B7280','#9CA3AF','#D1D5DB'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right', labels: {boxWidth: 10}}}}}); }
-            const modelosSorted = Object.entries(modelosMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
-            if(flotaAniosInst) flotaAniosInst.destroy(); if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { flotaAniosInst=new Chart(document.getElementById('flota-modelos-chart').getContext('2d'),{type:'bar',data:{labels:modelosSorted.map(a=>a[0]),datasets:[{label:'Unidades',data:modelosSorted.map(a=>a[1]),backgroundColor:'#111827',borderRadius:4}]},options:{indexAxis: 'y', responsive:true,maintainAspectRatio:false, plugins: { legend: { display: false } }, scales:{x:{grid:{color:'#F3F4F6'}},y:{grid:{display:false}}}}}); }
-        } catch(ec) {}
-        const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); if(term) autos = autos.filter(a => (a.loteStr||'').toLowerCase().includes(term) || (a.categoria||'').toLowerCase().includes(term) || (a.numeroLote||'').toString().includes(term) || (a.modeloStr||'').toLowerCase().includes(term) || (a.patente||'').toLowerCase().includes(term));
-        if(document.getElementById('flota-tabla-resultados')) document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
-            return `<tr class="hover:bg-gray-50 transition"><td class="px-4 py-2 font-medium text-gray-500 max-w-[150px] truncate" title="${a.remate}">${a.remate}</td><td class="px-3 py-2 text-center text-gray-800">Lote ${a.numeroLote||'-'}</td><td class="px-3 py-2 max-w-[200px] truncate"><span class="font-bold text-gray-900">${a.categoria}</span> <span class="text-gray-500 font-medium">${a.modeloStr}</span> ${a.patente && a.patente!=='-' ? `<span class="text-[10px] text-gray-400 ml-1">(${a.patente})</span>` : ''}</td><td class="px-3 py-2 text-right text-gray-500 font-medium">${formatMoney(a.minimo)}</td><td class="px-4 py-2 text-right font-bold text-emerald-700">${formatMoney(a.monto)}</td></tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin vehículos en la selección actual.</td></tr>';
-    } catch (e) {}
-};
-
-window.abrirModalFuga = function() {
-    try {
-        if(!globalAgg) return; let html = '';
-        if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
-            globalAgg.fugaList.sort((a,b)=>a.nombre.localeCompare(b.nombre)); let hoy = Date.now();
-            globalAgg.fugaList.forEach(f => { 
-                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
-                let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
-                let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
-                html += `<tr class="hover:bg-gray-50"><td class="pl-5 py-2 font-medium text-gray-900 truncate max-w-[150px]">${nombreRemate}</td><td class="py-2 text-red-500 font-bold">${textoDias}</td><td class="py-2 font-bold text-gray-900 truncate max-w-[200px]">${f.nombre}</td></tr>`; 
-            });
-        } else { html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">No hay registros de fuga.</td></tr>'; }
-        if(document.getElementById('modal-tabla-fuga')) document.getElementById('modal-tabla-fuga').innerHTML = html; document.getElementById('modal-fuga').classList.remove('hidden'); document.getElementById('modal-fuga').classList.add('flex');
-    } catch (e) {}
-};
-window.cerrarModalFuga = function(e) { 
-    if(e && e.target.id !== 'modal-fuga') return;
-    document.getElementById('modal-fuga').classList.add('hidden'); document.getElementById('modal-fuga').classList.remove('flex'); 
-};
-
-window.exportarFugaExcel = function() {
-    try {
-        if(!globalAgg || !globalAgg.fugaList) return; let hoy = Date.now();
-        const wsData = globalAgg.fugaList.map(f => { 
-            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
-            let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate);
-            return { "Matriz": nombreRemate, "Días Inactivo": diasFuga, "Fecha": f.fechaRemate ? window.formatExcelDate(f.fechaRemate) : '-', "Cliente": f.nombre, "RUT": f.rut || 'No Registrado', "Email": f.email || 'No Registrado' }; 
-        });
-        const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
-    } catch (e) {}
-};
-
-window.abrirModalPujadores = function(loteEncoded, nodeId){
-    try {
-        const loteStr = decodeURIComponent(loteEncoded); 
-        let remate = db.remates.find(r => r.id === nodeId);
-        if(!remate) return;
-
-        let todasPujas = remate.posturasPorLote ? (remate.posturasPorLote[loteStr] || []) : [];
-        let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null; 
-        
-        currentAdjudicadoModal = adjudicado; 
-        currentModalPujas = todasPujas.sort((a,b)=>b.monto-a.monto);
-        
-        if(document.getElementById('modal-subtitulo')) document.getElementById('modal-subtitulo').innerText=`Adj: ${adjudicado && !adjudicado.esFalso?formatMoney(adjudicado.monto):'FALSO'} | Min: ${adjudicado?formatMoney(adjudicado.minimo):'-'}`;
-        if(document.getElementById('modal-total-pujas')) document.getElementById('modal-total-pujas').innerText=todasPujas.length; 
-        if(document.getElementById('modal-unicos-reales')) document.getElementById('modal-unicos-reales').innerText=[...new Set(todasPujas.filter(p=>!p.esFalso).map(p=>p.nombreNorm))].length; 
-        
-        currentFiltroModal='todos'; 
-        if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className='px-3 py-1.5 rounded-md bg-black text-white transition'; 
-        if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className='px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
-        
-        renderModalTabla(); 
-        document.getElementById('modal-pujadores').classList.remove('hidden'); document.getElementById('modal-pujadores').classList.add('flex');
-    } catch(e) { console.error("Error modal pujas:", e); }
-};
-
-function renderModalTabla(){
-    try {
-        let lista=currentModalPujas; let adjudicado = currentAdjudicadoModal;
-        if(currentFiltroModal==='reales') lista=lista.filter(p=>!p.esFalso); if(currentFiltroModal==='falsos') lista=lista.filter(p=>p.esFalso);
-        if(document.getElementById('modal-tabla-pujas')) document.getElementById('modal-tabla-pujas').innerHTML=lista.map((p,i)=>{
-            let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto-adjudicado.monto)<1000;
-            let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">FALSO</span>' : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>'; if(esAdj) badge+=' <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 ml-1">ADJUDICADO</span>';
-            return `<tr class="hover:bg-gray-50 transition ${esAdj?'bg-emerald-50/20':''} ${p.esFalso?'opacity-40':''}"><td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td><td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td><td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td><td class="text-right py-2 text-[12px] font-black ${esAdj?'text-emerald-600':'text-gray-900'}">${formatMoney(p.monto)}</td><td class="text-center pr-5 py-2">${badge}</td></tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin pujas registradas en el excel</td></tr>';
-    } catch(e) {}
-}
-
-window.filtrarModal = function(tipo){ currentFiltroModal=tipo; if(document.getElementById('btn-filtro-todos')) document.getElementById('btn-filtro-todos').className=tipo==='todos'?'px-3 py-1.5 rounded-md bg-black text-white transition':'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; if(document.getElementById('btn-filtro-reales')) document.getElementById('btn-filtro-reales').className=tipo==='reales'?'px-3 py-1.5 rounded-md bg-black text-white transition':'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; renderModalTabla(); };
-window.cerrarModal = function(e){ 
-    if(e && e.target.id !== 'modal-pujadores') return;
-    document.getElementById('modal-pujadores').classList.add('hidden'); document.getElementById('modal-pujadores').classList.remove('flex'); 
-};
-
-function procesarDatosClientes(){ 
-    try {
-        let allRemates = getSelectedRemates(); if(!allRemates.length) { clientDB=[]; return; }
-        const mapBI={}; const MAX_TIMESTAMP=Math.max(...allRemates.map(r=>r.fechaData?.timestamp||0)); 
-        allRemates.forEach(r=>{ 
-            r.adjudicaciones.forEach(adj=>{ 
-                if(adj.esFalso) return; const c=adj.clienteReal; 
-                if(!mapBI[c]) mapBI[c]={nombre:c, rut: adj.rut||'-', email: adj.email||'-', compras:[],totalGastado:0,lotesSiniestrados:0,lotesRetail:0,tipos:new Set()}; 
-                mapBI[c].compras.push({fecha:r.fechaData?.timestamp,monto:adj.monto, tipo: r.tipo, lote: adj.numeroLote? 'Lote '+adj.numeroLote : (adj.loteStr?adj.loteStr.substring(0,10):''), remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)}); 
-                mapBI[c].totalGastado += (Number(adj.monto) || 0); 
-                if(r.tipo==='Siniestrados') mapBI[c].lotesSiniestrados++; else mapBI[c].lotesRetail++; mapBI[c].tipos.add(r.tipo); 
-            }); 
-        }); 
-        clientDB=Object.values(mapBI).map(c=>{ 
-            c.compras.sort((a,b)=>b.fecha-a.fecha); c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null; c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null; c.frecuencia=c.compras.length; c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP-c.ultimaCompra)/(1000*60*60*24)) : 0; c.isHibrido=c.tipos.size>1; 
-            if(c.frecuencia>3 && c.recencyDias<=60){ c.segmento="Frecuente"; c.color="text-gray-900"; c.bg="bg-black text-white"; } else if(c.frecuencia>1 && c.recencyDias<=60){ c.segmento="Recurrente"; c.color="text-blue-700"; c.bg="bg-black text-white"; } else if(c.frecuencia===1 && c.recencyDias<=60){ c.segmento="Nuevo"; c.color="text-emerald-700"; c.bg="bg-gray-100 text-gray-700"; } else { c.segmento="En Riesgo"; c.color="text-red-600"; c.bg="bg-red-50 text-red-600"; } return c; 
-        }).sort((a,b)=>b.totalGastado-a.totalGastado); 
-    } catch(e) {}
-}
-
-window.renderPanelClientesData = function(filtered,isFiltered=false){ 
-    try {
-        if(document.getElementById('bi-kpi-total')) document.getElementById('bi-kpi-total').innerText=clientDB.length; if(document.getElementById('bi-kpi-ltv')) document.getElementById('bi-kpi-ltv').innerText=formatMoney(clientDB.length ? clientDB.reduce((a,b)=>a+b.totalGastado,0)/clientDB.length : 0); if(document.getElementById('bi-kpi-hibridos')) document.getElementById('bi-kpi-hibridos').innerText=clientDB.filter(c=>c.isHibrido).length; if(document.getElementById('bi-kpi-inactivos')) document.getElementById('bi-kpi-inactivos').innerText=clientDB.filter(c=>c.segmento==="En Riesgo").length; 
-        if(document.getElementById('bi-tabla-clientes')) { document.getElementById('bi-tabla-clientes').innerHTML=filtered.map(c=>`<tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-gray-50 transition"><td class="px-4 py-2 font-medium text-gray-900 max-w-[150px] truncate">${c.nombre}</td><td class="px-3 py-2 text-center text-gray-500">${c.frecuencia}</td><td class="px-3 py-2 text-right font-semibold text-emerald-600">${formatMoney(c.totalGastado)}</td><td class="px-4 py-2 text-center hidden sm:table-cell"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.bg}">${c.segmento}</span></td></tr>`).join(''); }
-        if(!isFiltered){ const segCount={}; clientDB.forEach(c=>{ segCount[c.segmento]=(segCount[c.segmento]||0)+1; }); if(biChartSegmentsInst) biChartSegmentsInst.destroy(); if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { biChartSegmentsInst=new Chart(document.getElementById('bi-chartSegments').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(segCount),datasets:[{data:Object.values(segCount),backgroundColor:['#111827','#6B7280','#D1D5DB','#DC2626'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'75%',plugins:{legend:{position:'right', labels:{boxWidth:10}}}}}); } } 
-    } catch(e) {}
-};
-
-window.filtrarClientes = function(){ try { const term=(document.getElementById('search-client').value||'').toLowerCase(); const tipo=document.getElementById('filter-client-type').value; let filtered=clientDB.filter(c=>{ const matchName=(c.nombre||'').toLowerCase().includes(term); let matchTipo=true; if(tipo==='siniestrados') matchTipo=c.lotesSiniestrados>0 && c.lotesRetail===0; if(tipo==='retail') matchTipo=c.lotesRetail>0 && c.lotesSiniestrados===0; if(tipo==='ambos') matchTipo=c.isHibrido; return matchName && matchTipo; }); window.renderPanelClientesData(filtered, term!=="" || tipo!=="todos"); } catch(e) {} };
-
-window.abrirFichaCliente = function(nombreStr){ 
-    try {
-        const c=clientDB.find(x=>x.nombre===nombreStr); if(!c) return; 
-        if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
-        if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText=c.nombre; if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText=c.rut; if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText=c.email; if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText=c.primeraCompra?window.formatExcelDate(c.primeraCompra):'-'; if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText=`Hace ${c.recencyDias} d`; if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText=c.frecuencia; if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Siniestrados').reduce((a,b)=>a+(Number(b.monto)||0),0)); if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText=formatMoney(c.compras.filter(x=>x.tipo==='Retail').reduce((a,b)=>a+(Number(b.monto)||0),0)); 
-        if(document.getElementById('ficha-historial-tabla')) document.getElementById('ficha-historial-tabla').innerHTML=c.compras.map(h=>`<tr class="hover:bg-white/5"><td class="py-2 px-3 text-[11px] text-gray-400">${h.fecha?window.formatExcelDate(h.fecha):'-'}</td><td class="py-2 px-3 text-[11px] text-white truncate max-w-[120px]">${h.remate ? h.remate : '-'}</td><td class="py-2 px-3 text-[11px] text-gray-400">${h.tipo}</td><td class="py-2 px-3 text-[11px] font-bold text-blue-400">${h.lote}</td><td class="py-2 px-3 text-right text-[11px] font-bold text-emerald-400">${formatMoney(h.monto)}</td></tr>`).join(''); 
-        if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
-    } catch(e) {}
-};
-
-window.cerrarFicha = function(){ if(document.getElementById('bi-ficha-cliente')) document.getElementById('bi-ficha-cliente').classList.add('hidden'); };
-
-window.buscarPatente = function(){ 
-    try {
-        const term=(document.getElementById('search-patente').value||'').toUpperCase().trim(); const tbody=document.getElementById('buscador-tabla-resultados'); 
-        if(term.length<3){ tbody.innerHTML='<tr><td colspan="6" class="px-4 py-10 text-center text-gray-400 font-medium">Usa la barra superior para buscar en toda la base de datos sincronizada.</td></tr>'; return; } 
-        let resultados=[]; db.remates.forEach(r=>{ r.adjudicaciones.forEach(adj=>{ if((adj.loteStr||'').includes(term) || (adj.clienteReal||'').includes(term) || (adj.numeroLote||'').toString().includes(term) || (adj.rut||'').includes(term) || (adj.email||'').toUpperCase().includes(term) || (adj.patente||'').toUpperCase().includes(term)){ resultados.push({fecha:r.fechaData?.timestamp,remate:window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),lote:adj.loteStr,numeroLote:adj.numeroLote,monto:adj.monto,cliente:adj.clienteReal,patente:adj.patente}); } }); }); resultados.sort((a,b)=>b.fecha-a.fecha); 
-        if(!resultados.length){ tbody.innerHTML=`<tr><td colspan="6" class="px-4 py-10 text-center font-bold text-red-500">Sin resultados para la búsqueda "${term}"</td></tr>`; return; } 
-        tbody.innerHTML=resultados.map(res=>`<tr class="hover:bg-gray-50 transition"><td class="px-4 py-2 text-gray-500 font-medium">${res.fecha?window.formatExcelDate(res.fecha):'-'}</td><td class="px-3 py-2 font-medium text-gray-900 truncate max-w-[150px]">${res.remate ? res.remate : '-'}</td><td class="px-3 py-2 text-center text-gray-500">Lote ${res.numeroLote||'-'}</td><td class="px-3 py-2 max-w-[200px] truncate hidden sm:table-cell text-gray-700">${res.lote} ${res.patente && res.patente !== '-' ? `<span class="text-[10px] text-gray-400 ml-1">(${res.patente})</span>` : ''}</td><td class="px-3 py-2 font-bold text-gray-900 truncate max-w-[150px]">${res.cliente}</td><td class="px-4 py-2 text-right font-black text-emerald-600">${formatMoney(res.monto)}</td></tr>`).join(''); 
-    } catch(e) {}
-};
 </script>
 </body>
 </html>
