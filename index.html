@@ -38,7 +38,7 @@
         .nav-item:hover { background-color: #F3F4F6; color: #111827; }
         .nav-active { background-color: #111827 !important; color: #FFFFFF !important; font-weight: 700; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
         
-        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.15rem; height: 1.15rem; border: 1.5px solid #D1D5DB; border-radius: 0.25rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
+        input[type="checkbox"] { appearance: none; background-color: #fff; margin: 0; width: 1.1rem; height: 1.1rem; border: 1.5px solid #D1D5DB; border-radius: 0.2rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
         input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
         input[type="checkbox"]:checked { background-color: #111827; border-color: #111827; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
@@ -62,20 +62,19 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
+<body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.4 (Stable UI)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v7.3 (UX Fix)</div>
 
-    <!-- OVERLAY GIGANTE DE SINCRONIZACIÓN INICIAL -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] flex-col items-center justify-center transition-all backdrop-blur-sm flex">
-        <div class="w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin shadow-sm mb-6"></div>
-        <h2 class="text-3xl font-black text-gray-900 tracking-tight text-center mb-2">Zárate Analítica</h2>
-        <p id="loading-text" class="font-bold text-blue-600 text-sm tracking-widest text-center uppercase">Sincronizando Base de Datos...</p>
-        <p class="text-[10px] text-gray-500 mt-4 font-medium uppercase">Preparando datos consolidados</p>
+    <!-- OVERLAY DE CARGA -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[200] hidden flex-col items-center justify-center transition-all">
+        <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin shadow-sm"></div>
+        <p id="loading-text" class="mt-6 font-bold text-gray-900 text-lg tracking-tight text-center max-w-xs">Procesando...</p>
+        <p class="text-xs text-gray-500 uppercase tracking-widest mt-1 font-medium">No cierre esta ventana</p>
     </div>
 
     <!-- PANTALLA DE LOGIN -->
-    <div id="login-screen" class="fixed inset-0 bg-gray-100 z-[100] flex items-center justify-center p-4 hidden">
+    <div id="login-screen" class="fixed inset-0 bg-gray-100 z-[100] flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-lg shadow-xl border border-gray-200 w-full max-w-[360px] text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 to-green-500"></div>
             <div class="w-12 h-12 rounded-md bg-black flex items-center justify-center font-bold text-white text-xl mx-auto mb-4 shadow-sm">Z</div>
@@ -104,7 +103,7 @@
         <!-- HEADER MAESTRO -->
         <header class="bg-gray-900 px-4 md:px-6 py-2.5 flex items-center justify-between shrink-0 z-30 relative shadow-md no-print text-white">
             <div class="flex items-center gap-3">
-                <button onclick="window.toggleSidebar(event)" class="md:hidden text-gray-300 hover:text-white transition p-1 bg-gray-800 rounded"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-300 hover:text-white transition p-1 bg-gray-800 rounded"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
                 <div class="w-7 h-7 rounded bg-white flex items-center justify-center font-bold text-black text-sm shadow-sm">Z</div>
                 <div class="hidden sm:block"><h1 class="font-bold text-sm tracking-wide text-gray-100">Zárate Analítica</h1></div>
             </div>
@@ -120,61 +119,50 @@
 
         <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
         <div id="paraguas-bar" class="bg-white border-b border-gray-300 px-4 md:px-6 py-2.5 flex justify-between items-center shrink-0 z-20 sticky top-0 shadow-sm no-print">
-            <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1 relative">
+            <div class="flex items-center gap-2 md:gap-3 flex-wrap flex-1">
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:inline mr-2">Filtro Global</span>
                 
-                <select id="macro-segment" onchange="window.renderApp()" class="bg-white border border-gray-300 rounded px-2.5 py-2 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition shadow-sm"></select>
+                <select id="macro-segment" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition"></select>
                 <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
                 
-                <!-- SUPER FILTRO DE TIEMPO PERSONALIZADO -->
-                <div class="relative" id="dropdown-container">
-                    <button type="button" onclick="window.toggleDropdown(event)" class="bg-blue-50 border border-blue-200 rounded px-4 py-2 text-xs font-black text-blue-800 flex items-center gap-2 hover:bg-blue-100 transition shadow-sm min-w-[200px] justify-between">
-                        <span id="dropdown-label">📅 Cargando...</span>
-                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
+                <!-- Año ahora puede ser ALL para cruzar datos -->
+                <select id="macro-year" onchange="window.updateMacroFilter()" class="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs font-bold text-gray-900 outline-none cursor-pointer hover:bg-gray-50 transition">
+                    <option value="ALL">🌐 Todos los Años</option>
+                </select>
+                <span class="text-gray-300 font-light text-lg hidden sm:inline">/</span>
+                
+                <!-- Periodo limpio sin Custom -->
+                <select id="macro-period" onchange="window.updateMacroFilter()" class="bg-blue-50 border border-blue-200 rounded px-2.5 py-1.5 text-xs font-bold text-blue-800 outline-none cursor-pointer hover:bg-blue-100 transition">
+                    <option value="ALL">Todo el Año</option>
+                    <optgroup label="Semestres">
+                        <option value="S1">1er Semestre (Ene-Jun)</option>
+                        <option value="S2">2do Semestre (Jul-Dic)</option>
+                    </optgroup>
+                    <optgroup label="Trimestres">
+                        <option value="Q1">Q1 (Ene-Mar)</option>
+                        <option value="Q2">Q2 (Abr-Jun)</option>
+                        <option value="Q3">Q3 (Jul-Sep)</option>
+                        <option value="Q4">Q4 (Oct-Dic)</option>
+                    </optgroup>
+                    <optgroup label="Meses">
+                        <option value="M0">Enero</option>
+                        <option value="M1">Febrero</option>
+                        <option value="M2">Marzo</option>
+                        <option value="M3">Abril</option>
+                        <option value="M4">Mayo</option>
+                        <option value="M5">Junio</option>
+                        <option value="M6">Julio</option>
+                        <option value="M7">Agosto</option>
+                        <option value="M8">Septiembre</option>
+                        <option value="M9">Octubre</option>
+                        <option value="M10">Noviembre</option>
+                        <option value="M11">Diciembre</option>
+                    </optgroup>
+                    <option value="MANUAL" hidden class="bg-gray-800 text-white">📌 Selección Manual</option>
+                </select>
 
-                    <!-- CONTENIDO DEL SUPER FILTRO -->
-                    <div id="dropdown-menu" onclick="event.stopPropagation()" class="hidden absolute top-full mt-1.5 left-0 bg-white border border-gray-200 rounded-lg shadow-2xl w-80 z-50 flex-col overflow-hidden">
-                        
-                        <!-- 1. AÑOS EN COLUMNAS (BOTONES/PILLS) -->
-                        <div class="p-3 border-b border-gray-200 bg-white">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2">1. Selecciona Año(s):</span>
-                            <div id="dropdown-years-grid" class="flex gap-2 flex-wrap">
-                                <!-- JS inyecta los botones de años aquí -->
-                            </div>
-                        </div>
-
-                        <!-- 2. ATAJOS RÁPIDOS -->
-                        <div class="p-3 bg-gray-50 border-b border-gray-200">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">2. Filtro Rápido:</span>
-                                <button type="button" onclick="window.quickSelect('NADA')" class="text-[10px] text-red-500 hover:text-red-700 underline font-bold transition">Desmarcar Todo</button>
-                            </div>
-                            <div class="grid grid-cols-4 gap-1.5">
-                                <button type="button" onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
-                                <button type="button" onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
-                                <button type="button" onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
-                                <button type="button" onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
-                                <button type="button" onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
-                                <button type="button" onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
-                                <button type="button" onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
-                            </div>
-                        </div>
-
-                        <!-- 3. ÁRBOL DE MESES ESPECÍFICO -->
-                        <div class="p-3 max-h-[35vh] overflow-y-auto bg-white" id="dropdown-tree">
-                            <!-- JS inyecta meses y remates aquí -->
-                        </div>
-                        
-                        <!-- BOTÓN APLICAR -->
-                        <div class="p-3 border-t border-gray-200 bg-gray-50">
-                            <button type="button" onclick="window.applyDropdown()" class="w-full bg-black text-white font-bold py-2.5 rounded-md hover:bg-gray-800 transition shadow-sm text-xs">Aplicar y Cerrar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- GESTOR MATRICES -->
-                <button onclick="window.abrirModalGestor()" class="ml-2 flex items-center gap-1.5 bg-gray-900 text-white border border-gray-900 text-[11px] font-bold px-4 py-2 rounded shadow-sm hover:bg-black transition shrink-0 hidden md:flex">
+                <!-- EL CORAZÓN: GESTOR DE MATRICES RE-UBICADO -->
+                <button onclick="window.abrirModalArbol()" class="ml-2 flex items-center gap-1.5 bg-gray-900 text-white border border-gray-900 text-[11px] font-bold px-4 py-1.5 rounded shadow-sm hover:bg-black transition shrink-0">
                     <span>🗂️</span> Gestor de Matrices (<span id="count-matrices-btn">0</span>)
                 </button>
             </div>
@@ -188,17 +176,19 @@
         </div>
 
         <div class="flex-1 flex overflow-hidden relative">
-            <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar(event)"></div>
+            <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar()"></div>
 
             <!-- SIDEBAR NAVEGACIÓN -->
             <aside id="sidebar" class="absolute md:relative z-40 w-[220px] h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 border-r border-gray-200 bg-white flex flex-col shrink-0 no-print">
                 <div class="p-3 flex-1 overflow-y-auto space-y-1">
                     <div class="flex justify-between items-center mb-4 px-2 mt-2">
                         <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Navegación</div>
-                        <button onclick="window.toggleSidebar(event)" class="md:hidden text-gray-400 hover:text-gray-800 p-1 bg-gray-100 rounded">✕</button>
+                        <button onclick="window.toggleSidebar()" class="md:hidden text-gray-400 hover:text-gray-800 p-1 bg-gray-100 rounded">✕</button>
                     </div>
                     <div id="nav-mod-remates" class="nav-item nav-active" onclick="window.cambiarSeccion('remates')">Resumen General</div>
+                    
                     <div id="nav-mod-comparativa" class="nav-item nav-inactive" onclick="window.cambiarSeccion('comparativa')">Comparativa Histórica</div>
+                    
                     <div id="nav-mod-autos" class="nav-item nav-inactive" onclick="window.cambiarSeccion('autos')">Análisis Vehicular</div>
                     <div id="nav-mod-clientes" class="nav-item nav-inactive" onclick="window.cambiarSeccion('clientes')">Gestión de Clientes</div>
                     <div id="nav-mod-conclusiones" class="nav-item nav-inactive" onclick="window.cambiarSeccion('conclusiones')">Datos</div>
@@ -223,7 +213,7 @@
                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global (arriba) o sube un Excel para comenzar a analizar.</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Sube archivos Excel o usa el Gestor de Matrices para comenzar a analizar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
@@ -290,16 +280,14 @@
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2 no-print">
                             <div class="glass-panel p-5">
                                 <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest">Composición de Ventas y Lotes</h4>
-                                    <select id="dash-groupby" onchange="window.renderApp()" class="bg-gray-50 border border-gray-200 rounded px-2 py-1 text-[10px] font-bold text-gray-700 outline-none cursor-pointer">
-                                        <option value="auto">Agrupación Automática</option>
-                                        <option value="remate">Matriz por Matriz</option>
-                                        <option value="month">Mes a Mes</option>
-                                    </select>
+                                    <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest">Evolución de Venta y Lotes (Doble Eje)</h4>
                                 </div>
-                                <div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartVentas"></canvas></div>
+                                <div class="relative h-64 md:h-80 w-full"><canvas id="dash-chartVentas"></canvas></div>
                             </div>
-                            <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4><div class="relative h-56 md:h-64 w-full"><canvas id="dash-chartClientes"></canvas></div></div>
+                            <div class="glass-panel p-5">
+                                <h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4">Tracción de Clientes</h4>
+                                <div class="relative h-64 md:h-80 w-full"><canvas id="dash-chartClientes"></canvas></div>
+                            </div>
                         </div>
 
                         <div class="glass-panel p-5 overflow-hidden w-full bg-white">
@@ -333,7 +321,7 @@
                         <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Comparativa Histórica</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Análisis de evolución temporal de los datos filtrados</p></div>
                         <div class="flex items-center gap-3 w-full md:w-auto">
                             <span class="text-xs font-bold text-gray-500 hidden sm:inline">Agrupar por:</span>
-                            <select id="comp-groupby" onchange="window.renderApp()" class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-bold text-gray-900 focus:border-blue-600 transition w-full sm:w-auto shadow-sm">
+                            <select id="comp-groupby" onchange="window.actualizarVistaActual()" class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-bold text-gray-900 focus:border-blue-600 transition w-full sm:w-auto shadow-sm">
                                 <option value="remate" selected>Matriz por Matriz</option>
                                 <option value="month">Mes a Mes</option>
                                 <option value="quarter">Trimestres (Q1-Q4)</option>
@@ -372,7 +360,7 @@
                 <div id="module-autos" class="hidden space-y-5 md:space-y-6 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-300 pb-4 no-print">
                         <div><h2 class="text-2xl md:text-3xl font-black tracking-tight text-gray-900">Análisis de Vehículos</h2><p class="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Estructura del catálogo adjudicado</p></div>
-                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 w-full md:w-64 focus:outline-none focus:border-blue-600 transition-all shadow-sm" onkeyup="window.renderApp()">
+                        <input type="text" id="search-flota" placeholder="Filtrar lote o marca..." class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 w-full md:w-64 focus:outline-none focus:border-blue-600 transition-all shadow-sm" onkeyup="window.renderPanelAutos()">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="glass-panel p-5"><h4 class="font-bold text-xs text-gray-500 uppercase tracking-widest mb-4 text-center">Top Marcas Adjudicadas</h4><div class="relative h-56 md:h-64 w-full"><canvas id="flota-marcas-chart"></canvas></div></div>
@@ -568,12 +556,8 @@ let db = { remates: [] };
 let checkedNodes = []; let clientDB = []; let currentModalPujas = []; let currentAdjudicadoModal = null; let currentFiltroModal='todos';
 let dashChartVentasInst=null, dashChartClientesInst=null, biChartSegmentsInst=null, flotaMarcasInst=null, flotaAniosInst=null, compChartInst=null;
 let currentModule='remates'; let globalMapCMulti = {}; let globalAgg = null;
-let currentGestorYearTab = null;
 
-// ESTADO FILTRO GLOBAL Y MEMORIA DE EXPANSIÓN
-window.globalSelectedYears = [];
-window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
-window.expandedDropMonths = new Set(); // Guarda los meses abiertos en el dropdown
+window.actualizarVistaActual = function() { window.renderApp(); };
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#6B7280'; 
@@ -581,8 +565,7 @@ if(typeof Chart !== 'undefined') {
     Chart.defaults.font.size = 11;
 }
 
-window.toggleSidebar = function(e) {
-    if(e) e.stopPropagation();
+window.toggleSidebar = function() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('mobile-overlay');
     if (sidebar.classList.contains('-translate-x-full')) {
@@ -591,16 +574,6 @@ window.toggleSidebar = function(e) {
     } else {
         sidebar.classList.add('-translate-x-full');
         overlay.classList.add('hidden');
-    }
-};
-
-window.closeMenus = function(e) {
-    const dropdown = document.getElementById('dropdown-menu');
-    const container = document.getElementById('dropdown-container');
-    if(dropdown && !dropdown.classList.contains('hidden')) {
-        if(!container.contains(e.target)) {
-            dropdown.classList.add('hidden'); dropdown.classList.remove('flex');
-        }
     }
 };
 
@@ -628,9 +601,6 @@ async function checkSession() {
             document.getElementById('app-content').classList.add('flex');
             initApp();
         } else {
-            document.getElementById('loading-overlay').classList.add('hidden');
-            document.getElementById('loading-overlay').classList.remove('flex');
-            
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('app-content').classList.add('hidden');
             document.getElementById('app-content').classList.remove('flex');
@@ -638,9 +608,6 @@ async function checkSession() {
             if(btn) { btn.innerHTML = "Iniciar Sesión"; btn.disabled = false; }
         }
     } catch(e) {
-        document.getElementById('loading-overlay').classList.add('hidden');
-        document.getElementById('loading-overlay').classList.remove('flex');
-        
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('app-content').classList.add('hidden');
         document.getElementById('app-content').classList.remove('flex');
@@ -662,10 +629,6 @@ window.handleLogin = async function(e) {
         if (error) throw error;
         if (data && !data.session) throw new Error("Cuenta inactiva.");
         btn.innerHTML = "Abriendo...";
-        
-        document.getElementById('loading-overlay').classList.remove('hidden');
-        document.getElementById('loading-overlay').classList.add('flex');
-        
         await checkSession();
     } catch (ex) {
         let msj = ex.message || "Error desconocido";
@@ -673,9 +636,6 @@ window.handleLogin = async function(e) {
         if(msj.includes("Invalid login")) msj = "Credenciales incorrectas.";
         err.innerText = msj; err.classList.remove('hidden');
         btn.innerHTML = "Iniciar Sesión"; btn.disabled = false;
-        
-        document.getElementById('loading-overlay').classList.add('hidden');
-        document.getElementById('loading-overlay').classList.remove('flex');
     }
 };
 
@@ -702,8 +662,6 @@ window.handleSetPassword = async function(e) {
 window.onload = () => {
     const hash = window.location.hash;
     if (hash && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
-        document.getElementById('loading-overlay').classList.add('hidden');
-        document.getElementById('loading-overlay').classList.remove('flex');
         document.getElementById('login-form').classList.add('hidden');
         document.getElementById('invite-form').classList.remove('hidden');
         document.getElementById('login-screen').style.display = 'flex';
@@ -735,12 +693,8 @@ window.formatearNombreRemate = function(fileName, timestamp) {
     } catch(e) { return "Matriz"; }
 };
 
-// --- LOGICA DE ARRANQUE E INICIO ---
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
-    const loadingOverlay = document.getElementById('loading-overlay');
-    loadingOverlay.classList.remove('hidden'); loadingOverlay.classList.add('flex');
-
     try {
         statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Sincronizando...';
         const { data, error } = await supabaseClient.from('app_state').select('*');
@@ -754,13 +708,8 @@ async function initApp() {
         }
     } catch (e) {
         statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
-    } finally {
-        loadingOverlay.classList.add('hidden'); loadingOverlay.classList.remove('flex');
     }
-    
-    if(db.remates && db.remates.length > 0) { 
-        window.actualizarFiltrosGlobales(true); // isInitialLoad = true
-    }
+    if(db.remates && db.remates.length > 0) { window.actualizarFiltrosGlobales(); }
 }
 
 window.updateAdminButtonCount = function() {
@@ -768,311 +717,100 @@ window.updateAdminButtonCount = function() {
     if (btnCount) btnCount.innerText = checkedNodes.length;
 };
 
-window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
+window.actualizarFiltrosGlobales = function() {
     if(!db.remates || !db.remates.length) return;
-    let segments = new Set();
-    db.remates.forEach(r => { segments.add(r.tipo || 'Desconocido'); });
-    
-    let segSelect = document.getElementById('macro-segment');
-    let currentSeg = segSelect.value || Array.from(segments)[0];
-    segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
-    
-    if(isInitialLoad) {
-        // Encontrar el año máximo para el inicio inteligente
-        let years = new Set();
-        db.remates.forEach(r => {
-            let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-            if(!isNaN(y)) years.add(y);
-        });
-        let maxYear = Math.max(...Array.from(years));
-        window.globalSelectedYears = [maxYear];
-        window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
-        
-        let initialRemates = db.remates.filter(r => {
-            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-            let matchSeg = currentSeg === 'Todos' || r.tipo === currentSeg;
-            return matchSeg && rYr === maxYear;
-        }).map(r => r.id);
-        checkedNodes = initialRemates;
-    }
-    
-    window.renderDropdownUI();
-    window.updateDropdownLabel();
-    window.updateAdminButtonCount();
-    window.renderApp();
-};
-
-window.aplicarCambioSegmento = function() {
-    window.quickSelect('TODO'); // Al cambiar Siniestrados/Retail, forzamos recargar las selecciones actuales
-    window.renderApp();
-}
-
-// === NUEVO FILTRO CUSTOM TIEMPO ===
-window.toggleDropdown = function(e) {
-    if(e) e.stopPropagation();
-    const menu = document.getElementById('dropdown-menu');
-    if(menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        menu.classList.add('flex');
-    } else {
-        menu.classList.add('hidden');
-        menu.classList.remove('flex');
-    }
-};
-
-window.renderDropdownUI = function() {
-    let years = new Set();
+    let segments = new Set(); let years = new Set();
     db.remates.forEach(r => {
+        segments.add(r.tipo || 'Desconocido');
         let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         if(!isNaN(y)) years.add(y);
     });
     
-    let yearsArr = Array.from(years).sort((a,b)=>b-a);
+    let segSelect = document.getElementById('macro-segment');
+    let yearSelect = document.getElementById('macro-year');
     
-    let yearsHtml = '';
-    yearsArr.forEach(y => {
-        let isChecked = window.globalSelectedYears.includes(Number(y)) ? 'checked' : '';
-        let activeClass = isChecked ? 'bg-black text-white shadow-md border-black' : 'bg-white text-gray-500 hover:text-gray-900 border-gray-200';
-        yearsHtml += `
-        <label class="flex items-center gap-2 cursor-pointer rounded px-3 py-1.5 transition flex-1 sm:flex-none justify-center ${activeClass}">
-            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)"> 
-            <span class="text-xs font-bold">${y}</span>
-        </label>`;
-    });
-    const tyc = document.getElementById('dropdown-years-grid');
-    if(tyc) tyc.innerHTML = yearsHtml;
-
-    let seg = document.getElementById('macro-segment').value;
-    let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
-
-    let byYear = {};
-    rematesFiltrados.forEach(r => {
-        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-        if(!byYear[y]) byYear[y] = {};
-        let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-        if(!byYear[y][m]) byYear[y][m] = [];
-        byYear[y][m].push(r);
-    });
-
-    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    let html = '';
-
-    Object.keys(byYear).sort((a,b)=>b-a).forEach(y => {
-        // Solo renderizar el arbol si el año esta seleccionado en las columnas de arriba!
-        if(!window.globalSelectedYears.includes(Number(y))) return;
-
-        html += `<div class="mb-4 dropdown-year-group"><div class="sticky top-0 bg-white py-1 mb-2 z-10"><span class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-1 block">Año ${y}</span></div>`;
-        
-        Object.keys(byYear[y]).sort((a,b)=>a-b).forEach(m => {
-            let rematesMes = byYear[y][m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
-            let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
-            let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
-            
-            let dropId = `drop-${y}-${m}`;
-            let isExpanded = window.expandedDropMonths.has(dropId);
-            let hiddenClass = isExpanded ? '' : 'hidden';
-            let arrowClass = isExpanded ? 'rotate-180' : '';
-            
-            html += `
-            <div class="dropdown-month-group mb-1.5">
-                <div class="flex items-center justify-between p-1.5 hover:bg-gray-50 rounded transition group">
-                    <label class="flex items-center gap-3 cursor-pointer flex-1">
-                        <input type="checkbox" onchange="window.toggleDropMes(${y}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
-                        <span class="text-sm font-bold text-gray-800 uppercase tracking-wide group-hover:text-blue-700 transition" data-search="${monthNames[m]}">${monthNames[m]}</span>
-                    </label>
-                    <button type="button" class="text-gray-400 hover:text-gray-900 px-2 flex items-center justify-center h-full" onclick="window.toggleDropExpand('${dropId}')">
-                        <svg class="w-3.5 h-3.5 transform transition-transform ${arrowClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div id="${dropId}" class="${hiddenClass} pl-6 pr-2 py-1 space-y-2 border-l-2 border-gray-100 ml-2">
-                    ${rematesMes.map(r => {
-                        let isChecked = checkedNodes.includes(r.id);
-                        let rName = window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp);
-                        return `
-                        <label class="dropdown-remate-item flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" onchange="window.toggleDropRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''} class="!w-3.5 !h-3.5 !rounded-sm">
-                            <span class="text-xs font-medium text-gray-500 group-hover:text-gray-900 transition truncate" data-search="${rName}" title="${rName}">${rName}</span>
-                        </label>
-                        `;
-                    }).join('')}
-                </div>
-            </div>`;
-        });
-        html += `</div>`;
-    });
+    let currentSeg = segSelect.value || Array.from(segments)[0];
+    let currentYr = yearSelect.value || Math.max(...Array.from(years)).toString();
     
-    if(window.globalSelectedYears.length === 0) {
-        html = '<p class="text-center text-xs font-bold text-gray-400 p-4">Selecciona un año arriba.</p>';
-    } else if (html === '') {
-        html = '<p class="text-center text-xs font-bold text-gray-400 p-4">No hay datos en el periodo.</p>';
-    }
+    segSelect.innerHTML = `<option value="Todos">📊 Segmentos: Todos</option>` + Array.from(segments).map(s => `<option value="${s}" ${s===currentSeg?'selected':''}>${s.toLowerCase().includes('retail')?'🛒':'🚗'} ${s}</option>`).join('');
     
-    const dt = document.getElementById('dropdown-tree');
-    if(dt) dt.innerHTML = html;
-};
-
-window.toggleTimeYear = function(y, checked) {
-    if(checked) {
-        if(!window.globalSelectedYears.includes(y)) window.globalSelectedYears.push(y);
-        let seg = document.getElementById('macro-segment').value;
-        let toAdd = db.remates.filter(r => {
-            let matchSeg = seg === 'Todos' || r.tipo === seg;
-            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-            return matchSeg && rYr === y;
-        }).map(r => r.id);
-        toAdd.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); });
-    } else {
-        window.globalSelectedYears = window.globalSelectedYears.filter(val => val !== y);
-        let toRemove = db.remates.filter(r => {
-            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-            return rYr === y;
-        }).map(r => r.id);
-        checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
-    }
-    window.renderDropdownUI();
-};
-
-window.toggleDropExpand = function(id) {
-    if (window.expandedDropMonths.has(id)) {
-        window.expandedDropMonths.delete(id);
-    } else {
-        window.expandedDropMonths.add(id);
-    }
-    window.renderDropdownUI(); 
-};
-
-window.toggleDropMes = function(year, mesIndex, isChecked) {
-    let seg = document.getElementById('macro-segment').value;
-    let idsInMonth = db.remates.filter(r => {
-        let matchSeg = seg === 'Todos' || r.tipo === seg;
-        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-        let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-        return matchSeg && rYr === Number(year) && rM === Number(mesIndex);
-    }).map(r => r.id);
+    let yrOptions = `<option value="ALL" ${currentYr === 'ALL' ? 'selected' : ''}>🌐 Todos los Años</option>`;
+    yrOptions += Array.from(years).sort((a,b)=>b-a).map(y => `<option value="${y}" ${y==currentYr?'selected':''}>Año ${y}</option>`).join('');
+    yearSelect.innerHTML = yrOptions;
     
-    if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
-    else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
-    window.renderDropdownUI();
+    window.updateMacroFilter();
 };
 
-window.toggleDropRemate = function(id, isChecked) {
-    if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
-    else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    window.renderDropdownUI();
-};
-
-window.quickSelect = function(type) {
-    let allowedMonths = [];
-    if(type === 'TODO') allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
-    else if(type === 'S1') allowedMonths = [0,1,2,3,4,5];
-    else if(type === 'S2') allowedMonths = [6,7,8,9,10,11];
-    else if(type === 'Q1') allowedMonths = [0,1,2];
-    else if(type === 'Q2') allowedMonths = [3,4,5];
-    else if(type === 'Q3') allowedMonths = [6,7,8];
-    else if(type === 'Q4') allowedMonths = [9,10,11];
+window.applyModalSelection = function() {
+    let periodElement = document.getElementById('macro-period');
+    if(periodElement) periodElement.value = 'MANUAL';
     
-    if(type === 'NADA') {
-        checkedNodes = [];
-    } else {
-        let seg = document.getElementById('macro-segment').value;
-        checkedNodes = db.remates.filter(r => {
-            let matchSeg = seg === 'Todos' || r.tipo === seg;
-            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-            let matchYr = window.globalSelectedYears.includes(rYr);
-            let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-            return matchSeg && matchYr && allowedMonths.includes(rM);
-        }).map(r => r.id);
-    }
-    
-    window.renderDropdownUI();
-};
-
-window.filterDropdown = function() {
-    let term = document.getElementById('dropdown-search').value.toLowerCase();
-    document.querySelectorAll('.dropdown-month-group').forEach(group => {
-        let monthName = group.querySelector('span[data-search]').getAttribute('data-search').toLowerCase();
-        let monthMatch = monthName.includes(term);
-        let hasVisibleChild = false;
-        
-        group.querySelectorAll('.dropdown-remate-item').forEach(item => {
-            let rName = item.querySelector('span[data-search]').getAttribute('data-search').toLowerCase();
-            if(monthMatch || rName.includes(term)) {
-                item.style.display = 'flex'; hasVisibleChild = true;
-            } else { item.style.display = 'none'; }
-        });
-        
-        if(monthMatch || hasVisibleChild) {
-            group.style.display = 'block';
-            let contentDiv = group.querySelector('div[id^="drop-"]');
-            if(term.length > 1 && contentDiv) {
-                contentDiv.classList.remove('hidden');
-                // Auto expandir icono si forzamos por busqueda
-                let svg = group.querySelector('svg');
-                if(svg) svg.classList.add('rotate-180');
-            }
-        } else {
-            group.style.display = 'none';
-        }
-    });
-};
-
-window.applyDropdown = function() {
-    const menu = document.getElementById('dropdown-menu');
-    if(menu) { menu.classList.add('hidden'); menu.classList.remove('flex'); }
-
-    window.updateDropdownLabel();
     window.updateAdminButtonCount();
     window.renderApp();
 };
 
-window.updateDropdownLabel = function() {
-    let labelStr = '📅 ';
-    if(checkedNodes.length === 0) { labelStr += 'Sin Selección'; }
-    else if(checkedNodes.length === 1) {
-        let r = db.remates.find(x => x.id === checkedNodes[0]);
-        labelStr += r ? window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp).substring(0,20) : 'Matriz Única';
-    } else {
-        labelStr += `Selección (${checkedNodes.length})`;
+window.updateMacroFilter = function() {
+    let seg = document.getElementById('macro-segment').value;
+    let yr = document.getElementById('macro-year').value;
+    let periodElement = document.getElementById('macro-period');
+    let period = periodElement ? periodElement.value : 'ALL';
+    
+    if(period !== 'MANUAL') {
+        let allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+        if(period === 'S1') allowedMonths = [0,1,2,3,4,5];
+        else if(period === 'S2') allowedMonths = [6,7,8,9,10,11];
+        else if(period === 'Q1') allowedMonths = [0,1,2];
+        else if(period === 'Q2') allowedMonths = [3,4,5];
+        else if(period === 'Q3') allowedMonths = [6,7,8];
+        else if(period === 'Q4') allowedMonths = [9,10,11];
+        else if(period.startsWith('M')) allowedMonths = [Number(period.substring(1))];
+        
+        checkedNodes = db.remates.filter(r => {
+            let matchSeg = seg === 'Todos' || r.tipo === seg;
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            let matchYr = (yr === 'ALL') ? true : (rYr === Number(yr));
+            let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+            let matchM = allowedMonths.includes(rM);
+            return matchSeg && matchYr && matchM;
+        }).map(r => r.id);
     }
-    const lbl = document.getElementById('dropdown-label');
-    if(lbl) lbl.innerText = labelStr;
+    
+    window.updateAdminButtonCount();
+    window.renderApp();
 };
-
-
-// ----------------------------------------
 
 window.seleccionarUltimoRemate = function() {
     if (!db.remates || db.remates.length === 0) return;
+    
     const rematesOrdenados = [...db.remates].sort((a,b) => (b.fechaData?.timestamp||0) - (a.fechaData?.timestamp||0));
     const ultimo = rematesOrdenados[0];
 
     let segSelect = document.getElementById('macro-segment');
+    let yearSelect = document.getElementById('macro-year');
+    let periodSelect = document.getElementById('macro-period');
+    
     if (segSelect) segSelect.value = ultimo.tipo || 'Siniestrados';
+    if (yearSelect) yearSelect.value = ultimo.fechaData?.year ? Number(ultimo.fechaData.year).toString() : new Date().getFullYear().toString();
+    if (periodSelect) periodSelect.value = 'MANUAL';
     
-    let y = ultimo.fechaData?.year ? Number(ultimo.fechaData.year) : new Date().getFullYear();
-    
-    window.globalSelectedYears = [y];
     checkedNodes = [ultimo.id];
-    
-    window.renderDropdownUI();
-    document.getElementById('dropdown-label').innerText = "📌 Matriz Única";
     
     window.updateAdminButtonCount();
     window.cambiarSeccion('remates');
     window.renderApp();
 };
 
-window.switchGestorYear = function(y) {
-    currentGestorYearTab = y;
-    window.abrirModalGestor();
+window.switchModalYear = function(y) {
+    currentModalYearTab = y;
+    window.abrirModalArbol();
 };
 
-window.toggleGestorAll = function(check) {
+window.toggleArbolAll = function(check) {
     let seg = document.getElementById('macro-segment').value;
     let rematesEnPantalla = db.remates.filter(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
         let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
-        return matchSeg && rYr === Number(currentGestorYearTab);
+        return matchSeg && rYr === Number(currentModalYearTab);
     });
 
     if(check) {
@@ -1081,19 +819,17 @@ window.toggleGestorAll = function(check) {
     } else {
         checkedNodes = [];
     }
-    window.abrirModalGestor();
+    window.applyModalSelection();
+    window.abrirModalArbol();
 };
 
-window.filtrarModalGestor = function() {
-    let term = document.getElementById('search-gestor').value.toLowerCase();
-    document.querySelectorAll('.gestor-mes-group').forEach(mesGroup => {
-        let monthTitle = mesGroup.querySelector('span[data-search]').getAttribute('data-search').toLowerCase();
-        let monthMatches = monthTitle.includes(term);
+window.filtrarModalArbol = function() {
+    let term = document.getElementById('search-arbol').value.toLowerCase();
+    document.querySelectorAll('.arbol-mes-group').forEach(mesGroup => {
         let hasVisibleChild = false;
-
-        mesGroup.querySelectorAll('.gestor-remate-item').forEach(remateItem => {
-            let text = remateItem.querySelector('span[data-search]').getAttribute('data-search').toLowerCase();
-            if(monthMatches || text.includes(term)) {
+        mesGroup.querySelectorAll('.arbol-remate-item').forEach(remateItem => {
+            let text = remateItem.innerText.toLowerCase();
+            if(text.includes(term)) {
                 remateItem.style.display = 'flex';
                 hasVisibleChild = true;
             } else {
@@ -1104,9 +840,9 @@ window.filtrarModalGestor = function() {
     });
 };
 
-window.abrirModalGestor = function() {
-    const tabsContainer = document.getElementById('gestor-tabs-container');
-    const contentContainer = document.getElementById('gestor-content-container');
+window.abrirModalArbol = function() {
+    const tabsContainer = document.getElementById('arbol-tabs-container');
+    const contentContainer = document.getElementById('arbol-content-container');
     
     let seg = document.getElementById('macro-segment').value;
     let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
@@ -1121,16 +857,16 @@ window.abrirModalGestor = function() {
     });
 
     let years = Object.keys(byYear).sort((a,b)=>b-a);
-    if(years.length > 0 && !years.includes(String(currentGestorYearTab))) {
-        currentGestorYearTab = years[0];
+    if(years.length > 0 && !years.includes(String(currentModalYearTab))) {
+        currentModalYearTab = years[0];
     }
 
     let tabsHtml = '';
     if(years.length > 1) {
-        tabsHtml = `<div class="flex gap-2 px-6 pt-3 overflow-x-auto">`;
+        tabsHtml = `<div class="flex gap-2 p-3 bg-white border-b border-gray-200 overflow-x-auto shadow-sm z-20">`;
         years.forEach(y => {
-            let active = String(y) === String(currentGestorYearTab) ? 'bg-gray-50 text-gray-900 border-t border-l border-r border-gray-200 shadow-sm relative top-[1px]' : 'bg-transparent text-gray-500 hover:text-gray-800';
-            tabsHtml += `<button onclick="window.switchGestorYear('${y}')" class="px-6 py-2 rounded-t-lg text-sm font-bold transition whitespace-nowrap ${active}">Año ${y}</button>`;
+            let active = String(y) === String(currentModalYearTab) ? 'bg-black text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200';
+            tabsHtml += `<button onclick="window.switchModalYear('${y}')" class="px-4 py-1.5 rounded text-xs font-bold transition whitespace-nowrap ${active}">Año ${y}</button>`;
         });
         tabsHtml += `</div>`;
     }
@@ -1140,61 +876,56 @@ window.abrirModalGestor = function() {
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
     if(years.length === 0) {
-        contentHtml = '<div class="flex items-center justify-center h-full"><p class="text-sm font-bold text-gray-400">No hay matrices disponibles.</p></div>';
+        contentHtml = '<p class="text-center text-xs font-bold text-gray-400 p-6">No hay matrices disponibles.</p>';
     } else {
-        let currentData = byYear[currentGestorYearTab] || {};
-        contentHtml += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+        let currentData = byYear[currentModalYearTab] || {};
+        
         Object.keys(currentData).sort((a,b)=>a-b).forEach(m => {
             let rematesMes = currentData[m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
             let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
             let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
             
             contentHtml += `
-            <div class="gestor-mes-group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
-                <div class="flex justify-between items-center p-4 bg-gray-100 border-b border-gray-200">
+            <div class="arbol-mes-group mb-3 border border-gray-200 rounded-md overflow-hidden bg-gray-50/50 transition">
+                <div class="flex justify-between items-center p-3 bg-white border-b border-gray-100">
                     <label class="flex items-center gap-3 cursor-pointer w-full">
-                        <input type="checkbox" onchange="window.toggleGestorMes(${currentGestorYearTab}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''} !w-4 !h-4">
-                        <span class="font-black text-gray-900 text-sm uppercase tracking-wider" data-search="${monthNames[m]}">${monthNames[m]}</span>
-                        <span class="bg-white border border-gray-300 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-md ml-auto shadow-sm">${rematesMes.length}</span>
+                        <input type="checkbox" onchange="window.toggleArbolMes(${currentModalYearTab}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
+                        <span class="font-bold text-gray-800 text-sm uppercase tracking-wide">${monthNames[m]}</span>
+                        <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded ml-auto">${rematesMes.length} matrices</span>
                     </label>
                 </div>
-                <div class="p-4 flex flex-col gap-3 max-h-60 overflow-y-auto">
+                <div class="p-3 flex flex-col gap-3">
                     ${rematesMes.map(r => {
                         let isChecked = checkedNodes.includes(r.id);
-                        let rName = window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp);
                         return `
-                        <label class="gestor-remate-item flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" onchange="window.toggleGestorRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''}>
-                            <span class="text-xs font-medium text-gray-600 group-hover:text-black transition" data-search="${rName}">${rName}</span>
+                        <label class="arbol-remate-item flex items-center gap-3 cursor-pointer group ml-2">
+                            <input type="checkbox" onchange="window.toggleArbolRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''}>
+                            <span class="text-xs font-medium text-gray-600 group-hover:text-black transition">${window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)}</span>
                         </label>
                         `;
                     }).join('')}
                 </div>
             </div>`;
         });
-        contentHtml += `</div>`;
     }
 
     contentContainer.innerHTML = contentHtml;
-    window.filtrarModalGestor();
+    window.filtrarModalArbol();
     
-    document.getElementById('modal-gestor').classList.remove('hidden');
-    document.getElementById('modal-gestor').classList.add('flex');
+    document.getElementById('modal-arbol').classList.remove('hidden');
+    document.getElementById('modal-arbol').classList.add('flex');
 };
 
-window.cerrarModalGestor = function(e) { 
-    if(e && e.target.id !== 'modal-gestor') return;
-    document.getElementById('modal-gestor').classList.add('hidden'); 
-    document.getElementById('modal-gestor').classList.remove('flex'); 
-    let searchEl = document.getElementById('search-gestor');
+window.cerrarModalArbol = function() { 
+    document.getElementById('modal-arbol').classList.add('hidden'); 
+    document.getElementById('modal-arbol').classList.remove('flex'); 
+    let searchEl = document.getElementById('search-arbol');
     if(searchEl) searchEl.value = '';
-    window.updateDropdownLabel();
-    window.renderDropdownUI(); // Sincroniza el arbol pequeño con los cambios del grande
-    window.applyDropdown(); // Aplica y recarga
 };
 
-window.toggleGestorMes = function(year, mesIndex, isChecked) {
+window.toggleArbolMes = function(year, mesIndex, isChecked) {
     let seg = document.getElementById('macro-segment').value;
+    
     let idsInMonth = db.remates.filter(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
         let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
@@ -1204,13 +935,16 @@ window.toggleGestorMes = function(year, mesIndex, isChecked) {
     
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
-    window.abrirModalGestor(); 
+    
+    window.applyModalSelection();
+    window.abrirModalArbol(); 
 };
 
-window.toggleGestorRemate = function(id, isChecked) {
+window.toggleArbolRemate = function(id, isChecked) {
     if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    window.abrirModalGestor(); 
+    window.applyModalSelection();
+    window.abrirModalArbol(); 
 };
 
 window.sortTable = function(thElement, type) {
@@ -1305,7 +1039,6 @@ const formatMoney = (num) => {
     return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num)); 
 };
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
-const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
 window.iniciarProcesamiento = async function(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
@@ -1314,14 +1047,116 @@ window.iniciarProcesamiento = async function(files){
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingText = document.getElementById('loading-text');
     loadingOverlay.classList.remove('hidden'); loadingOverlay.classList.add('flex');
-    loadingText.innerText = `Analizando Matrices...`;
     
     let successCount = 0; let upsertQueue = [];
     
     for(let i = 0; i < validFiles.length; i++){ 
+        loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
         await new Promise(r => setTimeout(r, 20)); 
         try { 
-            const data = await parseExcel(validFiles[i]); 
+            const reader = new FileReader();
+            const dataP = new Promise((res, rej) => {
+                reader.onload = e => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const json = XLSX.utils.sheet_to_json(worksheet, {raw: false});
+                        const rowsArr = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                        let fechaData = extraerFechaInfo(validFiles[i], rowsArr);
+                        let tipo = validFiles[i].name.toLowerCase().includes('retail') ? 'Retail' : 'Siniestrados';
+
+                        let remate = {
+                            fileName: validFiles[i].name,
+                            fechaData: fechaData,
+                            tipo: tipo,
+                            ventaTotal: 0,
+                            comisionTotal: 0,
+                            lotesCount: 0,
+                            lotesDisponibles: 0,
+                            inscritos: 0,
+                            garantias: 0,
+                            garantiasEmailsReales: [],
+                            garantiasListaDetallada: [],
+                            adjudicaciones: [],
+                            posturasPorLote: {}
+                        };
+
+                        let lotesSet = new Set();
+                        let garantiasSet = new Set();
+
+                        json.forEach(row => {
+                            let lote = row['Lote'] || row['N° Lote'] || row['LOTE'] || row['Nº Lote'];
+                            let adjudicatario = row['Adjudicatario'] || row['Cliente'] || row['Nombre'] || row['Comprador'];
+                            let monto = row['Monto'] || row['Valor'] || row['Precio'] || row['Precio Final'] || row['Adjudicado'];
+                            let minimo = row['Mínimo'] || row['Minimo'] || row['Precio Base'] || 0;
+                            let email = row['Email'] || row['Correo'] || '';
+                            let rut = row['RUT'] || row['Rut'] || '';
+                            let detalle = row['Detalle'] || row['Vehículo'] || row['Vehiculo'] || row['Descripción'] || row['Marca'] || '';
+
+                            if (lote) {
+                                lotesSet.add(lote);
+                                let montoNum = parseFloat(String(monto).replace(/[^\d]/g, '')) || 0;
+                                let minNum = parseFloat(String(minimo).replace(/[^\d]/g, '')) || 0;
+                                
+                                let esFalso = esClienteFalso(adjudicatario, email);
+                                let esChatarra = String(detalle).toLowerCase().includes('chatarra');
+                                
+                                let { categoria, modeloStr } = extraerMarcaModelo(String(detalle));
+
+                                let adjObj = {
+                                    loteStr: String(detalle),
+                                    numeroLote: String(lote).replace(/\D/g, ''),
+                                    clienteReal: normalizarCliente(adjudicatario),
+                                    nombreRaw: String(adjudicatario),
+                                    monto: montoNum,
+                                    minimo: minNum,
+                                    esFalso: esFalso,
+                                    esChatarra: esChatarra,
+                                    rut: String(rut),
+                                    email: String(email),
+                                    categoria: categoria,
+                                    modeloStr: modeloStr,
+                                    pujadoresRealesCount: 1 
+                                };
+                                remate.adjudicaciones.push(adjObj);
+
+                                if (!esFalso && montoNum > 0) {
+                                    remate.ventaTotal += montoNum;
+                                    remate.lotesCount++;
+                                    if (email && !remate.garantiasEmailsReales.includes(email)) {
+                                        remate.garantiasEmailsReales.push(email);
+                                    }
+                                    let clienteKey = normalizarCliente(adjudicatario) + email;
+                                    if (!garantiasSet.has(clienteKey)) {
+                                        garantiasSet.add(clienteKey);
+                                        remate.garantiasListaDetallada.push({
+                                            nombreNorm: normalizarCliente(adjudicatario),
+                                            nombre: String(adjudicatario),
+                                            email: String(email),
+                                            rut: String(rut),
+                                            fechaRemate: fechaData.timestamp,
+                                            numRemate: String(lote)
+                                        });
+                                    }
+                                }
+                            }
+                        });
+
+                        remate.lotesDisponibles = lotesSet.size > 0 ? lotesSet.size : remate.adjudicaciones.length;
+                        remate.garantias = remate.garantiasListaDetallada.length;
+                        remate.inscritos = remate.garantias + Math.floor(remate.garantias * 0.1); 
+                        remate.comisionTotal = remate.ventaTotal * 0.12; 
+
+                        res(remate);
+                    } catch(error) { rej(error); }
+                };
+                reader.readAsArrayBuffer(validFiles[i]);
+            });
+            
+            const data = await dataP;
             if(data) { 
                 const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName); 
                 if (existsIdx >= 0) { data._dbId = db.remates[existsIdx]._dbId; data.id = db.remates[existsIdx].id; db.remates[existsIdx] = data; } 
@@ -1334,10 +1169,10 @@ window.iniciarProcesamiento = async function(files){
     
     if(successCount === 0) {
         loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
-        document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error Archivos`; return;
+        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`; return;
     }
 
-    loadingText.innerText = "Subiendo a la Nube..."; await new Promise(r => setTimeout(r, 20));
+    loadingText.innerText = "Sincronizando Cruces..."; await new Promise(r => setTimeout(r, 20));
 
     db.remates.sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
     let clientesGlobales=[]; let adjudicatariosGlobales=[];
@@ -1355,8 +1190,10 @@ window.iniciarProcesamiento = async function(files){
     
     try { 
         for (let i = 0; i < upsertQueue.length; i++) {
+            loadingText.innerText = `Subiendo a la Nube (${i+1}/${upsertQueue.length})...`;
             const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
             if (error) throw error;
+            await new Promise(r => setTimeout(r, 50)); 
         }
         document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> En Línea (${db.remates.length})`;
     } catch (e) { 
@@ -1364,11 +1201,10 @@ window.iniciarProcesamiento = async function(files){
         alert("Error de guardado en la nube: " + e.message);
     }
     
-    document.getElementById('file-input').value = ""; document.getElementById('folder-input').value = "";
-    
-    window.actualizarFiltrosGlobales(true); 
+    document.getElementById('file-input').value = ""; 
+    window.actualizarFiltrosGlobales(); 
     procesarDatosClientes(); 
-    window.actualizarVistaActual(); 
+    window.renderApp(); 
     loadingOverlay.classList.remove('flex'); loadingOverlay.classList.add('hidden');
 };
 
@@ -1431,67 +1267,62 @@ function buildAgg(rematesList){
 window.cambiarSeccion = function(mod){ 
     try {
         currentModule=mod; 
-        document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active':'nav-item nav-inactive'; 
-        document.getElementById('nav-mod-comparativa').className=mod==='comparativa'?'nav-item nav-active':'nav-item nav-inactive'; 
-        document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active':'nav-item nav-inactive'; 
-        document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active':'nav-item nav-inactive'; 
-        document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active':'nav-item nav-inactive'; 
+        document.getElementById('nav-mod-remates').className=mod==='remates'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-comparativa').className=mod==='comparativa'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-autos').className=mod==='autos'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-clientes').className=mod==='clientes'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
+        document.getElementById('nav-mod-conclusiones').className=mod==='conclusiones'?'nav-item nav-active mb-1':'nav-item nav-inactive mb-1'; 
         document.getElementById('nav-mod-buscador').className=mod==='buscador'?'nav-item nav-active mt-6':'nav-item nav-inactive mt-6'; 
-        
-        ['module-remates', 'module-comparativa', 'module-conclusiones', 'module-autos', 'module-clientes', 'module-buscador'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
         
         window.renderApp();
         if(window.innerWidth < 768) { window.toggleSidebar(); }
     } catch(e) { console.error(e); }
 };
 
-window.actualizarVistaActual = function() { 
+window.renderApp = function() { 
     try {
+        const emptyState = document.getElementById('empty-state');
+        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
+
+        if (checkedNodes.length === 0) {
+            emptyState.classList.remove('hidden');
+            return;
+        } else {
+            emptyState.classList.add('hidden');
+            const currentEl = document.getElementById(`module-${currentModule}`);
+            if(currentEl) currentEl.classList.remove('hidden');
+        }
+
         if (currentModule === 'remates') window.renderDashboard(); 
         else if (currentModule === 'comparativa') window.renderComparativa();
         else if (currentModule === 'autos') window.renderPanelAutos(); 
         else if (currentModule === 'conclusiones') window.renderConclusiones(); 
-        else if (currentModule === 'clientes') { if(checkedNodes.length===0){ document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('module-clientes').classList.add('hidden'); } else { document.getElementById('empty-state').classList.add('hidden'); document.getElementById('module-clientes').classList.remove('hidden'); procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); } }
-        else if (currentModule === 'buscador') { document.getElementById('module-buscador').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); window.buscarPatente(); }
+        else if (currentModule === 'clientes') { procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); }
+        else if (currentModule === 'buscador') { window.buscarPatente(); }
     } catch(e) { console.error(e); }
-};
-
-window.limpiarBase = async function(){ 
-    if(!confirm("¿ESTÁS SEGURO? Esta acción borrará todas las matrices alojadas en la nube y no se puede deshacer.")) return;
-    
-    const btn = document.getElementById('btn-vaciar-base');
-    if(btn) btn.innerText = "Borrando nube...";
-
-    try { 
-        const { error } = await supabaseClient.from('app_state').delete().not('id', 'is', null); 
-        if(error) throw error;
-        db = {remates:[]}; checkedNodes = []; clientDB = []; 
-        document.getElementById('empty-state').classList.remove('hidden'); 
-        window.actualizarFiltrosGlobales(); 
-        location.reload(); 
-    } catch (e) { 
-        alert("Error al vaciar la base de datos de la nube.\nRevisa tus permisos de Administrador o tu conexión.\n\nDetalle: " + e.message);
-        if(btn) btn.innerText = "Vaciar Nube";
-    }
 };
 
 window.renderDashboard = function(){ 
     try {
         if(currentModule!=='remates') return; 
-        const emptyState = document.getElementById('empty-state'); const dashboard = document.getElementById('module-remates');
-        
-        if(checkedNodes.length === 0){ emptyState.classList.remove('hidden'); dashboard.classList.add('hidden'); return; } 
-        emptyState.classList.add('hidden'); dashboard.classList.remove('hidden'); 
         
         let allRemates = getSelectedRemates(); 
         globalAgg = buildAgg(allRemates);
         
         let titulo = "Selección Activa";
         try {
-            let labelElement = document.getElementById('dropdown-label');
-            if (labelElement) {
-                let txt = labelElement.innerText.replace('📅 ', '');
-                titulo = txt.includes('📌') ? txt : 'Consolidado ' + txt;
+            let selectPeriodo = document.getElementById('macro-period');
+            let selectYear = document.getElementById('macro-year');
+            if (selectPeriodo) {
+                if (selectPeriodo.value === 'MANUAL') {
+                    titulo = "Selección Manual (Gestor de Matrices)";
+                } else if (selectPeriodo.selectedIndex >= 0 && selectPeriodo.options[selectPeriodo.selectedIndex]) {
+                    let yT = selectYear.value === 'ALL' ? 'Histórico Completo' : selectYear.value;
+                    titulo = selectPeriodo.options[selectPeriodo.selectedIndex].text + " " + yT;
+                }
             }
             if(checkedNodes.length === 1 && allRemates.length === 1) {
                 titulo = window.formatearNombreRemate(allRemates[0].fileName, allRemates[0].fechaData?.timestamp);
@@ -1545,79 +1376,45 @@ window.renderDashboard = function(){
         } catch(e){}
 
         try {
-            let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = []; let cMatrices = []; let cLotes = [];
+            let chartLabels = []; let cSiniestros = []; let cRetail = []; let cNuevos = []; let cRecurrentes = [];
             let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
             
             let distinctMonths = new Set(allRemates.map(r => r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0)).size;
-            
-            let forcedMode = document.getElementById('dash-groupby') ? document.getElementById('dash-groupby').value : 'auto';
-            let groupMode = 'remate';
-            if (forcedMode === 'auto') {
-                groupMode = (distinctMonths > 1 && checkedNodes.length > 4) ? 'month' : 'remate';
-            } else {
-                groupMode = forcedMode;
-            }
+            let groupMode = (distinctMonths > 1 && checkedNodes.length > 3) ? 'month' : 'remate';
 
             if(groupMode === 'month') {
                 let monthMap = {};
                 allRemates.forEach(r => {
                     let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
                     let y = r.fechaData?.year ? String(r.fechaData.year).slice(-2) : 'XX';
-                    let labelStr = window.globalSelectedYears.length > 1 ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
+                    let labelStr = document.getElementById('macro-year').value === 'ALL' ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
                     
                     let mk = `${y}-${m}`; 
-                    if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, lotes: 0, label: labelStr, rawD: r.fechaData?.timestamp||0, count: 0 };
-                    
-                    monthMap[mk].count++;
-                    monthMap[mk].lotes += (Number(r.lotesCount) || 0);
+                    if(!monthMap[mk]) monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, label: labelStr, rawD: r.fechaData?.timestamp||0 };
                     if(r.tipo === 'Siniestrados') monthMap[mk].siniestros += (Number(r.ventaTotal) || 0);
                     if(r.tipo === 'Retail') monthMap[mk].retail += (Number(r.ventaTotal) || 0);
                     monthMap[mk].nuevos += (Number(r.nuevos) || 0); monthMap[mk].antiguos += (Number(r.antiguos) || 0);
                 });
                 Object.values(monthMap).sort((a,b)=>a.rawD - b.rawD).forEach(v => {
-                    chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos); cMatrices.push(v.count); cLotes.push(v.lotes);
+                    chartLabels.push(v.label); cSiniestros.push(v.siniestros); cRetail.push(v.retail); cNuevos.push(v.nuevos); cRecurrentes.push(v.antiguos);
                 });
             } else {
                 allRemates.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0)).forEach(r => {
                     chartLabels.push(window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp));
                     cSiniestros.push(r.tipo === 'Siniestrados' ? (Number(r.ventaTotal) || 0) : 0);
                     cRetail.push(r.tipo === 'Retail' ? (Number(r.ventaTotal) || 0) : 0);
-                    cNuevos.push(Number(r.nuevos) || 0); cRecurrentes.push(Number(r.antiguos) || 0); cMatrices.push(1); cLotes.push(Number(r.lotesCount) || 0);
+                    cNuevos.push(Number(r.nuevos) || 0); cRecurrentes.push(Number(r.antiguos) || 0);
                 });
             }
 
             const showRetail = cRetail.some(val => val > 0);
-            let datasetsVentas = [
-                {label:'Venta Siniestrados', data: cSiniestros, type: 'line', borderColor: '#2563EB', backgroundColor: '#2563EB', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#2563EB', pointRadius: 4, yAxisID: 'y'}
-            ];
-            if(showRetail) datasetsVentas.push({label:'Venta Retail', data: cRetail, type: 'line', borderColor: '#111827', backgroundColor: '#111827', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 4, yAxisID: 'y'});
-            
-            datasetsVentas.push({label:'Lotes Vendidos', data: cLotes, type: 'bar', backgroundColor: '#16A34A', borderRadius: 4, yAxisID: 'y1'});
+            let datasetsVentas = [{label:'Venta Siniestrados', data: cSiniestros, backgroundColor: '#2563EB', borderRadius:4}];
+            if(showRetail) datasetsVentas.push({label:'Venta Retail', data: cRetail, backgroundColor: '#111827', borderRadius:4});
 
             const canvasVentas = document.getElementById('dash-chartVentas');
             if(canvasVentas) {
                 if(dashChartVentasInst) dashChartVentasInst.destroy();
-                dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), { 
-                    type: 'line', 
-                    data: { labels: chartLabels, datasets: datasetsVentas }, 
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    afterBody: function(context) {
-                                        return '\nMatrices Consolidadas: ' + cMatrices[context[0].dataIndex];
-                                    }
-                                }
-                            }
-                        },
-                        scales: { 
-                            y: { type: 'linear', display: true, position: 'left', beginAtZero: true },
-                            y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
-                        } 
-                    } 
-                });
+                dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), { type: 'bar', data: { labels: chartLabels, datasets: datasetsVentas }, options: { responsive: true, maintainAspectRatio: false } });
             }
 
             const canvasClientes = document.getElementById('dash-chartClientes');
@@ -1651,10 +1448,7 @@ window.renderComparativa = function() {
             
             let key = ''; let label = '';
             
-            if(groupMode === 'remate') {
-                key = `R-${d?.timestamp || 0}-${r.id}`; 
-                label = window.formatearNombreRemate(r.fileName, d?.timestamp);
-            } else if(groupMode === 'year') {
+            if(groupMode === 'year') {
                 key = `${y}`; label = `Año ${y}`;
             } else if(groupMode === 'semester') {
                 let s = m < 6 ? 1 : 2;
@@ -1667,23 +1461,15 @@ window.renderComparativa = function() {
                 label = `${monthNamesShort[m]} ${y}`;
             }
             
-            if(!groups[key]) groups[key] = { label, key, remates: [], timestamp: d?.timestamp || 0 };
+            if(!groups[key]) groups[key] = { label, key, remates: [] };
             groups[key].remates.push(r);
         });
 
-        let sortedKeys;
-        if(groupMode === 'remate') {
-            sortedKeys = Object.keys(groups).sort((a,b) => groups[a].timestamp - groups[b].timestamp);
-        } else {
-            sortedKeys = Object.keys(groups).sort();
-        }
-
+        let sortedKeys = Object.keys(groups).sort();
         let tableHtml = '';
         let chartLabels = [];
         let dataVenta = [];
         let dataComision = [];
-        let dataLotes = [];
-        let dataMatrices = [];
 
         sortedKeys.forEach(k => {
             let g = groups[k];
@@ -1691,8 +1477,6 @@ window.renderComparativa = function() {
             chartLabels.push(g.label);
             dataVenta.push(agg.venta);
             dataComision.push(agg.comisionTotal);
-            dataLotes.push(agg.lotes); 
-            dataMatrices.push(g.remates.length);
             
             tableHtml += `
             <tr class="hover:bg-gray-50 transition border-b border-gray-100">
@@ -1715,28 +1499,11 @@ window.renderComparativa = function() {
                 data: { 
                     labels: chartLabels, 
                     datasets: [
-                        { label: 'Venta Total Adjudicada', data: dataVenta, type: 'line', borderColor: '#111827', backgroundColor: '#111827', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 4, yAxisID: 'y' },
-                        { label: 'Comisiones Estimadas', data: dataComision, type: 'line', borderColor: '#2563EB', backgroundColor: '#2563EB', borderWidth: 2, borderDash: [5, 5], tension: 0.3, pointBackgroundColor: '#2563EB', pointRadius: 3, yAxisID: 'y' },
-                        { label: 'Lotes Vendidos', data: dataLotes, type: 'bar', backgroundColor: '#16A34A', borderRadius: 4, yAxisID: 'y1' }
+                        { label: 'Venta Total Adjudicada', data: dataVenta, borderColor: '#111827', backgroundColor: '#111827', borderWidth: 3, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 4 },
+                        { label: 'Comisiones Estimadas', data: dataComision, borderColor: '#2563EB', backgroundColor: '#2563EB', borderWidth: 2, borderDash: [5, 5], tension: 0.3, pointBackgroundColor: '#2563EB', pointRadius: 3 }
                     ] 
                 }, 
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                afterBody: function(context) {
-                                    return '\nMatrices Consolidadas: ' + dataMatrices[context[0].dataIndex];
-                                }
-                            }
-                        }
-                    },
-                    scales: { 
-                        y: { type: 'linear', display: true, position: 'left', beginAtZero: true },
-                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
-                    } 
-                } 
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } 
             });
         }
     } catch(e) { console.error(e); }
@@ -1754,12 +1521,8 @@ window.filtrarLotesMain = function() {
 };
 
 window.abrirModalMultiLote = function() { let html = ''; Object.entries(globalMapCMulti).sort((a,b)=>b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { if(data.lotes > 1) { html += `<tr><td class="pl-4 font-bold text-gray-900">${nombre}</td><td class="text-center font-black text-blue-700">${data.lotes}</td><td class="text-right pr-4 font-black text-green-700">${formatMoney(data.total)}</td></tr>`; } }); document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; document.getElementById('modal-multilote').classList.remove('hidden'); document.getElementById('modal-multilote').classList.add('flex'); };
-window.cerrarModalMulti = function(e) { 
-    if(e && e.target.id !== 'modal-multilote') return;
-    document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); 
-};
+window.cerrarModalMulti = function() { document.getElementById('modal-multilote').classList.add('hidden'); document.getElementById('modal-multilote').classList.remove('flex'); };
 
-// === DISEÑO ESTRUCTURADO DE DATOS ===
 window.renderConclusiones = function() {
     try {
         if(currentModule !== 'conclusiones') return; const emptyState = document.getElementById('empty-state'); const container = document.getElementById('module-conclusiones');
