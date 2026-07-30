@@ -3,166 +3,2495 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zárate Analítica | Core Simple</title>
+    <title>Zárate Analítica | Control Directivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #F3F4F6; font-family: sans-serif; }
+        body { font-family: 'Roboto', sans-serif; background-color: #F3F4F6; color: #111827; -webkit-font-smoothing: antialiased; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; } 
+        ::-webkit-scrollbar-track { background: transparent; } 
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+        input[type="checkbox"] { appearance: none; background-color: #f9fafb; margin: 0; width: 1.15rem; height: 1.15rem; border: 1.5px solid #d1d5db; border-radius: 0.25rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
+        input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
+        input[type="checkbox"]:checked { background-color: #111827; border-color: #111827; }
+        input[type="checkbox"]:checked::before { transform: scale(1); }
+
+        .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
+        
+        @media print {
+            aside, header, #paraguas-bar, .no-print { display: none !important; }
+            main { padding: 0 !important; background: white !important; }
+            .bg-white { box-shadow: none !important; border: 1px solid #e5e7eb !important; break-inside: avoid; }
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="max-w-7xl mx-auto space-y-6">
-        
-        <!-- CABECERA Y BOTÓN DE SUBIDA -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-black text-gray-900">Zárate Analítica <span class="text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded ml-2">Motor V2.1 Restaurado</span></h1>
-                <p class="text-sm text-gray-500 mt-1" id="status-text">Sube tu matriz para analizarla al instante.</p>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v13.0 (Meta UI + Motor V2.1 Garantizado)</div>
+
+    <!-- OVERLAY DE CARGA -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
+        <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-200 flex flex-col items-center">
+            <div class="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin mb-4"></div>
+            <p id="loading-text" class="font-bold text-[#111827] text-sm tracking-widest uppercase">Procesando...</p>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-screen" class="fixed inset-0 bg-[#F3F4F6] z-[100] flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-[420px] rounded-[16px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-8 border border-gray-100 relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 to-green-500"></div>
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-[#111827] text-white rounded-xl flex items-center justify-center font-black text-xl shadow-sm">Z</div>
+                <div>
+                    <h1 class="text-[18px] font-bold text-[#111827] leading-none">Zárate Analítica</h1>
+                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v13.0</p>
+                </div>
             </div>
             
-            <div>
-                <input type="file" id="file-input" multiple accept=".xlsx,.xls" class="hidden" onchange="procesarArchivos(this.files)">
-                <label for="file-input" class="cursor-pointer bg-[#111827] hover:bg-black text-white font-bold py-3 px-6 rounded-lg transition shadow-sm inline-block">
-                    📁 Subir Excel Zárate
-                </label>
+            <form id="login-form" onsubmit="window.handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="text-[11px] font-semibold tracking-widest text-gray-500 uppercase">Email</label>
+                    <input type="email" id="email" class="mt-1 w-full h-11 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all" required>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold tracking-widest text-gray-500 uppercase">Contraseña</label>
+                    <input type="password" id="password" class="mt-1 w-full h-11 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all" required>
+                </div>
+                <div id="login-error" class="hidden text-red-600 text-[11px] font-bold text-center bg-red-50 py-2 rounded"></div>
+                <button type="submit" id="btn-login" class="w-full h-11 bg-[#111827] text-white rounded-lg text-sm font-semibold hover:bg-black transition shadow-sm">Ingresar al Panel</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="app-content" class="hidden flex-col h-screen">
+        
+        <!-- HEADER MAESTRO -->
+        <header class="h-[56px] bg-white border-b border-gray-200 sticky top-0 z-30 flex items-center justify-between px-4 md:px-6 shrink-0 no-print">
+            <div class="flex items-center gap-3">
+                <button onclick="window.toggleSidebar(event)" class="md:hidden text-gray-400 hover:text-black transition p-1 bg-gray-50 rounded-lg">☰</button>
+                <div class="w-9 h-9 bg-[#111827] text-white rounded-lg flex items-center justify-center font-black shadow-sm">Z</div>
+                <div class="hidden sm:block">
+                    <div class="text-[14px] font-bold leading-none text-gray-900">Zárate Analítica | Control de Gestión</div>
+                    <div class="text-[11px] text-gray-500 flex items-center gap-2 mt-0.5">
+                        <span id="db-status" class="flex items-center gap-1 font-medium"><span class="w-1.5 h-1.5 bg-gray-400 rounded-full"></span> Conectando...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="window.handleLogout()" class="flex items-center gap-2 text-[12px] font-medium px-3 h-8 rounded-full border border-gray-200 hover:bg-gray-50 text-gray-700 transition shadow-sm">
+                    <span id="user-display-email" class="hidden sm:inline"></span> <span>Salir ✕</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
+        <div id="paraguas-bar" class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between shrink-0 z-20 no-print">
+            <div class="flex flex-wrap items-center gap-2 relative">
+                
+                <div class="flex items-center gap-2">
+                    <span class="text-[14px]">📊</span>
+                    <select id="macro-segment" onchange="window.aplicarCambioSegmento()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-[13px] font-medium outline-none cursor-pointer hover:bg-gray-100 transition shadow-sm text-gray-800"></select>
+                </div>
+                
+                <div class="relative ml-2" id="dropdown-container">
+                    <button type="button" onclick="window.toggleDropdown(event)" class="h-9 px-3 rounded-lg border border-gray-200 bg-white text-[13px] font-medium flex items-center gap-2 hover:bg-gray-50 shadow-sm text-gray-800 transition">
+                        <span id="dropdown-label">📅 Cargando...</span>
+                        <span class="text-[10px]">▼</span>
+                    </button>
+
+                    <!-- SUPER FILTRO DE TIEMPO -->
+                    <div id="dropdown-menu" onclick="event.stopPropagation()" class="hidden absolute top-[44px] left-0 w-[360px] max-w-[90vw] bg-white rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-gray-200 p-3 z-40 flex-col">
+                        
+                        <div class="flex gap-1.5 mb-3" id="dropdown-years-grid"></div>
+
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <button type="button" onclick="window.quickSelect('TODO')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">TODO</button>
+                            <button type="button" onclick="window.quickSelect('S1')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">S1</button>
+                            <button type="button" onclick="window.quickSelect('S2')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">S2</button>
+                            <button type="button" onclick="window.quickSelect('Q1')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">Q1</button>
+                            <button type="button" onclick="window.quickSelect('Q2')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">Q2</button>
+                            <button type="button" onclick="window.quickSelect('Q3')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">Q3</button>
+                            <button type="button" onclick="window.quickSelect('Q4')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">Q4</button>
+                            <button type="button" onclick="window.quickSelect('NADA')" class="px-2.5 h-6 rounded-full bg-red-50 hover:bg-red-100 text-[11px] font-semibold text-red-600 transition ml-auto border border-red-200">Limpiar</button>
+                        </div>
+
+                        <div class="max-h-[280px] overflow-auto space-y-2 pr-1" id="dropdown-tree"></div>
+                        
+                        <button type="button" onclick="window.applyDropdown()" class="mt-3 w-full h-8 bg-[#111827] text-white rounded-lg text-[12px] font-semibold hover:bg-black transition shadow-sm">Aplicar filtros</button>
+                    </div>
+                </div>
+
+                <button onclick="window.abrirModalGestor()" class="h-9 px-3 rounded-lg bg-white border border-gray-200 text-[12px] font-medium hover:bg-gray-50 items-center gap-1 shadow-sm text-gray-800 transition hidden sm:flex">
+                    <span>🗂️</span> Gestor (<span id="count-matrices-btn">0</span>)
+                </button>
+            </div>
+
+            <div class="flex items-center shrink-0 ml-auto lg:ml-0">
+                <button onclick="window.seleccionarUltimoRemate()" class="h-9 px-3 rounded-lg bg-[#111827] text-white text-[12px] font-medium flex items-center gap-1 shadow-sm hover:bg-black transition">
+                    <span>⚡</span> Último remate
+                </button>
             </div>
         </div>
 
-        <!-- TARJETAS DE RESUMEN (KPIs) -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 hidden" id="panel-kpis">
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Venta Total</div>
-                <div class="text-xl font-black text-emerald-600 mt-1" id="kpi-venta">$0</div>
+        <div class="flex-1 flex overflow-hidden relative">
+            <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar(event)"></div>
+
+            <!-- SIDEBAR NAVEGACIÓN -->
+            <aside id="sidebar" class="absolute md:relative z-40 w-[240px] bg-white border-r border-gray-200 flex flex-col p-3 gap-1 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 shrink-0 no-print">
+                <div class="flex justify-between items-center mb-4 px-2 mt-2 md:hidden">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Navegación</div>
+                    <button onclick="window.toggleSidebar(event)" class="text-gray-400 hover:text-gray-800 p-1 bg-gray-100 rounded">✕</button>
+                </div>
+                
+                <div class="space-y-1 overflow-y-auto flex-1">
+                    <button id="nav-mod-remates" onclick="window.cambiarSeccion('remates')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white"><span>📊</span> Resumen General</button>
+                    <button id="nav-mod-comparativa" onclick="window.cambiarSeccion('comparativa')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>📈</span> Comparativa Histórica</button>
+                    <button id="nav-mod-autos" onclick="window.cambiarSeccion('autos')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>🚗</span> Análisis Vehicular</button>
+                    <button id="nav-mod-clientes" onclick="window.cambiarSeccion('clientes')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>👥</span> Gestión de Clientes</button>
+                    <button id="nav-mod-conclusiones" onclick="window.cambiarSeccion('conclusiones')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>📄</span> Datos</button>
+                    <button id="nav-mod-buscador" onclick="window.cambiarSeccion('buscador')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-4"><span>🔍</span> Buscador Global</button>
+                </div>
+
+                <div id="admin-controls" class="hidden flex-col mt-auto pt-4 border-t border-gray-100 space-y-2">
+                    <div class="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
+                        <div class="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2">Admin Controls</div>
+                        <label for="file-input" class="w-full block text-left text-[12px] py-1.5 hover:text-blue-600 font-medium cursor-pointer transition">
+                            <span>📁</span> Carga Excel Múltiple
+                        </label>
+                        <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="window.iniciarProcesamiento(this.files)">
+                        <button onclick="window.limpiarBase()" class="w-full text-left text-[12px] py-1.5 text-red-500 hover:text-red-700 font-medium transition" id="btn-vaciar-base"><span>🗑️</span> Vaciar Nube DB</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ÁREA DE TRABAJO -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#F3F4F6] w-full pb-[80px] md:pb-6 relative">
+                
+                <!-- EMPTY STATE -->
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6 transition-all duration-200">
+                    <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
+                    <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global o el Gestor de Remates para comenzar a analizar.</p>
+                </div>
+
+                <!-- MODULE: REMATES -->
+                <div id="module-remates" class="hidden space-y-5 max-w-[1400px] mx-auto transition-all duration-200">
+                    <div>
+                        <h2 class="text-[22px] font-black tracking-tight text-gray-900" id="dash-titulo">-</h2>
+                        <p class="text-[13px] text-gray-500" id="dash-subtitulo">Control operativo • 0 seleccionados</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Ticket Prom.</span><span>🏷️</span></div>
+                            <div class="mt-1 text-[18px] font-black text-gray-900" id="dash-kpi-ticket">$0</div>
+                            <div class="text-[11px] text-gray-500 font-medium">por lote vendido</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Comisión Est.</span><span>💰</span></div>
+                            <div class="mt-1 text-[18px] font-black text-blue-700" id="dash-kpi-comision">$0</div>
+                            <div class="text-[11px] text-gray-500 font-medium">aprox. 12% + IVA</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm border-b-4 border-b-emerald-500 hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Venta Total</span><span>💵</span></div>
+                            <div class="mt-1 text-[18px] font-black text-emerald-600 tracking-tight" id="dash-kpi-venta">$0</div>
+                            <div class="text-[11px] text-gray-500 font-medium">monto adjudicado</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Lotes Disp.</span><span>📦</span></div>
+                            <div class="mt-1 text-[18px] font-black text-gray-900" id="dash-kpi-lotes-disp">0</div>
+                            <div class="text-[11px] text-gray-500 font-medium">catálogo base</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Lotes Vend.</span><span>✅</span></div>
+                            <div class="mt-1 text-[18px] font-black text-gray-900" id="dash-kpi-lotes">0</div>
+                            <div class="text-[11px] text-emerald-600 font-bold" id="dash-kpi-eficacia">0% eficacia</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Garantías</span><span>🛡️</span></div>
+                            <div class="mt-1 text-[18px] font-black text-gray-900" id="dash-kpi-garantias">0</div>
+                            <div class="text-[11px] text-gray-500 font-medium">pagadas totales</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Ganadores</span><span>🏆</span></div>
+                            <div class="mt-1 text-[18px] font-black text-emerald-700" id="dash-kpi-ganadores">0</div>
+                            <div class="text-[11px] text-gray-500 font-medium">clientes únicos</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Perdedores</span><span>🏃</span></div>
+                            <div class="mt-1 text-[18px] font-black text-red-500" id="dash-kpi-perdedores">0</div>
+                            <div class="text-[11px] text-gray-500 font-medium">sin adjudicación</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">1ra Compra</span><span>🌟</span></div>
+                            <div class="mt-1 text-[18px] font-black text-blue-600 flex items-baseline gap-2"><span id="dash-kpi-1racompra">0</span> <span class="text-[10px] text-gray-400 font-bold" id="dash-kpi-1racompra-pct">0%</span></div>
+                            <div class="text-[11px] text-gray-500 font-medium">nuevos clientes</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Multilote</span><span>📚</span></div>
+                            <div class="mt-1 flex items-center gap-2"><span class="text-[18px] font-black text-gray-900" id="dash-kpi-multilote">0</span> <button onclick="window.abrirModalMultiLote()" class="text-[9px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold transition">VER</button></div>
+                            <div class="text-[11px] text-gray-500 font-medium">compras > 1 lote</div>
+                        </div>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-4 no-print">
+                        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="text-[12px] font-bold uppercase tracking-widest text-gray-800">Ventas y Lotes en el Tiempo</div>
+                                <select id="dash-groupby" onchange="window.actualizarEstadoApp()" class="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-[11px] font-bold text-gray-700 outline-none cursor-pointer">
+                                    <option value="auto">Agrupación Automática</option>
+                                    <option value="remate">Matriz por Matriz</option>
+                                    <option value="month">Mes a Mes</option>
+                                </select>
+                            </div>
+                            <div class="relative h-[280px] w-full"><canvas id="dash-chartVentas"></canvas></div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-gray-800">Tracción de Clientes</div>
+                            <div class="relative h-[280px] w-full"><canvas id="dash-chartClientes"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="p-4 flex flex-col md:flex-row gap-3 justify-between border-b border-gray-100 bg-gray-50/50">
+                            <div class="text-[12px] font-bold uppercase tracking-widest text-gray-800 flex items-center gap-2"><span>🚗</span> Lotes Detallados</div>
+                            <div class="relative">
+                                <span class="absolute left-2.5 top-2.5 text-[12px] opacity-50">🔍</span>
+                                <input type="text" id="search-lotes-main" placeholder="Buscar matriz, lote, vehículo..." class="h-9 pl-8 pr-3 rounded-lg border border-gray-200 bg-white text-[13px] w-full md:w-[280px] focus:outline-none focus:border-gray-400 transition shadow-sm" onkeyup="window.filtrarLotesMain()">
+                            </div>
+                        </div>
+                        <div class="overflow-auto max-h-[480px]">
+                            <table class="w-full text-[12px]">
+                                <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 z-10 shadow-sm">
+                                    <tr class="text-left text-gray-500">
+                                        <th class="px-4 py-2.5 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
+                                        <th class="px-3 py-2.5 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
+                                        <th class="px-3 py-2.5 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Detalle Vehículo ↕️</th>
+                                        <th class="px-3 py-2.5 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'number')">Pujas ↕️</th>
+                                        <th class="px-3 py-2.5 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
+                                        <th class="px-3 py-2.5 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
+                                        <th class="px-4 py-2.5 font-bold cursor-pointer text-right hidden sm:table-cell hover:text-black transition" onclick="window.sortTable(this, 'money')">Delta ↕️</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dash-tabla-lotes" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULE: COMPARATIVA HISTÓRICA -->
+                <div id="module-comparativa" class="hidden space-y-5 max-w-[1400px] mx-auto transition-all duration-200">
+                    <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4">
+                        <div>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">Comparativa Histórica</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Evolución del rendimiento en el tiempo</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500 hidden sm:inline">Agrupar por</span>
+                            <select id="comp-groupby" onchange="window.actualizarEstadoApp()" class="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-medium shadow-sm outline-none">
+                                <option value="remate" selected>Remate Exacto</option>
+                                <option value="month">Mes a Mes</option>
+                                <option value="quarter">Trimestres (Q1-Q4)</option>
+                                <option value="semester">Semestres</option>
+                                <option value="year">Años Completos</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                        <div class="text-[12px] font-bold uppercase tracking-widest mb-4 text-gray-800">Evolución de Venta y Efectividad</div>
+                        <div class="relative h-[300px] w-full"><canvas id="comp-chart"></canvas></div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="overflow-auto max-h-[500px]">
+                            <table class="w-full text-[12px]">
+                                <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 z-10 shadow-sm">
+                                    <tr class="text-left text-gray-500">
+                                        <th class="px-4 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Periodo ↕️</th>
+                                        <th class="px-3 py-3 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'number')">Matrices ↕️</th>
+                                        <th class="px-3 py-3 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'number')">Lotes Vendidos ↕️</th>
+                                        <th class="px-3 py-3 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'percent')">Efectividad ↕️</th>
+                                        <th class="px-3 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Venta Total ↕️</th>
+                                        <th class="px-4 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Comisiones Est. ↕️</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comp-table-body" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULE: MODELOS Y VEHICULOS -->
+                <div id="module-autos" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
+                    <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
+                        <div>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">Análisis Vehicular</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Flota, marcas y modelos adjudicados</p>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute left-2.5 top-2.5 text-[12px] opacity-50">🔍</span>
+                            <input type="text" id="search-flota" placeholder="Buscar vehículo, marca..." class="h-9 pl-8 pr-3 rounded-lg border border-gray-200 bg-white text-[13px] w-[280px] shadow-sm outline-none" onkeyup="window.renderPanelAutos()">
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Top Marcas</div>
+                            <div class="relative h-[240px] w-full"><canvas id="flota-marcas-chart"></canvas></div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Top Modelos</div>
+                            <div class="relative h-[240px] w-full"><canvas id="flota-modelos-chart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="overflow-auto max-h-[500px]">
+                            <table class="w-full text-[12px]">
+                                <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 shadow-sm text-gray-500">
+                                    <tr class="text-left">
+                                        <th class="px-4 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
+                                        <th class="px-3 py-3 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
+                                        <th class="px-3 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Vehículo Extraído ↕️</th>
+                                        <th class="px-3 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
+                                        <th class="px-4 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="flota-tabla-resultados" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULE: CLIENTES -->
+                <div id="module-clientes" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
+                    <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
+                        <div>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">Gestión de Clientes</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Directorio y segmentación</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <select id="filter-client-type" class="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] shadow-sm outline-none" onchange="window.filtrarClientes()">
+                                <option value="todos">Todos los segmentos</option>
+                                <option value="siniestrados">Solo Siniestros</option>
+                                <option value="retail">Solo Retail</option>
+                            </select>
+                            <div class="relative">
+                                <span class="absolute left-2.5 top-2.5 text-[12px] opacity-50">🔍</span>
+                                <input type="text" id="search-client" placeholder="Buscar Razón Social..." class="h-9 pl-8 pr-3 rounded-lg border border-gray-200 bg-white text-[13px] w-full sm:w-[200px] shadow-sm outline-none" onkeyup="window.filtrarClientes()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Clientes</div>
+                            <div class="mt-1 text-[20px] font-black text-gray-900" id="bi-kpi-total">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Prom.</div>
+                            <div class="mt-1 text-[20px] font-black text-emerald-600" id="bi-kpi-ltv">$0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid lg:grid-cols-3 gap-4">
+                        <div id="bi-ficha-cliente" class="lg:col-span-3 hidden bg-[#111827] text-white rounded-xl p-5 shadow-lg relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                            <div class="flex justify-between items-start mb-4 pl-2">
+                                <div>
+                                    <h3 class="text-[18px] font-bold tracking-tight" id="ficha-nombre">-</h3>
+                                    <div class="flex flex-wrap gap-3 mt-1 text-[11px] text-gray-400 font-medium">
+                                        <span>RUT: <span id="ficha-rut" class="text-white"></span></span>
+                                        <span>Email: <span id="ficha-email" class="text-white"></span></span>
+                                    </div>
+                                </div>
+                                <button onclick="window.cerrarFicha()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">✕</button>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 py-3 border-y border-gray-700 mb-4 pl-2">
+                                <div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">1ra Compra</div><div class="text-[13px] font-medium mt-0.5" id="ficha-primera">-</div></div>
+                                <div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Última Compra</div><div class="text-[13px] font-medium mt-0.5" id="ficha-ultima">-</div></div>
+                                <div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Lotes Adj.</div><div class="text-[13px] font-bold mt-0.5" id="ficha-lotes">0</div></div>
+                                <div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Sin.</div><div class="text-[13px] font-bold text-emerald-400 mt-0.5" id="ficha-monto-sin">$0</div></div>
+                                <div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Ret.</div><div class="text-[13px] font-bold text-blue-400 mt-0.5" id="ficha-monto-ret">$0</div></div>
+                            </div>
+                            <div class="overflow-auto max-h-[250px] bg-white/5 rounded-lg pl-2">
+                                <table class="w-full text-[12px] text-left">
+                                    <thead class="bg-black/20 text-gray-400 sticky top-0"><tr class="border-b border-gray-700"><th class="py-2 px-3 font-medium">Fecha</th><th class="py-2 px-3 font-medium">Remate</th><th class="py-2 px-3 font-medium">Segmento</th><th class="py-2 px-3 font-medium">Lote</th><th class="py-2 px-3 font-medium text-right">Monto</th></tr></thead>
+                                    <tbody id="ficha-historial-tabla" class="divide-y divide-gray-800/50"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="p-3 border-b border-gray-100 bg-gray-50/50"><h4 class="text-[12px] font-bold uppercase tracking-widest text-gray-800">Directorio General</h4></div>
+                            <div class="overflow-auto max-h-[400px]">
+                                <table class="w-full text-[12px]">
+                                    <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 text-gray-500 shadow-sm">
+                                        <tr class="text-left">
+                                            <th class="px-4 py-2.5 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Razón Social ↕️</th>
+                                            <th class="px-3 py-2.5 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'number')">Frec. ↕️</th>
+                                            <th class="px-3 py-2.5 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Inversión ↕️</th>
+                                            <th class="px-4 py-2.5 font-bold cursor-pointer text-center hidden sm:table-cell hover:text-black transition" onclick="window.sortTable(this, 'string')">Status ↕️</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bi-tabla-clientes" class="divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <h4 class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Salud de Cartera</h4>
+                            <div class="relative h-[240px] w-full"><canvas id="bi-chartSegments"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULE: DATOS (CONCLUSIONES) -->
+                <div id="module-conclusiones" class="hidden space-y-6 max-w-[1000px] mx-auto pb-10 transition-all duration-200">
+                    <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
+                        <div>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">Datos y Reportes</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Resumen estructurado de la selección</p>
+                        </div>
+                        <button onclick="window.print()" class="h-9 px-4 rounded-lg bg-white border border-gray-200 text-[12px] font-bold shadow-sm hover:bg-gray-50 transition text-gray-800">🖨️ Imprimir PDF</button>
+                    </div>
+                    <div id="conclusiones-content" class="space-y-6"></div>
+                </div>
+
+                <!-- MODULE: BUSCADOR -->
+                <div id="module-buscador" class="hidden space-y-5 max-w-[1200px] mx-auto pb-10 transition-all duration-200">
+                    <div class="flex flex-col gap-2 border-b border-gray-200 pb-4 no-print">
+                        <h2 class="text-[22px] font-black tracking-tight text-gray-900">Buscador Global</h2>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex items-center gap-3">
+                            <span class="text-[16px] opacity-50 ml-2">🔍</span>
+                            <input type="text" id="search-patente" placeholder="Ingresa mínimo 3 letras (Patente, Modelo, Cliente, RUT...)" class="flex-1 h-10 bg-transparent text-[14px] font-medium outline-none" onkeyup="window.buscarPatente()">
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="overflow-auto max-h-[600px]">
+                            <table class="w-full text-[12px]">
+                                <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 text-gray-500 shadow-sm">
+                                    <tr class="text-left">
+                                        <th class="px-4 py-3 font-bold">Fecha</th>
+                                        <th class="px-3 py-3 font-bold">Matriz Origen</th>
+                                        <th class="px-3 py-3 font-bold text-center">N° Lote</th>
+                                        <th class="px-3 py-3 font-bold hidden sm:table-cell">Detalle / Vehículo</th>
+                                        <th class="px-3 py-3 font-bold">Adjudicatario</th>
+                                        <th class="px-4 py-3 font-bold text-right">Monto Final</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="buscador-tabla-resultados" class="divide-y divide-gray-100">
+                                    <tr><td colspan="6" class="px-4 py-10 text-center text-gray-400 font-medium">Usa la barra superior para buscar en toda la base de datos sincronizada.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div> <!-- FIN APP CONTENT -->
+
+    <!-- MODAL GESTOR MATRICES -->
+    <div id="modal-gestor" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalGestor(event)">
+        <div class="bg-white w-full max-w-[720px] max-h-[90vh] rounded-[16px] shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 shrink-0">
+                <div>
+                    <div class="font-bold text-[14px] text-gray-900">Gestor de Remates • Selección avanzada</div>
+                    <div class="text-[11px] text-gray-500 mt-0.5">Activa o desactiva matrices específicas para el análisis sin perder tu posición.</div>
+                </div>
+                <button onclick="window.cerrarModalGestor()" class="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-100 flex items-center justify-center transition text-gray-600">✕</button>
             </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Comisión Est. (12%)</div>
-                <div class="text-xl font-black text-blue-600 mt-1" id="kpi-comision">$0</div>
+            
+            <div class="p-3 border-b border-gray-100 bg-white shrink-0">
+                <input type="text" id="search-gestor" placeholder="🔍 Buscar por mes, año o nombre de matriz..." class="w-full h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-[12px] focus:outline-none focus:border-gray-400 transition" onkeyup="window.filtrarModalGestor()">
             </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lotes Vendidos</div>
-                <div class="text-xl font-black text-gray-900 mt-1" id="kpi-lotes">0</div>
+            
+            <div id="gestor-tabs-container" class="shrink-0 bg-white border-b border-gray-100"></div>
+
+            <div class="flex-1 overflow-y-auto p-4 bg-gray-50" id="gestor-content-container">
+                <!-- Se llena con JS -->
             </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ticket Promedio</div>
-                <div class="text-xl font-black text-gray-900 mt-1" id="kpi-ticket">$0</div>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Clientes Únicos</div>
-                <div class="text-xl font-black text-indigo-600 mt-1" id="kpi-clientes">0</div>
+            <div class="p-4 border-t border-gray-200 bg-white shrink-0 flex justify-between items-center">
+                <div class="flex gap-2">
+                    <button onclick="window.toggleGestorAll(true)" class="text-[11px] font-bold text-gray-600 hover:text-black transition">✔ Marcar Todas</button>
+                    <span class="text-gray-300">|</span>
+                    <button onclick="window.toggleGestorAll(false)" class="text-[11px] font-bold text-red-500 hover:text-red-700 transition">✖ Limpiar</button>
+                </div>
+                <button onclick="window.cerrarModalGestor()" class="h-9 px-5 rounded-lg bg-[#111827] text-white text-[12px] font-bold hover:bg-black transition shadow-sm">Aplicar y Cerrar</button>
             </div>
         </div>
+    </div>
 
-        <!-- TABLA DE RESULTADOS -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hidden" id="panel-tabla">
-            <div class="overflow-x-auto max-h-[600px]">
-                <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead class="bg-gray-50 text-gray-500 font-bold text-[11px] sticky top-0 uppercase tracking-wider border-b border-gray-200">
+    <!-- MODAL PUJAS -->
+    <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModal(event)">
+        <div class="bg-white rounded-[16px] w-full max-w-[480px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
+            <div class="p-5 flex justify-between items-start border-b border-gray-100 bg-gray-50 shrink-0">
+                <div>
+                    <h3 class="font-bold text-[14px] text-gray-900" id="modal-titulo">Historial de Pujas</h3>
+                    <p class="text-[11px] text-gray-500 mt-1 font-medium" id="modal-subtitulo"></p>
+                </div>
+                <button onclick="window.cerrarModal()" class="w-7 h-7 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-100 transition text-gray-500">✕</button>
+            </div>
+            <div class="px-5 py-3 bg-white flex flex-wrap gap-4 text-[11px] border-b border-gray-100 font-bold items-center shrink-0">
+                <div><span class="text-gray-400 uppercase tracking-widest">Pujas:</span> <span class="text-gray-900 ml-1" id="modal-total-pujas">0</span></div>
+                <div><span class="text-gray-400 uppercase tracking-widest">Reales:</span> <span class="text-blue-600 ml-1" id="modal-unicos-reales">0</span></div>
+                <div class="ml-auto flex gap-1 w-full sm:w-auto">
+                    <button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1.5 rounded-md bg-black text-white transition">Todos</button>
+                    <button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition">Reales</button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-auto bg-white p-0">
+                <table class="w-full text-left text-[12px]">
+                    <thead class="sticky top-0 bg-gray-50 shadow-sm text-gray-500">
                         <tr>
-                            <th class="px-4 py-3">Lote</th>
-                            <th class="px-4 py-3">Vehículo</th>
-                            <th class="px-4 py-3">Patente</th>
-                            <th class="px-4 py-3">Adjudicatario</th>
-                            <th class="px-4 py-3 text-center">Pujas</th>
-                            <th class="px-4 py-3 text-right">Mínimo</th>
-                            <th class="px-4 py-3 text-right">Adjudicado</th>
-                            <th class="px-4 py-3 text-right">Rentabilidad</th>
+                            <th class="pl-5 py-2 font-medium">#</th>
+                            <th class="hidden sm:table-cell py-2 font-medium">Fecha</th>
+                            <th class="py-2 font-medium">Nombre</th>
+                            <th class="text-right py-2 font-medium">Monto</th>
+                            <th class="text-center pr-5 py-2 font-medium">Status</th>
                         </tr>
                     </thead>
-                    <tbody id="tabla-body" class="divide-y divide-gray-100">
-                        <!-- Llenado por JS -->
-                    </tbody>
+                    <tbody id="modal-tabla-pujas" class="divide-y divide-gray-50"></tbody>
                 </table>
             </div>
         </div>
+    </div>
 
+    <!-- MODAL FUGA -->
+    <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalFuga(event)">
+        <div class="bg-white rounded-[16px] w-full max-w-[520px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
+            <div class="p-5 flex justify-between items-start border-b border-gray-100 bg-gray-50 shrink-0">
+                <div>
+                    <h3 class="font-bold text-[14px] text-red-600">Clientes que NO adjudicaron</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">Exportar base para remarketing</p>
+                </div>
+                <button onclick="window.cerrarModalFuga()" class="w-7 h-7 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-100 transition text-gray-500">✕</button>
+            </div>
+            <div class="flex-1 overflow-auto bg-white p-0">
+                <table class="w-full text-left text-[12px] whitespace-nowrap">
+                    <thead class="sticky top-0 bg-gray-50 shadow-sm text-gray-500">
+                        <tr>
+                            <th class="pl-5 py-2 font-medium">Matriz</th>
+                            <th class="py-2 font-medium">Inactivo por</th>
+                            <th class="py-2 font-medium">Cliente</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-tabla-fuga" class="divide-y divide-gray-50"></tbody>
+                </table>
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 shrink-0 flex justify-end">
+                <button onclick="window.exportarFugaExcel()" class="h-9 px-4 bg-black text-white rounded-lg text-[12px] font-bold hover:bg-gray-800 transition shadow-sm">Exportar Excel (XLSX)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL MULTILOTE -->
+    <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalMulti(event)">
+        <div class="bg-white rounded-[16px] w-full max-w-[420px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
+            <div class="p-4 flex justify-between items-center border-b border-gray-100 bg-gray-50 shrink-0">
+                <h3 class="font-bold text-[14px] text-gray-900">Compradores > 1 Lote</h3>
+                <button onclick="window.cerrarModalMulti()" class="w-7 h-7 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-100 transition text-gray-500">✕</button>
+            </div>
+            <div class="flex-1 overflow-auto bg-white p-0">
+                <table class="w-full text-left text-[12px]">
+                    <thead class="sticky top-0 bg-gray-50 shadow-sm text-gray-500">
+                        <tr>
+                            <th class="pl-5 py-2 font-medium">Cliente</th>
+                            <th class="text-center py-2 font-medium">Volumen</th>
+                            <th class="text-right pr-5 py-2 font-medium">Inversión</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-tabla-multilote" class="divide-y divide-gray-50"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 <script>
-const formatMoney = (num) => { 
-    return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num || 0)); 
+// === CONFIGURACIÓN DE SUPABASE ===
+const { createClient } = supabase;
+const supabaseUrl = 'https://gxfvjmuzxzpghlbzzmui.supabase.co';
+const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
+const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+let sessionUser = null;
+let db = { remates: [] };
+let checkedNodes = []; 
+let clientDB = []; 
+let currentModalPujas = []; 
+let currentAdjudicadoModal = null; 
+let currentFiltroModal = 'todos';
+let dashChartVentasInst = null;
+let dashChartClientesInst = null;
+let biChartSegmentsInst = null;
+let flotaMarcasInst = null;
+let flotaAniosInst = null;
+let compChartInst = null;
+let currentModule = 'remates'; 
+let globalMapCMulti = {}; 
+let globalAgg = null;
+let currentGestorYearTab = null;
+
+// ESTADO FILTRO GLOBAL
+window.globalSelectedYears = [];
+window.expandedDropMonths = new Set(); 
+
+if(typeof Chart !== 'undefined') { 
+    Chart.defaults.color = '#6B7280'; 
+    Chart.defaults.font.family = 'Roboto, sans-serif'; 
+    Chart.defaults.font.size = 11;
+}
+
+// === CEREBRO DE SINCRONIZACIÓN CENTRAL ===
+window.actualizarEstadoApp = function(keepGestorScroll = false) {
+    window.renderDropdownUI();
+    window.updateDropdownLabel();
+    window.updateAdminButtonCount();
+    window.renderApp();
+    
+    // Mantiene el gestor abierto sin que salte
+    const modalGestor = document.getElementById('modal-gestor');
+    if(modalGestor && !modalGestor.classList.contains('hidden')) {
+        window.abrirModalGestor(keepGestorScroll);
+    }
 };
 
-async function procesarArchivos(files) {
-    const statusText = document.getElementById('status-text');
-    if(!files.length) return;
-    
-    statusText.innerText = "⏳ Procesando Excel...";
-    statusText.className = "text-sm mt-1 font-bold text-blue-600";
-    
+window.actualizarVistaActual = function() { 
+    window.renderApp(); 
+};
+
+window.toggleSidebar = function(e) {
+    if(e) e.stopPropagation();
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobile-overlay');
+    if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+    } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+    }
+};
+
+window.closeMenus = function(e) {
+    const dropdown = document.getElementById('dropdown-menu');
+    const container = document.getElementById('dropdown-container');
+    if(dropdown && !dropdown.classList.contains('hidden')) {
+        if(!container.contains(e.target)) {
+            dropdown.classList.add('hidden'); 
+            dropdown.classList.remove('flex');
+        }
+    }
+};
+
+async function checkSession() {
     try {
-        let todosLosLotes = [];
-        for(let i=0; i<files.length; i++) {
-            const data = await parseZarateExcel(files[i]);
-            todosLosLotes = todosLosLotes.concat(data);
-        }
-
-        if(todosLosLotes.length === 0) {
-            statusText.innerText = "❌ Error: 0 lotes encontrados. (Revisa si el excel tiene las columnas monto/adjudicacion y cliente)";
-            statusText.className = "text-sm mt-1 font-bold text-red-600";
-            return;
-        }
-
-        renderUI(todosLosLotes);
+        const timeoutP = new Promise((_, r) => setTimeout(() => r(new Error("Timeout Supabase")), 7000));
+        const sessionP = supabaseClient.auth.getSession();
+        const { data, error } = await Promise.race([sessionP, timeoutP]);
+        if (error) throw error;
         
-        statusText.innerText = `✅ ¡Éxito! Se cargaron ${todosLosLotes.length} lotes correctamente.`;
-        statusText.className = "text-sm mt-1 font-bold text-emerald-600";
-    } catch (e) {
-        statusText.innerText = "❌ Error al leer: " + e.message;
-        statusText.className = "text-sm mt-1 font-bold text-red-600";
-        console.error(e);
+        if (data && data.session) {
+            sessionUser = data.session.user;
+            const displayEl = document.getElementById('user-display-email');
+            if(displayEl) {
+                displayEl.innerText = sessionUser.email.substring(0,12) + "...";
+            }
+            
+            const esAdmin = sessionUser.email.toLowerCase() === 'pabloaat@gmail.com';
+            const adminControls = document.getElementById('admin-controls');
+            if (adminControls) {
+                if (esAdmin) { 
+                    adminControls.classList.remove('hidden'); 
+                    adminControls.classList.add('flex'); 
+                } else { 
+                    adminControls.classList.add('hidden'); 
+                    adminControls.classList.remove('flex'); 
+                }
+            }
+            
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('app-content').classList.add('flex');
+            initApp();
+        } else {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('loading-overlay').classList.remove('flex');
+            
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('app-content').classList.add('hidden');
+            document.getElementById('app-content').classList.remove('flex');
+            const btn = document.getElementById('btn-login');
+            if(btn) { 
+                btn.innerHTML = "Ingresar al Panel"; 
+                btn.disabled = false; 
+            }
+        }
+    } catch(e) {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        document.getElementById('loading-overlay').classList.remove('flex');
+        
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app-content').classList.add('hidden');
+        document.getElementById('app-content').classList.remove('flex');
+        const err = document.getElementById('login-error');
+        if(err) { 
+            err.innerText = "Error: " + e.message; 
+            err.classList.remove('hidden'); 
+        }
     }
 }
 
-function renderUI(lotes) {
-    document.getElementById('panel-kpis').classList.remove('hidden');
-    document.getElementById('panel-tabla').classList.remove('hidden');
-
-    let ventaTotal = 0;
-    let clientes = new Set();
+window.handleLogin = async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-login');
+    const err = document.getElementById('login-error');
+    btn.innerHTML = "Validando..."; 
+    btn.disabled = true; 
+    err.classList.add('hidden');
     
-    lotes.forEach(l => {
-        ventaTotal += l.monto;
-        if(l.nombreRaw) clientes.add(l.nombreRaw);
-    });
+    try {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        if (data && !data.session) throw new Error("Cuenta inactiva.");
+        btn.innerHTML = "Abriendo...";
+        
+        document.getElementById('loading-overlay').classList.remove('hidden');
+        document.getElementById('loading-overlay').classList.add('flex');
+        
+        await checkSession();
+    } catch (ex) {
+        let msj = ex.message || "Error desconocido";
+        if(msj.includes("Email not confirmed")) msj = "Cuenta requiere confirmación en BD.";
+        if(msj.includes("Invalid login")) msj = "Credenciales incorrectas.";
+        err.innerText = msj; 
+        err.classList.remove('hidden');
+        btn.innerHTML = "Ingresar al Panel"; 
+        btn.disabled = false;
+        
+        document.getElementById('loading-overlay').classList.add('hidden');
+        document.getElementById('loading-overlay').classList.remove('flex');
+    }
+};
 
-    let comision = ventaTotal * 0.12;
-    let ticketPromedio = lotes.length > 0 ? ventaTotal / lotes.length : 0;
+window.onload = () => { 
+    checkSession(); 
+};
 
-    document.getElementById('kpi-venta').innerText = formatMoney(ventaTotal);
-    document.getElementById('kpi-comision').innerText = formatMoney(comision);
-    document.getElementById('kpi-lotes').innerText = lotes.length;
-    document.getElementById('kpi-ticket').innerText = formatMoney(ticketPromedio);
-    document.getElementById('kpi-clientes').innerText = clientes.size;
+window.handleLogout = async function() { 
+    await supabaseClient.auth.signOut(); 
+    window.location.reload(); 
+};
 
-    const tablaBody = document.getElementById('tabla-body');
-    tablaBody.innerHTML = lotes.map(lote => {
-        let delta = lote.monto - lote.minimo;
-        let deltaColor = delta > 0 ? 'text-emerald-600' : (delta < 0 ? 'text-red-500' : 'text-gray-400');
-        let deltaSign = delta > 0 ? '+' : '';
+window.formatearNombreRemate = function(fileName, timestamp) {
+    try {
+        if(!fileName || typeof fileName !== 'string') fileName = "Matriz Desconocida";
+        let numMatch = fileName.match(/(?:REMATE|ZARATE).*?(\d{3,5})/i) || fileName.match(/\b(\d{4})\b/);
+        let num = numMatch ? (numMatch[1] || numMatch[0]) : '';
+        let dateStr = '';
+        if (timestamp && !isNaN(timestamp)) {
+            let d = new Date(timestamp);
+            let dd = String(d.getDate()).padStart(2, '0');
+            let mm = String(d.getMonth() + 1).padStart(2, '0');
+            let yyyy = d.getFullYear();
+            dateStr = `${dd}/${mm}/${yyyy}`; 
+        }
+        if(num && dateStr) return `Remate ${num} (${dateStr})`;
+        if(num) return `Remate ${num}`;
+        let base = fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,18);
+        return dateStr ? `${base} (${dateStr})` : base;
+    } catch(e) { 
+        return "Matriz"; 
+    }
+};
 
-        return `
-            <tr class="hover:bg-gray-50 transition">
-                <td class="px-4 py-3 font-bold text-gray-700 text-center">${lote.numeroLote || '-'}</td>
-                <td class="px-4 py-3 font-medium text-gray-900 max-w-[250px] truncate" title="${lote.loteStr}">${lote.loteStr}</td>
-                <td class="px-4 py-3 font-mono text-gray-500">${lote.patente || '-'}</td>
-                <td class="px-4 py-3">
-                    <div class="font-bold text-gray-800 truncate max-w-[200px]" title="${lote.nombreRaw}">${lote.nombreRaw}</div>
-                    <div class="text-[10px] text-gray-400">${lote.rut || 'Sin RUT'}</div>
-                </td>
-                <td class="px-4 py-3 text-center"><span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded font-bold">${lote.pujasCount}</span></td>
-                <td class="px-4 py-3 text-right text-gray-500">${formatMoney(lote.minimo)}</td>
-                <td class="px-4 py-3 text-right font-black text-emerald-600">${formatMoney(lote.monto)}</td>
-                <td class="px-4 py-3 text-right font-bold ${deltaColor}">${lote.minimo > 0 ? deltaSign + formatMoney(delta) : '-'}</td>
-            </tr>
-        `;
-    }).join('');
+// --- LOGICA DE ARRANQUE E INICIO ---
+async function initApp() {
+    const statusLabel = document.getElementById('db-status');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    loadingOverlay.classList.remove('hidden'); 
+    loadingOverlay.classList.add('flex');
+
+    try {
+        statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Sincronizando...';
+        const { data, error } = await supabaseClient.from('app_state').select('*');
+        
+        if (data && data.length > 0) {
+            if (data.length === 1 && data[0].payload && data[0].payload.remates) { 
+                db = data[0].payload; 
+            } else { 
+                db.remates = data.map(row => { 
+                    let r = row.payload; 
+                    r._dbId = row.id; 
+                    return r; 
+                }); 
+            }
+            db.remates.forEach(r => { 
+                if (!r.id) {
+                    r.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); 
+                }
+            });
+            statusLabel.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> En Línea (${db.remates.length})`;
+        } else {
+            statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Base Vacía';
+        }
+    } catch (e) {
+        statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
+    } finally {
+        loadingOverlay.classList.add('hidden'); 
+        loadingOverlay.classList.remove('flex');
+    }
+    
+    if(db.remates && db.remates.length > 0) { 
+        window.actualizarFiltrosGlobales(true); 
+    }
 }
 
-// ==========================================
-// EL MOTOR V2.1 PURO (Restaurado con la variable correcta)
-// ==========================================
-function parseZarateExcel(file) {
+window.updateAdminButtonCount = function() {
+    const btnCount = document.getElementById('count-matrices-btn');
+    if (btnCount) {
+        btnCount.innerText = checkedNodes.length;
+    }
+};
+
+window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
+    if(!db.remates || !db.remates.length) return;
+    
+    let segments = new Set();
+    db.remates.forEach(r => { 
+        segments.add(r.tipo || 'Desconocido'); 
+    });
+    
+    let segSelect = document.getElementById('macro-segment');
+    let currentSeg = segSelect.value || Array.from(segments)[0];
+    
+    let optionsHtml = `<option value="Todos">📊 Segmentos: Todos</option>`;
+    optionsHtml += Array.from(segments).map(s => {
+        return `<option value="${s}" ${s === currentSeg ? 'selected' : ''}>${s}</option>`;
+    }).join('');
+    
+    segSelect.innerHTML = optionsHtml;
+    
+    if(isInitialLoad) {
+        let years = new Set();
+        db.remates.forEach(r => {
+            let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            if(!isNaN(y)) years.add(y);
+        });
+        
+        let maxYear = Math.max(...Array.from(years));
+        window.globalSelectedYears = [maxYear];
+        
+        let initialRemates = db.remates.filter(r => {
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            let matchSeg = currentSeg === 'Todos' || r.tipo === currentSeg;
+            return matchSeg && rYr === maxYear;
+        }).map(r => r.id);
+        
+        checkedNodes = initialRemates;
+    }
+    
+    window.actualizarEstadoApp();
+};
+
+window.aplicarCambioSegmento = function() {
+    window.quickSelect('TODO'); 
+}
+
+window.toggleDropdown = function(e) {
+    if(e) e.stopPropagation();
+    const menu = document.getElementById('dropdown-menu');
+    if(menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        menu.classList.add('flex');
+    } else {
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+    }
+};
+
+window.renderDropdownUI = function() {
+    let years = new Set();
+    db.remates.forEach(r => {
+        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        if(!isNaN(y)) years.add(y);
+    });
+    
+    let yearsArr = Array.from(years).sort((a,b)=>b-a);
+    
+    let yearsHtml = '';
+    yearsArr.forEach(y => {
+        let isChecked = window.globalSelectedYears.includes(Number(y)) ? 'checked' : '';
+        let activeClass = isChecked ? 'bg-[#111827] text-white border-black' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200';
+        yearsHtml += `
+        <label class="flex items-center gap-2 cursor-pointer rounded-full px-4 py-1.5 transition justify-center border shadow-sm ${activeClass}">
+            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)" ${isChecked}> 
+            <span class="text-[12px] font-bold">Año ${y}</span>
+        </label>`;
+    });
+    const tyc = document.getElementById('dropdown-years-grid');
+    if(tyc) {
+        tyc.innerHTML = yearsHtml;
+    }
+
+    let seg = document.getElementById('macro-segment').value;
+    let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
+
+    let byYear = {};
+    rematesFiltrados.forEach(r => {
+        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        if(!byYear[y]) byYear[y] = {};
+        
+        let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+        if(!byYear[y][m]) byYear[y][m] = [];
+        
+        byYear[y][m].push(r);
+    });
+
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    let html = '';
+
+    Object.keys(byYear).sort((a,b)=>b-a).forEach(y => {
+        if(!window.globalSelectedYears.includes(Number(y))) return;
+
+        html += `<div class="mb-3 dropdown-year-group">`;
+        
+        Object.keys(byYear[y]).sort((a,b)=>a-b).forEach(m => {
+            let rematesMes = byYear[y][m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
+            let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
+            let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
+            
+            let dropId = `drop-${y}-${m}`;
+            let isExpanded = window.expandedDropMonths.has(dropId);
+            let hiddenClass = isExpanded ? '' : 'hidden';
+            let arrowClass = isExpanded ? 'rotate-90' : '';
+            
+            html += `
+            <div class="dropdown-month-group border border-gray-100 rounded-lg mb-2">
+                <div class="flex items-center justify-between px-2 py-1.5 bg-gray-50 rounded-t-lg group">
+                    <label class="flex items-center gap-2 cursor-pointer flex-1">
+                        <span class="text-[12px] font-bold text-gray-800 flex items-center gap-1 group-hover:text-black transition" data-search="${monthNames[m]}" onclick="window.toggleDropExpand('${dropId}')">
+                            <span class="inline-block transition-transform text-[10px] text-gray-400 ${arrowClass}">▶</span> ${monthNames[m]} <span class="text-[10px] text-gray-400 font-normal">(${rematesMes.length})</span>
+                        </span>
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-gray-400 font-medium">${rematesMes.filter(r => checkedNodes.includes(r.id)).length}/${rematesMes.length}</span>
+                        <input type="checkbox" onchange="window.toggleDropMes(this, ${y}, ${m})" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''} !w-3.5 !h-3.5">
+                    </div>
+                </div>
+                <div id="${dropId}" class="${hiddenClass} pl-6 pr-2 pb-2 pt-1 space-y-1">
+                    ${rematesMes.map(r => {
+                        let isChecked = checkedNodes.includes(r.id);
+                        let rName = window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp);
+                        return `
+                        <label class="dropdown-remate-item flex items-center gap-2 cursor-pointer py-0.5 group">
+                            <input type="checkbox" onchange="window.toggleDropRemate(this, '${r.id}')" ${isChecked ? 'checked' : ''} class="!w-3.5 !h-3.5">
+                            <span class="text-[12px] font-medium text-gray-600 group-hover:text-black transition truncate" data-search="${rName}" title="${rName}">${rName}</span>
+                        </label>
+                        `;
+                    }).join('')}
+                </div>
+            </div>`;
+        });
+        html += `</div>`;
+    });
+    
+    if(window.globalSelectedYears.length === 0) {
+        html = '<p class="text-center text-[12px] font-medium text-gray-400 p-4">Selecciona un año arriba para ver los meses.</p>';
+    } else if (html === '') {
+        html = '<p class="text-center text-[12px] font-medium text-gray-400 p-4">No hay datos en el periodo.</p>';
+    }
+    
+    const dt = document.getElementById('dropdown-tree');
+    if(dt) dt.innerHTML = html;
+};
+
+window.toggleTimeYear = function(y, checked) {
+    if(checked) {
+        if(!window.globalSelectedYears.includes(y)) {
+            window.globalSelectedYears.push(y);
+        }
+        let seg = document.getElementById('macro-segment').value;
+        let toAdd = db.remates.filter(r => {
+            let matchSeg = seg === 'Todos' || r.tipo === seg;
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            return matchSeg && rYr === y;
+        }).map(r => r.id);
+        
+        toAdd.forEach(id => { 
+            if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+        });
+    } else {
+        window.globalSelectedYears = window.globalSelectedYears.filter(val => val !== y);
+        let toRemove = db.remates.filter(r => {
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            return rYr === y;
+        }).map(r => r.id);
+        
+        checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
+    }
+    window.actualizarEstadoApp();
+};
+
+window.toggleDropExpand = function(id) {
+    if (window.expandedDropMonths.has(id)) {
+        window.expandedDropMonths.delete(id);
+    } else {
+        window.expandedDropMonths.add(id);
+    }
+    window.renderDropdownUI(); 
+};
+
+window.toggleDropMes = function(el, year, mesIndex) {
+    let isChecked = el.checked;
+    let seg = document.getElementById('macro-segment').value;
+    
+    let idsInMonth = db.remates.filter(r => {
+        let matchSeg = seg === 'Todos' || r.tipo === seg;
+        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+        return matchSeg && rYr === Number(year) && rM === Number(mesIndex);
+    }).map(r => r.id);
+    
+    if(isChecked) { 
+        idsInMonth.forEach(id => { 
+            if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+        }); 
+    } else { 
+        checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); 
+    }
+    
+    window.actualizarEstadoApp(true);
+};
+
+window.toggleDropRemate = function(el, id) {
+    if(el.checked) { 
+        if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+    } else { 
+        checkedNodes = checkedNodes.filter(n => n !== id); 
+    }
+    
+    window.actualizarEstadoApp(true);
+};
+
+window.quickSelect = function(type) {
+    let allowedMonths = [];
+    if(type === 'TODO') allowedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
+    else if(type === 'S1') allowedMonths = [0,1,2,3,4,5];
+    else if(type === 'S2') allowedMonths = [6,7,8,9,10,11];
+    else if(type === 'Q1') allowedMonths = [0,1,2];
+    else if(type === 'Q2') allowedMonths = [3,4,5];
+    else if(type === 'Q3') allowedMonths = [6,7,8];
+    else if(type === 'Q4') allowedMonths = [9,10,11];
+    
+    if(type === 'NADA') {
+        checkedNodes = [];
+    } else {
+        let seg = document.getElementById('macro-segment').value;
+        checkedNodes = db.remates.filter(r => {
+            let matchSeg = seg === 'Todos' || r.tipo === seg;
+            let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+            let matchYr = window.globalSelectedYears.includes(rYr);
+            let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+            return matchSeg && matchYr && allowedMonths.includes(rM);
+        }).map(r => r.id);
+    }
+    
+    window.actualizarEstadoApp();
+};
+
+window.applyDropdown = function() {
+    const menu = document.getElementById('dropdown-menu');
+    if(menu) { 
+        menu.classList.add('hidden'); 
+        menu.classList.remove('flex'); 
+    }
+};
+
+window.updateDropdownLabel = function() {
+    let labelStr = '';
+    if(checkedNodes.length === 0) { 
+        labelStr += '0 seleccionados'; 
+    } else if(checkedNodes.length === 1) {
+        let r = db.remates.find(x => x.id === checkedNodes[0]);
+        labelStr += r ? window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp).substring(0,25) : 'Matriz Única';
+    } else {
+        labelStr += `${checkedNodes.length} matrices`;
+    }
+    const lbl = document.getElementById('dropdown-label');
+    if(lbl) {
+        lbl.innerHTML = `📅 <span class="ml-1">${labelStr}</span>`;
+    }
+};
+
+window.seleccionarUltimoRemate = function() {
+    if (!db.remates || db.remates.length === 0) return;
+    
+    const rematesOrdenados = [...db.remates].sort((a,b) => (b.fechaData?.timestamp||0) - (a.fechaData?.timestamp||0));
+    const ultimo = rematesOrdenados[0];
+
+    let segSelect = document.getElementById('macro-segment');
+    if (segSelect) {
+        segSelect.value = ultimo.tipo || 'Siniestrados';
+    }
+    
+    let y = ultimo.fechaData?.year ? Number(ultimo.fechaData.year) : new Date().getFullYear();
+    
+    window.globalSelectedYears = [y];
+    checkedNodes = [ultimo.id];
+    
+    window.cambiarSeccion('remates');
+    window.actualizarEstadoApp();
+};
+
+window.switchGestorYear = function(y) {
+    currentGestorYearTab = y;
+    
+    const container = document.getElementById('gestor-content-container');
+    const scrollPos = container ? container.scrollTop : 0;
+    
+    window.abrirModalGestor(true);
+    
+    if(container) { 
+        container.scrollTop = scrollPos; 
+    }
+};
+
+window.toggleGestorAll = function(check) {
+    let seg = document.getElementById('macro-segment').value;
+    let rematesEnPantalla = db.remates.filter(r => {
+        let matchSeg = seg === 'Todos' || r.tipo === seg;
+        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        return matchSeg && rYr === Number(currentGestorYearTab);
+    });
+
+    if(check) {
+        let ids = rematesEnPantalla.map(r => r.id);
+        ids.forEach(id => { 
+            if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+        });
+    } else {
+        checkedNodes = [];
+    }
+    
+    window.actualizarEstadoApp(true);
+};
+
+window.filtrarModalGestor = function() {
+    let term = document.getElementById('search-gestor').value.toLowerCase();
+    
+    document.querySelectorAll('.gestor-mes-group').forEach(mesGroup => {
+        let monthTitle = mesGroup.querySelector('span[data-search]').getAttribute('data-search').toLowerCase();
+        let monthMatches = monthTitle.includes(term);
+        let hasVisibleChild = false;
+
+        mesGroup.querySelectorAll('.gestor-remate-item').forEach(remateItem => {
+            let text = remateItem.querySelector('span[data-search]').getAttribute('data-search').toLowerCase();
+            if(monthMatches || text.includes(term)) {
+                remateItem.style.display = 'flex';
+                hasVisibleChild = true;
+            } else {
+                remateItem.style.display = 'none';
+            }
+        });
+        
+        mesGroup.style.display = hasVisibleChild ? 'block' : 'none';
+    });
+};
+
+window.abrirModalGestor = function(keepScroll = false) {
+    const tabsContainer = document.getElementById('gestor-tabs-container');
+    const contentContainer = document.getElementById('gestor-content-container');
+    
+    let currentScroll = keepScroll && contentContainer ? contentContainer.scrollTop : 0;
+    
+    let seg = document.getElementById('macro-segment').value;
+    let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
+
+    let byYear = {};
+    rematesFiltrados.forEach(r => {
+        let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        if(!byYear[y]) byYear[y] = {};
+        
+        let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+        if(!byYear[y][m]) byYear[y][m] = [];
+        
+        byYear[y][m].push(r);
+    });
+
+    let years = Object.keys(byYear).sort((a,b)=>b-a);
+    if(years.length > 0 && !years.includes(String(currentGestorYearTab))) {
+        currentGestorYearTab = years[0];
+    }
+
+    let tabsHtml = '';
+    if(years.length > 1) {
+        tabsHtml = `<div class="flex gap-2 p-3 overflow-x-auto bg-gray-50/50">`;
+        years.forEach(y => {
+            let active = String(y) === String(currentGestorYearTab) ? 'bg-[#111827] text-white shadow-md border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50';
+            tabsHtml += `<button onclick="window.switchGestorYear('${y}')" class="px-5 py-2 rounded-full text-[13px] font-bold transition whitespace-nowrap border ${active}">Año ${y}</button>`;
+        });
+        tabsHtml += `</div>`;
+    }
+    tabsContainer.innerHTML = tabsHtml;
+
+    let contentHtml = '';
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    if(years.length === 0) {
+        contentHtml = '<div class="flex items-center justify-center h-full"><p class="text-sm font-medium text-gray-400">No hay matrices disponibles.</p></div>';
+    } else {
+        let currentData = byYear[currentGestorYearTab] || {};
+        contentHtml += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
+        
+        Object.keys(currentData).sort((a,b)=>a-b).forEach(m => {
+            let rematesMes = currentData[m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
+            let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
+            let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
+            
+            contentHtml += `
+            <div class="gestor-mes-group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm transition">
+                <div class="flex justify-between items-center px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                    <label class="flex items-center gap-2 cursor-pointer w-full">
+                        <span class="font-bold text-gray-900 text-[13px]" data-search="${monthNames[m]}">${monthNames[m]}</span>
+                        <span class="text-gray-400 text-[10px] font-medium">(${rematesMes.length})</span>
+                    </label>
+                    <input type="checkbox" onchange="window.toggleGestorMes(this, ${currentGestorYearTab}, ${m})" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
+                </div>
+                <div class="p-3 flex flex-col gap-1 max-h-48 overflow-y-auto">
+                    ${rematesMes.map(r => {
+                        let isChecked = checkedNodes.includes(r.id);
+                        let rName = window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp);
+                        return `
+                        <label class="gestor-remate-item flex items-center gap-2.5 cursor-pointer group py-1">
+                            <input type="checkbox" onchange="window.toggleGestorRemate(this, '${r.id}')" ${isChecked ? 'checked' : ''} class="!w-3.5 !h-3.5">
+                            <span class="text-[11px] font-medium text-gray-600 group-hover:text-black transition truncate" data-search="${rName}">${rName}</span>
+                        </label>
+                        `;
+                    }).join('')}
+                </div>
+            </div>`;
+        });
+        contentHtml += `</div>`;
+    }
+
+    contentContainer.innerHTML = contentHtml;
+    window.filtrarModalGestor();
+    
+    document.getElementById('modal-gestor').classList.remove('hidden');
+    document.getElementById('modal-gestor').classList.add('flex');
+    
+    if (keepScroll && contentContainer) {
+        contentContainer.scrollTop = currentScroll;
+    }
+};
+
+window.cerrarModalGestor = function(e) { 
+    if(e && e.target.id !== 'modal-gestor') return;
+    
+    document.getElementById('modal-gestor').classList.add('hidden'); 
+    document.getElementById('modal-gestor').classList.remove('flex'); 
+    
+    let searchEl = document.getElementById('search-gestor');
+    if(searchEl) {
+        searchEl.value = '';
+    }
+};
+
+window.toggleGestorMes = function(el, year, mesIndex) {
+    let isChecked = el.checked;
+    let seg = document.getElementById('macro-segment').value;
+    
+    let idsInMonth = db.remates.filter(r => {
+        let matchSeg = seg === 'Todos' || r.tipo === seg;
+        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+        return matchSeg && rYr === Number(year) && rM === Number(mesIndex);
+    }).map(r => r.id);
+    
+    if(isChecked) { 
+        idsInMonth.forEach(id => { 
+            if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+        }); 
+    } else { 
+        checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); 
+    }
+
+    window.actualizarEstadoApp(true);
+};
+
+window.toggleGestorRemate = function(el, id) {
+    if(el.checked) { 
+        if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+    } else { 
+        checkedNodes = checkedNodes.filter(n => n !== id); 
+    }
+    
+    window.actualizarEstadoApp(true);
+};
+
+function buildAgg(rematesList) {
+    const agg = { 
+        venta: 0,
+        comisionTotal: 0,
+        lotes: 0,
+        lotesDisponibles: 0,
+        inscritos: 0,
+        garantias: 0,
+        ganadoresUnicosCount: 0,
+        nuevos: 0,
+        antiguos: 0,
+        ventaSiniestros: 0,
+        ventaRetail: 0,
+        ganadoresNuevos: 0,
+        ventaGanadoresNuevos: 0,
+        ventaGanadoresAntiguos: 0,
+        adjudicaciones: [], 
+        sumMontoValido: 0, 
+        sumMinimoValido: 0, 
+        garantiasLista: [] 
+    };
+    
+    let uniqueGanadoresSet = new Set();
+    
+    rematesList.forEach(r => {
+        try {
+            agg.venta += (Number(r.ventaTotal) || 0);
+            agg.comisionTotal += (Number(r.comisionTotal) || 0);
+            agg.lotes += (Number(r.lotesCount) || 0);
+            agg.lotesDisponibles += (Number(r.lotesDisponibles) || 0);
+            agg.inscritos += (Number(r.inscritos) || 0);
+            agg.garantias += (Number(r.garantias) || 0);
+            agg.nuevos += (Number(r.nuevos) || 0);
+            agg.antiguos += (Number(r.antiguos) || 0);
+            agg.ganadoresNuevos += (Number(r.ganadoresNuevos) || 0);
+            agg.ventaGanadoresNuevos += (Number(r.ventaNuevos) || 0);
+            agg.ventaGanadoresAntiguos += (Number(r.ventaAntiguos) || 0);
+            
+            if(r.adjudicaciones && Array.isArray(r.adjudicaciones)) {
+                r.adjudicaciones.forEach(a => {
+                    if(!a) return;
+                    let aCopy = {...a, origen: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)};
+                    agg.adjudicaciones.push(aCopy);
+                    
+                    if(!a.esFalso && a.clienteReal) {
+                        uniqueGanadoresSet.add(a.clienteReal);
+                    }
+                    
+                    if((Number(a.minimo) > 0) && (Number(a.monto) > 0) && !a.esFalso && !a.esChatarra) { 
+                        agg.sumMontoValido += Number(a.monto); 
+                        agg.sumMinimoValido += Number(a.minimo); 
+                    }
+                });
+            }
+
+            if(r.garantiasListaDetallada && Array.isArray(r.garantiasListaDetallada)) { 
+                r.garantiasListaDetallada.forEach(g => { 
+                    if(!agg.garantiasLista.some(x => x.nombreNorm === g.nombreNorm)) {
+                        agg.garantiasLista.push(g); 
+                    }
+                }); 
+            }
+            
+            if(r.tipo === 'Siniestrados') agg.ventaSiniestros += (Number(r.ventaTotal) || 0); 
+            if(r.tipo === 'Retail') agg.ventaRetail += (Number(r.ventaTotal) || 0);
+        } catch(e) {}
+    });
+    
+    agg.ganadoresUnicosCount = uniqueGanadoresSet.size; 
+    agg.perdedoresCount = Math.max(0, agg.garantias - agg.ganadoresUnicosCount); 
+    agg.conversion = agg.inscritos ? (agg.garantias / agg.inscritos * 100) : 0; 
+    agg.ticketPromedio = agg.lotes ? (agg.venta / agg.lotes) : 0; 
+    agg.eficaciaLotes = agg.lotesDisponibles ? (agg.lotes / agg.lotesDisponibles * 100) : 0; 
+    agg.pctVentaNuevos = agg.venta ? (agg.ventaGanadoresNuevos / agg.venta * 100) : 0; 
+    agg.deltaPujaTotal = agg.sumMontoValido - agg.sumMinimoValido; 
+    agg.deltaPujaPromedio = agg.lotes ? (agg.deltaPujaTotal / agg.lotes) : 0; 
+    agg.sobreprecioReal = agg.sumMinimoValido > 0 ? ((agg.sumMontoValido / agg.sumMinimoValido) * 100) - 100 : 0; 
+    agg.fugaList = agg.garantiasLista.filter(g => !uniqueGanadoresSet.has(g.nombreNorm));
+    
+    return agg;
+}
+
+window.cambiarSeccion = function(mod) { 
+    try {
+        currentModule = mod; 
+        document.getElementById('nav-mod-remates').className = mod === 'remates' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-comparativa').className = mod === 'comparativa' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-autos').className = mod === 'autos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-clientes').className = mod === 'clientes' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-conclusiones').className = mod === 'conclusiones' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-buscador').className = mod === 'buscador' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 hover:bg-gray-50 text-gray-700'; 
+        
+        window.renderApp();
+        if(window.innerWidth < 768) { 
+            window.toggleSidebar(); 
+        }
+    } catch(e) { 
+        console.error(e); 
+    }
+};
+
+window.renderApp = function() { 
+    try {
+        const emptyState = document.getElementById('empty-state');
+        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
+
+        if (checkedNodes.length === 0) {
+            emptyState.classList.remove('hidden');
+            emptyState.classList.add('flex');
+            return;
+        } else {
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+            const currentEl = document.getElementById(`module-${currentModule}`);
+            if(currentEl) currentEl.classList.remove('hidden');
+        }
+
+        if (currentModule === 'remates') window.renderDashboard(); 
+        else if (currentModule === 'comparativa') window.renderComparativa();
+        else if (currentModule === 'autos') window.renderPanelAutos(); 
+        else if (currentModule === 'conclusiones') window.renderConclusiones(); 
+        else if (currentModule === 'clientes') { 
+            procesarDatosClientes(); 
+            window.renderPanelClientesData(clientDB, false); 
+        }
+        else if (currentModule === 'buscador') { window.buscarPatente(); }
+    } catch(e) { 
+        console.error(e); 
+    }
+};
+
+window.renderDashboard = function() { 
+    try {
+        if(currentModule !== 'remates') return; 
+        
+        let allRemates = getSelectedRemates(); 
+        globalAgg = buildAgg(allRemates);
+        
+        let titulo = "Selección Activa";
+        try {
+            if(checkedNodes.length === 1 && allRemates.length === 1) {
+                titulo = window.formatearNombreRemate(allRemates[0].fileName, allRemates[0].fechaData?.timestamp);
+            } else {
+                titulo = "Dashboard de Remates";
+            }
+        } catch(e) { 
+            titulo = "Dashboard de Remates"; 
+        }
+        
+        const elTitulo = document.getElementById('dash-titulo'); 
+        if(elTitulo) elTitulo.innerText = titulo; 
+        
+        const elSubtitulo = document.getElementById('dash-subtitulo'); 
+        if(elSubtitulo) elSubtitulo.innerText = `Control operativo • ${checkedNodes.length} seleccionados`;
+        
+        try { document.getElementById('dash-kpi-ticket').innerText = formatMoney(globalAgg.ticketPromedio); } catch(e){}
+        try { document.getElementById('dash-kpi-comision').innerText = formatMoney(globalAgg.comisionTotal); } catch(e){}
+        try { document.getElementById('dash-kpi-venta').innerText = formatMoney(globalAgg.venta); } catch(e){}
+        try { document.getElementById('dash-kpi-lotes-disp').innerText = globalAgg.lotesDisponibles.toLocaleString('es-CL'); } catch(e){}
+        try { document.getElementById('dash-kpi-lotes').innerText = globalAgg.lotes.toLocaleString('es-CL'); } catch(e){}
+        try { document.getElementById('dash-kpi-eficacia').innerText = `${globalAgg.eficaciaLotes.toFixed(1)}% eficacia`; } catch(e){}
+        try { document.getElementById('dash-kpi-garantias').innerText = globalAgg.garantias.toLocaleString('es-CL'); } catch(e){}
+        try { document.getElementById('dash-kpi-ganadores').innerText = globalAgg.ganadoresUnicosCount.toLocaleString('es-CL'); } catch(e){}
+        try { document.getElementById('dash-kpi-perdedores').innerText = globalAgg.perdedoresCount.toLocaleString('es-CL'); } catch(e){}
+        try { document.getElementById('dash-kpi-1racompra').innerText = globalAgg.ganadoresNuevos.toLocaleString('es-CL'); } catch(e){}
+        try { document.getElementById('dash-kpi-1racompra-pct').innerText = `${globalAgg.pctVentaNuevos.toFixed(1)}%`; } catch(e){}
+        
+        try {
+            const mapC = {}; 
+            globalAgg.adjudicaciones.forEach(a => { 
+                if(a.esFalso) return; 
+                if(!mapC[a.clienteReal]) {
+                    mapC[a.clienteReal] = {lotes: 0, total: 0}; 
+                }
+                mapC[a.clienteReal].lotes++; 
+                mapC[a.clienteReal].total += a.monto; 
+            }); 
+            let multi = 0; 
+            Object.values(mapC).forEach(c => { 
+                if(c.lotes > 1) multi++; 
+            }); 
+            document.getElementById('dash-kpi-multilote').innerText = multi; 
+            globalMapCMulti = mapC;
+        } catch(e){}
+        
+        try {
+            const lotesTabla = [...globalAgg.adjudicaciones].filter(a => !a.esFalso && a.monto > 0).sort((a,b) => (parseInt(a.numeroLote)||0) - (parseInt(b.numeroLote)||0));
+            if(document.getElementById('dash-tabla-lotes')) {
+                document.getElementById('dash-tabla-lotes').innerHTML = lotesTabla.map(l => {
+                    let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
+                    let dSignL = deltaLote >= 0 ? '+' : ''; 
+                    let dColorL = deltaLote > 0 ? 'text-emerald-600' : (deltaLote < 0 ? 'text-red-500' : 'text-gray-500');
+                    let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData?.timestamp) === l.origen)?.id || checkedNodes[0];
+                    return `<tr class="hover:bg-gray-50 transition cursor-pointer" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
+                        <td class="px-4 py-2 font-medium truncate max-w-[120px]" title="${l.origen}">${l.origen}</td>
+                        <td class="px-3 py-2 text-center text-gray-500">Lote ${l.numeroLote||'-'}</td>
+                        <td class="px-3 py-2 max-w-[280px] truncate" title="${l.loteStr}">
+                            <span class="font-bold text-gray-900">${l.loteStr}</span>
+                            ${l.patente && l.patente !== '-' ? `<span class="text-gray-400 text-[10px] ml-1">(${l.patente})</span>` : ''}
+                            <span class="text-gray-400 block text-[10px]">👤 ${l.clienteReal}</span>
+                        </td>
+                        <td class="px-3 py-2 text-center"><span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
+                        <td class="px-3 py-2 text-right font-medium text-gray-500">${formatMoney(l.minimo)}</td>
+                        <td class="px-3 py-2 text-right font-semibold text-emerald-700">${formatMoney(l.monto)}</td>
+                        <td class="px-4 py-2 text-right font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td>
+                    </tr>`;
+                }).join('');
+            }
+        } catch(e){}
+
+        try {
+            let chartLabels = []; 
+            let cSiniestros = []; 
+            let cRetail = []; 
+            let cNuevos = []; 
+            let cRecurrentes = []; 
+            let cMatrices = []; 
+            let cLotes = [];
+            let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            
+            let distinctMonths = new Set(allRemates.map(r => r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0)).size;
+            
+            let forcedMode = document.getElementById('dash-groupby') ? document.getElementById('dash-groupby').value : 'auto';
+            let groupMode = 'remate';
+            if (forcedMode === 'auto') {
+                groupMode = (distinctMonths > 1 && checkedNodes.length > 4) ? 'month' : 'remate';
+            } else {
+                groupMode = forcedMode;
+            }
+
+            if(groupMode === 'month') {
+                let monthMap = {};
+                allRemates.forEach(r => {
+                    let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+                    let y = r.fechaData?.year ? String(r.fechaData.year).slice(-2) : 'XX';
+                    let labelStr = window.globalSelectedYears.length > 1 ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
+                    
+                    let mk = `${y}-${m}`; 
+                    if(!monthMap[mk]) {
+                        monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, lotes: 0, label: labelStr, rawD: r.fechaData?.timestamp||0, count: 0 };
+                    }
+                    
+                    monthMap[mk].count++;
+                    monthMap[mk].lotes += (Number(r.lotesCount) || 0);
+                    if(r.tipo === 'Siniestrados') monthMap[mk].siniestros += (Number(r.ventaTotal) || 0);
+                    if(r.tipo === 'Retail') monthMap[mk].retail += (Number(r.ventaTotal) || 0);
+                    monthMap[mk].nuevos += (Number(r.nuevos) || 0); 
+                    monthMap[mk].antiguos += (Number(r.antiguos) || 0);
+                });
+                
+                Object.values(monthMap).sort((a,b) => a.rawD - b.rawD).forEach(v => {
+                    chartLabels.push(v.label); 
+                    cSiniestros.push(v.siniestros); 
+                    cRetail.push(v.retail); 
+                    cNuevos.push(v.nuevos); 
+                    cRecurrentes.push(v.antiguos); 
+                    cMatrices.push(v.count); 
+                    cLotes.push(v.lotes);
+                });
+            } else {
+                allRemates.sort((a,b) => (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0)).forEach(r => {
+                    chartLabels.push(window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp));
+                    cSiniestros.push(r.tipo === 'Siniestrados' ? (Number(r.ventaTotal) || 0) : 0);
+                    cRetail.push(r.tipo === 'Retail' ? (Number(r.ventaTotal) || 0) : 0);
+                    cNuevos.push(Number(r.nuevos) || 0); 
+                    cRecurrentes.push(Number(r.antiguos) || 0); 
+                    cMatrices.push(1); 
+                    cLotes.push(Number(r.lotesCount) || 0);
+                });
+            }
+
+            const showRetail = cRetail.some(val => val > 0);
+            let datasetsVentas = [
+                {
+                    label: 'Venta Siniestrados', 
+                    data: cSiniestros, 
+                    type: 'line', 
+                    borderColor: '#111827', 
+                    backgroundColor: '#111827', 
+                    borderWidth: 2, 
+                    tension: 0.3, 
+                    pointBackgroundColor: '#111827', 
+                    pointRadius: 3, 
+                    yAxisID: 'y'
+                }
+            ];
+            
+            if(showRetail) {
+                datasetsVentas.push({
+                    label: 'Venta Retail', 
+                    data: cRetail, 
+                    type: 'line', 
+                    borderColor: '#9CA3AF', 
+                    backgroundColor: '#9CA3AF', 
+                    borderWidth: 2, 
+                    tension: 0.3, 
+                    pointBackgroundColor: '#9CA3AF', 
+                    pointRadius: 3, 
+                    yAxisID: 'y'
+                });
+            }
+            
+            datasetsVentas.push({
+                label: 'Lotes Vendidos', 
+                data: cLotes, 
+                type: 'bar', 
+                backgroundColor: '#E5E7EB', 
+                borderRadius: 4, 
+                yAxisID: 'y1'
+            });
+
+            const canvasVentas = document.getElementById('dash-chartVentas');
+            if(canvasVentas) {
+                if(dashChartVentasInst) dashChartVentasInst.destroy();
+                dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), { 
+                    type: 'line', 
+                    data: { labels: chartLabels, datasets: datasetsVentas }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            tooltip: { 
+                                callbacks: { 
+                                    afterBody: function(context) { 
+                                        return '\nMatrices: ' + cMatrices[context[0].dataIndex]; 
+                                    } 
+                                } 
+                            },
+                            legend: { 
+                                display: true, 
+                                position: 'bottom', 
+                                labels: { boxWidth: 10, usePointStyle: true } 
+                            }
+                        },
+                        scales: { 
+                            y: { 
+                                type: 'linear', 
+                                display: true, 
+                                position: 'left', 
+                                beginAtZero: true, 
+                                grid: { color: '#F3F4F6' } 
+                            },
+                            y1: { 
+                                type: 'linear', 
+                                display: true, 
+                                position: 'right', 
+                                grid: { drawOnChartArea: false }, 
+                                beginAtZero: true 
+                            }
+                        } 
+                    } 
+                });
+            }
+
+            const canvasClientes = document.getElementById('dash-chartClientes');
+            if (canvasClientes) {
+                if(dashChartClientesInst) dashChartClientesInst.destroy();
+                dashChartClientesInst = new Chart(canvasClientes.getContext('2d'), { 
+                    type: 'bar', 
+                    data: { 
+                        labels: chartLabels, 
+                        datasets: [
+                            {
+                                label: 'Recurrentes', 
+                                data: cRecurrentes, 
+                                backgroundColor: '#111827', 
+                                borderRadius: 4
+                            }, 
+                            {
+                                label: 'Nuevos', 
+                                data: cNuevos, 
+                                backgroundColor: '#D1D5DB', 
+                                borderRadius: 4
+                            }
+                        ] 
+                    }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { display: true, position: 'bottom', labels: { boxWidth: 10 } } 
+                        }, 
+                        scales: { 
+                            x: { stacked: true, grid: { display: false } }, 
+                            y: { stacked: true, grid: { color: '#F3F4F6' } } 
+                        } 
+                    } 
+                });
+            }
+        } catch(e) { 
+            console.error("Error graficos", e); 
+        }
+
+    } catch(e) { 
+        console.error(e); 
+    }
+};
+
+window.renderComparativa = function() {
+    try {
+        if(currentModule !== 'comparativa') return; 
+        
+        let allRemates = getSelectedRemates();
+        let groupMode = document.getElementById('comp-groupby').value;
+        let groups = {};
+        let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+        allRemates.forEach(r => {
+            let d = r.fechaData;
+            let dateObj = d?.timestamp ? new Date(d.timestamp) : new Date();
+            let y = d?.year || dateObj.getFullYear();
+            let m = dateObj.getMonth(); 
+            
+            let key = ''; 
+            let label = '';
+            
+            if(groupMode === 'remate') {
+                key = `R-${d?.timestamp || 0}-${r.id}`; 
+                label = window.formatearNombreRemate(r.fileName, d?.timestamp);
+            } else if(groupMode === 'year') {
+                key = `${y}`; 
+                label = `Año ${y}`;
+            } else if(groupMode === 'semester') {
+                let s = m < 6 ? 1 : 2;
+                key = `${y}-S${s}`; 
+                label = `S${s} ${y}`;
+            } else if(groupMode === 'quarter') {
+                let q = Math.floor(m/3) + 1;
+                key = `${y}-Q${q}`; 
+                label = `Q${q} ${y}`;
+            } else {
+                key = `${y}-${String(m).padStart(2,'0')}`; 
+                label = `${monthNamesShort[m]} ${y}`;
+            }
+            
+            if(!groups[key]) {
+                groups[key] = { label, key, remates: [], timestamp: d?.timestamp || 0 };
+            }
+            groups[key].remates.push(r);
+        });
+
+        let sortedKeys;
+        if(groupMode === 'remate') {
+            sortedKeys = Object.keys(groups).sort((a,b) => groups[a].timestamp - groups[b].timestamp);
+        } else {
+            sortedKeys = Object.keys(groups).sort();
+        }
+
+        let tableHtml = '';
+        let chartLabels = [];
+        let dataVenta = [];
+        let dataComision = [];
+        let dataLotes = [];
+        let dataMatrices = [];
+
+        sortedKeys.forEach(k => {
+            let g = groups[k];
+            let agg = buildAgg(g.remates);
+            chartLabels.push(g.label);
+            dataVenta.push(agg.venta);
+            dataComision.push(agg.comisionTotal);
+            dataLotes.push(agg.lotes); 
+            dataMatrices.push(g.remates.length);
+            
+            tableHtml += `
+            <tr class="hover:bg-gray-50 transition border-b border-gray-100">
+                <td class="pl-4 py-3 font-medium text-gray-900">${g.label}</td>
+                <td class="text-center py-3 text-gray-500">${g.remates.length}</td>
+                <td class="text-center py-3 text-gray-900">${agg.lotes.toLocaleString('es-CL')}</td>
+                <td class="text-center py-3 font-semibold text-emerald-600">${agg.eficaciaLotes.toFixed(1)}%</td>
+                <td class="text-right py-3 font-bold text-gray-900">${formatMoney(agg.venta)}</td>
+                <td class="text-right pr-4 py-3 font-medium text-gray-500">${formatMoney(agg.comisionTotal)}</td>
+            </tr>`;
+        });
+
+        document.getElementById('comp-table-body').innerHTML = tableHtml;
+
+        const canvasComp = document.getElementById('comp-chart');
+        if(canvasComp) {
+            if(compChartInst) compChartInst.destroy();
+            compChartInst = new Chart(canvasComp.getContext('2d'), { 
+                type: 'line', 
+                data: { 
+                    labels: chartLabels, 
+                    datasets: [
+                        { label: 'Venta Total Adjudicada', data: dataVenta, type: 'line', borderColor: '#111827', backgroundColor: '#111827', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 3, yAxisID: 'y' },
+                        { label: 'Comisiones Estimadas', data: dataComision, type: 'line', borderColor: '#9CA3AF', backgroundColor: '#9CA3AF', borderWidth: 1.5, borderDash: [5, 5], tension: 0.3, pointBackgroundColor: '#9CA3AF', pointRadius: 2, yAxisID: 'y' },
+                        { label: 'Lotes Vendidos', data: dataLotes, type: 'bar', backgroundColor: '#E5E7EB', borderRadius: 4, yAxisID: 'y1' }
+                    ] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: {
+                        tooltip: { 
+                            callbacks: { 
+                                afterBody: function(context) { 
+                                    return '\nMatrices: ' + dataMatrices[context[0].dataIndex]; 
+                                } 
+                            } 
+                        },
+                        legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true } }
+                    },
+                    scales: { 
+                        y: { type: 'linear', display: true, position: 'left', beginAtZero: true, grid: { color: '#F3F4F6'} },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
+                    } 
+                } 
+            });
+        }
+    } catch(e) { 
+        console.error(e); 
+    }
+};
+
+window.filtrarLotesMain = function() {
+    const term = (document.getElementById('search-lotes-main').value || '').toLowerCase();
+    const tbody = document.getElementById('dash-tabla-lotes');
+    if(!tbody) return;
+    const rows = tbody.getElementsByTagName('tr');
+    for(let i=0; i<rows.length; i++) {
+        const text = rows[i].innerText.toLowerCase();
+        rows[i].style.display = text.includes(term) ? '' : 'none';
+    }
+};
+
+window.abrirModalMultiLote = function() { 
+    let html = ''; 
+    Object.entries(globalMapCMulti).sort((a,b) => b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { 
+        if(data.lotes > 1) { 
+            html += `
+            <tr>
+                <td class="pl-5 py-2 font-bold text-gray-900">${nombre}</td>
+                <td class="text-center py-2 font-black text-gray-700">${data.lotes}</td>
+                <td class="text-right pr-5 py-2 font-black text-emerald-600">${formatMoney(data.total)}</td>
+            </tr>`; 
+        } 
+    }); 
+    
+    document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; 
+    document.getElementById('modal-multilote').classList.remove('hidden'); 
+    document.getElementById('modal-multilote').classList.add('flex'); 
+};
+
+window.cerrarModalMulti = function(e) { 
+    if(e && e.target.id !== 'modal-multilote') return;
+    document.getElementById('modal-multilote').classList.add('hidden'); 
+    document.getElementById('modal-multilote').classList.remove('flex'); 
+};
+
+// === DISEÑO ESTRUCTURADO DE DATOS ===
+window.renderConclusiones = function() {
+    try {
+        if(currentModule !== 'conclusiones') return; 
+        let allRemates = getSelectedRemates(); 
+        const agg = buildAgg(allRemates); 
+        let html = ''; 
+        globalAgg = agg; 
+        
+        if(!clientDB.length) {
+            procesarDatosClientes(); 
+        }
+
+        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; 
+        let sobreColor = agg.sobreprecioReal >= 0 ? 'text-emerald-600' : 'text-red-500';
+        let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
+        
+        let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
+
+        // SECCIÓN 1: Resultados Financieros
+        html += `
+        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="text-[13px] font-black mb-1">Resultados Financieros</div>
+            <div class="text-[12px] text-gray-500 mb-3">Análisis de rentabilidad y comisiones por periodo seleccionado</div>
+            <table class="w-full text-[12px]">
+                <tbody class="divide-y divide-gray-100">
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Venta Total Adjudicada</td><td class="py-2.5 font-bold text-lg">${formatMoney(agg.venta)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Suma operaciones válidas</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Comisiones Estimadas</td><td class="py-2.5 font-bold text-blue-600">${formatMoney(agg.comisionTotal)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Ingresos al 8/12%</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Ticket Promedio</td><td class="py-2.5 font-bold">${formatMoney(agg.ticketPromedio)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${agg.lotes} ops</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+        // SECCIÓN 2: Rendimiento de Catálogo
+        html += `
+        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="text-[13px] font-black mb-1">Rendimiento de Catálogo</div>
+            <div class="text-[12px] text-gray-500 mb-3">Efectividad y rotación por matriz</div>
+            <table class="w-full text-[12px]">
+                <tbody class="divide-y divide-gray-100">
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Efectividad Total</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${agg.eficaciaLotes.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Subastado exitosamente</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Volumen Físico</td><td class="py-2.5 font-bold">${agg.lotes.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">de ${agg.lotesDisponibles.toLocaleString('es-CL')} disp.</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Unidades procesadas</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Incremento sobre Mínimo</td><td class="py-2.5 font-bold">${sobreSigno}${formatMoney(agg.deltaPujaTotal)} <span class="${sobreColor} font-bold text-[10px] ml-1">(${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Margen pujas</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+        // SECCIÓN 3: Tracción
+        html += `
+        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="text-[13px] font-black mb-1">Tracción y Audiencia</div>
+            <div class="text-[12px] text-gray-500 mb-3">Comportamiento de audiencia y adquisición de clientes</div>
+            <table class="w-full text-[12px]">
+                <tbody class="divide-y divide-gray-100">
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Tasa de Cierre</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${tasaExito.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">De ${agg.garantias.toLocaleString('es-CL')} garantías</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Fuga de Clientes</td><td class="py-2.5 font-bold text-red-500">${agg.perdedoresCount.toLocaleString('es-CL')} <button onclick="window.abrirModalFuga()" class="ml-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-[10px] font-bold transition">VER</button></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pagaron garantía sin compra</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Clientes Nuevos</td><td class="py-2.5 font-bold">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Adquisición pura</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Limpieza Datos (Falsos)</td><td class="py-2.5 font-bold text-gray-400">${falsos}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pujas internas de prueba</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+        document.getElementById('conclusiones-content').innerHTML = html;
+    } catch (e) { 
+        console.error(e); 
+    }
+};
+
+window.renderPanelAutos = function() {
+    try {
+        if(currentModule !== 'autos') return; 
+        
+        let autos = []; 
+        let allRemates = getSelectedRemates(); 
+        
+        allRemates.forEach(r => { 
+            r.adjudicaciones.forEach(a => { 
+                if(!a.esFalso && !a.esChatarra) {
+                    autos.push({
+                        ...a, 
+                        remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)
+                    }); 
+                }
+            }); 
+        });
+        
+        let marcasMap = {}; 
+        let modelosMap = {}; 
+        
+        autos.forEach(a => { 
+            if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') {
+                marcasMap[a.categoria] = (marcasMap[a.categoria] || 0) + 1; 
+            }
+            if(a.modeloStr && a.modeloStr.trim() !== '') {
+                modelosMap[a.modeloStr] = (modelosMap[a.modeloStr] || 0) + 1; 
+            }
+        });
+        
+        const marcasSorted = Object.entries(marcasMap).sort((a,b) => b[1] - a[1]).slice(0,5);
+        
+        try {
+            if(flotaMarcasInst) flotaMarcasInst.destroy(); 
+            if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { 
+                flotaMarcasInst = new Chart(document.getElementById('flota-marcas-chart').getContext('2d'), {
+                    type:'doughnut',
+                    data:{
+                        labels: marcasSorted.map(m => m[0]),
+                        datasets:[{
+                            data: marcasSorted.map(m => m[1]),
+                            backgroundColor: ['#111827','#374151','#6B7280','#9CA3AF','#D1D5DB'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options:{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout:'75%',
+                        plugins:{
+                            legend:{
+                                position:'right', 
+                                labels: {boxWidth: 10}
+                            }
+                        }
+                    }
+                }); 
+            }
+            
+            const modelosSorted = Object.entries(modelosMap).sort((a,b) => b[1] - a[1]).slice(0,7);
+            
+            if(flotaAniosInst) flotaAniosInst.destroy(); 
+            if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { 
+                flotaAniosInst = new Chart(document.getElementById('flota-modelos-chart').getContext('2d'), {
+                    type:'bar',
+                    data:{
+                        labels: modelosSorted.map(a => a[0]),
+                        datasets:[{
+                            label: 'Unidades',
+                            data: modelosSorted.map(a => a[1]),
+                            backgroundColor: '#111827',
+                            borderRadius: 4
+                        }]
+                    },
+                    options:{
+                        indexAxis: 'y', 
+                        responsive: true,
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { display: false } 
+                        }, 
+                        scales: {
+                            x: {grid:{color:'#F3F4F6'}},
+                            y: {grid:{display:false}}
+                        }
+                    }
+                }); 
+            }
+        } catch(ec) {}
+        
+        const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); 
+        if(term) {
+            autos = autos.filter(a => 
+                (a.loteStr || '').toLowerCase().includes(term) || 
+                (a.categoria || '').toLowerCase().includes(term) || 
+                (a.numeroLote || '').toString().includes(term) || 
+                (a.modeloStr || '').toLowerCase().includes(term) || 
+                (a.patente || '').toLowerCase().includes(term)
+            );
+        }
+        
+        if(document.getElementById('flota-tabla-resultados')) {
+            document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
+                return `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-2 font-medium text-gray-500 max-w-[150px] truncate" title="${a.remate}">${a.remate}</td>
+                    <td class="px-3 py-2 text-center text-gray-800">Lote ${a.numeroLote||'-'}</td>
+                    <td class="px-3 py-2 max-w-[200px] truncate">
+                        <span class="font-bold text-gray-900">${a.categoria}</span> 
+                        <span class="text-gray-500 font-medium">${a.modeloStr}</span> 
+                        ${a.patente && a.patente!=='-' ? `<span class="text-[10px] text-gray-400 ml-1">(${a.patente})</span>` : ''}
+                    </td>
+                    <td class="px-3 py-2 text-right text-gray-500 font-medium">${formatMoney(a.minimo)}</td>
+                    <td class="px-4 py-2 text-right font-bold text-emerald-700">${formatMoney(a.monto)}</td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin vehículos en la selección actual.</td></tr>';
+        }
+    } catch (e) {}
+};
+
+window.abrirModalFuga = function() {
+    try {
+        if(!globalAgg) return; 
+        let html = '';
+        if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
+            globalAgg.fugaList.sort((a,b) => a.nombre.localeCompare(b.nombre)); 
+            let hoy = Date.now();
+            globalAgg.fugaList.forEach(f => { 
+                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
+                let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
+                let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
+                html += `
+                <tr class="hover:bg-gray-50">
+                    <td class="pl-5 py-2 font-medium text-gray-900 truncate max-w-[150px]">${nombreRemate}</td>
+                    <td class="py-2 text-red-500 font-bold">${textoDias}</td>
+                    <td class="py-2 font-bold text-gray-900 truncate max-w-[200px]">${f.nombre}</td>
+                </tr>`; 
+            });
+        } else { 
+            html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">No hay registros de fuga.</td></tr>'; 
+        }
+        
+        if(document.getElementById('modal-tabla-fuga')) {
+            document.getElementById('modal-tabla-fuga').innerHTML = html; 
+        }
+        document.getElementById('modal-fuga').classList.remove('hidden'); 
+        document.getElementById('modal-fuga').classList.add('flex');
+    } catch (e) {}
+};
+
+window.cerrarModalFuga = function(e) { 
+    if(e && e.target.id !== 'modal-fuga') return;
+    document.getElementById('modal-fuga').classList.add('hidden'); 
+    document.getElementById('modal-fuga').classList.remove('flex'); 
+};
+
+window.exportarFugaExcel = function() {
+    try {
+        if(!globalAgg || !globalAgg.fugaList) return; 
+        let hoy = Date.now();
+        const wsData = globalAgg.fugaList.map(f => { 
+            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
+            let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate);
+            return { 
+                "Matriz": nombreRemate, 
+                "Días Inactivo": diasFuga, 
+                "Fecha": f.fechaRemate ? window.formatExcelDate(f.fechaRemate) : '-', 
+                "Cliente": f.nombre, 
+                "RUT": f.rut || 'No Registrado', 
+                "Email": f.email || 'No Registrado' 
+            }; 
+        });
+        
+        const ws = XLSX.utils.json_to_sheet(wsData); 
+        const wb = XLSX.utils.book_new(); 
+        XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); 
+        XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
+    } catch (e) {}
+};
+
+window.abrirModalPujadores = function(loteEncoded, nodeId) {
+    try {
+        const loteStr = decodeURIComponent(loteEncoded); 
+        let remate = db.remates.find(r => r.id === nodeId);
+        if(!remate) return;
+
+        let todasPujas = remate.posturasPorLote ? (remate.posturasPorLote[loteStr] || []) : [];
+        let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null; 
+        
+        currentAdjudicadoModal = adjudicado; 
+        currentModalPujas = todasPujas.sort((a,b) => b.monto - a.monto);
+        
+        if(document.getElementById('modal-subtitulo')) {
+            document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'FALSO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
+        }
+        
+        if(document.getElementById('modal-total-pujas')) {
+            document.getElementById('modal-total-pujas').innerText = todasPujas.length; 
+        }
+        
+        if(document.getElementById('modal-unicos-reales')) {
+            document.getElementById('modal-unicos-reales').innerText = [...new Set(todasPujas.filter(p => !p.esFalso).map(p => p.nombreNorm))].length; 
+        }
+        
+        currentFiltroModal = 'todos'; 
+        
+        if(document.getElementById('btn-filtro-todos')) {
+            document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition'; 
+        }
+        
+        if(document.getElementById('btn-filtro-reales')) {
+            document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+        }
+        
+        renderModalTabla(); 
+        
+        document.getElementById('modal-pujadores').classList.remove('hidden'); 
+        document.getElementById('modal-pujadores').classList.add('flex');
+    } catch(e) { 
+        console.error("Error modal pujas:", e); 
+    }
+};
+
+function renderModalTabla() {
+    try {
+        let lista = currentModalPujas; 
+        let adjudicado = currentAdjudicadoModal;
+        
+        if(currentFiltroModal === 'reales') lista = lista.filter(p => !p.esFalso); 
+        if(currentFiltroModal === 'falsos') lista = lista.filter(p => p.esFalso);
+        
+        if(document.getElementById('modal-tabla-pujas')) {
+            document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
+                let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
+                
+                let badge = p.esFalso 
+                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">FALSO</span>' 
+                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>'; 
+                    
+                if(esAdj) {
+                    badge += ' <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 ml-1">ADJUDICADO</span>';
+                }
+                
+                return `
+                <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.esFalso ? 'opacity-40' : ''}">
+                    <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
+                    <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
+                    <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
+                    <td class="text-right py-2 text-[12px] font-black ${esAdj ? 'text-emerald-600' : 'text-gray-900'}">${formatMoney(p.monto)}</td>
+                    <td class="text-center pr-5 py-2">${badge}</td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin pujas registradas en el excel</td></tr>';
+        }
+    } catch(e) {}
+}
+
+window.filtrarModal = function(tipo) { 
+    currentFiltroModal = tipo; 
+    
+    if(document.getElementById('btn-filtro-todos')) {
+        document.getElementById('btn-filtro-todos').className = tipo === 'todos' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+    }
+    
+    if(document.getElementById('btn-filtro-reales')) {
+        document.getElementById('btn-filtro-reales').className = tipo === 'reales' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+    }
+    
+    renderModalTabla(); 
+};
+
+window.cerrarModal = function(e) { 
+    if(e && e.target.id !== 'modal-pujadores') return;
+    document.getElementById('modal-pujadores').classList.add('hidden'); 
+    document.getElementById('modal-pujadores').classList.remove('flex'); 
+};
+
+function procesarDatosClientes() { 
+    try {
+        let allRemates = getSelectedRemates(); 
+        if(!allRemates.length) { 
+            clientDB = []; 
+            return; 
+        }
+        
+        const mapBI = {}; 
+        const MAX_TIMESTAMP = Math.max(...allRemates.map(r => r.fechaData?.timestamp || 0)); 
+        
+        allRemates.forEach(r => { 
+            r.adjudicaciones.forEach(adj => { 
+                if(adj.esFalso) return; 
+                
+                const c = adj.clienteReal; 
+                
+                if(!mapBI[c]) {
+                    mapBI[c] = {
+                        nombre: c, 
+                        rut: adj.rut || '-', 
+                        email: adj.email || '-', 
+                        compras: [],
+                        totalGastado: 0,
+                        lotesSiniestrados: 0,
+                        lotesRetail: 0,
+                        tipos: new Set()
+                    }; 
+                }
+                
+                mapBI[c].compras.push({
+                    fecha: r.fechaData?.timestamp,
+                    monto: adj.monto, 
+                    tipo: r.tipo, 
+                    lote: adj.numeroLote ? 'Lote ' + adj.numeroLote : (adj.loteStr ? adj.loteStr.substring(0,10) : ''), 
+                    remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)
+                }); 
+                
+                mapBI[c].totalGastado += (Number(adj.monto) || 0); 
+                
+                if(r.tipo === 'Siniestrados') {
+                    mapBI[c].lotesSiniestrados++; 
+                } else {
+                    mapBI[c].lotesRetail++; 
+                }
+                
+                mapBI[c].tipos.add(r.tipo); 
+            }); 
+        }); 
+        
+        clientDB = Object.values(mapBI).map(c => { 
+            c.compras.sort((a,b) => b.fecha - a.fecha); 
+            c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null; 
+            c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null; 
+            c.frecuencia = c.compras.length; 
+            c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP - c.ultimaCompra) / (1000*60*60*24)) : 0; 
+            
+            if(c.frecuencia > 3 && c.recencyDias <= 60) { 
+                c.segmento = "Frecuente"; 
+                c.color = "text-gray-900"; 
+                c.bg = "bg-black text-white"; 
+            } else if(c.frecuencia > 1 && c.recencyDias <= 60) { 
+                c.segmento = "Recurrente"; 
+                c.color = "text-blue-700"; 
+                c.bg = "bg-black text-white"; 
+            } else if(c.frecuencia === 1 && c.recencyDias <= 60) { 
+                c.segmento = "Nuevo"; 
+                c.color = "text-emerald-700"; 
+                c.bg = "bg-gray-100 text-gray-700"; 
+            } else { 
+                c.segmento = "En Riesgo"; 
+                c.color = "text-red-600"; 
+                c.bg = "bg-red-50 text-red-600"; 
+            } 
+            return c; 
+        }).sort((a,b) => b.totalGastado - a.totalGastado); 
+    } catch(e) {}
+}
+
+window.renderPanelClientesData = function(filtered, isFiltered = false) { 
+    try {
+        if(document.getElementById('bi-kpi-total')) {
+            document.getElementById('bi-kpi-total').innerText = clientDB.length; 
+        }
+        if(document.getElementById('bi-kpi-ltv')) {
+            document.getElementById('bi-kpi-ltv').innerText = formatMoney(clientDB.length ? clientDB.reduce((a,b) => a + b.totalGastado, 0) / clientDB.length : 0); 
+        }
+        if(document.getElementById('bi-kpi-inactivos')) {
+            document.getElementById('bi-kpi-inactivos').innerText = clientDB.filter(c => c.segmento === "En Riesgo").length; 
+        }
+        
+        if(document.getElementById('bi-tabla-clientes')) { 
+            document.getElementById('bi-tabla-clientes').innerHTML = filtered.map(c => `
+                <tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-gray-50 transition">
+                    <td class="px-4 py-2 font-medium text-gray-900 max-w-[150px] truncate">${c.nombre}</td>
+                    <td class="px-3 py-2 text-center text-gray-500">${c.frecuencia}</td>
+                    <td class="px-3 py-2 text-right font-semibold text-emerald-600">${formatMoney(c.totalGastado)}</td>
+                    <td class="px-4 py-2 text-center hidden sm:table-cell"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.bg}">${c.segmento}</span></td>
+                </tr>
+            `).join(''); 
+        }
+        
+        if(!isFiltered) { 
+            const segCount = {}; 
+            clientDB.forEach(c => { 
+                segCount[c.segmento] = (segCount[c.segmento] || 0) + 1; 
+            }); 
+            
+            if(biChartSegmentsInst) biChartSegmentsInst.destroy(); 
+            
+            if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { 
+                biChartSegmentsInst = new Chart(document.getElementById('bi-chartSegments').getContext('2d'), {
+                    type:'doughnut',
+                    data:{
+                        labels: Object.keys(segCount),
+                        datasets:[{
+                            data: Object.values(segCount),
+                            backgroundColor: ['#111827','#6B7280','#D1D5DB','#DC2626'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options:{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins:{
+                            legend:{
+                                position:'right', 
+                                labels:{boxWidth:10}
+                            }
+                        }
+                    }
+                }); 
+            } 
+        } 
+    } catch(e) {}
+};
+
+window.filtrarClientes = function() { 
+    try { 
+        const term = (document.getElementById('search-client').value || '').toLowerCase(); 
+        const tipo = document.getElementById('filter-client-type').value; 
+        
+        let filtered = clientDB.filter(c => { 
+            const matchName = (c.nombre || '').toLowerCase().includes(term); 
+            let matchTipo = true; 
+            
+            if(tipo === 'siniestrados') matchTipo = c.lotesSiniestrados > 0 && c.lotesRetail === 0; 
+            if(tipo === 'retail') matchTipo = c.lotesRetail > 0 && c.lotesSiniestrados === 0; 
+            
+            return matchName && matchTipo; 
+        }); 
+        
+        window.renderPanelClientesData(filtered, term !== "" || tipo !== "todos"); 
+    } catch(e) {} 
+};
+
+window.abrirFichaCliente = function(nombreStr) { 
+    try {
+        const c = clientDB.find(x => x.nombre === nombreStr); 
+        if(!c) return; 
+        
+        if(document.getElementById('bi-ficha-cliente')) {
+            document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
+        }
+        
+        if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText = c.nombre; 
+        if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText = c.rut; 
+        if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText = c.email; 
+        if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText = c.primeraCompra ? window.formatExcelDate(c.primeraCompra) : '-'; 
+        if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText = `Hace ${c.recencyDias} d`; 
+        if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText = c.frecuencia; 
+        if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText = formatMoney(c.compras.filter(x => x.tipo === 'Siniestrados').reduce((a,b) => a + (Number(b.monto) || 0), 0)); 
+        if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText = formatMoney(c.compras.filter(x => x.tipo === 'Retail').reduce((a,b) => a + (Number(b.monto) || 0), 0)); 
+        
+        if(document.getElementById('ficha-historial-tabla')) {
+            document.getElementById('ficha-historial-tabla').innerHTML = c.compras.map(h => `
+                <tr class="hover:bg-white/5">
+                    <td class="py-2 px-3 text-[11px] text-gray-400">${h.fecha ? window.formatExcelDate(h.fecha) : '-'}</td>
+                    <td class="py-2 px-3 text-[11px] text-white truncate max-w-[120px]">${h.remate ? h.remate : '-'}</td>
+                    <td class="py-2 px-3 text-[11px] text-gray-400">${h.tipo}</td>
+                    <td class="py-2 px-3 text-[11px] font-bold text-blue-400">${h.lote}</td>
+                    <td class="py-2 px-3 text-right text-[11px] font-bold text-emerald-400">${formatMoney(h.monto)}</td>
+                </tr>
+            `).join(''); 
+        }
+        
+        if(document.getElementById('bi-ficha-cliente')) {
+            document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
+        }
+    } catch(e) {}
+};
+
+window.cerrarFicha = function() { 
+    if(document.getElementById('bi-ficha-cliente')) {
+        document.getElementById('bi-ficha-cliente').classList.add('hidden'); 
+    }
+};
+
+window.buscarPatente = function() { 
+    try {
+        const term = (document.getElementById('search-patente').value || '').toUpperCase().trim(); 
+        const tbody = document.getElementById('buscador-tabla-resultados'); 
+        
+        if(term.length < 3) { 
+            tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-10 text-center text-gray-400 font-medium">Usa la barra superior para buscar en toda la base de datos sincronizada.</td></tr>'; 
+            return; 
+        } 
+        
+        let resultados = []; 
+        db.remates.forEach(r => { 
+            r.adjudicaciones.forEach(adj => { 
+                if((adj.loteStr || '').includes(term) || 
+                   (adj.clienteReal || '').includes(term) || 
+                   (adj.numeroLote || '').toString().includes(term) || 
+                   (adj.rut || '').includes(term) || 
+                   (adj.email || '').toUpperCase().includes(term) || 
+                   (adj.patente || '').toUpperCase().includes(term)) { 
+                       
+                    resultados.push({
+                        fecha: r.fechaData?.timestamp,
+                        remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),
+                        lote: adj.loteStr,
+                        numeroLote: adj.numeroLote,
+                        monto: adj.monto,
+                        cliente: adj.clienteReal,
+                        patente: adj.patente
+                    }); 
+                } 
+            }); 
+        }); 
+        
+        resultados.sort((a,b) => b.fecha - a.fecha); 
+        
+        if(!resultados.length) { 
+            tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center font-bold text-red-500">Sin resultados para la búsqueda "${term}"</td></tr>`; 
+            return; 
+        } 
+        
+        tbody.innerHTML = resultados.map(res => `
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-2 text-gray-500 font-medium">${res.fecha ? window.formatExcelDate(res.fecha) : '-'}</td>
+                <td class="px-3 py-2 font-medium text-gray-900 truncate max-w-[150px]">${res.remate ? res.remate : '-'}</td>
+                <td class="px-3 py-2 text-center text-gray-500">Lote ${res.numeroLote||'-'}</td>
+                <td class="px-3 py-2 max-w-[200px] truncate hidden sm:table-cell text-gray-700">
+                    ${res.lote} ${res.patente && res.patente !== '-' ? `<span class="text-[10px] text-gray-400 ml-1">(${res.patente})</span>` : ''}
+                </td>
+                <td class="px-3 py-2 font-bold text-gray-900 truncate max-w-[150px]">${res.cliente}</td>
+                <td class="px-4 py-2 text-right font-black text-emerald-600">${formatMoney(res.monto)}</td>
+            </tr>
+        `).join(''); 
+    } catch(e) {}
+};
+
+window.parseZarateExcel = function(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -170,10 +2499,12 @@ function parseZarateExcel(file) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, {type: 'array'});
                 
-                // 1. LEER ADJUDICACIONES
                 let sheetAdjName = workbook.SheetNames.find(s => s.toLowerCase().includes('adjudicaciones')) || workbook.SheetNames[0];
                 const rowsAdj = XLSX.utils.sheet_to_json(workbook.Sheets[sheetAdjName], {header: 1, defval: ""});
-                
+
+                let fechaData = extraerFechaInfo(file, rowsAdj);
+                let tipo = file.name.toLowerCase().includes('retail') ? 'Retail' : 'Siniestrados';
+
                 let maxScore = 0;
                 let headerIdx = 0;
                 let headers = [];
@@ -194,7 +2525,24 @@ function parseZarateExcel(file) {
                     }
                 }
 
-                let adjudicaciones = [];
+                let remate = {
+                    fileName: file.name,
+                    fechaData: fechaData,
+                    tipo: tipo,
+                    ventaTotal: 0,
+                    comisionTotal: 0,
+                    lotesCount: 0,
+                    lotesDisponibles: 0,
+                    inscritos: 0,
+                    garantias: 0,
+                    garantiasEmailsReales: [],
+                    garantiasListaDetallada: [],
+                    adjudicaciones: [],
+                    posturasPorLote: {}
+                };
+
+                let lotesSet = new Set();
+                let garantiasSet = new Set();
 
                 for(let i = headerIdx + 1; i < rowsAdj.length; i++) {
                     if(rowsAdj[i].join('').trim() === '') continue;
@@ -207,21 +2555,22 @@ function parseZarateExcel(file) {
                     let numVal = String(obj['numero'] || obj['nrolote'] || obj['nlote'] || obj['item'] || obj['id'] || '').replace(/\D/g, '');
                     let nombre = obj['nombre'] || obj['adjudicatario'] || obj['cliente'] || obj['nombresorazonsocial'] || obj['razonsocial'] || '';
                     
-                    // ¡AQUÍ ESTABA EL ERROR! Restauré "montoadjudicacion" y "totaladjudicacion"
                     let montoRaw = obj['montoadjudicacion'] || obj['totaladjudicacion'] || obj['montoadjudicado'] || obj['totaladjudicado'] || obj['monto'] || obj['adjudicado'] || obj['total'] || obj['valor'] || obj['precio'] || 0;
                     let minimoRaw = obj['minimo'] || obj['preciobase'] || obj['base'] || 0;
                     let rut = obj['rut'] || obj['nrorut'] || obj['rutcliente'] || '';
+                    let email = obj['email'] || obj['correo'] || obj['correoelectronico'] || '';
                     
                     let monto = typeof montoRaw === 'number' ? montoRaw : parseFloat(String(montoRaw).replace(/[^\d]/g, '')) || 0;
                     let minimo = typeof minimoRaw === 'number' ? minimoRaw : parseFloat(String(minimoRaw).replace(/[^\d]/g, '')) || 0;
 
                     let textLote = String(obj['lote'] || '').trim();
                     let textDetalle = String(obj['detalle'] || '').trim();
+                    let textDesc = String(obj['descripcion'] || '').trim();
+                    let textEstado = String(obj['estado'] || '').trim();
                     
                     let patente = obj['patente'] || '';
                     let vehiculoText = '';
 
-                    // 1. Separar Patente y Auto si vienen en lote (Ej: "ET1190-K: MOTOR FORD")
                     if (textLote.includes(':')) {
                         let parts = textLote.split(':');
                         if(!patente) patente = parts[0].trim();
@@ -230,7 +2579,6 @@ function parseZarateExcel(file) {
                         vehiculoText = textLote;
                     }
 
-                    // 2. Extraer del Detalle HTML
                     if (!patente && textDetalle.includes('Patente')) {
                         let match = textDetalle.match(/Patente<\/b><\/td><td[^>]*>:<\/td><td>([^<]+)/i);
                         if (match && match[1]) patente = match[1].trim();
@@ -245,22 +2593,112 @@ function parseZarateExcel(file) {
                     }
 
                     vehiculoText = vehiculoText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+                    
+                    let extraDesc = textDesc + " " + textEstado;
 
-                    if(monto > 0 && nombre) {
-                        adjudicaciones.push({
-                            numeroLote: numVal,
-                            loteStr: vehiculoText,
-                            patente: String(patente).trim().toUpperCase(),
-                            nombreRaw: nombre,
-                            rut: rut,
-                            minimo: minimo,
-                            monto: monto,
-                            pujasCount: 1 
-                        });
+                    if (numVal || vehiculoText) {
+                        lotesSet.add(String(numVal || vehiculoText).trim());
+                        
+                        let esFalso = esClienteFalso(nombre, email);
+                        let esChatarra = extraDesc.toLowerCase().includes('chatarra') || String(vehiculoText).toLowerCase().includes('chatarra') || String(vehiculoText).toLowerCase().includes('restos');
+                        
+                        let { categoria, modeloStr } = extraerMarcaModelo(String(vehiculoText));
+
+                        if(monto > 0 && nombre) {
+                            remate.adjudicaciones.push({
+                                numeroLote: numVal,
+                                loteStr: vehiculoText,
+                                patente: String(patente).trim().toUpperCase(),
+                                nombreRaw: nombre,
+                                clienteReal: normalizarCliente(nombre),
+                                rut: rut,
+                                email: email,
+                                minimo: minimo,
+                                monto: monto,
+                                esFalso: esFalso,
+                                esChatarra: esChatarra,
+                                categoria: categoria,
+                                modeloStr: modeloStr,
+                                pujadoresRealesCount: 1 
+                            });
+
+                            if (!esFalso) {
+                                remate.ventaTotal += monto;
+                                remate.lotesCount++;
+                                if (email && !remate.garantiasEmailsReales.includes(String(email).trim())) {
+                                    remate.garantiasEmailsReales.push(String(email).trim());
+                                }
+                                let clienteKey = normalizarCliente(nombre) + String(email).trim().toLowerCase();
+                                if (!garantiasSet.has(clienteKey)) {
+                                    garantiasSet.add(clienteKey);
+                                    remate.garantiasListaDetallada.push({
+                                        nombreNorm: normalizarCliente(nombre),
+                                        nombre: String(nombre),
+                                        email: String(email),
+                                        rut: String(rut),
+                                        fechaRemate: fechaData.timestamp,
+                                        numRemate: String(numVal)
+                                    });
+                                }
+                            }
+                        }
                     }
                 }
 
-                // 2. LEER POSTURAS
+                remate.lotesDisponibles = lotesSet.size > 0 ? lotesSet.size : remate.adjudicaciones.length;
+
+                // 4. PESTAÑA GARANTÍAS
+                let sheetGarantiasName = workbook.SheetNames.find(s => s.toLowerCase() === 'garantías' || s.toLowerCase() === 'garantias');
+                if (sheetGarantiasName) {
+                    const wsGarantias = workbook.Sheets[sheetGarantiasName];
+                    const rowsGarantias = XLSX.utils.sheet_to_json(wsGarantias, {header: 1, defval: ""});
+                    let garantiasCount = 0;
+                    let headerGIdx = -1;
+                    let gHeaders = [];
+                    for(let i=0; i<Math.min(rowsGarantias.length, 15); i++){
+                        let rowStr = rowsGarantias[i].map(c => String(c).toLowerCase().trim()).join(' ');
+                        if((rowStr.includes('rut') || rowStr.includes('cliente') || rowStr.includes('nombre')) && 
+                           (rowStr.includes('monto') || rowStr.includes('garantia') || rowStr.includes('email'))) {
+                            headerGIdx = i;
+                            gHeaders = rowsGarantias[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                            break;
+                        }
+                    }
+                    if(headerGIdx !== -1) {
+                        for(let i = headerGIdx + 1; i < rowsGarantias.length; i++) {
+                            let rowData = rowsGarantias[i];
+                            if(rowData.join('').trim() === '') continue;
+                            let obj = {};
+                            for(let j = 0; j < gHeaders.length; j++) {
+                                obj[gHeaders[j] || ('col' + j)] = rowData[j];
+                            }
+                            let email = obj['email'] || obj['correo'];
+                            let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['titular'] || obj['razonsocial'];
+                            let rut = obj['rut'] || obj['rutcliente'];
+                            
+                            if(nombre && !esClienteFalso(nombre, email)) {
+                                garantiasCount++;
+                                remate.garantiasListaDetallada.push({
+                                    nombreNorm: normalizarCliente(nombre),
+                                    nombre: String(nombre),
+                                    email: String(email),
+                                    rut: String(rut),
+                                    fechaRemate: fechaData.timestamp,
+                                    numRemate: ""
+                                });
+                            }
+                        }
+                    }
+                    if(garantiasCount > remate.garantiasListaDetallada.length) {
+                        remate.garantias = garantiasCount;
+                    } else {
+                        remate.garantias = remate.garantiasListaDetallada.length;
+                    }
+                } else {
+                    remate.garantias = remate.garantiasListaDetallada.length;
+                }
+
+                // 5. PESTAÑA POSTURAS (PUJAS)
                 let sheetPostName = workbook.SheetNames.find(s => s.toLowerCase().includes('posturas') || s.toLowerCase().includes('pujas'));
                 
                 if (sheetPostName) {
@@ -300,22 +2738,54 @@ function parseZarateExcel(file) {
                                 numP = posibleNumero;
                             }
 
+                            let nombreP = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['adjudicatario'];
+                            let montoRawP = obj['postura'] || obj['monto'] || obj['oferta'] || obj['valor'];
+                            let emailP = obj['email'] || obj['correo'] || '';
+                            let rutP = obj['rut'] || obj['rutcliente'] || '';
+
+                            let montoP = typeof montoRawP === 'number' ? montoRawP : parseFloat(String(montoRawP).replace(/[^\d]/g, '')) || 0;
+
                             if(!loteP && !numP) continue;
 
-                            let matchAdj = adjudicaciones.find(a => {
-                                let mStr = a.loteStr && loteP && loteP.includes(a.loteStr);
-                                let mNum = a.numeroLote && numP && (loteP.startsWith(a.numeroLote + " ") || a.numeroLote === numP);
-                                return mStr || mNum;
-                            });
+                            if(montoP > 0 && nombreP) {
+                                let isFalso = esClienteFalso(nombreP, emailP);
+                                let puja = {
+                                    nombre: String(nombreP),
+                                    nombreNorm: normalizarCliente(nombreP),
+                                    monto: montoP,
+                                    email: emailP,
+                                    rut: rutP,
+                                    esFalso: isFalso,
+                                    fecha: fechaData.timestamp
+                                };
 
-                            if(matchAdj) {
-                                matchAdj.pujasCount++;
+                                let matchAdj = remate.adjudicaciones.find(a => {
+                                    let mStr = a.loteStr && loteP && loteP.includes(a.loteStr);
+                                    let mNum = a.numeroLote && numP && (loteP.startsWith(a.numeroLote + " ") || a.numeroLote === numP);
+                                    return mStr || mNum;
+                                });
+
+                                if(matchAdj) {
+                                    matchAdj.pujadoresRealesCount++;
+                                    let loteKey = matchAdj.loteStr;
+                                    if (!remate.posturasPorLote[loteKey]) remate.posturasPorLote[loteKey] = [];
+                                    remate.posturasPorLote[loteKey].push(puja);
+                                } else if (loteP) {
+                                    if (!remate.posturasPorLote[loteP]) remate.posturasPorLote[loteP] = [];
+                                    remate.posturasPorLote[loteP].push(puja);
+                                } else if (numP) {
+                                    if (!remate.posturasPorLote[numP]) remate.posturasPorLote[numP] = [];
+                                    remate.posturasPorLote[numP].push(puja);
+                                }
                             }
                         }
                     }
                 }
 
-                resolve(adjudicaciones);
+                remate.inscritos = remate.garantias + Math.floor(remate.garantias * 0.1); 
+                remate.comisionTotal = remate.ventaTotal * 0.12; 
+
+                resolve(remate);
             } catch(error) { reject(error); }
         };
         reader.readAsArrayBuffer(file);
