@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.6 (Bulletproof Upload)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.7 (Upload Engine Fix)</div>
 
     <!-- OVERLAY GIGANTE DE SINCRONIZACIÓN INICIAL -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] flex-col items-center justify-center transition-all backdrop-blur-sm flex">
@@ -148,16 +148,16 @@
                         <div class="p-3 bg-gray-50 border-b border-gray-200">
                             <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2 flex justify-between">
                                 <span>2. Filtro Rápido:</span>
-                                <button type="button" onclick="window.quickSelect('NADA')" class="text-red-500 hover:text-red-700 underline font-bold transition">Desmarcar Todo</button>
+                                <button onclick="window.quickSelect('NADA')" class="text-red-500 hover:text-red-700 underline">Desmarcar Todo</button>
                             </span>
                             <div class="grid grid-cols-4 gap-1.5">
-                                <button type="button" onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
-                                <button type="button" onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
-                                <button type="button" onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
-                                <button type="button" onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
-                                <button type="button" onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
-                                <button type="button" onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
-                                <button type="button" onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
+                                <button onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
+                                <button onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
+                                <button onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
+                                <button onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
+                                <button onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
+                                <button onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
+                                <button onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
                             </div>
                         </div>
 
@@ -783,7 +783,7 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
             let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
             if(!isNaN(y)) years.add(y);
         });
-        let maxYear = years.size > 0 ? Math.max(...Array.from(years)) : new Date().getFullYear();
+        let maxYear = Math.max(...Array.from(years));
         window.globalSelectedYears = [maxYear];
         window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
         
@@ -1126,7 +1126,7 @@ window.abrirModalGestor = function() {
     if(years.length > 1) {
         tabsHtml = `<div class="flex gap-2 px-6 pt-3 overflow-x-auto">`;
         years.forEach(y => {
-            let active = String(y) === String(currentGestorYearTab) ? 'bg-gray-50 text-gray-900 border-t border-l border-r border-gray-200 shadow-sm relative top-[1px]' : 'bg-transparent text-gray-500 hover:text-gray-800';
+            let active = String(y) === String(currentGestorYearTab) ? 'bg-white text-gray-900 border-t border-l border-r border-gray-200 shadow-sm relative top-[1px]' : 'bg-transparent text-gray-500 hover:text-gray-800';
             tabsHtml += `<button onclick="window.switchGestorYear('${y}')" class="px-6 py-2 rounded-t-lg text-sm font-bold transition whitespace-nowrap ${active}">Año ${y}</button>`;
         });
         tabsHtml += `</div>`;
@@ -1187,7 +1187,7 @@ window.cerrarModalGestor = function(e) {
     if(searchEl) searchEl.value = '';
     window.updateDropdownLabel();
     window.renderDropdownUI(); 
-    window.applyDropdown(); 
+    window.renderApp(); 
 };
 
 window.toggleGestorMes = function(year, mesIndex, isChecked) {
@@ -1467,8 +1467,7 @@ window.iniciarProcesamiento = async function(files){
         if(fileInput) fileInput.value = "";
         
         window.actualizarFiltrosGlobales(true); 
-        procesarDatosClientes(); 
-        window.actualizarVistaActual(); 
+        window.renderApp(); 
 
     } catch (e) { 
         document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
