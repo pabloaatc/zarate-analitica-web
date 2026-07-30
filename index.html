@@ -180,7 +180,7 @@
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global o el Gestor de Remates para comenzar a analizar.</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global (arriba) o sube un Excel en el panel Admin para comenzar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
@@ -954,8 +954,7 @@ window.toggleDropMes = function(el, year, mesIndex) {
     
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
-
-    // Cambia los child en el DOM sin recargar todo el modal
+    
     let container = el.closest('.dropdown-month-group');
     if(container) {
         container.querySelectorAll('.dropdown-remate-item input[type="checkbox"]').forEach(cb => cb.checked = isChecked);
@@ -1043,9 +1042,12 @@ window.seleccionarUltimoRemate = function() {
 
 window.switchGestorYear = function(y) {
     currentGestorYearTab = y;
+    
     const container = document.getElementById('gestor-content-container');
     const scrollPos = container ? container.scrollTop : 0;
+    
     window.abrirModalGestor(true);
+    
     if(container) { container.scrollTop = scrollPos; }
 };
 
@@ -1197,20 +1199,22 @@ window.toggleGestorMes = function(el, year, mesIndex) {
     
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
-    
+
+    // Cambia los child en el DOM sin recargar todo el modal
     let container = el.closest('.gestor-mes-group');
-    if(container) container.querySelectorAll('.gestor-remate-item input[type="checkbox"]').forEach(cb => cb.checked = isChecked);
-    
-    window.updateAdminButtonCount();
+    if(container) {
+        container.querySelectorAll('.gestor-remate-item input[type="checkbox"]').forEach(cb => cb.checked = isChecked);
+    }
     window.updateDropdownLabel();
+    window.updateAdminButtonCount();
     window.renderApp();
 };
 
 window.toggleGestorRemate = function(el, id) {
     if(el.checked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    window.updateAdminButtonCount();
     window.updateDropdownLabel();
+    window.updateAdminButtonCount();
     window.renderApp();
 };
 
@@ -1252,6 +1256,7 @@ window.parseExcel = function(file) {
                 // 1. FORZAMOS A BUSCAR LA PESTAÑA "ADJUDICACIONES" SI EXISTE
                 let sheetName = workbook.SheetNames.find(s => s.toLowerCase().includes('adjudicaciones')) || workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
+                
                 const rowsArr = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
 
                 let fechaData = extraerFechaInfo(file, rowsArr);
@@ -1260,10 +1265,10 @@ window.parseExcel = function(file) {
                 // 2. ESCÁNER INTELIGENTE: BUSCA EN QUÉ FILA ESTÁN LOS TÍTULOS
                 let headerRowIdx = 0;
                 let foundHeaders = [];
+                
                 for(let i=0; i<Math.min(rowsArr.length, 15); i++){
                     let rowStr = rowsArr[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                    if((rowStr.includes('lote') || rowStr.includes('item') || rowStr.includes('n°') || rowStr.includes('numero')) && 
-                       (rowStr.includes('monto') || rowStr.includes('precio') || rowStr.includes('valor') || rowStr.includes('adjudica') || rowStr.includes('total'))) {
+                    if(rowStr.includes('rut') && rowStr.includes('nombre') && (rowStr.includes('adjudicad') || rowStr.includes('monto') || rowStr.includes('total'))) {
                         headerRowIdx = i;
                         foundHeaders = rowsArr[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
                         break;
@@ -1306,30 +1311,22 @@ window.parseExcel = function(file) {
                 let garantiasSet = new Set();
 
                 parsedData.forEach(rowNorm => {
-                    let textLote = String(rowNorm['lote'] || '').trim();
-                    let isLoteText = textLote.length > 3 && /[a-zA-Z]/.test(textLote);
+                    let adjudicatario = rowNorm['nombre'] || rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombresorazonsocial'];
+                    let monto = rowNorm['montoadjudicado'] || rowNorm['totaladjudicado'] || rowNorm['monto'] || rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['adjudicado'];
+                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'];
+                    let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'];
+                    let rut = rowNorm['rut'] || rowNorm['nrorut'] || rowNorm['rutcliente'];
+                    let patenteVal = String(rowNorm['patente'] || '').trim();
+                    let numVal = rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'];
+                    
+                    let detalleVal = rowNorm['descripcion'] || rowNorm['vehiculo'] || rowNorm['detalle'];
+                    if (!detalleVal && rowNorm['lote']) detalleVal = rowNorm['lote'];
 
-                    let numVal = rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'] || rowNorm['item'] || rowNorm['id'] || rowNorm['n'];
-                    if (!numVal && !isLoteText) numVal = textLote;
-                    
-                    let detalleVal = rowNorm['descripcion'] || rowNorm['vehiculo'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['detalle'] || rowNorm['modelo'];
-                    if (!detalleVal && isLoteText) detalleVal = textLote;
-                    
                     // 3. LIMPIEZA DE HTML DE ZÁRATE
                     if (typeof detalleVal === 'string' && detalleVal.includes('<table')) {
                         detalleVal = detalleVal.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
                     }
 
-                    let adjudicatario = rowNorm['nombre'] || rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['comprador'] || rowNorm['ganador'] || rowNorm['razonsocial'] || rowNorm['nombresorazonsocial'];
-                    
-                    // 4. EXPANSIÓN DE VARIABLES
-                    let monto = rowNorm['montoadjudicado'] || rowNorm['totaladjudicado'] || rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'];
-                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'] || rowNorm['montoestimado'];
-                    
-                    let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'];
-                    let rut = rowNorm['rut'] || rowNorm['rutcliente'] || rowNorm['nrorut'];
-                    let patenteVal = String(rowNorm['patente'] || '').trim();
-                    
                     let extraDesc = String(rowNorm['descripcion'] || '') + " " + String(rowNorm['estado'] || '');
 
                     if (numVal || detalleVal) {
@@ -1449,7 +1446,7 @@ window.parseExcel = function(file) {
                 }
 
                 // 6. INTENTA LEER LA PESTAÑA DE POSTURAS (PUJAS) SI EXISTE
-                let sheetPosturasName = workbook.SheetNames.find(s => s.toLowerCase() === 'posturas');
+                let sheetPosturasName = workbook.SheetNames.find(s => s.toLowerCase().includes('posturas') || s.toLowerCase().includes('pujas'));
                 if (sheetPosturasName) {
                     const wsPosturas = workbook.Sheets[sheetPosturasName];
                     const rowsPosturas = XLSX.utils.sheet_to_json(wsPosturas, {header: 1, defval: ""});
@@ -1458,8 +1455,7 @@ window.parseExcel = function(file) {
                     
                     for(let i=0; i<Math.min(rowsPosturas.length, 15); i++){
                         let rowStr = rowsPosturas[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                        if((rowStr.includes('rut') || rowStr.includes('nombre') || rowStr.includes('cliente') || rowStr.includes('razon')) && 
-                           (rowStr.includes('postura') || rowStr.includes('monto') || rowStr.includes('oferta') || rowStr.includes('valor'))) {
+                        if((rowStr.includes('rut') || rowStr.includes('nombre')) && (rowStr.includes('postura') || rowStr.includes('monto'))) {
                             headerPIdx = i;
                             pHeaders = rowsPosturas[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
                             break;
@@ -1491,8 +1487,8 @@ window.parseExcel = function(file) {
                             let monto = parseMoney(montoRaw);
                             let email = obj['email'] || obj['correo'] || '';
                             let rut = obj['rut'] || obj['rutcliente'] || '';
-                            let loteRaw = String(obj['lote'] || obj['detalle'] || obj['vehiculo'] || '').replace(/<[^>]+>/g, '').trim();
-                            let numVal = String(obj['numero'] || obj['nrolote'] || obj['nlote'] || '').replace(/\D/g, '');
+                            let loteRaw = String(obj['lote'] || obj['detalle'] || obj['descripcion'] || '').replace(/<[^>]+>/g, '').trim();
+                            let numVal = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
                             
                             if(monto > 0 && nombre) {
                                 let isFalso = esClienteFalso(nombre, email);
@@ -1603,15 +1599,17 @@ window.limpiarBase = async function() {
         try {
             document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Borrando...';
             
-            // Extracción segura de IDs para borrar individualmente
+            // Extracción segura de IDs para borrar individualmente en lugar de 'neq'
             const { data, error: errFetch } = await supabaseClient.from('app_state').select('id');
             if (errFetch) throw errFetch;
             
             if (data && data.length > 0) {
                 const ids = data.map(row => row.id);
+                // Borrar en lotes de 100 para evitar timeout
                 for(let i=0; i<ids.length; i+=100) {
                     const chunk = ids.slice(i, i+100);
-                    await supabaseClient.from('app_state').delete().in('id', chunk);
+                    const { error } = await supabaseClient.from('app_state').delete().in('id', chunk);
+                    if(error) throw error;
                 }
             }
             
