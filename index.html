@@ -33,7 +33,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v9.1 (Meta UI + Zárate Engine)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v9.5 (Meta UI + Zárate V10 Scanner)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -51,7 +51,7 @@
                 <div class="w-12 h-12 bg-[#111827] text-white rounded-xl flex items-center justify-center font-black text-xl shadow-sm">Z</div>
                 <div>
                     <h1 class="text-[18px] font-bold text-[#111827] leading-none">Zárate Analítica</h1>
-                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v9.1</p>
+                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v9.5</p>
                 </div>
             </div>
             
@@ -500,7 +500,7 @@
             <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 shrink-0">
                 <div>
                     <div class="font-bold text-[14px] text-gray-900">Gestor de Remates • Selección avanzada</div>
-                    <div class="text-[11px] text-gray-500 mt-0.5">Activa o desactiva matrices específicas para el análisis</div>
+                    <div class="text-[11px] text-gray-500 mt-0.5">Activa o desactiva matrices específicas para el análisis sin perder tu posición.</div>
                 </div>
                 <button onclick="window.cerrarModalGestor()" class="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-100 flex items-center justify-center transition text-gray-600">✕</button>
             </div>
@@ -882,7 +882,7 @@ window.renderDropdownUI = function() {
                     </label>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] text-gray-400 font-medium">${rematesMes.filter(r => checkedNodes.includes(r.id)).length}/${rematesMes.length}</span>
-                        <input type="checkbox" onchange="window.toggleDropMes(${y}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''} !w-3.5 !h-3.5">
+                        <input type="checkbox" onchange="window.toggleDropMes(this, ${y}, ${m})" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''} !w-3.5 !h-3.5">
                     </div>
                 </div>
                 <div id="${dropId}" class="${hiddenClass} pl-6 pr-2 pb-2 pt-1 space-y-1">
@@ -891,7 +891,7 @@ window.renderDropdownUI = function() {
                         let rName = window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp);
                         return `
                         <label class="dropdown-remate-item flex items-center gap-2 cursor-pointer py-0.5 group">
-                            <input type="checkbox" onchange="window.toggleDropRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''} class="!w-3.5 !h-3.5">
+                            <input type="checkbox" onchange="window.toggleDropRemate(this, '${r.id}')" ${isChecked ? 'checked' : ''} class="!w-3.5 !h-3.5">
                             <span class="text-[12px] font-medium text-gray-600 group-hover:text-black transition truncate" data-search="${rName}" title="${rName}">${rName}</span>
                         </label>
                         `;
@@ -942,7 +942,8 @@ window.toggleDropExpand = function(id) {
     window.renderDropdownUI(); 
 };
 
-window.toggleDropMes = function(year, mesIndex, isChecked) {
+window.toggleDropMes = function(el, year, mesIndex) {
+    let isChecked = el.checked;
     let seg = document.getElementById('macro-segment').value;
     let idsInMonth = db.remates.filter(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
@@ -953,13 +954,23 @@ window.toggleDropMes = function(year, mesIndex, isChecked) {
     
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
-    window.renderDropdownUI();
+
+    // Cambia los child en el DOM sin recargar todo el modal
+    let container = el.closest('.dropdown-month-group');
+    if(container) {
+        container.querySelectorAll('.dropdown-remate-item input[type="checkbox"]').forEach(cb => cb.checked = isChecked);
+    }
+    window.updateDropdownLabel();
+    window.updateAdminButtonCount();
+    window.renderApp();
 };
 
-window.toggleDropRemate = function(id, isChecked) {
-    if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
+window.toggleDropRemate = function(el, id) {
+    if(el.checked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    window.renderDropdownUI();
+    window.updateDropdownLabel();
+    window.updateAdminButtonCount();
+    window.renderApp();
 };
 
 window.quickSelect = function(type) {
@@ -1032,12 +1043,9 @@ window.seleccionarUltimoRemate = function() {
 
 window.switchGestorYear = function(y) {
     currentGestorYearTab = y;
-    
     const container = document.getElementById('gestor-content-container');
     const scrollPos = container ? container.scrollTop : 0;
-    
     window.abrirModalGestor(true);
-    
     if(container) { container.scrollTop = scrollPos; }
 };
 
@@ -1136,7 +1144,7 @@ window.abrirModalGestor = function(keepScroll = false) {
                         <span class="font-bold text-gray-900 text-[13px]" data-search="${monthNames[m]}">${monthNames[m]}</span>
                         <span class="text-gray-400 text-[10px] font-medium">(${rematesMes.length})</span>
                     </label>
-                    <input type="checkbox" onchange="window.toggleGestorMes(${currentGestorYearTab}, ${m}, this.checked)" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
+                    <input type="checkbox" onchange="window.toggleGestorMes(this, ${currentGestorYearTab}, ${m})" ${allChecked ? 'checked' : ''} class="${someChecked && !allChecked ? 'opacity-50' : ''}">
                 </div>
                 <div class="p-3 flex flex-col gap-1 max-h-48 overflow-y-auto">
                     ${rematesMes.map(r => {
@@ -1144,7 +1152,7 @@ window.abrirModalGestor = function(keepScroll = false) {
                         let rName = window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp);
                         return `
                         <label class="gestor-remate-item flex items-center gap-2.5 cursor-pointer group py-1">
-                            <input type="checkbox" onchange="window.toggleGestorRemate('${r.id}', this.checked)" ${isChecked ? 'checked' : ''} class="!w-3.5 !h-3.5">
+                            <input type="checkbox" onchange="window.toggleGestorRemate(this, '${r.id}')" ${isChecked ? 'checked' : ''} class="!w-3.5 !h-3.5">
                             <span class="text-[11px] font-medium text-gray-600 group-hover:text-black transition truncate" data-search="${rName}">${rName}</span>
                         </label>
                         `;
@@ -1177,7 +1185,8 @@ window.cerrarModalGestor = function(e) {
     window.renderApp(); 
 };
 
-window.toggleGestorMes = function(year, mesIndex, isChecked) {
+window.toggleGestorMes = function(el, year, mesIndex) {
+    let isChecked = el.checked;
     let seg = document.getElementById('macro-segment').value;
     let idsInMonth = db.remates.filter(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
@@ -1189,20 +1198,20 @@ window.toggleGestorMes = function(year, mesIndex, isChecked) {
     if(isChecked) { idsInMonth.forEach(id => { if(!checkedNodes.includes(id)) checkedNodes.push(id); }); } 
     else { checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); }
     
-    const container = document.getElementById('gestor-content-container');
-    const scrollPos = container ? container.scrollTop : 0;
-    window.abrirModalGestor(true); 
-    if(container) { container.scrollTop = scrollPos; }
+    let container = el.closest('.gestor-mes-group');
+    if(container) container.querySelectorAll('.gestor-remate-item input[type="checkbox"]').forEach(cb => cb.checked = isChecked);
+    
+    window.updateAdminButtonCount();
+    window.updateDropdownLabel();
+    window.renderApp();
 };
 
-window.toggleGestorRemate = function(id, isChecked) {
-    if(isChecked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
+window.toggleGestorRemate = function(el, id) {
+    if(el.checked) { if(!checkedNodes.includes(id)) checkedNodes.push(id); } 
     else { checkedNodes = checkedNodes.filter(n => n !== id); }
-    
-    const container = document.getElementById('gestor-content-container');
-    const scrollPos = container ? container.scrollTop : 0;
-    window.abrirModalGestor(true); 
-    if(container) { container.scrollTop = scrollPos; }
+    window.updateAdminButtonCount();
+    window.updateDropdownLabel();
+    window.renderApp();
 };
 
 window.sortTable = function(thElement, type) {
@@ -1243,7 +1252,6 @@ window.parseExcel = function(file) {
                 // 1. FORZAMOS A BUSCAR LA PESTAÑA "ADJUDICACIONES" SI EXISTE
                 let sheetName = workbook.SheetNames.find(s => s.toLowerCase().includes('adjudicaciones')) || workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
-                
                 const rowsArr = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
 
                 let fechaData = extraerFechaInfo(file, rowsArr);
@@ -1252,7 +1260,6 @@ window.parseExcel = function(file) {
                 // 2. ESCÁNER INTELIGENTE: BUSCA EN QUÉ FILA ESTÁN LOS TÍTULOS
                 let headerRowIdx = 0;
                 let foundHeaders = [];
-                
                 for(let i=0; i<Math.min(rowsArr.length, 15); i++){
                     let rowStr = rowsArr[i].map(c => String(c).toLowerCase().trim()).join(' ');
                     if((rowStr.includes('lote') || rowStr.includes('item') || rowStr.includes('n°') || rowStr.includes('numero')) && 
@@ -1305,14 +1312,15 @@ window.parseExcel = function(file) {
                     let numVal = rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'] || rowNorm['item'] || rowNorm['id'] || rowNorm['n'];
                     if (!numVal && !isLoteText) numVal = textLote;
                     
-                    let detalleVal = isLoteText ? textLote : (rowNorm['vehiculo'] || rowNorm['descripcion'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['patente'] || rowNorm['modelo'] || rowNorm['detalle']);
+                    let detalleVal = rowNorm['descripcion'] || rowNorm['vehiculo'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['detalle'] || rowNorm['modelo'];
+                    if (!detalleVal && isLoteText) detalleVal = textLote;
                     
                     // 3. LIMPIEZA DE HTML DE ZÁRATE
                     if (typeof detalleVal === 'string' && detalleVal.includes('<table')) {
                         detalleVal = detalleVal.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
                     }
 
-                    let adjudicatario = rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombre'] || rowNorm['comprador'] || rowNorm['ganador'] || rowNorm['razonsocial'] || rowNorm['nombresorazonsocial'];
+                    let adjudicatario = rowNorm['nombre'] || rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['comprador'] || rowNorm['ganador'] || rowNorm['razonsocial'] || rowNorm['nombresorazonsocial'];
                     
                     // 4. EXPANSIÓN DE VARIABLES
                     let monto = rowNorm['montoadjudicado'] || rowNorm['totaladjudicado'] || rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'];
@@ -1595,14 +1603,16 @@ window.limpiarBase = async function() {
         try {
             document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Borrando...';
             
-            // Extracción segura de IDs para borrar individualmente en lugar de 'neq'
+            // Extracción segura de IDs para borrar individualmente
             const { data, error: errFetch } = await supabaseClient.from('app_state').select('id');
             if (errFetch) throw errFetch;
             
             if (data && data.length > 0) {
                 const ids = data.map(row => row.id);
-                const { error } = await supabaseClient.from('app_state').delete().in('id', ids);
-                if(error) throw error;
+                for(let i=0; i<ids.length; i+=100) {
+                    const chunk = ids.slice(i, i+100);
+                    await supabaseClient.from('app_state').delete().in('id', chunk);
+                }
             }
             
             db.remates = [];
