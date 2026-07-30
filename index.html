@@ -10,53 +10,19 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            background-color: #F3F4F6; 
-            color: #111827; 
-            -webkit-font-smoothing: antialiased; 
-        }
+        body { font-family: 'Roboto', sans-serif; background-color: #F3F4F6; color: #111827; -webkit-font-smoothing: antialiased; }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; } 
         ::-webkit-scrollbar-track { background: transparent; } 
         ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
-        input[type="checkbox"] { 
-            appearance: none; 
-            background-color: #f9fafb; 
-            margin: 0; 
-            width: 1.15rem; 
-            height: 1.15rem; 
-            border: 1.5px solid #d1d5db; 
-            border-radius: 0.25rem; 
-            display: grid; 
-            place-content: center; 
-            transition: all 0.1s; 
-            cursor: pointer;
-        }
-        input[type="checkbox"]::before { 
-            content: ""; 
-            width: 0.65em; 
-            height: 0.65em; 
-            transform: scale(0); 
-            box-shadow: inset 1em 1em white; 
-            transform-origin: center; 
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); 
-            transition: 120ms transform ease-in-out;
-        }
-        input[type="checkbox"]:checked { 
-            background-color: #111827; 
-            border-color: #111827; 
-        }
-        input[type="checkbox"]:checked::before { 
-            transform: scale(1); 
-        }
+        input[type="checkbox"] { appearance: none; background-color: #f9fafb; margin: 0; width: 1.15rem; height: 1.15rem; border: 1.5px solid #d1d5db; border-radius: 0.25rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
+        input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
+        input[type="checkbox"]:checked { background-color: #111827; border-color: #111827; }
+        input[type="checkbox"]:checked::before { transform: scale(1); }
 
-        .modal-bg { 
-            background: rgba(0, 0, 0, 0.4); 
-            backdrop-filter: blur(4px); 
-        }
+        .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
         
         @media print {
             aside, header, #paraguas-bar, .no-print { display: none !important; }
@@ -67,11 +33,8 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">
-        v10.1 (Motor de Extracción Vehicular Corregido)
-    </div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v10.0 (Reinicio Exitoso)</div>
 
-    <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
         <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-200 flex flex-col items-center">
             <div class="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin mb-4"></div>
@@ -79,7 +42,6 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-[#F3F4F6] z-[100] flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-[420px] rounded-[16px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-8 border border-gray-100 relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 to-green-500"></div>
@@ -87,7 +49,7 @@
                 <div class="w-12 h-12 bg-[#111827] text-white rounded-xl flex items-center justify-center font-black text-xl shadow-sm">Z</div>
                 <div>
                     <h1 class="text-[18px] font-bold text-[#111827] leading-none">Zárate Analítica</h1>
-                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión</p>
+                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v10.0</p>
                 </div>
             </div>
             
@@ -106,10 +68,8 @@
         </div>
     </div>
     
-    <!-- CONTENIDO PRINCIPAL -->
     <div id="app-content" class="hidden flex-col h-screen">
         
-        <!-- HEADER MAESTRO -->
         <header class="h-[56px] bg-white border-b border-gray-200 sticky top-0 z-30 flex items-center justify-between px-4 md:px-6 shrink-0 no-print">
             <div class="flex items-center gap-3">
                 <button onclick="window.toggleSidebar(event)" class="md:hidden text-gray-400 hover:text-black transition p-1 bg-gray-50 rounded-lg">☰</button>
@@ -129,7 +89,6 @@
             </div>
         </header>
 
-        <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
         <div id="paraguas-bar" class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between shrink-0 z-20 no-print">
             <div class="flex flex-wrap items-center gap-2 relative">
                 
@@ -144,7 +103,6 @@
                         <span class="text-[10px]">▼</span>
                     </button>
 
-                    <!-- SUPER FILTRO DE TIEMPO -->
                     <div id="dropdown-menu" onclick="event.stopPropagation()" class="hidden absolute top-[44px] left-0 w-[360px] max-w-[90vw] bg-white rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-gray-200 p-3 z-40 flex-col">
                         
                         <div class="flex gap-1.5 mb-3" id="dropdown-years-grid"></div>
@@ -181,7 +139,6 @@
         <div class="flex-1 flex overflow-hidden relative">
             <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden" onclick="window.toggleSidebar(event)"></div>
 
-            <!-- SIDEBAR NAVEGACIÓN -->
             <aside id="sidebar" class="absolute md:relative z-40 w-[240px] bg-white border-r border-gray-200 flex flex-col p-3 gap-1 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 shrink-0 no-print">
                 <div class="flex justify-between items-center mb-4 px-2 mt-2 md:hidden">
                     <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Navegación</div>
@@ -209,17 +166,14 @@
                 </div>
             </aside>
 
-            <!-- ÁREA DE TRABAJO -->
             <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#F3F4F6] w-full pb-[80px] md:pb-6 relative">
                 
-                <!-- EMPTY STATE -->
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global o el Gestor de Remates para comenzar a analizar.</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global (arriba) o sube un Excel en el panel Admin para comenzar.</p>
                 </div>
 
-                <!-- MODULE: REMATES -->
                 <div id="module-remates" class="hidden space-y-5 max-w-[1400px] mx-auto">
                     <div>
                         <h2 class="text-[22px] font-black tracking-tight text-gray-900" id="dash-titulo">-</h2>
@@ -324,7 +278,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: COMPARATIVA HISTÓRICA -->
                 <div id="module-comparativa" class="hidden space-y-5 max-w-[1400px] mx-auto">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4">
                         <div>
@@ -367,7 +320,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: MODELOS Y VEHICULOS -->
                 <div id="module-autos" class="hidden space-y-5 max-w-[1200px] mx-auto">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
@@ -407,7 +359,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: CLIENTES -->
                 <div id="module-clientes" class="hidden space-y-5 max-w-[1200px] mx-auto">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
@@ -493,7 +444,6 @@
                     </div>
                 </div>
 
-                <!-- MODULE: DATOS (CONCLUSIONES) -->
                 <div id="module-conclusiones" class="hidden space-y-6 max-w-[1000px] mx-auto pb-10">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
@@ -505,7 +455,6 @@
                     <div id="conclusiones-content" class="space-y-6"></div>
                 </div>
 
-                <!-- MODULE: BUSCADOR -->
                 <div id="module-buscador" class="hidden space-y-5 max-w-[1200px] mx-auto pb-10">
                     <div class="flex flex-col gap-2 border-b border-gray-200 pb-4 no-print">
                         <h2 class="text-[22px] font-black tracking-tight text-gray-900">Buscador Global</h2>
@@ -537,10 +486,7 @@
 
             </main>
         </div>
-    </div> <!-- FIN APP CONTENT -->
-
-    <!-- MODAL GESTOR MATRICES -->
-    <div id="modal-gestor" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalGestor(event)">
+    </div> <div id="modal-gestor" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalGestor(event)">
         <div class="bg-white w-full max-w-[720px] max-h-[90vh] rounded-[16px] shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
             <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 shrink-0">
                 <div>
@@ -557,8 +503,7 @@
             <div id="gestor-tabs-container" class="shrink-0 bg-white border-b border-gray-100"></div>
 
             <div class="flex-1 overflow-y-auto p-4 bg-gray-50" id="gestor-content-container">
-                <!-- Se llena con JS -->
-            </div>
+                </div>
             <div class="p-4 border-t border-gray-200 bg-white shrink-0 flex justify-between items-center">
                 <div class="flex gap-2">
                     <button onclick="window.toggleGestorAll(true)" class="text-[11px] font-bold text-gray-600 hover:text-black transition">✔ Marcar Todas</button>
@@ -570,7 +515,6 @@
         </div>
     </div>
 
-    <!-- MODAL PUJAS -->
     <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModal(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[480px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-5 flex justify-between items-start border-b border-gray-100 bg-gray-50 shrink-0">
@@ -605,7 +549,6 @@
         </div>
     </div>
 
-    <!-- MODAL FUGA -->
     <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalFuga(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[520px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-5 flex justify-between items-start border-b border-gray-100 bg-gray-50 shrink-0">
@@ -633,7 +576,6 @@
         </div>
     </div>
 
-    <!-- MODAL MULTILOTE -->
     <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalMulti(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[420px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-4 flex justify-between items-center border-b border-gray-100 bg-gray-50 shrink-0">
@@ -1547,7 +1489,9 @@ window.parseExcel = function(file) {
                     let rut = rowNorm['rut'] || rowNorm['nrorut'] || rowNorm['rutcliente'];
                     let patenteVal = String(rowNorm['patente'] || '').trim();
                     let numVal = rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'];
+                    
                     let textLote = String(rowNorm['lote'] || '').trim();
+                    let isLoteText = textLote.length > 3 && /[a-zA-Z]/.test(textLote);
                     
                     // CORRECCIÓN VITAL: El vehículo viene en DESCRIPCIÓN en la tabla Adjudicaciones
                     let detalleVal = rowNorm['descripcion'] || rowNorm['vehiculo'] || rowNorm['detalle'] || rowNorm['bien'];
@@ -1567,7 +1511,7 @@ window.parseExcel = function(file) {
                          detalleVal = textLote; 
                     }
 
-                    // LIMPIEZA DE HTML (Por si el sistema de Zárate inyectó código)
+                    // LIMPIEZA DE HTML 
                     if (typeof detalleVal === 'string' && detalleVal.includes('<table')) {
                         detalleVal = detalleVal.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
                     }
@@ -1690,7 +1634,7 @@ window.parseExcel = function(file) {
                     remate.garantias = remate.garantiasListaDetallada.length;
                 }
 
-                // 5. PESTAÑA POSTURAS (PUJAS) - CÓDIGO CORREGIDO PARA ENCONTRAR PUJAS REALES
+                // 5. PESTAÑA POSTURAS (PUJAS) 
                 let sheetPosturasName = workbook.SheetNames.find(s => s.toLowerCase().includes('posturas') || s.toLowerCase().includes('pujas'));
                 if (sheetPosturasName) {
                     const wsPosturas = workbook.Sheets[sheetPosturasName];
@@ -1750,8 +1694,7 @@ window.parseExcel = function(file) {
                                     fecha: fechaData.timestamp
                                 };
                                 
-                                // Búsqueda Inteligente del Lote 
-                                // A veces Posturas dice "1 CHEVROLET" y Adjudicaciones dice "CHEVROLET"
+                                // Búsqueda Inteligente del Lote
                                 let matchAdj = remate.adjudicaciones.find(a => {
                                     let matchStr = a.loteStr && loteRaw.includes(a.loteStr);
                                     let matchNum = a.numeroLote && (loteRaw.startsWith(a.numeroLote + " ") || a.numeroLote === numVal);
