@@ -64,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.7 (Upload Engine Fix)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v8.8 (Data Rescue Engine)</div>
 
     <!-- OVERLAY GIGANTE DE SINCRONIZACIÓN INICIAL -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/95 z-[200] flex-col items-center justify-center transition-all backdrop-blur-sm flex">
@@ -87,13 +87,6 @@
                 <div class="mb-6"><input type="password" id="password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-black transition-all" required placeholder="Contraseña"></div>
                 <div id="login-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
                 <button type="submit" id="btn-login" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Iniciar Sesión</button>
-            </form>
-            <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
-                <div class="mb-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Invitación Aceptada</span></div>
-                <p class="text-xs text-gray-500 mb-6 text-center leading-relaxed font-medium mt-4">¡Bienvenido! Crea tu contraseña definitiva.</p>
-                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-green-600 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
-                <div id="invite-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
-                <button type="submit" id="btn-invite" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Guardar y Entrar</button>
             </form>
         </div>
     </div>
@@ -148,16 +141,16 @@
                         <div class="p-3 bg-gray-50 border-b border-gray-200">
                             <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest block mb-2 flex justify-between">
                                 <span>2. Filtro Rápido:</span>
-                                <button onclick="window.quickSelect('NADA')" class="text-red-500 hover:text-red-700 underline">Desmarcar Todo</button>
+                                <button type="button" onclick="window.quickSelect('NADA')" class="text-red-500 hover:text-red-700 underline font-bold transition">Desmarcar Todo</button>
                             </span>
                             <div class="grid grid-cols-4 gap-1.5">
-                                <button onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
-                                <button onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
-                                <button onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
-                                <button onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
-                                <button onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
-                                <button onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
-                                <button onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
+                                <button type="button" onclick="window.quickSelect('TODO')" class="col-span-4 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Todo el Año</button>
+                                <button type="button" onclick="window.quickSelect('S1')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">1er Semestre (S1)</button>
+                                <button type="button" onclick="window.quickSelect('S2')" class="col-span-2 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">2do Semestre (S2)</button>
+                                <button type="button" onclick="window.quickSelect('Q1')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q1</button>
+                                <button type="button" onclick="window.quickSelect('Q2')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q2</button>
+                                <button type="button" onclick="window.quickSelect('Q3')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q3</button>
+                                <button type="button" onclick="window.quickSelect('Q4')" class="col-span-1 bg-white border border-gray-300 text-[10px] font-bold py-1.5 rounded hover:bg-gray-100 shadow-sm transition text-gray-800">Q4</button>
                             </div>
                         </div>
 
@@ -1126,7 +1119,7 @@ window.abrirModalGestor = function() {
     if(years.length > 1) {
         tabsHtml = `<div class="flex gap-2 px-6 pt-3 overflow-x-auto">`;
         years.forEach(y => {
-            let active = String(y) === String(currentGestorYearTab) ? 'bg-white text-gray-900 border-t border-l border-r border-gray-200 shadow-sm relative top-[1px]' : 'bg-transparent text-gray-500 hover:text-gray-800';
+            let active = String(y) === String(currentGestorYearTab) ? 'bg-gray-50 text-gray-900 border-t border-l border-r border-gray-200 shadow-sm relative top-[1px]' : 'bg-transparent text-gray-500 hover:text-gray-800';
             tabsHtml += `<button onclick="window.switchGestorYear('${y}')" class="px-6 py-2 rounded-t-lg text-sm font-bold transition whitespace-nowrap ${active}">Año ${y}</button>`;
         });
         tabsHtml += `</div>`;
@@ -1246,6 +1239,7 @@ window.parseExcel = function(file) {
                 const workbook = XLSX.read(data, {type: 'array'});
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
+                
                 const json = XLSX.utils.sheet_to_json(worksheet, {raw: false});
                 const rowsArr = XLSX.utils.sheet_to_json(worksheet, {header: 1});
 
@@ -1272,21 +1266,31 @@ window.parseExcel = function(file) {
                 let garantiasSet = new Set();
 
                 json.forEach(row => {
-                    let lote = row['Lote'] || row['N° Lote'] || row['LOTE'] || row['Nº Lote'];
-                    let adjudicatario = row['Adjudicatario'] || row['Cliente'] || row['Nombre'] || row['Comprador'];
-                    let monto = row['Monto'] || row['Valor'] || row['Precio'] || row['Precio Final'] || row['Adjudicado'];
-                    let minimo = row['Mínimo'] || row['Minimo'] || row['Precio Base'] || 0;
-                    let email = row['Email'] || row['Correo'] || '';
-                    let rut = row['RUT'] || row['Rut'] || '';
-                    let detalle = row['Detalle'] || row['Vehículo'] || row['Vehiculo'] || row['Descripción'] || row['Marca'] || '';
+                    let rowNorm = {};
+                    for(let key in row) {
+                        let cleanKey = key.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
+                        rowNorm[cleanKey] = row[key];
+                    }
+
+                    let lote = rowNorm['lote'] || rowNorm['nlote'] || rowNorm['nrolote'] || rowNorm['item'] || rowNorm['numero'];
+                    let adjudicatario = rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombre'] || rowNorm['comprador'] || rowNorm['ganador'] || rowNorm['razonsocial'];
+                    let monto = rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'] || rowNorm['montoadjudicado'] || rowNorm['valoradjudicado'] || rowNorm['montofinal'] || rowNorm['valorfinal'];
+                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'];
+                    let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'];
+                    let rut = rowNorm['rut'] || rowNorm['rutcliente'];
+                    let detalle = rowNorm['detalle'] || rowNorm['vehiculo'] || rowNorm['descripcion'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['patente'] || rowNorm['ppu'] || rowNorm['producto'];
 
                     if (lote) {
                         lotesSet.add(lote);
-                        let montoNum = parseFloat(String(monto).replace(/[^\d]/g, '')) || 0;
-                        let minNum = parseFloat(String(minimo).replace(/[^\d]/g, '')) || 0;
+                        
+                        let montoStr = String(monto || '0').split(',')[0].replace(/[^\d-]/g, '');
+                        let montoNum = parseFloat(montoStr) || 0;
+                        
+                        let minStr = String(minimo || '0').split(',')[0].replace(/[^\d-]/g, '');
+                        let minNum = parseFloat(minStr) || 0;
                         
                         let esFalso = esClienteFalso(adjudicatario, email);
-                        let esChatarra = String(detalle).toLowerCase().includes('chatarra');
+                        let esChatarra = String(detalle).toLowerCase().includes('chatarra') || String(detalle).toLowerCase().includes('restos');
                         
                         let { categoria, modeloStr } = extraerMarcaModelo(String(detalle));
 
@@ -1408,7 +1412,6 @@ const formatMoney = (num) => {
     return '$' + new Intl.NumberFormat('es-CL').format(Math.round(num)); 
 };
 const extraerFechaInfo = (file, dataStrRows)=>{ let date=null; const match=file.name.match(/(\d{4})[-_](\d{2})[-_](\d{2})/) || file.name.match(/(\d{2})[-_](\d{2})[-_](\d{4})/); if(match){ date=match[1].length===4 ? new Date(`${match[1]}-${match[2]}-${match[3]}T12:00:00`) : new Date(`${match[3]}-${match[2]}-${match[1]}T12:00:00`); } if(!date || isNaN(date)){ if(dataStrRows && dataStrRows.length>0){ const dateRegex=/\b(\d{2})[\/\-](\d{2})[\/\-](\d{4})\b/; for(let i=0;i<Math.min(dataStrRows.length,100);i++){ const row=dataStrRows[i]; if(!row) continue; for(let cell of row){ if(typeof cell==='string'){ const m=cell.match(dateRegex); if(m){ date=new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00`); break; } } } if(date && !isNaN(date)) break; } } } if(!date || isNaN(date)) date=new Date(); const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return { timestamp:date.getTime(), year:date.getFullYear(), semester:Math.floor(date.getMonth()/6)+1, quarter:Math.floor(date.getMonth()/3)+1, yearMonth:(date.getFullYear()*100)+(date.getMonth()+1), mesStr:meses[date.getMonth()] }; };
-const findHeaderRow = (data, keywords)=>{ for(let i=0;i<Math.min(data.length,20);i++){ const row=data[i]||[]; const rowStr=row.map(c=>String(c).toLowerCase().trim()); if(keywords.some(kw=>rowStr.some(c=>c.includes(kw)))) return { index:i, headers:rowStr }; } return { index:0, headers:(data[0]||[]).map(c=>String(c).toLowerCase().trim()) }; };
 
 window.iniciarProcesamiento = async function(files){
     const validFiles = Array.from(files).filter(f=>f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
@@ -1467,7 +1470,6 @@ window.iniciarProcesamiento = async function(files){
         if(fileInput) fileInput.value = "";
         
         window.actualizarFiltrosGlobales(true); 
-        window.renderApp(); 
 
     } catch (e) { 
         document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
@@ -1576,6 +1578,30 @@ window.renderApp = function() {
         else if (currentModule === 'clientes') { procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); }
         else if (currentModule === 'buscador') { window.buscarPatente(); }
     } catch(e) { console.error(e); }
+};
+
+window.limpiarBase = async function(){ 
+    if(!confirm("¿ESTÁS SEGURO? Esta acción borrará todas las matrices alojadas en la nube y no se puede deshacer.")) return;
+    
+    const btn = document.getElementById('btn-vaciar-base');
+    if(btn) btn.innerText = "Borrando nube...";
+
+    try { 
+        const { error } = await supabaseClient.from('app_state').delete().neq('id', -99999); 
+        if(error) throw error;
+        db = {remates:[]}; checkedNodes = []; clientDB = []; 
+        window.globalSelectedYears = []; window.globalSelectedMonths = [];
+        
+        document.getElementById('empty-state').classList.remove('hidden'); 
+        document.getElementById('empty-state').classList.add('flex'); 
+        window.actualizarFiltrosGlobales(); 
+        
+        alert("Base de datos vaciada con éxito.");
+        location.reload(); 
+    } catch (e) { 
+        alert("Error al vaciar la base de datos de la nube.\nRevisa tus permisos de Administrador o tu conexión.\n\nDetalle: " + e.message);
+        if(btn) btn.innerText = "Vaciar Nube";
+    }
 };
 
 window.renderDashboard = function(){ 
