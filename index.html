@@ -88,6 +88,13 @@
                 <div id="login-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
                 <button type="submit" id="btn-login" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Iniciar Sesión</button>
             </form>
+            <form id="invite-form" onsubmit="window.handleSetPassword(event)" class="text-left hidden">
+                <div class="mb-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-green-200">Invitación Aceptada</span></div>
+                <p class="text-xs text-gray-500 mb-6 text-center leading-relaxed font-medium mt-4">¡Bienvenido! Crea tu contraseña definitiva.</p>
+                <div class="mb-6"><input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md px-3 py-2.5 focus:outline-none focus:border-green-600 transition-all" required placeholder="Nueva contraseña (mín. 6 letras)" minlength="6"></div>
+                <div id="invite-error" class="hidden text-red-600 text-xs font-bold mb-4 text-center bg-red-50 py-2 px-3 rounded border border-red-200"></div>
+                <button type="submit" id="btn-invite" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 text-sm rounded-md transition-all shadow-sm flex justify-center items-center">Guardar y Entrar</button>
+            </form>
         </div>
     </div>
     
@@ -517,7 +524,7 @@
             <div class="px-5 py-2.5 bg-white flex flex-wrap gap-5 text-[10px] border-b border-gray-200 uppercase tracking-widest font-bold items-center">
                 <div><span class="text-gray-400">Total Pujas:</span> <span class="text-gray-900 text-xs ml-1" id="modal-total-pujas">0</span></div>
                 <div><span class="text-gray-400">Pujadores Únicos:</span> <span class="text-blue-700 text-xs ml-1" id="modal-unicos-reales">0</span></div>
-                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded bg-black text-white shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition">Solo Reales</button></div>
+                <div class="ml-auto flex gap-2 w-full sm:w-auto"><button onclick="window.filtrarModal('todos')" id="btn-filtro-todos" class="px-3 py-1 rounded bg-black text-white shadow-sm transition">Todos</button><button onclick="window.filtrarModal('reales')" id="btn-filtro-reales" class="px-3 py-1 rounded text-gray-50 hover:text-gray-900 hover:bg-gray-100 transition">Solo Reales</button></div>
             </div>
             <div class="flex-1 overflow-x-auto overflow-y-auto p-0 bg-white">
                 <table class="w-full text-left">
@@ -567,6 +574,22 @@ let currentGestorYearTab = null;
 window.globalSelectedYears = [];
 window.globalSelectedMonths = [0,1,2,3,4,5,6,7,8,9,10,11];
 window.expandedDropMonths = new Set(); 
+
+// Alias de seguridad
+window.actualizarVistaActual = function() { window.renderApp(); };
+
+const parseMontoCLP = (val) => {
+    if(!val) return 0;
+    if(typeof val === 'number') return val;
+    let str = String(val).trim().toUpperCase();
+    if(str.includes('MM')) {
+        let n = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
+        return (n || 0) * 1000000;
+    }
+    let parts = str.split(',');
+    let intPart = parts[0].replace(/[^\d-]/g, '');
+    return parseInt(intPart) || 0;
+};
 
 if(typeof Chart !== 'undefined') { 
     Chart.defaults.color = '#6B7280'; 
@@ -1240,11 +1263,39 @@ window.parseExcel = function(file) {
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
                 
-                const json = XLSX.utils.sheet_to_json(worksheet, {raw: false});
-                const rowsArr = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                const rowsArr = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
 
                 let fechaData = extraerFechaInfo(file, rowsArr);
                 let tipo = file.name.toLowerCase().includes('retail') ? 'Retail' : 'Siniestrados';
+
+                let headerRowIdx = 0;
+                let foundHeaders = [];
+                
+                for(let i=0; i<Math.min(rowsArr.length, 15); i++){
+                    let rowStr = rowsArr[i].map(c => String(c).toLowerCase().trim()).join(' ');
+                    if((rowStr.includes('lote') || rowStr.includes('item') || rowStr.includes('n°')) && 
+                       (rowStr.includes('monto') || rowStr.includes('precio') || rowStr.includes('valor') || rowStr.includes('adjudica') || rowStr.includes('total'))) {
+                        headerRowIdx = i;
+                        foundHeaders = rowsArr[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                        break;
+                    }
+                }
+                
+                if(foundHeaders.length === 0 && rowsArr.length > 0) {
+                    foundHeaders = rowsArr[0].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                }
+
+                let parsedData = [];
+                for(let i = headerRowIdx + 1; i < rowsArr.length; i++) {
+                    let rowData = rowsArr[i];
+                    if(rowData.join('').trim() === '') continue;
+                    let obj = {};
+                    for(let j = 0; j < foundHeaders.length; j++) {
+                        let key = foundHeaders[j] || ('col' + j);
+                        obj[key] = rowData[j];
+                    }
+                    parsedData.push(obj);
+                }
 
                 let remate = {
                     fileName: file.name,
@@ -1265,29 +1316,20 @@ window.parseExcel = function(file) {
                 let lotesSet = new Set();
                 let garantiasSet = new Set();
 
-                json.forEach(row => {
-                    let rowNorm = {};
-                    for(let key in row) {
-                        let cleanKey = key.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
-                        rowNorm[cleanKey] = row[key];
-                    }
-
-                    let lote = rowNorm['lote'] || rowNorm['nlote'] || rowNorm['nrolote'] || rowNorm['item'] || rowNorm['numero'];
+                parsedData.forEach(rowNorm => {
+                    let lote = rowNorm['lote'] || rowNorm['nlote'] || rowNorm['nrolote'] || rowNorm['item'] || rowNorm['numero'] || rowNorm['id'] || rowNorm['n'];
                     let adjudicatario = rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombre'] || rowNorm['comprador'] || rowNorm['ganador'] || rowNorm['razonsocial'];
-                    let monto = rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'] || rowNorm['montoadjudicado'] || rowNorm['valoradjudicado'] || rowNorm['montofinal'] || rowNorm['valorfinal'];
-                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'];
+                    let monto = rowNorm['monto'] || rowNorm['valor'] || rowNorm['precio'] || rowNorm['preciofinal'] || rowNorm['adjudicado'] || rowNorm['total'] || rowNorm['montoadjudicado'] || rowNorm['valoradjudicado'] || rowNorm['montofinal'] || rowNorm['valorfinal'] || rowNorm['precioadjudicado'];
+                    let minimo = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'] || rowNorm['valorminimo'] || rowNorm['pbase'];
                     let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'];
-                    let rut = rowNorm['rut'] || rowNorm['rutcliente'];
-                    let detalle = rowNorm['detalle'] || rowNorm['vehiculo'] || rowNorm['descripcion'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['patente'] || rowNorm['ppu'] || rowNorm['producto'];
+                    let rut = rowNorm['rut'] || rowNorm['rutcliente'] || rowNorm['nrorut'];
+                    let detalle = rowNorm['detalle'] || rowNorm['vehiculo'] || rowNorm['descripcion'] || rowNorm['marca'] || rowNorm['bien'] || rowNorm['patente'] || rowNorm['ppu'] || rowNorm['producto'] || rowNorm['modelo'] || rowNorm['observacion'];
 
                     if (lote) {
-                        lotesSet.add(lote);
+                        lotesSet.add(String(lote).trim());
                         
-                        let montoStr = String(monto || '0').split(',')[0].replace(/[^\d-]/g, '');
-                        let montoNum = parseFloat(montoStr) || 0;
-                        
-                        let minStr = String(minimo || '0').split(',')[0].replace(/[^\d-]/g, '');
-                        let minNum = parseFloat(minStr) || 0;
+                        let montoNum = parseMontoCLP(monto);
+                        let minNum = parseMontoCLP(minimo);
                         
                         let esFalso = esClienteFalso(adjudicatario, email);
                         let esChatarra = String(detalle).toLowerCase().includes('chatarra') || String(detalle).toLowerCase().includes('restos');
@@ -1314,10 +1356,10 @@ window.parseExcel = function(file) {
                         if (!esFalso && montoNum > 0) {
                             remate.ventaTotal += montoNum;
                             remate.lotesCount++;
-                            if (email && !remate.garantiasEmailsReales.includes(email)) {
-                                remate.garantiasEmailsReales.push(email);
+                            if (email && !remate.garantiasEmailsReales.includes(String(email).trim())) {
+                                remate.garantiasEmailsReales.push(String(email).trim());
                             }
-                            let clienteKey = normalizarCliente(adjudicatario) + email;
+                            let clienteKey = normalizarCliente(adjudicatario) + String(email).trim().toLowerCase();
                             if (!garantiasSet.has(clienteKey)) {
                                 garantiasSet.add(clienteKey);
                                 remate.garantiasListaDetallada.push({
@@ -1340,6 +1382,7 @@ window.parseExcel = function(file) {
 
                 resolve(remate);
             } catch(error) {
+                console.error(error);
                 reject(error);
             }
         };
@@ -1470,6 +1513,7 @@ window.iniciarProcesamiento = async function(files){
         if(fileInput) fileInput.value = "";
         
         window.actualizarFiltrosGlobales(true); 
+        window.renderApp(); 
 
     } catch (e) { 
         document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
@@ -1578,30 +1622,6 @@ window.renderApp = function() {
         else if (currentModule === 'clientes') { procesarDatosClientes(); window.renderPanelClientesData(clientDB, false); }
         else if (currentModule === 'buscador') { window.buscarPatente(); }
     } catch(e) { console.error(e); }
-};
-
-window.limpiarBase = async function(){ 
-    if(!confirm("¿ESTÁS SEGURO? Esta acción borrará todas las matrices alojadas en la nube y no se puede deshacer.")) return;
-    
-    const btn = document.getElementById('btn-vaciar-base');
-    if(btn) btn.innerText = "Borrando nube...";
-
-    try { 
-        const { error } = await supabaseClient.from('app_state').delete().neq('id', -99999); 
-        if(error) throw error;
-        db = {remates:[]}; checkedNodes = []; clientDB = []; 
-        window.globalSelectedYears = []; window.globalSelectedMonths = [];
-        
-        document.getElementById('empty-state').classList.remove('hidden'); 
-        document.getElementById('empty-state').classList.add('flex'); 
-        window.actualizarFiltrosGlobales(); 
-        
-        alert("Base de datos vaciada con éxito.");
-        location.reload(); 
-    } catch (e) { 
-        alert("Error al vaciar la base de datos de la nube.\nRevisa tus permisos de Administrador o tu conexión.\n\nDetalle: " + e.message);
-        if(btn) btn.innerText = "Vaciar Nube";
-    }
 };
 
 window.renderDashboard = function(){ 
