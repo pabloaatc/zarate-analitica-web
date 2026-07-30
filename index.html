@@ -10,53 +10,19 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            background-color: #F3F4F6; 
-            color: #111827; 
-            -webkit-font-smoothing: antialiased; 
-        }
+        body { font-family: 'Roboto', sans-serif; background-color: #F3F4F6; color: #111827; -webkit-font-smoothing: antialiased; }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; } 
         ::-webkit-scrollbar-track { background: transparent; } 
         ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
-        input[type="checkbox"] { 
-            appearance: none; 
-            background-color: #f9fafb; 
-            margin: 0; 
-            width: 1.15rem; 
-            height: 1.15rem; 
-            border: 1.5px solid #d1d5db; 
-            border-radius: 0.25rem; 
-            display: grid; 
-            place-content: center; 
-            transition: all 0.1s; 
-            cursor: pointer;
-        }
-        input[type="checkbox"]::before { 
-            content: ""; 
-            width: 0.65em; 
-            height: 0.65em; 
-            transform: scale(0); 
-            box-shadow: inset 1em 1em white; 
-            transform-origin: center; 
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); 
-            transition: 120ms transform ease-in-out;
-        }
-        input[type="checkbox"]:checked { 
-            background-color: #111827; 
-            border-color: #111827; 
-        }
-        input[type="checkbox"]:checked::before { 
-            transform: scale(1); 
-        }
+        input[type="checkbox"] { appearance: none; background-color: #f9fafb; margin: 0; width: 1.15rem; height: 1.15rem; border: 1.5px solid #d1d5db; border-radius: 0.25rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
+        input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
+        input[type="checkbox"]:checked { background-color: #111827; border-color: #111827; }
+        input[type="checkbox"]:checked::before { transform: scale(1); }
 
-        .modal-bg { 
-            background: rgba(0, 0, 0, 0.4); 
-            backdrop-filter: blur(4px); 
-        }
+        .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
         
         @media print {
             aside, header, #paraguas-bar, .no-print { display: none !important; }
@@ -67,9 +33,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">
-        v9.9 (Escáner de Flota Corregido)
-    </div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v10.0 (Zárate Engine)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -87,7 +51,7 @@
                 <div class="w-12 h-12 bg-[#111827] text-white rounded-xl flex items-center justify-center font-black text-xl shadow-sm">Z</div>
                 <div>
                     <h1 class="text-[18px] font-bold text-[#111827] leading-none">Zárate Analítica</h1>
-                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión v9.9</p>
+                    <p class="text-[12px] text-gray-500 mt-1">Control de Gestión</p>
                 </div>
             </div>
             
@@ -216,7 +180,7 @@
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6">
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
-                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global o el Gestor de Remates para comenzar a analizar.</p>
+                    <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global (arriba) o sube un Excel en el panel Admin para comenzar.</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
@@ -1497,7 +1461,6 @@ window.parseExcel = function(file) {
                 
                 for(let i=0; i<Math.min(rowsArr.length, 15); i++){
                     let rowStr = rowsArr[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                    // Buscamos la cabecera real
                     if(rowStr.includes('rut') && rowStr.includes('nombre') && (rowStr.includes('adjudicad') || rowStr.includes('monto') || rowStr.includes('total'))) {
                         headerRowIdx = i;
                         foundHeaders = rowsArr[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
@@ -1554,10 +1517,10 @@ window.parseExcel = function(file) {
                     let numVal = rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'];
                     if (!numVal && !isLoteText) numVal = textLote;
                     
-                    // CORRECCIÓN: El vehículo está en 'Lote' o en 'Vehículo', 'Detalle'. NUNCA en 'Descripción' porque ahí viene el estado (Siniestrado).
+                    // CORRECCIÓN VITAL: MARCA / MODELO SE SACA DEL LOTE. IGNORAR LA COLUMNA DESCRIPCIÓN PARA ESTO
                     let detalleVal = isLoteText ? textLote : (rowNorm['vehiculo'] || rowNorm['detalle'] || rowNorm['bien'] || rowNorm['marca']);
                     
-                    // Último recurso si no hay nada en Lote/Vehículo (aunque casi siempre viene en Lote)
+                    // Último recurso por si la columna Lote era solo un número y no había columna Vehículo
                     if(!detalleVal) detalleVal = rowNorm['descripcion'] || '';
 
                     // 3. LIMPIEZA DE HTML
@@ -1729,7 +1692,7 @@ window.parseExcel = function(file) {
                             let email = obj['email'] || obj['correo'] || '';
                             let rut = obj['rut'] || obj['rutcliente'] || '';
                             
-                            let loteRaw = String(obj['lote'] || obj['detalle'] || obj['vehiculo'] || '').replace(/<[^>]+>/g, '').trim();
+                            let loteRaw = String(obj['lote'] || obj['detalle'] || obj['descripcion'] || '').replace(/<[^>]+>/g, '').trim();
                             let numVal = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
                             
                             if(monto > 0 && nombre) {
@@ -1744,8 +1707,7 @@ window.parseExcel = function(file) {
                                     fecha: fechaData.timestamp
                                 };
                                 
-                                // Búsqueda Inteligente del Lote 
-                                // A veces Posturas dice "1 CHEVROLET" y Adjudicaciones dice "CHEVROLET"
+                                // Búsqueda Inteligente del Lote
                                 let matchAdj = remate.adjudicaciones.find(a => {
                                     let matchStr = a.loteStr && loteRaw.includes(a.loteStr);
                                     let matchNum = a.numeroLote && (loteRaw.startsWith(a.numeroLote + " ") || a.numeroLote === numVal);
