@@ -33,7 +33,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v16.0 (Flujo de Carga Restaurado)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v16.1 (Helpers Restaurados)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -2489,6 +2489,242 @@ window.buscarPatente = function() {
         `).join(''); 
     } catch(e) {}
 };
+
+
+// ============================================================
+// FUNCIONES AUXILIARES QUE FALTABAN (v16.0 fix)
+// ============================================================
+
+function formatMoney(n) {
+    if (n === null || n === undefined || isNaN(n)) return '$0';
+    const num = Math.round(Number(n));
+    return '$' + num.toLocaleString('es-CL');
+}
+
+window.formatExcelDate = function(ts) {
+    if (!ts || isNaN(ts)) return '-';
+    try {
+        const d = new Date(Number(ts));
+        if (isNaN(d.getTime())) return '-';
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    } catch (e) {
+        return '-';
+    }
+};
+
+function getSelectedRemates() {
+    if (!db || !db.remates || !checkedNodes) return [];
+    return db.remates.filter(r => checkedNodes.includes(r.id));
+}
+
+function normalizarCliente(nombre) {
+    if (!nombre) return '';
+    return String(nombre)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/[^A-Z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function esClienteFalso(nombre, email) {
+    if (!nombre && !email) return true;
+    const n = String(nombre || '').toLowerCase();
+    const e = String(email || '').toLowerCase();
+
+    const falsos = [
+        'zarate', 'zárate', 'prueba', 'test', 'interno', 'admin',
+        'sistema', 'demo', 'falso', 'no adjudicado', 'sin adjudicar',
+        'casa matriz', 'casa de remate', 'rematadora'
+    ];
+
+    for (const f of falsos) {
+        if (n.includes(f) || e.includes(f)) return true;
+    }
+
+    if (e.includes('@zarate') || e.includes('@remate') || e.includes('noreply') || e.includes('no-reply')) {
+        return true;
+    }
+
+    return false;
+}
+
+function extraerMarcaModelo(texto) {
+    if (!texto || typeof texto !== 'string') {
+        return { categoria: 'SIN MARCA', modeloStr: '' };
+    }
+
+    const t = texto.toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const marcas = [
+        'TOYOTA', 'CHEVROLET', 'NISSAN', 'HYUNDAI', 'KIA', 'SUZUKI',
+        'FORD', 'MAZDA', 'VOLKSWAGEN', 'VW', 'PEUGEOT', 'RENAULT',
+        'CITROEN', 'CITROËN', 'FIAT', 'JEEP', 'MITSUBISHI', 'HONDA',
+        'SUBARU', 'BMW', 'MERCEDES', 'AUDI', 'VOLVO', 'SSANGYONG',
+        'GREAT WALL', 'CHERY', 'MG', 'JAC', 'BYD',
+        'RAM', 'DODGE', 'CHRYSLER', 'ISUZU', 'MAXUS', 'DFSK',
+        'FOTON', 'HAVAL', 'GEELY', 'CHANGAN', 'DONGFENG', 'FAW',
+        'SKODA', 'SEAT', 'OPEL', 'LAND ROVER', 'JAGUAR', 'PORSCHE',
+        'MINI', 'SMART', 'DAIHATSU', 'LADA', 'PROTON', 'TATA',
+        'MAHINDRA', 'BAIC', 'GWM', 'ORA', 'ZEEKR'
+    ];
+
+    let categoria = 'OTROS';
+    let modeloStr = t;
+
+    for (const marca of marcas) {
+        if (t.includes(marca)) {
+            categoria = marca === 'VW' ? 'VOLKSWAGEN' : marca;
+            modeloStr = t.replace(new RegExp(marca, 'g'), '').replace(/\s+/g, ' ').trim();
+            break;
+        }
+    }
+
+    if (modeloStr.length > 40) {
+        modeloStr = modeloStr.substring(0, 40).trim();
+    }
+
+    if (!modeloStr) modeloStr = '';
+
+    return { categoria, modeloStr };
+}
+
+function extraerFechaInfo(file, rowsAdj) {
+    let year = new Date().getFullYear();
+    let timestamp = Date.now();
+
+    const name = (file && file.name) ? file.name : '';
+
+    // dd-mm-yyyy / dd/mm/yyyy / dd_mm_yyyy
+    let m = name.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
+    if (m) {
+        const d = parseInt(m[1], 10);
+        const mo = parseInt(m[2], 10) - 1;
+        const y = parseInt(m[3], 10);
+        if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
+            const dt = new Date(y, mo, d, 12, 0, 0);
+            if (!isNaN(dt.getTime())) {
+                return { year: y, timestamp: dt.getTime(), source: 'filename' };
+            }
+        }
+    }
+
+    // yyyy-mm-dd
+    m = name.match(/(\d{4})[\/\-_\.](\d{1,2})[\/\-_\.](\d{1,2})/);
+    if (m) {
+        const y = parseInt(m[1], 10);
+        const mo = parseInt(m[2], 10) - 1;
+        const d = parseInt(m[3], 10);
+        if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
+            const dt = new Date(y, mo, d, 12, 0, 0);
+            if (!isNaN(dt.getTime())) {
+                return { year: y, timestamp: dt.getTime(), source: 'filename' };
+            }
+        }
+    }
+
+    // Solo año
+    m = name.match(/(20[1-3]\d)/);
+    if (m) {
+        year = parseInt(m[1], 10);
+        timestamp = new Date(year, 5, 15, 12, 0, 0).getTime();
+        return { year, timestamp, source: 'filename-year' };
+    }
+
+    // Buscar en filas del Excel
+    if (rowsAdj && Array.isArray(rowsAdj)) {
+        for (let i = 0; i < Math.min(rowsAdj.length, 15); i++) {
+            const row = rowsAdj[i];
+            if (!row || !Array.isArray(row)) continue;
+            for (const cell of row) {
+                if (cell === null || cell === undefined || cell === '') continue;
+
+                if (typeof cell === 'number' && cell > 40000 && cell < 60000) {
+                    const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+                    const dt = new Date(excelEpoch.getTime() + cell * 86400000);
+                    if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2015 && dt.getFullYear() <= 2035) {
+                        return { year: dt.getFullYear(), timestamp: dt.getTime(), source: 'excel-serial' };
+                    }
+                }
+
+                const s = String(cell);
+                let dm = s.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
+                if (dm) {
+                    const d = parseInt(dm[1], 10);
+                    const mo = parseInt(dm[2], 10) - 1;
+                    const y = parseInt(dm[3], 10);
+                    if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
+                        const dt = new Date(y, mo, d, 12, 0, 0);
+                        if (!isNaN(dt.getTime())) {
+                            return { year: y, timestamp: dt.getTime(), source: 'excel-text' };
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // lastModified del archivo
+    if (file && file.lastModified) {
+        const dt = new Date(file.lastModified);
+        if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2015) {
+            return { year: dt.getFullYear(), timestamp: dt.getTime(), source: 'file-mtime' };
+        }
+    }
+
+    return { year, timestamp, source: 'default' };
+}
+
+window.limpiarBase = async function() {
+    if (!confirm('¿Estás seguro de vaciar TODA la base de datos en la nube? Esta acción no se puede deshacer.')) {
+        return;
+    }
+
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.classList.add('flex');
+    loadingText.innerText = 'Vaciando base de datos...';
+
+    try {
+        const { error } = await supabaseClient
+            .from('app_state')
+            .delete()
+            .neq('id', 0);
+
+        if (error) throw error;
+
+        db = { remates: [] };
+        checkedNodes = [];
+        clientDB = [];
+        window.globalSelectedYears = [];
+
+        document.getElementById('db-status').innerHTML =
+            '<span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Base Vacía';
+
+        window.actualizarFiltrosGlobales();
+        window.actualizarEstadoApp();
+
+        alert('Base de datos vaciada correctamente.');
+    } catch (e) {
+        alert('Error al vaciar la base: ' + e.message);
+        document.getElementById('db-status').innerHTML =
+            '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
+    } finally {
+        loadingOverlay.classList.add('hidden');
+        loadingOverlay.classList.remove('flex');
+    }
+};
+
 
 window.parseExcel = function(file) {
     return new Promise((resolve, reject) => {
