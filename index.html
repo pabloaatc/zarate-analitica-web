@@ -33,7 +33,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v16.3 (Bono Automatizado)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v16.4 (Bonos de Gestión)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -160,6 +160,7 @@
                     <button id="nav-mod-conclusiones" onclick="window.cambiarSeccion('conclusiones')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>📄</span> Datos</button>
                     <button id="nav-mod-buscador" onclick="window.cambiarSeccion('buscador')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-4"><span>🔍</span> Buscador Global</button>
                     <button id="nav-mod-gestion" onclick="window.cambiarSeccion('gestion')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1"><span>🎯</span> Gestión Directiva</button>
+                    <button id="nav-mod-bonos" onclick="window.cambiarSeccion('bonos')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1"><span>🏆</span> Bonos de Gestión</button>
                 </div>
 
                 <div id="admin-controls" class="hidden flex-col mt-auto pt-4 border-t border-gray-100 space-y-2">
@@ -496,7 +497,7 @@
                     </div>
                 </div>
 
-                <!-- MODULE: GESTIÓN DIRECTIVA (BONO AUTOMATIZADO) -->
+                <!-- MODULE: GESTIÓN DIRECTIVA -->
                 <div id="module-gestion" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4">
                         <div>
@@ -563,6 +564,84 @@
                         <div class="p-5">
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="auto-indicators-container">
                                 <!-- Se llena dinámicamente con JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULE: BONOS DE GESTIÓN -->
+                <div id="module-bonos" class="hidden space-y-5 max-w-[1000px] mx-auto transition-all duration-200">
+                    <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4">
+                        <div>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">🏆 Bonos de Gestión</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Cálculo automático de bonos por cumplimiento de KPIs</p>
+                        </div>
+                        <div class="text-[11px] text-gray-400">
+                            <span class="font-bold">Bono máximo:</span> $200.000
+                        </div>
+                    </div>
+
+                    <!-- Resumen del Bono -->
+                    <div id="bono-resumen-container" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="bg-black text-white px-5 py-3 flex justify-between items-center">
+                            <span class="font-bold text-sm">💰 Bono del Mes</span>
+                            <span class="text-xs opacity-60" id="bono-mes-label">-</span>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Bono Total</p>
+                                <p class="text-2xl font-black text-emerald-600 mt-1" id="bono-total-mes">$0</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">KPIs Cumplidos</p>
+                                <p class="text-2xl font-black text-blue-600 mt-1" id="bono-kpis-cumplidos">0/4</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Nuevos Clientes</p>
+                                <p class="text-2xl font-black text-gray-900 mt-1" id="bono-nuevos-clientes">0</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Tasa Retención</p>
+                                <p class="text-2xl font-black text-purple-600 mt-1" id="bono-tasa-retencion">0%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalle de KPIs -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50">
+                            <span class="font-bold text-sm text-gray-800">📊 Detalle de KPIs</span>
+                        </div>
+                        <div class="p-5">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="bono-kpis-detalle">
+                                <!-- Se llena dinámicamente con JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Bonos -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                            <span class="font-bold text-sm text-gray-800">📈 Historial de Bonos</span>
+                            <span class="text-[10px] text-gray-400">Últimos 6 meses</span>
+                        </div>
+                        <div class="p-5">
+                            <div id="bono-historial-container" class="overflow-x-auto">
+                                <table class="w-full text-[12px]">
+                                    <thead class="bg-gray-50 border-b border-gray-200 text-gray-500">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left font-bold">Mes</th>
+                                            <th class="px-3 py-2 text-center font-bold">Nuevos Ganadores</th>
+                                            <th class="px-3 py-2 text-center font-bold">Nuevos Pujadores</th>
+                                            <th class="px-3 py-2 text-center font-bold">Nuevos Garantes</th>
+                                            <th class="px-3 py-2 text-center font-bold">Retención</th>
+                                            <th class="px-3 py-2 text-right font-bold">Bono</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bono-historial-tabla" class="divide-y divide-gray-100">
+                                        <!-- Se llena dinámicamente con JS -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -689,7 +768,9 @@
     </div>
 
 <script>
-// === CONFIGURACIÓN DE SUPABASE ===
+// ============================================================
+// CONFIGURACIÓN DE SUPABASE
+// ============================================================
 const { createClient } = supabase;
 const supabaseUrl = 'https://gxfvjmuzxzpghlbzzmui.supabase.co';
 const supabaseKey = 'sb_publishable_DOH0iHUCDzDwObAjujD0vA_sSM1-49V';
@@ -717,13 +798,9 @@ let currentGestorYearTab = null;
 window.globalSelectedYears = [];
 window.expandedDropMonths = new Set(); 
 
-if(typeof Chart !== 'undefined') { 
-    Chart.defaults.color = '#6B7280'; 
-    Chart.defaults.font.family = 'Roboto, sans-serif'; 
-    Chart.defaults.font.size = 11;
-}
-
-// === CONFIGURACIÓN DE KPIS MANUALES PARA GESTIÓN DIRECTIVA ===
+// ============================================================
+// CONFIGURACIÓN DE KPIS MANUALES PARA GESTIÓN DIRECTIVA
+// ============================================================
 const DEFAULT_KPIS_MANUAL = [
     {
         id: 'kpi_feedback_positivo',
@@ -762,7 +839,24 @@ const DEFAULT_KPIS_MANUAL = [
 let kpiManualConfig = [];
 let ultimosResultados = null;
 
-// === CEREBRO DE SINCRONIZACIÓN CENTRAL ===
+// ============================================================
+// VARIABLES PARA BONOS DE GESTIÓN
+// ============================================================
+let historialBonos = [];
+let bonoActual = null;
+
+// ============================================================
+// INICIALIZACIÓN DE CHART.JS
+// ============================================================
+if(typeof Chart !== 'undefined') { 
+    Chart.defaults.color = '#6B7280'; 
+    Chart.defaults.font.family = 'Roboto, sans-serif'; 
+    Chart.defaults.font.size = 11;
+}
+
+// ============================================================
+// FUNCIONES DE AUTENTICACIÓN Y SINCRONIZACIÓN
+// ============================================================
 window.actualizarEstadoApp = function(keepGestorScroll = false) {
     window.renderDropdownUI();
     window.updateDropdownLabel();
@@ -926,7 +1020,9 @@ window.formatearNombreRemate = function(fileName, timestamp) {
     }
 };
 
-// --- LOGICA DE ARRANQUE E INICIO ---
+// ============================================================
+// INICIO DE LA APLICACIÓN
+// ============================================================
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
     const loadingOverlay = document.getElementById('loading-overlay');
@@ -978,6 +1074,9 @@ window.updateAdminButtonCount = function() {
     }
 };
 
+// ============================================================
+// FILTROS GLOBALES
+// ============================================================
 window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     if(!db.remates || !db.remates.length) return;
     
@@ -1268,6 +1367,9 @@ window.seleccionarUltimoRemate = function() {
     window.actualizarEstadoApp();
 };
 
+// ============================================================
+// GESTOR DE MATRICES
+// ============================================================
 window.switchGestorYear = function(y) {
     currentGestorYearTab = y;
     
@@ -1454,6 +1556,9 @@ window.toggleGestorRemate = function(el, id) {
     window.actualizarEstadoApp(true);
 };
 
+// ============================================================
+// FUNCIONES DE AGREGACIÓN Y RENDERING
+// ============================================================
 function buildAgg(rematesList) {
     const agg = { 
         venta: 0,
@@ -1536,6 +1641,9 @@ function buildAgg(rematesList) {
     return agg;
 }
 
+// ============================================================
+// NAVEGACIÓN Y RENDER DE MÓDULOS
+// ============================================================
 window.cambiarSeccion = function(mod) { 
     try {
         currentModule = mod; 
@@ -1546,6 +1654,7 @@ window.cambiarSeccion = function(mod) {
         document.getElementById('nav-mod-conclusiones').className = mod === 'conclusiones' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
         document.getElementById('nav-mod-buscador').className = mod === 'buscador' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 hover:bg-gray-50 text-gray-700';
         document.getElementById('nav-mod-gestion').className = mod === 'gestion' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 hover:bg-gray-50 text-gray-700';
+        document.getElementById('nav-mod-bonos').className = mod === 'bonos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 hover:bg-gray-50 text-gray-700';
         
         window.renderApp();
         if(window.innerWidth < 768) { 
@@ -1559,7 +1668,7 @@ window.cambiarSeccion = function(mod) {
 window.renderApp = function() { 
     try {
         const emptyState = document.getElementById('empty-state');
-        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador', 'module-gestion'].forEach(id => {
+        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador', 'module-gestion', 'module-bonos'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.add('hidden');
         });
@@ -1590,11 +1699,17 @@ window.renderApp = function() {
             window.renderizarIndicadoresAutoV2();
             window.calcularBonoAutomatico();
         }
+        else if (currentModule === 'bonos') { 
+            window.calcularBonos();
+        }
     } catch(e) { 
         console.error(e); 
     }
 };
 
+// ============================================================
+// MÓDULO: DASHBOARD DE REMATES
+// ============================================================
 window.renderDashboard = function() { 
     try {
         if(currentModule !== 'remates') return; 
@@ -1862,6 +1977,9 @@ window.renderDashboard = function() {
     }
 };
 
+// ============================================================
+// MÓDULO: COMPARATIVA HISTÓRICA
+// ============================================================
 window.renderComparativa = function() {
     try {
         if(currentModule !== 'comparativa') return; 
@@ -1979,123 +2097,9 @@ window.renderComparativa = function() {
     }
 };
 
-window.filtrarLotesMain = function() {
-    const term = (document.getElementById('search-lotes-main').value || '').toLowerCase();
-    const tbody = document.getElementById('dash-tabla-lotes');
-    if(!tbody) return;
-    const rows = tbody.getElementsByTagName('tr');
-    for(let i=0; i<rows.length; i++) {
-        const text = rows[i].innerText.toLowerCase();
-        rows[i].style.display = text.includes(term) ? '' : 'none';
-    }
-};
-
-window.abrirModalMultiLote = function() { 
-    let html = ''; 
-    Object.entries(globalMapCMulti).sort((a,b) => b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { 
-        if(data.lotes > 1) { 
-            html += `
-            <tr>
-                <td class="pl-5 py-2 font-bold text-gray-900">${nombre}</td>
-                <td class="text-center py-2 font-black text-gray-700">${data.lotes}</td>
-                <td class="text-right pr-5 py-2 font-black text-emerald-600">${formatMoney(data.total)}</td>
-            </tr>`; 
-        } 
-    }); 
-    
-    document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; 
-    document.getElementById('modal-multilote').classList.remove('hidden'); 
-    document.getElementById('modal-multilote').classList.add('flex'); 
-};
-
-window.cerrarModalMulti = function(e) { 
-    if(e && e.target.id !== 'modal-multilote') return;
-    document.getElementById('modal-multilote').classList.add('hidden'); 
-    document.getElementById('modal-multilote').classList.remove('flex'); 
-};
-
-window.renderConclusiones = function() {
-    try {
-        if(currentModule !== 'conclusiones') return; 
-        let allRemates = getSelectedRemates(); 
-        const agg = buildAgg(allRemates); 
-        let html = ''; 
-        globalAgg = agg; 
-        
-        if(!clientDB.length) {
-            procesarDatosClientes(); 
-        }
-
-        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; 
-        let sobreColor = agg.sobreprecioReal >= 0 ? 'text-emerald-600' : 'text-red-500';
-        let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        
-        let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
-
-        // SECCIÓN 1: Resultados Financieros
-        html += `
-        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <div class="text-[13px] font-black mb-1">Resultados Financieros</div>
-            <div class="text-[12px] text-gray-500 mb-3">Análisis de rentabilidad y comisiones por periodo seleccionado</div>
-            <table class="w-full text-[12px]">
-                <tbody class="divide-y divide-gray-100">
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Venta Total Adjudicada</td><td class="py-2.5 font-bold text-lg">${formatMoney(agg.venta)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Suma operaciones válidas</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Comisiones Estimadas</td><td class="py-2.5 font-bold text-blue-600">${formatMoney(agg.comisionTotal)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Ingresos al 8/12%</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Ticket Promedio</td><td class="py-2.5 font-bold">${formatMoney(agg.ticketPromedio)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${agg.lotes} ops</td></tr>
-                </tbody>
-            </table>
-        </div>`;
-
-        // SECCIÓN 2: Rendimiento de Catálogo
-        html += `
-        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <div class="text-[13px] font-black mb-1">Rendimiento de Catálogo</div>
-            <div class="text-[12px] text-gray-500 mb-3">Efectividad y rotación por matriz</div>
-            <table class="w-full text-[12px]">
-                <tbody class="divide-y divide-gray-100">
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Efectividad Total</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${agg.eficaciaLotes.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Subastado exitosamente</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Volumen Físico</td><td class="py-2.5 font-bold">${agg.lotes.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">de ${agg.lotesDisponibles.toLocaleString('es-CL')} disp.</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Unidades procesadas</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Incremento sobre Mínimo</td><td class="py-2.5 font-bold">${sobreSigno}${formatMoney(agg.deltaPujaTotal)} <span class="${sobreColor} font-bold text-[10px] ml-1">(${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Margen pujas</td></tr>
-                </tbody>
-            </table>
-        </div>`;
-
-        // SECCIÓN 3: Tracción
-        html += `
-        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <div class="text-[13px] font-black mb-1">Tracción y Audiencia</div>
-            <div class="text-[12px] text-gray-500 mb-3">Comportamiento de audiencia y adquisición de clientes</div>
-            <table class="w-full text-[12px]">
-                <tbody class="divide-y divide-gray-100">
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Tasa de Cierre</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${tasaExito.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">De ${agg.garantias.toLocaleString('es-CL')} garantías</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Fuga de Clientes</td><td class="py-2.5 font-bold text-red-500">${agg.perdedoresCount.toLocaleString('es-CL')} <button onclick="window.abrirModalFuga()" class="ml-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-[10px] font-bold transition">VER</button></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pagaron garantía sin compra</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Clientes Nuevos</td><td class="py-2.5 font-bold">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Adquisición pura</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Limpieza Datos (Falsos)</td><td class="py-2.5 font-bold text-gray-400">${falsos}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pujas internas de prueba</td></tr>
-                </tbody>
-            </table>
-        </div>`;
-
-        // SECCIÓN 4: Bonificación (Automatizada)
-        const bonoData = getBonoDataV2();
-        html += `
-        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <div class="text-[13px] font-black mb-1">💰 Bonificación por Desempeño</div>
-            <div class="text-[12px] text-gray-500 mb-3">Cálculo automático basado en KPIs reales</div>
-            <table class="w-full text-[12px]">
-                <tbody class="divide-y divide-gray-100">
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Sueldo Base</td><td class="py-2.5 font-bold">${formatMoney(bonoData.sueldoBase)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Base fija</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Bono Alcanzado</td><td class="py-2.5 font-bold text-emerald-600">${formatMoney(bonoData.bonoAlcanzado)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${bonoData.porcentaje.toFixed(1)}% del máximo (${formatMoney(bonoData.bonoMaximo)})</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Bonificación Total</td><td class="py-2.5 font-bold text-blue-600 text-lg">${formatMoney(bonoData.total)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Sueldo + Bono</td></tr>
-                </tbody>
-            </table>
-        </div>`;
-
-        document.getElementById('conclusiones-content').innerHTML = html;
-    } catch (e) { 
-        console.error(e); 
-    }
-};
-
+// ============================================================
+// MÓDULO: ANÁLISIS VEHICULAR
+// ============================================================
 window.renderPanelAutos = function() {
     try {
         if(currentModule !== 'autos') return; 
@@ -2216,162 +2220,9 @@ window.renderPanelAutos = function() {
     } catch (e) {}
 };
 
-window.abrirModalFuga = function() {
-    try {
-        if(!globalAgg) return; 
-        let html = '';
-        if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
-            globalAgg.fugaList.sort((a,b) => a.nombre.localeCompare(b.nombre)); 
-            let hoy = Date.now();
-            globalAgg.fugaList.forEach(f => { 
-                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
-                let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
-                let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
-                html += `
-                <tr class="hover:bg-gray-50">
-                    <td class="pl-5 py-2 font-medium text-gray-900 truncate max-w-[150px]">${nombreRemate}</td>
-                    <td class="py-2 text-red-500 font-bold">${textoDias}</td>
-                    <td class="py-2 font-bold text-gray-900 truncate max-w-[200px]">${f.nombre}</td>
-                </tr>`; 
-            });
-        } else { 
-            html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">No hay registros de fuga.</td></tr>'; 
-        }
-        
-        if(document.getElementById('modal-tabla-fuga')) {
-            document.getElementById('modal-tabla-fuga').innerHTML = html; 
-        }
-        document.getElementById('modal-fuga').classList.remove('hidden'); 
-        document.getElementById('modal-fuga').classList.add('flex');
-    } catch (e) {}
-};
-
-window.cerrarModalFuga = function(e) { 
-    if(e && e.target.id !== 'modal-fuga') return;
-    document.getElementById('modal-fuga').classList.add('hidden'); 
-    document.getElementById('modal-fuga').classList.remove('flex'); 
-};
-
-window.exportarFugaExcel = function() {
-    try {
-        if(!globalAgg || !globalAgg.fugaList) return; 
-        let hoy = Date.now();
-        const wsData = globalAgg.fugaList.map(f => { 
-            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
-            let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate);
-            return { 
-                "Matriz": nombreRemate, 
-                "Días Inactivo": diasFuga, 
-                "Fecha": f.fechaRemate ? window.formatExcelDate(f.fechaRemate) : '-', 
-                "Cliente": f.nombre, 
-                "RUT": f.rut || 'No Registrado', 
-                "Email": f.email || 'No Registrado' 
-            }; 
-        });
-        
-        const ws = XLSX.utils.json_to_sheet(wsData); 
-        const wb = XLSX.utils.book_new(); 
-        XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); 
-        XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
-    } catch (e) {}
-};
-
-window.abrirModalPujadores = function(loteEncoded, nodeId) {
-    try {
-        const loteStr = decodeURIComponent(loteEncoded); 
-        let remate = db.remates.find(r => r.id === nodeId);
-        if(!remate) return;
-
-        let todasPujas = remate.posturasPorLote ? (remate.posturasPorLote[loteStr] || []) : [];
-        let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null; 
-        
-        currentAdjudicadoModal = adjudicado; 
-        currentModalPujas = todasPujas.sort((a,b) => b.monto - a.monto);
-        
-        if(document.getElementById('modal-subtitulo')) {
-            document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'FALSO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
-        }
-        
-        if(document.getElementById('modal-total-pujas')) {
-            document.getElementById('modal-total-pujas').innerText = todasPujas.length; 
-        }
-        
-        if(document.getElementById('modal-unicos-reales')) {
-            document.getElementById('modal-unicos-reales').innerText = [...new Set(todasPujas.filter(p => !p.esFalso).map(p => p.nombreNorm))].length; 
-        }
-        
-        currentFiltroModal = 'todos'; 
-        
-        if(document.getElementById('btn-filtro-todos')) {
-            document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition'; 
-        }
-        
-        if(document.getElementById('btn-filtro-reales')) {
-            document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
-        }
-        
-        renderModalTabla(); 
-        
-        document.getElementById('modal-pujadores').classList.remove('hidden'); 
-        document.getElementById('modal-pujadores').classList.add('flex');
-    } catch(e) { 
-        console.error("Error modal pujas:", e); 
-    }
-};
-
-function renderModalTabla() {
-    try {
-        let lista = currentModalPujas; 
-        let adjudicado = currentAdjudicadoModal;
-        
-        if(currentFiltroModal === 'reales') lista = lista.filter(p => !p.esFalso); 
-        if(currentFiltroModal === 'falsos') lista = lista.filter(p => p.esFalso);
-        
-        if(document.getElementById('modal-tabla-pujas')) {
-            document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
-                let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
-                
-                let badge = p.esFalso 
-                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">FALSO</span>' 
-                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>'; 
-                    
-                if(esAdj) {
-                    badge += ' <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 ml-1">ADJUDICADO</span>';
-                }
-                
-                return `
-                <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.esFalso ? 'opacity-40' : ''}">
-                    <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
-                    <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
-                    <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
-                    <td class="text-right py-2 text-[12px] font-black ${esAdj ? 'text-emerald-600' : 'text-gray-900'}">${formatMoney(p.monto)}</td>
-                    <td class="text-center pr-5 py-2">${badge}</td>
-                </tr>`;
-            }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin pujas registradas en el excel</td></tr>';
-        }
-    } catch(e) {}
-}
-
-window.filtrarModal = function(tipo) { 
-    currentFiltroModal = tipo; 
-    
-    if(document.getElementById('btn-filtro-todos')) {
-        document.getElementById('btn-filtro-todos').className = tipo === 'todos' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
-    }
-    
-    if(document.getElementById('btn-filtro-reales')) {
-        document.getElementById('btn-filtro-reales').className = tipo === 'reales' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
-    }
-    
-    renderModalTabla(); 
-};
-
-window.cerrarModal = function(e) { 
-    if(e && e.target.id !== 'modal-pujadores') return;
-    document.getElementById('modal-pujadores').classList.add('hidden'); 
-    document.getElementById('modal-pujadores').classList.remove('flex'); 
-};
-
+// ============================================================
+// MÓDULO: GESTIÓN DE CLIENTES
+// ============================================================
 function procesarDatosClientes() { 
     try {
         let allRemates = getSelectedRemates(); 
@@ -2571,6 +2422,9 @@ window.cerrarFicha = function() {
     }
 };
 
+// ============================================================
+// MÓDULO: BUSCADOR GLOBAL
+// ============================================================
 window.buscarPatente = function() { 
     try {
         const term = (document.getElementById('search-patente').value || '').toUpperCase().trim(); 
@@ -2627,9 +2481,837 @@ window.buscarPatente = function() {
 };
 
 // ============================================================
+// MÓDULO: CONCLUSIONES
+// ============================================================
+window.renderConclusiones = function() {
+    try {
+        if(currentModule !== 'conclusiones') return; 
+        let allRemates = getSelectedRemates(); 
+        const agg = buildAgg(allRemates); 
+        let html = ''; 
+        globalAgg = agg; 
+        
+        if(!clientDB.length) {
+            procesarDatosClientes(); 
+        }
+
+        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; 
+        let sobreColor = agg.sobreprecioReal >= 0 ? 'text-emerald-600' : 'text-red-500';
+        let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
+        
+        let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
+
+        // SECCIÓN 1: Resultados Financieros
+        html += `
+        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="text-[13px] font-black mb-1">Resultados Financieros</div>
+            <div class="text-[12px] text-gray-500 mb-3">Análisis de rentabilidad y comisiones por periodo seleccionado</div>
+            <table class="w-full text-[12px]">
+                <tbody class="divide-y divide-gray-100">
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Venta Total Adjudicada</td><td class="py-2.5 font-bold text-lg">${formatMoney(agg.venta)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Suma operaciones válidas</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Comisiones Estimadas</td><td class="py-2.5 font-bold text-blue-600">${formatMoney(agg.comisionTotal)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Ingresos al 8/12%</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Ticket Promedio</td><td class="py-2.5 font-bold">${formatMoney(agg.ticketPromedio)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${agg.lotes} ops</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+        // SECCIÓN 2: Rendimiento de Catálogo
+        html += `
+        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="text-[13px] font-black mb-1">Rendimiento de Catálogo</div>
+            <div class="text-[12px] text-gray-500 mb-3">Efectividad y rotación por matriz</div>
+            <table class="w-full text-[12px]">
+                <tbody class="divide-y divide-gray-100">
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Efectividad Total</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${agg.eficaciaLotes.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Subastado exitosamente</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Volumen Físico</td><td class="py-2.5 font-bold">${agg.lotes.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">de ${agg.lotesDisponibles.toLocaleString('es-CL')} disp.</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Unidades procesadas</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Incremento sobre Mínimo</td><td class="py-2.5 font-bold">${sobreSigno}${formatMoney(agg.deltaPujaTotal)} <span class="${sobreColor} font-bold text-[10px] ml-1">(${sobreSigno}${agg.sobreprecioReal.toFixed(1)}%)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Margen pujas</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+        // SECCIÓN 3: Tracción
+        html += `
+        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="text-[13px] font-black mb-1">Tracción y Audiencia</div>
+            <div class="text-[12px] text-gray-500 mb-3">Comportamiento de audiencia y adquisición de clientes</div>
+            <table class="w-full text-[12px]">
+                <tbody class="divide-y divide-gray-100">
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Tasa de Cierre</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${tasaExito.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">De ${agg.garantias.toLocaleString('es-CL')} garantías</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Fuga de Clientes</td><td class="py-2.5 font-bold text-red-500">${agg.perdedoresCount.toLocaleString('es-CL')} <button onclick="window.abrirModalFuga()" class="ml-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-[10px] font-bold transition">VER</button></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pagaron garantía sin compra</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Clientes Nuevos</td><td class="py-2.5 font-bold">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Adquisición pura</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Limpieza Datos (Falsos)</td><td class="py-2.5 font-bold text-gray-400">${falsos}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pujas internas de prueba</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+        // SECCIÓN 4: Bonificación (Automatizada)
+        const bonoData = getBonoDataV2();
+        html += `
+        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="text-[13px] font-black mb-1">💰 Bonificación por Desempeño</div>
+            <div class="text-[12px] text-gray-500 mb-3">Cálculo automático basado en KPIs reales</div>
+            <table class="w-full text-[12px]">
+                <tbody class="divide-y divide-gray-100">
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Sueldo Base</td><td class="py-2.5 font-bold">${formatMoney(bonoData.sueldoBase)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Base fija</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Bono Alcanzado</td><td class="py-2.5 font-bold text-emerald-600">${formatMoney(bonoData.bonoAlcanzado)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${bonoData.porcentaje.toFixed(1)}% del máximo (${formatMoney(bonoData.bonoMaximo)})</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Bonificación Total</td><td class="py-2.5 font-bold text-blue-600 text-lg">${formatMoney(bonoData.total)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Sueldo + Bono</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+        document.getElementById('conclusiones-content').innerHTML = html;
+    } catch (e) { 
+        console.error(e); 
+    }
+};
+
+// ============================================================
+// MÓDULO: GESTIÓN DIRECTIVA (BONO AUTOMATIZADO)
+// ============================================================
+function cargarConfiguracionManual() {
+    const stored = localStorage.getItem('zarate_kpi_manual_config');
+    if (stored) {
+        try {
+            kpiManualConfig = JSON.parse(stored);
+            const defaultIds = DEFAULT_KPIS_MANUAL.map(k => k.id);
+            kpiManualConfig = kpiManualConfig.filter(k => defaultIds.includes(k.id));
+            DEFAULT_KPIS_MANUAL.forEach(def => {
+                if (!kpiManualConfig.find(k => k.id === def.id)) {
+                    kpiManualConfig.push(JSON.parse(JSON.stringify(def)));
+                }
+            });
+            rebalancearPesosManual();
+            return;
+        } catch (e) {}
+    }
+    kpiManualConfig = DEFAULT_KPIS_MANUAL.map(k => JSON.parse(JSON.stringify(k)));
+    guardarConfiguracionManual();
+}
+
+function guardarConfiguracionManual() {
+    localStorage.setItem('zarate_kpi_manual_config', JSON.stringify(kpiManualConfig));
+}
+
+function rebalancearPesosManual() {
+    const total = kpiManualConfig.reduce((sum, k) => sum + (k.peso || 0), 0);
+    if (total !== 60 && total > 0) {
+        kpiManualConfig.forEach(k => {
+            k.peso = Math.round((k.peso / total) * 60);
+        });
+        let diff = 60 - kpiManualConfig.reduce((s, k) => s + k.peso, 0);
+        if (diff !== 0 && kpiManualConfig.length > 0) {
+            kpiManualConfig[0].peso += diff;
+        }
+    }
+}
+
+function calcularIndicadoresAutomaticos(periodo) {
+    const allRemates = getSelectedRemates();
+    if (!allRemates || allRemates.length < 2) {
+        return { 
+            rrss: { valor: 0, meta: 5, label: 'No hay suficientes datos' },
+            ruts: { valor: 0, meta: 5, label: 'No hay suficientes datos' }
+        };
+    }
+
+    const sorted = [...allRemates].sort((a, b) => (a.fechaData?.timestamp || 0) - (b.fechaData?.timestamp || 0));
+    
+    let grupoActual = [];
+    let grupoAnterior = [];
+    
+    if (periodo === 'remate') {
+        grupoActual = [sorted[sorted.length - 1]];
+        grupoAnterior = [sorted[sorted.length - 2]];
+    } else {
+        const meses = {};
+        sorted.forEach(r => {
+            const m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+            const y = r.fechaData?.year || new Date().getFullYear();
+            const key = `${y}-${m}`;
+            if (!meses[key]) meses[key] = [];
+            meses[key].push(r);
+        });
+        
+        const keys = Object.keys(meses).sort();
+        if (keys.length < 2) {
+            return { 
+                rrss: { valor: 0, meta: 5, label: 'No hay suficientes meses' },
+                ruts: { valor: 0, meta: 5, label: 'No hay suficientes meses' }
+            };
+        }
+        
+        grupoActual = meses[keys[keys.length - 1]];
+        grupoAnterior = meses[keys[keys.length - 2]];
+    }
+
+    const metricsActual = calcularMetricasGrupo(grupoActual);
+    const metricsAnterior = calcularMetricasGrupo(grupoAnterior);
+
+    const crecimientoClientes = metricsAnterior.totalClientes > 0 
+        ? ((metricsActual.totalClientes - metricsAnterior.totalClientes) / metricsAnterior.totalClientes) * 100 
+        : 0;
+
+    const crecimientoRUTs = metricsAnterior.totalRUTs > 0 
+        ? ((metricsActual.totalRUTs - metricsAnterior.totalRUTs) / metricsAnterior.totalRUTs) * 100 
+        : 0;
+
+    return {
+        rrss: {
+            valor: Math.round(crecimientoClientes * 10) / 10,
+            meta: 5,
+            label: `+${crecimientoClientes.toFixed(1)}% (${metricsActual.totalClientes} vs ${metricsAnterior.totalClientes})`
+        },
+        ruts: {
+            valor: Math.round(crecimientoRUTs * 10) / 10,
+            meta: 5,
+            label: `+${crecimientoRUTs.toFixed(1)}% (${metricsActual.totalRUTs} vs ${metricsAnterior.totalRUTs})`
+        }
+    };
+}
+
+function calcularMetricasGrupo(remates) {
+    const clientesSet = new Set();
+    const rutsSet = new Set();
+    
+    remates.forEach(r => {
+        r.adjudicaciones.forEach(a => {
+            if (!a.esFalso) {
+                if (a.clienteReal) clientesSet.add(a.clienteReal);
+                if (a.rut) rutsSet.add(a.rut);
+            }
+        });
+    });
+    
+    return {
+        totalClientes: clientesSet.size,
+        totalRUTs: rutsSet.size
+    };
+}
+
+window.calcularBonoAutomatico = function() {
+    const sueldoBase = 50000;
+    const bonoMaximo = 200000;
+    const periodo = document.getElementById('bono-periodo')?.value || 'remate';
+    
+    const autoIndicadores = calcularIndicadoresAutomaticos(periodo);
+    
+    let cumplimientoTotal = 0;
+    let pesoTotal = 0;
+    let detalles = [];
+
+    // 1. KPIs Automáticos (40% del total)
+    const autoPeso = 40;
+    let cumplimientoAuto = 0;
+    
+    const cumplimientoRRSS = autoIndicadores.rrss.meta > 0 
+        ? Math.min(1, autoIndicadores.rrss.valor / autoIndicadores.rrss.meta) 
+        : 0;
+    cumplimientoAuto += (cumplimientoRRSS * (autoPeso / 2));
+    detalles.push({
+        label: '📱 Clientes RRSS',
+        valor: autoIndicadores.rrss.valor,
+        meta: autoIndicadores.rrss.meta,
+        cumplimiento: Math.round(cumplimientoRRSS * 100),
+        peso: autoPeso / 2,
+        detalle: autoIndicadores.rrss.label
+    });
+
+    const cumplimientoRUTS = autoIndicadores.ruts.meta > 0 
+        ? Math.min(1, autoIndicadores.ruts.valor / autoIndicadores.ruts.meta) 
+        : 0;
+    cumplimientoAuto += (cumplimientoRUTS * (autoPeso / 2));
+    detalles.push({
+        label: '📋 RUTs distintos',
+        valor: autoIndicadores.ruts.valor,
+        meta: autoIndicadores.ruts.meta,
+        cumplimiento: Math.round(cumplimientoRUTS * 100),
+        peso: autoPeso / 2,
+        detalle: autoIndicadores.ruts.label
+    });
+
+    cumplimientoTotal += cumplimientoAuto;
+    pesoTotal += autoPeso;
+
+    // 2. KPIs Manuales (60% del total)
+    kpiManualConfig.forEach(kpi => {
+        const peso = kpi.peso || 0;
+        pesoTotal += peso;
+        
+        let cumplimiento = 0;
+        if (kpi.meta > 0) {
+            cumplimiento = Math.min(1, kpi.valorActual / kpi.meta);
+        }
+        cumplimientoTotal += (cumplimiento * peso);
+        
+        detalles.push({
+            label: kpi.label,
+            valor: kpi.valorActual,
+            meta: kpi.meta,
+            cumplimiento: Math.round(cumplimiento * 100),
+            peso: peso,
+            detalle: kpi.tipo === 'porcentaje' ? `${kpi.valorActual}% / ${kpi.meta}%` : `${kpi.valorActual} / ${kpi.meta}`
+        });
+    });
+
+    const porcentajeCumplimiento = pesoTotal > 0 ? (cumplimientoTotal / pesoTotal) * 100 : 0;
+    const bonoAlcanzado = Math.round((porcentajeCumplimiento / 100) * bonoMaximo);
+
+    document.getElementById('bono-sueldo-base').innerText = formatMoney(sueldoBase);
+    document.getElementById('bono-monto-alcanzado').innerText = formatMoney(bonoAlcanzado);
+    document.getElementById('bono-porcentaje-alcanzado').innerText = `${porcentajeCumplimiento.toFixed(1)}% del máximo`;
+    document.getElementById('bono-total').innerText = formatMoney(sueldoBase + bonoAlcanzado);
+    
+    const labelPeriodo = periodo === 'remate' ? 'Comparando remates' : 'Comparando meses';
+    document.getElementById('bono-periodo-label').innerText = `Período: ${labelPeriodo}`;
+
+    const detalleContainer = document.getElementById('bono-detalle-container');
+    if (detalleContainer) {
+        detalleContainer.innerHTML = detalles.map(d => `
+            <div class="bg-white rounded-lg p-3 border border-gray-200">
+                <div class="flex justify-between items-start">
+                    <span class="text-[11px] font-bold text-gray-700">${d.label}</span>
+                    <span class="text-[10px] font-bold text-gray-400">${d.peso}%</span>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[12px] font-bold ${d.cumplimiento >= 100 ? 'text-emerald-600' : d.cumplimiento >= 70 ? 'text-yellow-600' : 'text-red-500'}">${d.cumplimiento}%</span>
+                    <span class="text-[10px] text-gray-400">${d.detalle}</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1">
+                    <div class="h-full rounded-full ${d.cumplimiento >= 100 ? 'bg-emerald-500' : d.cumplimiento >= 70 ? 'bg-yellow-500' : 'bg-red-400'}" 
+                         style="width: ${Math.min(100, d.cumplimiento)}%"></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    ultimosResultados = { sueldoBase, bonoMaximo, bonoAlcanzado, porcentajeCumplimiento, total: sueldoBase + bonoAlcanzado };
+};
+
+window.renderizarConfigManual = function() {
+    const container = document.getElementById('kpi-manual-container');
+    if (!container) return;
+
+    const totalPeso = kpiManualConfig.reduce((s, k) => s + (k.peso || 0), 0);
+
+    let html = `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        ${kpiManualConfig.map((kpi) => `
+        <div class="border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition">
+            <div class="flex items-start justify-between mb-2">
+                <label class="text-[12px] font-bold text-gray-800 cursor-pointer">${kpi.label}</label>
+                <span class="text-[10px] font-black text-gray-400 bg-gray-100 px-2 py-0.5 rounded">${kpi.peso}%</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="text-[10px] text-gray-400 font-bold">META</span>
+                <input type="number" id="${kpi.id}_meta" value="${kpi.meta}" 
+                    class="w-14 h-7 px-2 rounded border border-gray-200 text-[11px] font-bold text-center bg-gray-50 focus:border-black outline-none" 
+                    onchange="window.actualizarMetaManual('${kpi.id}', this.value)" step="0.1">
+                <span class="text-[10px] text-gray-400 font-bold">${kpi.tipo === 'porcentaje' ? '%' : ''}</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="text-[10px] text-gray-400 font-bold">ACTUAL</span>
+                <input type="number" id="${kpi.id}_valor" value="${kpi.valorActual}" 
+                    class="w-14 h-7 px-2 rounded border border-gray-200 text-[11px] font-bold text-center bg-blue-50 focus:border-black outline-none text-blue-700" 
+                    onchange="window.actualizarValorManual('${kpi.id}', this.value)" step="0.1">
+                <span class="text-[10px] text-gray-400 font-bold">${kpi.tipo === 'porcentaje' ? '%' : ''}</span>
+            </div>
+            <div class="mt-2">
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full ${window.calcularBarraManual(kpi)}" style="width: ${Math.min(100, (kpi.valorActual / kpi.meta) * 100)}%"></div>
+                </div>
+                <span class="text-[9px] text-gray-400 mt-0.5 block">${Math.min(100, ((kpi.valorActual / kpi.meta) * 100).toFixed(1))}% de meta</span>
+            </div>
+            <div class="flex items-center gap-1 mt-2">
+                <input type="range" min="0" max="30" value="${kpi.peso}" 
+                    class="flex-1 accent-black h-1 cursor-pointer" 
+                    oninput="window.actualizarPesoManual('${kpi.id}', this.value)">
+                <span class="text-[10px] text-gray-400 font-bold w-8 text-right">${kpi.peso}%</span>
+            </div>
+        </div>
+        `).join('')}
+    </div>
+    <div class="mt-3 flex justify-between items-center border-t border-gray-100 pt-3">
+        <span class="text-[11px] text-gray-400 font-medium">Peso total KPIs manuales: <span class="font-bold ${totalPeso === 60 ? 'text-emerald-600' : 'text-red-500'}">${totalPeso}%</span> (debe sumar 60%)</span>
+        <button onclick="window.reestablecerManual()" class="text-[11px] text-gray-400 hover:text-red-500 transition font-medium">↺ Restablecer Defaults</button>
+    </div>
+    `;
+
+    container.innerHTML = html;
+};
+
+window.calcularBarraManual = function(kpi) {
+    const ratio = kpi.valorActual / kpi.meta;
+    if (ratio >= 1) return 'bg-emerald-500';
+    if (ratio >= 0.75) return 'bg-blue-500';
+    if (ratio >= 0.5) return 'bg-yellow-500';
+    return 'bg-red-400';
+};
+
+window.actualizarMetaManual = function(id, value) {
+    const kpi = kpiManualConfig.find(k => k.id === id);
+    if (kpi) {
+        kpi.meta = parseFloat(value) || 0;
+        guardarConfiguracionManual();
+        window.renderizarConfigManual();
+        window.calcularBonoAutomatico();
+    }
+};
+
+window.actualizarValorManual = function(id, value) {
+    const kpi = kpiManualConfig.find(k => k.id === id);
+    if (kpi) {
+        kpi.valorActual = parseFloat(value) || 0;
+        guardarConfiguracionManual();
+        window.renderizarConfigManual();
+        window.calcularBonoAutomatico();
+    }
+};
+
+window.actualizarPesoManual = function(id, value) {
+    const kpi = kpiManualConfig.find(k => k.id === id);
+    if (kpi) {
+        kpi.peso = parseInt(value) || 0;
+        guardarConfiguracionManual();
+        rebalancearPesosManual();
+        window.renderizarConfigManual();
+        window.calcularBonoAutomatico();
+    }
+};
+
+window.reestablecerManual = function() {
+    if (confirm('¿Restablecer la configuración de KPIs manuales a los valores por defecto?')) {
+        kpiManualConfig = DEFAULT_KPIS_MANUAL.map(k => JSON.parse(JSON.stringify(k)));
+        guardarConfiguracionManual();
+        window.renderizarConfigManual();
+        window.calcularBonoAutomatico();
+    }
+};
+
+window.renderizarIndicadoresAutoV2 = function() {
+    const container = document.getElementById('auto-indicators-container');
+    if (!container) return;
+
+    const allRemates = getSelectedRemates();
+    if (!allRemates || allRemates.length < 2) {
+        container.innerHTML = `
+            <div class="col-span-full text-center text-gray-400 py-8">
+                <p class="text-sm font-medium">Se necesitan al menos 2 remates para calcular automáticamente</p>
+            </div>
+        `;
+        return;
+    }
+
+    const sorted = [...allRemates].sort((a, b) => (a.fechaData?.timestamp || 0) - (b.fechaData?.timestamp || 0));
+    const ultimo = sorted[sorted.length - 1];
+    const anterior = sorted[sorted.length - 2];
+
+    const metricsUltimo = calcularMetricasGrupo([ultimo]);
+    const metricsAnterior = calcularMetricasGrupo([anterior]);
+
+    const crecimientoClientes = metricsAnterior.totalClientes > 0 
+        ? ((metricsUltimo.totalClientes - metricsAnterior.totalClientes) / metricsAnterior.totalClientes) * 100 
+        : 0;
+
+    const crecimientoRUTs = metricsAnterior.totalRUTs > 0 
+        ? ((metricsUltimo.totalRUTs - metricsAnterior.totalRUTs) / metricsAnterior.totalRUTs) * 100 
+        : 0;
+
+    container.innerHTML = `
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Clientes Último</p>
+            <p class="text-xl font-black text-gray-900">${metricsUltimo.totalClientes}</p>
+            <p class="text-[10px] text-gray-400">vs ${metricsAnterior.totalClientes} anterior</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Crecimiento RRSS</p>
+            <p class="text-xl font-black ${crecimientoClientes >= 5 ? 'text-emerald-600' : crecimientoClientes >= 0 ? 'text-yellow-600' : 'text-red-500'}">${crecimientoClientes.toFixed(1)}%</p>
+            <p class="text-[10px] text-gray-400">Meta: 5%</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">RUTs Último</p>
+            <p class="text-xl font-black text-gray-900">${metricsUltimo.totalRUTs}</p>
+            <p class="text-[10px] text-gray-400">vs ${metricsAnterior.totalRUTs} anterior</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Crecimiento RUTs</p>
+            <p class="text-xl font-black ${crecimientoRUTs >= 5 ? 'text-emerald-600' : crecimientoRUTs >= 0 ? 'text-yellow-600' : 'text-red-500'}">${crecimientoRUTs.toFixed(1)}%</p>
+            <p class="text-[10px] text-gray-400">Meta: 5%</p>
+        </div>
+    `;
+};
+
+function getBonoDataV2() {
+    if (ultimosResultados) {
+        return ultimosResultados;
+    }
+    return { sueldoBase: 50000, bonoMaximo: 200000, bonoAlcanzado: 0, porcentaje: 0, total: 50000 };
+}
+
+// ============================================================
+// MÓDULO: BONOS DE GESTIÓN
+// ============================================================
+window.calcularBonos = function() {
+    const allRemates = getSelectedRemates();
+    if (!allRemates || allRemates.length < 2) {
+        document.getElementById('bono-total-mes').innerText = '$0';
+        document.getElementById('bono-kpis-cumplidos').innerText = '0/4';
+        document.getElementById('bono-nuevos-clientes').innerText = '0';
+        document.getElementById('bono-tasa-retencion').innerText = '0%';
+        document.getElementById('bono-mes-label').innerText = 'Sin datos suficientes';
+        document.getElementById('bono-kpis-detalle').innerHTML = `
+            <div class="col-span-full text-center text-gray-400 py-8">
+                <p class="text-sm font-medium">Se necesitan al menos 2 meses de datos para calcular bonos</p>
+            </div>
+        `;
+        document.getElementById('bono-historial-tabla').innerHTML = `
+            <tr><td colspan="6" class="p-8 text-center text-gray-400">Sin datos históricos</td></tr>
+        `;
+        return;
+    }
+
+    // 1. Agrupar remates por mes calendario
+    const meses = agruparPorMes(allRemates);
+    const mesesKeys = Object.keys(meses).sort();
+
+    if (mesesKeys.length < 2) {
+        document.getElementById('bono-total-mes').innerText = '$0';
+        document.getElementById('bono-kpis-cumplidos').innerText = '0/4';
+        document.getElementById('bono-nuevos-clientes').innerText = '0';
+        document.getElementById('bono-tasa-retencion').innerText = '0%';
+        document.getElementById('bono-mes-label').innerText = 'Se necesita más de 1 mes';
+        return;
+    }
+
+    // 2. Identificar clientes y su primera aparición
+    const clientesInfo = identificarClientes(allRemates);
+    
+    // 3. Calcular KPIs para cada mes
+    const resultadosMensuales = calcularKPIsMensuales(meses, clientesInfo, mesesKeys);
+    
+    // 4. Guardar historial
+    historialBonos = resultadosMensuales;
+    
+    // 5. Mostrar el mes más reciente
+    const ultimoMes = resultadosMensuales[resultadosMensuales.length - 1];
+    bonoActual = ultimoMes;
+    
+    // 6. Renderizar UI
+    renderizarBonoActual(ultimoMes);
+    renderizarHistorialBonos(resultadosMensuales);
+};
+
+function agruparPorMes(remates) {
+    const meses = {};
+    
+    remates.forEach(r => {
+        const fecha = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp) : new Date();
+        const key = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
+        const label = `${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
+        
+        if (!meses[key]) {
+            meses[key] = { key, label, remates: [], fecha: fecha.getTime() };
+        }
+        meses[key].remates.push(r);
+    });
+    
+    return meses;
+}
+
+function identificarClientes(remates) {
+    const clientesMap = {};
+    
+    const sortedRemates = [...remates].sort((a, b) => (a.fechaData?.timestamp || 0) - (b.fechaData?.timestamp || 0));
+    
+    sortedRemates.forEach(r => {
+        const fecha = r.fechaData?.timestamp || 0;
+        
+        if (r.adjudicaciones) {
+            r.adjudicaciones.forEach(a => {
+                if (!a.esFalso && a.clienteReal) {
+                    const nombre = a.clienteReal;
+                    if (!clientesMap[nombre]) {
+                        clientesMap[nombre] = {
+                            primeraAparicion: fecha,
+                            fuentes: { adjudicaciones: 0, pujas: 0, garantias: 0 }
+                        };
+                    }
+                    clientesMap[nombre].fuentes.adjudicaciones++;
+                }
+            });
+        }
+        
+        if (r.posturasPorLote) {
+            Object.values(r.posturasPorLote).forEach(pujas => {
+                pujas.forEach(p => {
+                    if (p.nombreNorm) {
+                        const nombre = p.nombreNorm;
+                        if (!clientesMap[nombre]) {
+                            clientesMap[nombre] = {
+                                primeraAparicion: fecha,
+                                fuentes: { adjudicaciones: 0, pujas: 0, garantias: 0 }
+                            };
+                        }
+                        clientesMap[nombre].fuentes.pujas++;
+                    }
+                });
+            });
+        }
+        
+        if (r.garantiasListaDetallada) {
+            r.garantiasListaDetallada.forEach(g => {
+                if (g.nombreNorm) {
+                    const nombre = g.nombreNorm;
+                    if (!clientesMap[nombre]) {
+                        clientesMap[nombre] = {
+                            primeraAparicion: fecha,
+                            fuentes: { adjudicaciones: 0, pujas: 0, garantias: 0 }
+                        };
+                    }
+                    clientesMap[nombre].fuentes.garantias++;
+                }
+            });
+        }
+    });
+    
+    return clientesMap;
+}
+
+function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
+    const resultados = [];
+    let clientesAcumulados = new Set();
+    
+    mesesKeys.forEach((key, index) => {
+        const mesData = meses[key];
+        const clientesDelMes = new Set();
+        
+        mesData.remates.forEach(r => {
+            if (r.adjudicaciones) {
+                r.adjudicaciones.forEach(a => {
+                    if (!a.esFalso && a.clienteReal) {
+                        clientesDelMes.add(a.clienteReal);
+                    }
+                });
+            }
+            if (r.posturasPorLote) {
+                Object.values(r.posturasPorLote).forEach(pujas => {
+                    pujas.forEach(p => {
+                        if (p.nombreNorm) {
+                            clientesDelMes.add(p.nombreNorm);
+                        }
+                    });
+                });
+            }
+            if (r.garantiasListaDetallada) {
+                r.garantiasListaDetallada.forEach(g => {
+                    if (g.nombreNorm) {
+                        clientesDelMes.add(g.nombreNorm);
+                    }
+                });
+            }
+        });
+        
+        const nuevosClientes = new Set();
+        clientesDelMes.forEach(c => {
+            if (!clientesAcumulados.has(c)) {
+                nuevosClientes.add(c);
+            }
+        });
+        
+        const fechaLimite = mesData.fecha - (90 * 24 * 60 * 60 * 1000);
+        const clientesAntiguos = new Set();
+        const clientesAntiguosActivos = new Set();
+        
+        clientesAcumulados.forEach(c => {
+            const info = clientesInfo[c];
+            if (info && info.primeraAparicion <= fechaLimite) {
+                clientesAntiguos.add(c);
+                if (clientesDelMes.has(c)) {
+                    clientesAntiguosActivos.add(c);
+                }
+            }
+        });
+        
+        const nuevosGanadores = new Set();
+        const nuevosPujadores = new Set();
+        const nuevosGarantes = new Set();
+        
+        mesData.remates.forEach(r => {
+            if (r.adjudicaciones) {
+                r.adjudicaciones.forEach(a => {
+                    if (!a.esFalso && a.clienteReal && nuevosClientes.has(a.clienteReal)) {
+                        nuevosGanadores.add(a.clienteReal);
+                    }
+                });
+            }
+            if (r.posturasPorLote) {
+                Object.values(r.posturasPorLote).forEach(pujas => {
+                    pujas.forEach(p => {
+                        if (p.nombreNorm && nuevosClientes.has(p.nombreNorm)) {
+                            nuevosPujadores.add(p.nombreNorm);
+                        }
+                    });
+                });
+            }
+            if (r.garantiasListaDetallada) {
+                r.garantiasListaDetallada.forEach(g => {
+                    if (g.nombreNorm && nuevosClientes.has(g.nombreNorm)) {
+                        nuevosGarantes.add(g.nombreNorm);
+                    }
+                });
+            }
+        });
+        
+        const tasaRetencion = clientesAntiguos.size > 0 
+            ? (clientesAntiguosActivos.size / clientesAntiguos.size) * 100 
+            : 0;
+        
+        let resultado = {
+            mes: mesData.label,
+            key: key,
+            nuevosGanadores: nuevosGanadores.size,
+            nuevosPujadores: nuevosPujadores.size,
+            nuevosGarantes: nuevosGarantes.size,
+            totalNuevos: nuevosClientes.size,
+            tasaRetencion: tasaRetencion,
+            bono: 0,
+            kpis: {}
+        };
+        
+        if (index > 0) {
+            const mesAnterior = resultados[index - 1];
+            
+            const crecimientoGanadores = mesAnterior.nuevosGanadores > 0 
+                ? ((resultado.nuevosGanadores - mesAnterior.nuevosGanadores) / mesAnterior.nuevosGanadores) * 100 
+                : 0;
+            
+            const crecimientoPujadores = mesAnterior.nuevosPujadores > 0 
+                ? ((resultado.nuevosPujadores - mesAnterior.nuevosPujadores) / mesAnterior.nuevosPujadores) * 100 
+                : 0;
+            
+            const crecimientoGarantes = mesAnterior.nuevosGarantes > 0 
+                ? ((resultado.nuevosGarantes - mesAnterior.nuevosGarantes) / mesAnterior.nuevosGarantes) * 100 
+                : 0;
+            
+            const retencionAnterior = mesAnterior.tasaRetencion || 0;
+            const mejoraRetencion = resultado.tasaRetencion >= retencionAnterior;
+            
+            resultado.kpis = {
+                ganadores: { valor: crecimientoGanadores, meta: 5, cumple: crecimientoGanadores >= 5 },
+                pujadores: { valor: crecimientoPujadores, meta: 5, cumple: crecimientoPujadores >= 5 },
+                garantes: { valor: crecimientoGarantes, meta: 5, cumple: crecimientoGarantes >= 5 },
+                retencion: { valor: resultado.tasaRetencion, meta: retencionAnterior, cumple: mejoraRetencion }
+            };
+            
+            let bonoTotal = 0;
+            if (resultado.kpis.ganadores.cumple) bonoTotal += 50000;
+            if (resultado.kpis.pujadores.cumple) bonoTotal += 50000;
+            if (resultado.kpis.garantes.cumple) bonoTotal += 50000;
+            if (resultado.kpis.retencion.cumple) bonoTotal += 50000;
+            
+            resultado.bono = bonoTotal;
+        }
+        
+        resultados.push(resultado);
+        clientesAcumulados = new Set([...clientesAcumulados, ...clientesDelMes]);
+    });
+    
+    return resultados;
+}
+
+function renderizarBonoActual(ultimoMes) {
+    document.getElementById('bono-total-mes').innerText = formatMoney(ultimoMes.bono || 0);
+    
+    const cumplidos = ultimoMes.kpis ? Object.values(ultimoMes.kpis).filter(k => k.cumple).length : 0;
+    document.getElementById('bono-kpis-cumplidos').innerText = `${cumplidos}/4`;
+    document.getElementById('bono-nuevos-clientes').innerText = ultimoMes.totalNuevos || 0;
+    document.getElementById('bono-tasa-retencion').innerText = `${(ultimoMes.tasaRetencion || 0).toFixed(1)}%`;
+    document.getElementById('bono-mes-label').innerText = `Mes: ${ultimoMes.mes}`;
+    
+    const detalleContainer = document.getElementById('bono-kpis-detalle');
+    if (ultimoMes.kpis) {
+        const kpis = [
+            { key: 'ganadores', label: '🏆 Nuevos Ganadores', data: ultimoMes.kpis.ganadores },
+            { key: 'pujadores', label: '📊 Nuevos Pujadores', data: ultimoMes.kpis.pujadores },
+            { key: 'garantes', label: '🛡️ Nuevos Garantes', data: ultimoMes.kpis.garantes },
+            { key: 'retencion', label: '🔄 Tasa de Retención', data: ultimoMes.kpis.retencion }
+        ];
+        
+        detalleContainer.innerHTML = kpis.map(k => `
+            <div class="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
+                <div class="flex justify-between items-start">
+                    <span class="text-[12px] font-bold text-gray-800">${k.label}</span>
+                    <span class="text-[11px] font-bold ${k.data.cumple ? 'text-emerald-600' : 'text-red-500'}">
+                        ${k.data.cumple ? '✅ Cumple' : '❌ No cumple'}
+                    </span>
+                </div>
+                <div class="mt-1 flex items-center gap-2">
+                    <span class="text-[14px] font-black ${k.data.cumple ? 'text-emerald-600' : 'text-red-500'}">
+                        ${k.key === 'retencion' ? k.data.valor.toFixed(1) + '%' : k.data.valor.toFixed(1) + '%'}
+                    </span>
+                    <span class="text-[11px] text-gray-400">Meta: ${k.key === 'retencion' ? '≥ ' + k.data.meta.toFixed(1) + '%' : k.data.meta + '%'}</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
+                    <div class="h-full rounded-full ${k.data.cumple ? 'bg-emerald-500' : 'bg-red-400'}" 
+                         style="width: ${k.data.cumple ? 100 : Math.min(100, (k.data.valor / k.data.meta) * 100)}%"></div>
+                </div>
+                ${k.key !== 'retencion' ? `
+                <div class="text-[9px] text-gray-400 mt-1">
+                    ${k.data.valor >= 0 ? '+' : ''}${k.data.valor.toFixed(1)}% vs mes anterior
+                </div>
+                ` : `
+                <div class="text-[9px] text-gray-400 mt-1">
+                    ${ultimoMes.tasaRetencion >= (ultimoMes.kpis.retencion.meta || 0) ? '↗️ Mejoró o mantuvo' : '↘️ Disminuyó'}
+                </div>
+                `}
+            </div>
+        `).join('');
+    } else {
+        detalleContainer.innerHTML = `
+            <div class="col-span-full text-center text-gray-400 py-4">
+                <p class="text-sm font-medium">No hay datos suficientes para el primer mes</p>
+            </div>
+        `;
+    }
+}
+
+function renderizarHistorialBonos(resultados) {
+    const tbody = document.getElementById('bono-historial-tabla');
+    
+    if (!resultados || resultados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">Sin datos históricos</td></tr>`;
+        return;
+    }
+    
+    // Mostrar últimos 6 meses o todos
+    const historial = resultados.slice(-6);
+    
+    tbody.innerHTML = historial.map(m => `
+        <tr class="hover:bg-gray-50 transition">
+            <td class="px-3 py-2 font-medium text-gray-900">${m.mes}</td>
+            <td class="px-3 py-2 text-center ${m.kpis?.ganadores?.cumple ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
+                ${m.kpis?.ganadores ? (m.kpis.ganadores.cumple ? '✅' : '❌') : '-'}
+                ${m.nuevosGanadores || 0}
+            </td>
+            <td class="px-3 py-2 text-center ${m.kpis?.pujadores?.cumple ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
+                ${m.kpis?.pujadores ? (m.kpis.pujadores.cumple ? '✅' : '❌') : '-'}
+                ${m.nuevosPujadores || 0}
+            </td>
+            <td class="px-3 py-2 text-center ${m.kpis?.garantes?.cumple ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
+                ${m.kpis?.garantes ? (m.kpis.garantes.cumple ? '✅' : '❌') : '-'}
+                ${m.nuevosGarantes || 0}
+            </td>
+            <td class="px-3 py-2 text-center ${m.kpis?.retencion?.cumple ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
+                ${m.kpis?.retencion ? (m.kpis.retencion.cumple ? '✅' : '❌') : '-'}
+                ${(m.tasaRetencion || 0).toFixed(1)}%
+            </td>
+            <td class="px-3 py-2 text-right font-bold text-emerald-600">${formatMoney(m.bono || 0)}</td>
+        </tr>
+    `).join('');
+}
+
+// ============================================================
 // FUNCIONES AUXILIARES
 // ============================================================
-
 function formatMoney(n) {
     if (n === null || n === undefined || isNaN(n)) return '$0';
     const num = Math.round(Number(n));
@@ -2739,7 +3421,6 @@ function extraerFechaInfo(file, rowsAdj) {
 
     const name = (file && file.name) ? file.name : '';
 
-    // dd-mm-yyyy / dd/mm/yyyy / dd_mm_yyyy
     let m = name.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
     if (m) {
         const d = parseInt(m[1], 10);
@@ -2753,7 +3434,6 @@ function extraerFechaInfo(file, rowsAdj) {
         }
     }
 
-    // yyyy-mm-dd
     m = name.match(/(\d{4})[\/\-_\.](\d{1,2})[\/\-_\.](\d{1,2})/);
     if (m) {
         const y = parseInt(m[1], 10);
@@ -2767,7 +3447,6 @@ function extraerFechaInfo(file, rowsAdj) {
         }
     }
 
-    // Solo año
     m = name.match(/(20[1-3]\d)/);
     if (m) {
         year = parseInt(m[1], 10);
@@ -2775,7 +3454,6 @@ function extraerFechaInfo(file, rowsAdj) {
         return { year, timestamp, source: 'filename-year' };
     }
 
-    // Buscar en filas del Excel
     if (rowsAdj && Array.isArray(rowsAdj)) {
         for (let i = 0; i < Math.min(rowsAdj.length, 15); i++) {
             const row = rowsAdj[i];
@@ -2808,7 +3486,6 @@ function extraerFechaInfo(file, rowsAdj) {
         }
     }
 
-    // lastModified del archivo
     if (file && file.lastModified) {
         const dt = new Date(file.lastModified);
         if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2015) {
@@ -2819,6 +3496,9 @@ function extraerFechaInfo(file, rowsAdj) {
     return { year, timestamp, source: 'default' };
 }
 
+// ============================================================
+// PROCESAMIENTO DE EXCEL Y CARGA DE DATOS
+// ============================================================
 window.limpiarBase = async function() {
     if (!confirm('¿Estás seguro de vaciar TODA la base de datos en la nube? Esta acción no se puede deshacer.')) {
         return;
@@ -2859,7 +3539,6 @@ window.limpiarBase = async function() {
         loadingOverlay.classList.remove('flex');
     }
 };
-
 
 window.parseExcel = function(file) {
     return new Promise((resolve, reject) => {
@@ -3031,7 +3710,6 @@ window.parseExcel = function(file) {
 
                 remate.lotesDisponibles = lotesSet.size > 0 ? lotesSet.size : remate.adjudicaciones.length;
 
-                // 4. PESTAÑA GARANTÍAS
                 let sheetGarantiasName = workbook.SheetNames.find(s => String(s).toLowerCase() === 'garantías' || String(s).toLowerCase() === 'garantias');
                 if (sheetGarantiasName) {
                     try {
@@ -3085,7 +3763,6 @@ window.parseExcel = function(file) {
                     remate.garantias = remate.garantiasListaDetallada.length;
                 }
 
-                // 5. PESTAÑA POSTURAS (PUJAS) 
                 let sheetPosturasName = workbook.SheetNames.find(s => String(s).toLowerCase().includes('posturas') || String(s).toLowerCase().includes('pujas'));
                 if (sheetPosturasName) {
                     try {
@@ -3136,7 +3813,6 @@ window.parseExcel = function(file) {
                                 let loteRaw = String(obj['lote'] || obj['detalle'] || obj['descripcion'] || '').replace(/<[^>]+>/g, '').trim();
                                 let numP = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
                                 
-                                // Si en el lote dice "1 ET1190-K", intentamos extraer el numero inicial
                                 if (!numP && loteRaw) {
                                     let matchLoteP = loteRaw.match(/^(\d+)\s/);
                                     if(matchLoteP) {
@@ -3156,7 +3832,6 @@ window.parseExcel = function(file) {
                                         fecha: fechaData.timestamp
                                     };
                                     
-                                    // Búsqueda Inteligente del Lote
                                     let matchAdj = remate.adjudicaciones.find(a => {
                                         let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
                                         let matchNum = a.numeroLote && numP && a.numeroLote === numP;
@@ -3375,396 +4050,198 @@ window.iniciarProcesamiento = async function(files) {
 };
 
 // ============================================================
-// NUEVO MÓDULO: GESTIÓN DIRECTIVA (BONO AUTOMATIZADO)
+// MODALES
 // ============================================================
+window.abrirModalMultiLote = function() { 
+    let html = ''; 
+    Object.entries(globalMapCMulti).sort((a,b) => b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { 
+        if(data.lotes > 1) { 
+            html += `
+            <tr>
+                <td class="pl-5 py-2 font-bold text-gray-900">${nombre}</td>
+                <td class="text-center py-2 font-black text-gray-700">${data.lotes}</td>
+                <td class="text-right pr-5 py-2 font-black text-emerald-600">${formatMoney(data.total)}</td>
+            </tr>`; 
+        } 
+    }); 
+    
+    document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; 
+    document.getElementById('modal-multilote').classList.remove('hidden'); 
+    document.getElementById('modal-multilote').classList.add('flex'); 
+};
 
-// Cargar configuración manual desde localStorage
-function cargarConfiguracionManual() {
-    const stored = localStorage.getItem('zarate_kpi_manual_config');
-    if (stored) {
-        try {
-            kpiManualConfig = JSON.parse(stored);
-            const defaultIds = DEFAULT_KPIS_MANUAL.map(k => k.id);
-            kpiManualConfig = kpiManualConfig.filter(k => defaultIds.includes(k.id));
-            DEFAULT_KPIS_MANUAL.forEach(def => {
-                if (!kpiManualConfig.find(k => k.id === def.id)) {
-                    kpiManualConfig.push(JSON.parse(JSON.stringify(def)));
-                }
+window.cerrarModalMulti = function(e) { 
+    if(e && e.target.id !== 'modal-multilote') return;
+    document.getElementById('modal-multilote').classList.add('hidden'); 
+    document.getElementById('modal-multilote').classList.remove('flex'); 
+};
+
+window.abrirModalFuga = function() {
+    try {
+        if(!globalAgg) return; 
+        let html = '';
+        if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
+            globalAgg.fugaList.sort((a,b) => a.nombre.localeCompare(b.nombre)); 
+            let hoy = Date.now();
+            globalAgg.fugaList.forEach(f => { 
+                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
+                let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
+                let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
+                html += `
+                <tr class="hover:bg-gray-50">
+                    <td class="pl-5 py-2 font-medium text-gray-900 truncate max-w-[150px]">${nombreRemate}</td>
+                    <td class="py-2 text-red-500 font-bold">${textoDias}</td>
+                    <td class="py-2 font-bold text-gray-900 truncate max-w-[200px]">${f.nombre}</td>
+                </tr>`; 
             });
-            rebalancearPesosManual();
-            return;
-        } catch (e) {}
-    }
-    kpiManualConfig = DEFAULT_KPIS_MANUAL.map(k => JSON.parse(JSON.stringify(k)));
-    guardarConfiguracionManual();
-}
-
-function guardarConfiguracionManual() {
-    localStorage.setItem('zarate_kpi_manual_config', JSON.stringify(kpiManualConfig));
-}
-
-function rebalancearPesosManual() {
-    const total = kpiManualConfig.reduce((sum, k) => sum + (k.peso || 0), 0);
-    if (total !== 60 && total > 0) {
-        kpiManualConfig.forEach(k => {
-            k.peso = Math.round((k.peso / total) * 60);
-        });
-        let diff = 60 - kpiManualConfig.reduce((s, k) => s + k.peso, 0);
-        if (diff !== 0 && kpiManualConfig.length > 0) {
-            kpiManualConfig[0].peso += diff;
+        } else { 
+            html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">No hay registros de fuga.</td></tr>'; 
         }
-    }
-}
-
-// Calcular indicadores automáticos comparando períodos
-function calcularIndicadoresAutomaticos(periodo) {
-    const allRemates = getSelectedRemates();
-    if (!allRemates || allRemates.length < 2) {
-        return { 
-            rrss: { valor: 0, meta: 5, label: 'No hay suficientes datos' },
-            ruts: { valor: 0, meta: 5, label: 'No hay suficientes datos' }
-        };
-    }
-
-    const sorted = [...allRemates].sort((a, b) => (a.fechaData?.timestamp || 0) - (b.fechaData?.timestamp || 0));
-    
-    let grupoActual = [];
-    let grupoAnterior = [];
-    
-    if (periodo === 'remate') {
-        grupoActual = [sorted[sorted.length - 1]];
-        grupoAnterior = [sorted[sorted.length - 2]];
-    } else {
-        const meses = {};
-        sorted.forEach(r => {
-            const m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-            const y = r.fechaData?.year || new Date().getFullYear();
-            const key = `${y}-${m}`;
-            if (!meses[key]) meses[key] = [];
-            meses[key].push(r);
-        });
         
-        const keys = Object.keys(meses).sort();
-        if (keys.length < 2) {
+        if(document.getElementById('modal-tabla-fuga')) {
+            document.getElementById('modal-tabla-fuga').innerHTML = html; 
+        }
+        document.getElementById('modal-fuga').classList.remove('hidden'); 
+        document.getElementById('modal-fuga').classList.add('flex');
+    } catch (e) {}
+};
+
+window.cerrarModalFuga = function(e) { 
+    if(e && e.target.id !== 'modal-fuga') return;
+    document.getElementById('modal-fuga').classList.add('hidden'); 
+    document.getElementById('modal-fuga').classList.remove('flex'); 
+};
+
+window.exportarFugaExcel = function() {
+    try {
+        if(!globalAgg || !globalAgg.fugaList) return; 
+        let hoy = Date.now();
+        const wsData = globalAgg.fugaList.map(f => { 
+            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
+            let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate);
             return { 
-                rrss: { valor: 0, meta: 5, label: 'No hay suficientes meses' },
-                ruts: { valor: 0, meta: 5, label: 'No hay suficientes meses' }
-            };
-        }
-        
-        grupoActual = meses[keys[keys.length - 1]];
-        grupoAnterior = meses[keys[keys.length - 2]];
-    }
-
-    const metricsActual = calcularMetricasGrupo(grupoActual);
-    const metricsAnterior = calcularMetricasGrupo(grupoAnterior);
-
-    const crecimientoClientes = metricsAnterior.totalClientes > 0 
-        ? ((metricsActual.totalClientes - metricsAnterior.totalClientes) / metricsAnterior.totalClientes) * 100 
-        : 0;
-
-    const crecimientoRUTs = metricsAnterior.totalRUTs > 0 
-        ? ((metricsActual.totalRUTs - metricsAnterior.totalRUTs) / metricsAnterior.totalRUTs) * 100 
-        : 0;
-
-    return {
-        rrss: {
-            valor: Math.round(crecimientoClientes * 10) / 10,
-            meta: 5,
-            label: `+${crecimientoClientes.toFixed(1)}% (${metricsActual.totalClientes} vs ${metricsAnterior.totalClientes})`
-        },
-        ruts: {
-            valor: Math.round(crecimientoRUTs * 10) / 10,
-            meta: 5,
-            label: `+${crecimientoRUTs.toFixed(1)}% (${metricsActual.totalRUTs} vs ${metricsAnterior.totalRUTs})`
-        }
-    };
-}
-
-function calcularMetricasGrupo(remates) {
-    const clientesSet = new Set();
-    const rutsSet = new Set();
-    
-    remates.forEach(r => {
-        r.adjudicaciones.forEach(a => {
-            if (!a.esFalso) {
-                if (a.clienteReal) clientesSet.add(a.clienteReal);
-                if (a.rut) rutsSet.add(a.rut);
-            }
+                "Matriz": nombreRemate, 
+                "Días Inactivo": diasFuga, 
+                "Fecha": f.fechaRemate ? window.formatExcelDate(f.fechaRemate) : '-', 
+                "Cliente": f.nombre, 
+                "RUT": f.rut || 'No Registrado', 
+                "Email": f.email || 'No Registrado' 
+            }; 
         });
-    });
-    
-    return {
-        totalClientes: clientesSet.size,
-        totalRUTs: rutsSet.size
-    };
-}
-
-// Calcular Bono Automático
-window.calcularBonoAutomatico = function() {
-    const sueldoBase = 50000;
-    const bonoMaximo = 200000;
-    const periodo = document.getElementById('bono-periodo')?.value || 'remate';
-    
-    const autoIndicadores = calcularIndicadoresAutomaticos(periodo);
-    
-    let cumplimientoTotal = 0;
-    let pesoTotal = 0;
-    let detalles = [];
-
-    // 1. KPIs Automáticos (40% del total)
-    const autoPeso = 40;
-    let cumplimientoAuto = 0;
-    
-    const cumplimientoRRSS = autoIndicadores.rrss.meta > 0 
-        ? Math.min(1, autoIndicadores.rrss.valor / autoIndicadores.rrss.meta) 
-        : 0;
-    cumplimientoAuto += (cumplimientoRRSS * (autoPeso / 2));
-    detalles.push({
-        label: '📱 Clientes RRSS',
-        valor: autoIndicadores.rrss.valor,
-        meta: autoIndicadores.rrss.meta,
-        cumplimiento: Math.round(cumplimientoRRSS * 100),
-        peso: autoPeso / 2,
-        detalle: autoIndicadores.rrss.label
-    });
-
-    const cumplimientoRUTS = autoIndicadores.ruts.meta > 0 
-        ? Math.min(1, autoIndicadores.ruts.valor / autoIndicadores.ruts.meta) 
-        : 0;
-    cumplimientoAuto += (cumplimientoRUTS * (autoPeso / 2));
-    detalles.push({
-        label: '📋 RUTs distintos',
-        valor: autoIndicadores.ruts.valor,
-        meta: autoIndicadores.ruts.meta,
-        cumplimiento: Math.round(cumplimientoRUTS * 100),
-        peso: autoPeso / 2,
-        detalle: autoIndicadores.ruts.label
-    });
-
-    cumplimientoTotal += cumplimientoAuto;
-    pesoTotal += autoPeso;
-
-    // 2. KPIs Manuales (60% del total)
-    kpiManualConfig.forEach(kpi => {
-        const peso = kpi.peso || 0;
-        pesoTotal += peso;
         
-        let cumplimiento = 0;
-        if (kpi.meta > 0) {
-            cumplimiento = Math.min(1, kpi.valorActual / kpi.meta);
+        const ws = XLSX.utils.json_to_sheet(wsData); 
+        const wb = XLSX.utils.book_new(); 
+        XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); 
+        XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
+    } catch (e) {}
+};
+
+window.abrirModalPujadores = function(loteEncoded, nodeId) {
+    try {
+        const loteStr = decodeURIComponent(loteEncoded); 
+        let remate = db.remates.find(r => r.id === nodeId);
+        if(!remate) return;
+
+        let todasPujas = remate.posturasPorLote ? (remate.posturasPorLote[loteStr] || []) : [];
+        let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null; 
+        
+        currentAdjudicadoModal = adjudicado; 
+        currentModalPujas = todasPujas.sort((a,b) => b.monto - a.monto);
+        
+        if(document.getElementById('modal-subtitulo')) {
+            document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'FALSO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
         }
-        cumplimientoTotal += (cumplimiento * peso);
         
-        detalles.push({
-            label: kpi.label,
-            valor: kpi.valorActual,
-            meta: kpi.meta,
-            cumplimiento: Math.round(cumplimiento * 100),
-            peso: peso,
-            detalle: kpi.tipo === 'porcentaje' ? `${kpi.valorActual}% / ${kpi.meta}%` : `${kpi.valorActual} / ${kpi.meta}`
-        });
-    });
-
-    const porcentajeCumplimiento = pesoTotal > 0 ? (cumplimientoTotal / pesoTotal) * 100 : 0;
-    const bonoAlcanzado = Math.round((porcentajeCumplimiento / 100) * bonoMaximo);
-
-    document.getElementById('bono-sueldo-base').innerText = formatMoney(sueldoBase);
-    document.getElementById('bono-monto-alcanzado').innerText = formatMoney(bonoAlcanzado);
-    document.getElementById('bono-porcentaje-alcanzado').innerText = `${porcentajeCumplimiento.toFixed(1)}% del máximo`;
-    document.getElementById('bono-total').innerText = formatMoney(sueldoBase + bonoAlcanzado);
-    
-    const labelPeriodo = periodo === 'remate' ? 'Comparando remates' : 'Comparando meses';
-    document.getElementById('bono-periodo-label').innerText = `Período: ${labelPeriodo}`;
-
-    const detalleContainer = document.getElementById('bono-detalle-container');
-    if (detalleContainer) {
-        detalleContainer.innerHTML = detalles.map(d => `
-            <div class="bg-white rounded-lg p-3 border border-gray-200">
-                <div class="flex justify-between items-start">
-                    <span class="text-[11px] font-bold text-gray-700">${d.label}</span>
-                    <span class="text-[10px] font-bold text-gray-400">${d.peso}%</span>
-                </div>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="text-[12px] font-bold ${d.cumplimiento >= 100 ? 'text-emerald-600' : d.cumplimiento >= 70 ? 'text-yellow-600' : 'text-red-500'}">${d.cumplimiento}%</span>
-                    <span class="text-[10px] text-gray-400">${d.detalle}</span>
-                </div>
-                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1">
-                    <div class="h-full rounded-full ${d.cumplimiento >= 100 ? 'bg-emerald-500' : d.cumplimiento >= 70 ? 'bg-yellow-500' : 'bg-red-400'}" 
-                         style="width: ${Math.min(100, d.cumplimiento)}%"></div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    ultimosResultados = { sueldoBase, bonoMaximo, bonoAlcanzado, porcentajeCumplimiento, total: sueldoBase + bonoAlcanzado };
-};
-
-// Renderizar configuración manual
-window.renderizarConfigManual = function() {
-    const container = document.getElementById('kpi-manual-container');
-    if (!container) return;
-
-    const totalPeso = kpiManualConfig.reduce((s, k) => s + (k.peso || 0), 0);
-
-    let html = `
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        ${kpiManualConfig.map((kpi) => `
-        <div class="border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition">
-            <div class="flex items-start justify-between mb-2">
-                <label class="text-[12px] font-bold text-gray-800 cursor-pointer">${kpi.label}</label>
-                <span class="text-[10px] font-black text-gray-400 bg-gray-100 px-2 py-0.5 rounded">${kpi.peso}%</span>
-            </div>
-            <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] text-gray-400 font-bold">META</span>
-                <input type="number" id="${kpi.id}_meta" value="${kpi.meta}" 
-                    class="w-14 h-7 px-2 rounded border border-gray-200 text-[11px] font-bold text-center bg-gray-50 focus:border-black outline-none" 
-                    onchange="window.actualizarMetaManual('${kpi.id}', this.value)" step="0.1">
-                <span class="text-[10px] text-gray-400 font-bold">${kpi.tipo === 'porcentaje' ? '%' : ''}</span>
-            </div>
-            <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] text-gray-400 font-bold">ACTUAL</span>
-                <input type="number" id="${kpi.id}_valor" value="${kpi.valorActual}" 
-                    class="w-14 h-7 px-2 rounded border border-gray-200 text-[11px] font-bold text-center bg-blue-50 focus:border-black outline-none text-blue-700" 
-                    onchange="window.actualizarValorManual('${kpi.id}', this.value)" step="0.1">
-                <span class="text-[10px] text-gray-400 font-bold">${kpi.tipo === 'porcentaje' ? '%' : ''}</span>
-            </div>
-            <div class="mt-2">
-                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div class="h-full rounded-full ${window.calcularBarraManual(kpi)}" style="width: ${Math.min(100, (kpi.valorActual / kpi.meta) * 100)}%"></div>
-                </div>
-                <span class="text-[9px] text-gray-400 mt-0.5 block">${Math.min(100, ((kpi.valorActual / kpi.meta) * 100).toFixed(1))}% de meta</span>
-            </div>
-            <div class="flex items-center gap-1 mt-2">
-                <input type="range" min="0" max="30" value="${kpi.peso}" 
-                    class="flex-1 accent-black h-1 cursor-pointer" 
-                    oninput="window.actualizarPesoManual('${kpi.id}', this.value)">
-                <span class="text-[10px] text-gray-400 font-bold w-8 text-right">${kpi.peso}%</span>
-            </div>
-        </div>
-        `).join('')}
-    </div>
-    <div class="mt-3 flex justify-between items-center border-t border-gray-100 pt-3">
-        <span class="text-[11px] text-gray-400 font-medium">Peso total KPIs manuales: <span class="font-bold ${totalPeso === 60 ? 'text-emerald-600' : 'text-red-500'}">${totalPeso}%</span> (debe sumar 60%)</span>
-        <button onclick="window.reestablecerManual()" class="text-[11px] text-gray-400 hover:text-red-500 transition font-medium">↺ Restablecer Defaults</button>
-    </div>
-    `;
-
-    container.innerHTML = html;
-};
-
-window.calcularBarraManual = function(kpi) {
-    const ratio = kpi.valorActual / kpi.meta;
-    if (ratio >= 1) return 'bg-emerald-500';
-    if (ratio >= 0.75) return 'bg-blue-500';
-    if (ratio >= 0.5) return 'bg-yellow-500';
-    return 'bg-red-400';
-};
-
-window.actualizarMetaManual = function(id, value) {
-    const kpi = kpiManualConfig.find(k => k.id === id);
-    if (kpi) {
-        kpi.meta = parseFloat(value) || 0;
-        guardarConfiguracionManual();
-        window.renderizarConfigManual();
-        window.calcularBonoAutomatico();
+        if(document.getElementById('modal-total-pujas')) {
+            document.getElementById('modal-total-pujas').innerText = todasPujas.length; 
+        }
+        
+        if(document.getElementById('modal-unicos-reales')) {
+            document.getElementById('modal-unicos-reales').innerText = [...new Set(todasPujas.filter(p => !p.esFalso).map(p => p.nombreNorm))].length; 
+        }
+        
+        currentFiltroModal = 'todos'; 
+        
+        if(document.getElementById('btn-filtro-todos')) {
+            document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition'; 
+        }
+        
+        if(document.getElementById('btn-filtro-reales')) {
+            document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+        }
+        
+        renderModalTabla(); 
+        
+        document.getElementById('modal-pujadores').classList.remove('hidden'); 
+        document.getElementById('modal-pujadores').classList.add('flex');
+    } catch(e) { 
+        console.error("Error modal pujas:", e); 
     }
 };
 
-window.actualizarValorManual = function(id, value) {
-    const kpi = kpiManualConfig.find(k => k.id === id);
-    if (kpi) {
-        kpi.valorActual = parseFloat(value) || 0;
-        guardarConfiguracionManual();
-        window.renderizarConfigManual();
-        window.calcularBonoAutomatico();
-    }
-};
-
-window.actualizarPesoManual = function(id, value) {
-    const kpi = kpiManualConfig.find(k => k.id === id);
-    if (kpi) {
-        kpi.peso = parseInt(value) || 0;
-        guardarConfiguracionManual();
-        rebalancearPesosManual();
-        window.renderizarConfigManual();
-        window.calcularBonoAutomatico();
-    }
-};
-
-window.reestablecerManual = function() {
-    if (confirm('¿Restablecer la configuración de KPIs manuales a los valores por defecto?')) {
-        kpiManualConfig = DEFAULT_KPIS_MANUAL.map(k => JSON.parse(JSON.stringify(k)));
-        guardarConfiguracionManual();
-        window.renderizarConfigManual();
-        window.calcularBonoAutomatico();
-    }
-};
-
-// Renderizar indicadores automáticos (solo lectura)
-window.renderizarIndicadoresAutoV2 = function() {
-    const container = document.getElementById('auto-indicators-container');
-    if (!container) return;
-
-    const allRemates = getSelectedRemates();
-    if (!allRemates || allRemates.length < 2) {
-        container.innerHTML = `
-            <div class="col-span-full text-center text-gray-400 py-8">
-                <p class="text-sm font-medium">Se necesitan al menos 2 remates para calcular automáticamente</p>
-            </div>
-        `;
-        return;
-    }
-
-    const sorted = [...allRemates].sort((a, b) => (a.fechaData?.timestamp || 0) - (b.fechaData?.timestamp || 0));
-    const ultimo = sorted[sorted.length - 1];
-    const anterior = sorted[sorted.length - 2];
-
-    const metricsUltimo = calcularMetricasGrupo([ultimo]);
-    const metricsAnterior = calcularMetricasGrupo([anterior]);
-
-    const crecimientoClientes = metricsAnterior.totalClientes > 0 
-        ? ((metricsUltimo.totalClientes - metricsAnterior.totalClientes) / metricsAnterior.totalClientes) * 100 
-        : 0;
-
-    const crecimientoRUTs = metricsAnterior.totalRUTs > 0 
-        ? ((metricsUltimo.totalRUTs - metricsAnterior.totalRUTs) / metricsAnterior.totalRUTs) * 100 
-        : 0;
-
-    container.innerHTML = `
-        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Clientes Último</p>
-            <p class="text-xl font-black text-gray-900">${metricsUltimo.totalClientes}</p>
-            <p class="text-[10px] text-gray-400">vs ${metricsAnterior.totalClientes} anterior</p>
-        </div>
-        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Crecimiento RRSS</p>
-            <p class="text-xl font-black ${crecimientoClientes >= 5 ? 'text-emerald-600' : crecimientoClientes >= 0 ? 'text-yellow-600' : 'text-red-500'}">${crecimientoClientes.toFixed(1)}%</p>
-            <p class="text-[10px] text-gray-400">Meta: 5%</p>
-        </div>
-        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">RUTs Último</p>
-            <p class="text-xl font-black text-gray-900">${metricsUltimo.totalRUTs}</p>
-            <p class="text-[10px] text-gray-400">vs ${metricsAnterior.totalRUTs} anterior</p>
-        </div>
-        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Crecimiento RUTs</p>
-            <p class="text-xl font-black ${crecimientoRUTs >= 5 ? 'text-emerald-600' : crecimientoRUTs >= 0 ? 'text-yellow-600' : 'text-red-500'}">${crecimientoRUTs.toFixed(1)}%</p>
-            <p class="text-[10px] text-gray-400">Meta: 5%</p>
-        </div>
-    `;
-};
-
-function getBonoDataV2() {
-    if (ultimosResultados) {
-        return ultimosResultados;
-    }
-    return { sueldoBase: 50000, bonoMaximo: 200000, bonoAlcanzado: 0, porcentaje: 0, total: 50000 };
+function renderModalTabla() {
+    try {
+        let lista = currentModalPujas; 
+        let adjudicado = currentAdjudicadoModal;
+        
+        if(currentFiltroModal === 'reales') lista = lista.filter(p => !p.esFalso); 
+        if(currentFiltroModal === 'falsos') lista = lista.filter(p => p.esFalso);
+        
+        if(document.getElementById('modal-tabla-pujas')) {
+            document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
+                let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
+                
+                let badge = p.esFalso 
+                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">FALSO</span>' 
+                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>'; 
+                    
+                if(esAdj) {
+                    badge += ' <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 ml-1">ADJUDICADO</span>';
+                }
+                
+                return `
+                <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.esFalso ? 'opacity-40' : ''}">
+                    <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
+                    <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
+                    <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
+                    <td class="text-right py-2 text-[12px] font-black ${esAdj ? 'text-emerald-600' : 'text-gray-900'}">${formatMoney(p.monto)}</td>
+                    <td class="text-center pr-5 py-2">${badge}</td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin pujas registradas en el excel</td></tr>';
+        }
+    } catch(e) {}
 }
 
-// ============================================================
-// FIN NUEVO MÓDULO: GESTIÓN DIRECTIVA
-// ============================================================
+window.filtrarModal = function(tipo) { 
+    currentFiltroModal = tipo; 
+    
+    if(document.getElementById('btn-filtro-todos')) {
+        document.getElementById('btn-filtro-todos').className = tipo === 'todos' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+    }
+    
+    if(document.getElementById('btn-filtro-reales')) {
+        document.getElementById('btn-filtro-reales').className = tipo === 'reales' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+    }
+    
+    renderModalTabla(); 
+};
+
+window.cerrarModal = function(e) { 
+    if(e && e.target.id !== 'modal-pujadores') return;
+    document.getElementById('modal-pujadores').classList.add('hidden'); 
+    document.getElementById('modal-pujadores').classList.remove('flex'); 
+};
+
+window.filtrarLotesMain = function() {
+    const term = (document.getElementById('search-lotes-main').value || '').toLowerCase();
+    const tbody = document.getElementById('dash-tabla-lotes');
+    if(!tbody) return;
+    const rows = tbody.getElementsByTagName('tr');
+    for(let i=0; i<rows.length; i++) {
+        const text = rows[i].innerText.toLowerCase();
+        rows[i].style.display = text.includes(term) ? '' : 'none';
+    }
+};
 
 </script>
 </body>
