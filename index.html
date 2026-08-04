@@ -33,7 +33,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v16.1 (Helpers Restaurados)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v16.2 (Gestión Directiva)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -159,6 +159,7 @@
                     <button id="nav-mod-clientes" onclick="window.cambiarSeccion('clientes')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>👥</span> Gestión de Clientes</button>
                     <button id="nav-mod-conclusiones" onclick="window.cambiarSeccion('conclusiones')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>📄</span> Datos</button>
                     <button id="nav-mod-buscador" onclick="window.cambiarSeccion('buscador')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-4"><span>🔍</span> Buscador Global</button>
+                    <button id="nav-mod-gestion" onclick="window.cambiarSeccion('gestion')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1"><span>🎯</span> Gestión Directiva</button>
                 </div>
 
                 <div id="admin-controls" class="hidden flex-col mt-auto pt-4 border-t border-gray-100 space-y-2">
@@ -495,6 +496,66 @@
                     </div>
                 </div>
 
+                <!-- MODULE: GESTIÓN DIRECTIVA (BONO) -->
+                <div id="module-gestion" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
+                    <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4">
+                        <div>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">🎯 Control Directivo</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Cálculo de bono de desempeño basado en KPIs configurables</p>
+                        </div>
+                        <button onclick="window.calcularBono()" class="h-10 px-5 rounded-lg bg-[#111827] text-white text-[13px] font-bold shadow-sm hover:bg-black transition flex items-center gap-2">
+                            <span>⚡</span> Calcular Bono Actual
+                        </button>
+                    </div>
+
+                    <!-- Resultados del Bono -->
+                    <div id="bonificacion-container" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="bg-black text-white px-5 py-3 flex justify-between items-center">
+                            <span class="font-bold text-sm">📊 Resultado de Bonificación</span>
+                            <span class="text-xs opacity-60">Basado en la selección de matrices activa</span>
+                        </div>
+                        <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+                                <p class="text-[11px] font-bold uppercase tracking-widest text-gray-400">Sueldo Base</p>
+                                <p class="text-2xl font-black text-gray-900 mt-1" id="bono-sueldo-base">$50.000</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+                                <p class="text-[11px] font-bold uppercase tracking-widest text-gray-400">Bono Alcanzado</p>
+                                <p class="text-2xl font-black text-emerald-600 mt-1" id="bono-monto-alcanzado">$0</p>
+                                <p class="text-[11px] text-gray-400" id="bono-porcentaje-alcanzado">0% del máximo</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+                                <p class="text-[11px] font-bold uppercase tracking-widest text-gray-400">Bonificación Total</p>
+                                <p class="text-2xl font-black text-blue-600 mt-1" id="bono-total">$50.000</p>
+                                <p class="text-[11px] text-gray-400">Sueldo Base + Bono</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuración de KPIs -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                            <span class="font-bold text-sm text-gray-800">⚙️ Configuración de KPIs</span>
+                            <span class="text-[10px] text-gray-400">Peso total debe sumar 100%</span>
+                        </div>
+                        <div class="p-5" id="kpi-config-container">
+                            <!-- Se llena dinámicamente con JS -->
+                        </div>
+                    </div>
+
+                    <!-- Indicadores Calculados (Auto) -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50">
+                            <span class="font-bold text-sm text-gray-800">📈 Indicadores Automáticos</span>
+                        </div>
+                        <div class="p-5">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4" id="auto-indicators-container">
+                                <!-- Se llena dinámicamente con JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div> <!-- FIN APP CONTENT -->
@@ -649,6 +710,66 @@ if(typeof Chart !== 'undefined') {
     Chart.defaults.font.family = 'Roboto, sans-serif'; 
     Chart.defaults.font.size = 11;
 }
+
+// === CONFIGURACIÓN DE KPIS PARA GESTIÓN DIRECTIVA ===
+const DEFAULT_KPIS = [
+    {
+        id: 'kpi_rrss_clientes',
+        label: 'Aumento # clientes en RRSS',
+        peso: 20,
+        meta: 5,
+        valorActual: 0,
+        tipo: 'porcentaje',
+        autoCalculado: true
+    },
+    {
+        id: 'kpi_ruts_distintos',
+        label: 'Aumento RUTs distintos que adjudican',
+        peso: 20,
+        meta: 5,
+        valorActual: 0,
+        tipo: 'porcentaje',
+        autoCalculado: true
+    },
+    {
+        id: 'kpi_feedback_positivo',
+        label: 'Feedback positivo medible en RRSS',
+        peso: 20,
+        meta: 5,
+        valorActual: 0,
+        tipo: 'porcentaje',
+        autoCalculado: false
+    },
+    {
+        id: 'kpi_innovacion',
+        label: 'Innovación en RRSS/IA/Comunicación',
+        peso: 20,
+        meta: 1,
+        valorActual: 0,
+        tipo: 'manual',
+        autoCalculado: false
+    },
+    {
+        id: 'kpi_google_reviews',
+        label: '⭐ Reseñas Google (Puntaje Promedio)',
+        peso: 10,
+        meta: 4.5,
+        valorActual: 0,
+        tipo: 'manual',
+        autoCalculado: false
+    },
+    {
+        id: 'kpi_extra',
+        label: 'Indicador Extra (Configurable)',
+        peso: 10,
+        meta: 10,
+        valorActual: 0,
+        tipo: 'manual',
+        autoCalculado: false
+    }
+];
+
+let kpiConfig = [];
 
 // === CEREBRO DE SINCRONIZACIÓN CENTRAL ===
 window.actualizarEstadoApp = function(keepGestorScroll = false) {
@@ -851,6 +972,9 @@ async function initApp() {
         loadingOverlay.classList.add('hidden'); 
         loadingOverlay.classList.remove('flex');
     }
+    
+    // Cargar configuración de KPIs
+    cargarConfiguracionKPI();
     
     if(db.remates && db.remates.length > 0) { 
         window.actualizarFiltrosGlobales(true); 
@@ -1430,7 +1554,8 @@ window.cambiarSeccion = function(mod) {
         document.getElementById('nav-mod-autos').className = mod === 'autos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
         document.getElementById('nav-mod-clientes').className = mod === 'clientes' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
         document.getElementById('nav-mod-conclusiones').className = mod === 'conclusiones' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
-        document.getElementById('nav-mod-buscador').className = mod === 'buscador' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-buscador').className = mod === 'buscador' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 hover:bg-gray-50 text-gray-700';
+        document.getElementById('nav-mod-gestion').className = mod === 'gestion' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 hover:bg-gray-50 text-gray-700';
         
         window.renderApp();
         if(window.innerWidth < 768) { 
@@ -1444,7 +1569,7 @@ window.cambiarSeccion = function(mod) {
 window.renderApp = function() { 
     try {
         const emptyState = document.getElementById('empty-state');
-        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador'].forEach(id => {
+        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador', 'module-gestion'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.add('hidden');
         });
@@ -1469,6 +1594,13 @@ window.renderApp = function() {
             window.renderPanelClientesData(clientDB, false); 
         }
         else if (currentModule === 'buscador') { window.buscarPatente(); }
+        else if (currentModule === 'gestion') { 
+            cargarConfiguracionKPI(); 
+            window.renderizarConfigKPI(); 
+            window.calcularIndicadoresAutomaticos(); 
+            window.renderizarIndicadoresAuto(); 
+            window.calcularBono(); 
+        }
     } catch(e) { 
         console.error(e); 
     }
@@ -1950,6 +2082,21 @@ window.renderConclusiones = function() {
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Fuga de Clientes</td><td class="py-2.5 font-bold text-red-500">${agg.perdedoresCount.toLocaleString('es-CL')} <button onclick="window.abrirModalFuga()" class="ml-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-[10px] font-bold transition">VER</button></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pagaron garantía sin compra</td></tr>
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Clientes Nuevos</td><td class="py-2.5 font-bold">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Adquisición pura</td></tr>
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Limpieza Datos (Falsos)</td><td class="py-2.5 font-bold text-gray-400">${falsos}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pujas internas de prueba</td></tr>
+                </tbody>
+            </table>
+        </div>`;
+
+        // SECCIÓN 4: Bonificación (NUEVO)
+        const bonoData = getBonoData();
+        html += `
+        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <div class="text-[13px] font-black mb-1">💰 Bonificación por Desempeño</div>
+            <div class="text-[12px] text-gray-500 mb-3">Cálculo basado en KPIs configurados</div>
+            <table class="w-full text-[12px]">
+                <tbody class="divide-y divide-gray-100">
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Sueldo Base</td><td class="py-2.5 font-bold">${formatMoney(bonoData.sueldoBase)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Base fija</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Bono Alcanzado</td><td class="py-2.5 font-bold text-emerald-600">${formatMoney(bonoData.bonoAlcanzado)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${bonoData.porcentaje.toFixed(1)}% del máximo (${formatMoney(bonoData.bonoMaximo)})</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Bonificación Total</td><td class="py-2.5 font-bold text-blue-600 text-lg">${formatMoney(bonoData.total)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Sueldo + Bono</td></tr>
                 </tbody>
             </table>
         </div>`;
@@ -2490,9 +2637,8 @@ window.buscarPatente = function() {
     } catch(e) {}
 };
 
-
 // ============================================================
-// FUNCIONES AUXILIARES QUE FALTABAN (v16.0 fix)
+// FUNCIONES AUXILIARES
 // ============================================================
 
 function formatMoney(n) {
@@ -3238,6 +3384,388 @@ window.iniciarProcesamiento = async function(files) {
     loadingOverlay.classList.remove('flex'); 
     loadingOverlay.classList.add('hidden');
 };
+
+// ============================================================
+// NUEVO MÓDULO: GESTIÓN DIRECTIVA (BONO)
+// ============================================================
+
+// Cargar configuración desde localStorage o usar defaults
+function cargarConfiguracionKPI() {
+    const stored = localStorage.getItem('zarate_kpi_config');
+    if (stored) {
+        try {
+            kpiConfig = JSON.parse(stored);
+            // Asegurar que todos los campos existen
+            const defaultIds = DEFAULT_KPIS.map(k => k.id);
+            kpiConfig = kpiConfig.filter(k => defaultIds.includes(k.id));
+            // Agregar los que faltan
+            DEFAULT_KPIS.forEach(def => {
+                if (!kpiConfig.find(k => k.id === def.id)) {
+                    kpiConfig.push(JSON.parse(JSON.stringify(def)));
+                }
+            });
+            // Recalcular pesos para que sumen 100
+            rebalancearPesos();
+            return;
+        } catch (e) {}
+    }
+    // Si no hay stored, usar defaults clonados
+    kpiConfig = DEFAULT_KPIS.map(k => JSON.parse(JSON.stringify(k)));
+    guardarConfiguracionKPI();
+}
+
+function guardarConfiguracionKPI() {
+    localStorage.setItem('zarate_kpi_config', JSON.stringify(kpiConfig));
+}
+
+function rebalancearPesos() {
+    const total = kpiConfig.reduce((sum, k) => sum + (k.peso || 0), 0);
+    if (total !== 100 && total > 0) {
+        // Ajustar proporcionalmente
+        kpiConfig.forEach(k => {
+            k.peso = Math.round((k.peso / total) * 100);
+        });
+        // Corregir errores de redondeo
+        let diff = 100 - kpiConfig.reduce((s, k) => s + k.peso, 0);
+        if (diff !== 0 && kpiConfig.length > 0) {
+            kpiConfig[0].peso += diff;
+        }
+    }
+}
+
+// Renderizar configuración de KPIs
+window.renderizarConfigKPI = function() {
+    const container = document.getElementById('kpi-config-container');
+    if (!container) return;
+
+    // Calcular total de pesos
+    const totalPeso = kpiConfig.reduce((s, k) => s + (k.peso || 0), 0);
+    const pesoRestante = Math.max(0, 100 - totalPeso);
+
+    let html = `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${kpiConfig.map((kpi, index) => `
+        <div class="border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition">
+            <div class="flex items-start justify-between mb-2">
+                <label class="text-[12px] font-bold text-gray-800 cursor-pointer" for="${kpi.id}">${kpi.label}</label>
+                <span class="text-[10px] font-black text-gray-400 bg-gray-100 px-2 py-0.5 rounded">${kpi.peso}%</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="text-[10px] text-gray-400 font-bold">META</span>
+                <input type="number" id="${kpi.id}_meta" value="${kpi.meta}" 
+                    class="w-16 h-7 px-2 rounded border border-gray-200 text-[11px] font-bold text-center bg-gray-50 focus:border-black outline-none" 
+                    onchange="window.actualizarMetaKPI('${kpi.id}', this.value)" step="0.1">
+                <span class="text-[10px] text-gray-400 font-bold">${kpi.tipo === 'porcentaje' ? '%' : ''}</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="text-[10px] text-gray-400 font-bold">ACTUAL</span>
+                <input type="number" id="${kpi.id}_valor" value="${kpi.valorActual}" 
+                    class="w-16 h-7 px-2 rounded border border-gray-200 text-[11px] font-bold text-center ${kpi.autoCalculado ? 'bg-emerald-50' : 'bg-gray-50'} focus:border-black outline-none ${kpi.autoCalculado ? 'text-emerald-700' : 'text-gray-800'}" 
+                    onchange="window.actualizarValorKPI('${kpi.id}', this.value)" step="0.1"
+                    ${kpi.autoCalculado ? 'readonly' : ''}>
+                <span class="text-[10px] text-gray-400 font-bold">${kpi.tipo === 'porcentaje' ? '%' : ''}</span>
+                ${kpi.autoCalculado ? '<span class="text-[9px] text-emerald-500 font-bold">auto</span>' : ''}
+            </div>
+            <div class="mt-2">
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full ${window.calcularBarraProgresoKPI(kpi)}" style="width: ${Math.min(100, (kpi.valorActual / kpi.meta) * 100)}%"></div>
+                </div>
+                <span class="text-[9px] text-gray-400 mt-0.5 block">${Math.min(100, ((kpi.valorActual / kpi.meta) * 100).toFixed(1))}% de meta</span>
+            </div>
+            <div class="flex items-center gap-1 mt-2">
+                <input type="range" min="0" max="30" value="${kpi.peso}" 
+                    class="flex-1 accent-black h-1 cursor-pointer" 
+                    oninput="window.actualizarPesoKPI('${kpi.id}', this.value)">
+                <span class="text-[10px] text-gray-400 font-bold w-8 text-right">${kpi.peso}%</span>
+            </div>
+            ${kpi._valorCalculado ? `<div class="text-[9px] text-gray-400 mt-1">${kpi._valorCalculado}</div>` : ''}
+        </div>
+        `).join('')}
+    </div>
+    <div class="mt-3 flex justify-between items-center border-t border-gray-100 pt-3">
+        <span class="text-[11px] text-gray-400 font-medium">Peso total: <span id="kpi-peso-total" class="font-bold ${totalPeso === 100 ? 'text-emerald-600' : 'text-red-500'}">${totalPeso}%</span> ${pesoRestante > 0 ? `(Faltan ${pesoRestante}%)` : ''}</span>
+        <button onclick="window.reestablecerKPIs()" class="text-[11px] text-gray-400 hover:text-red-500 transition font-medium">↺ Restablecer Defaults</button>
+    </div>
+    `;
+
+    container.innerHTML = html;
+};
+
+window.calcularBarraProgresoKPI = function(kpi) {
+    const ratio = kpi.valorActual / kpi.meta;
+    if (ratio >= 1) return 'bg-emerald-500';
+    if (ratio >= 0.75) return 'bg-blue-500';
+    if (ratio >= 0.5) return 'bg-yellow-500';
+    return 'bg-red-400';
+};
+
+window.actualizarMetaKPI = function(id, value) {
+    const kpi = kpiConfig.find(k => k.id === id);
+    if (kpi) {
+        kpi.meta = parseFloat(value) || 0;
+        guardarConfiguracionKPI();
+        window.renderizarConfigKPI();
+        window.calcularBono();
+    }
+};
+
+window.actualizarValorKPI = function(id, value) {
+    const kpi = kpiConfig.find(k => k.id === id);
+    if (kpi) {
+        kpi.valorActual = parseFloat(value) || 0;
+        guardarConfiguracionKPI();
+        window.renderizarConfigKPI();
+        window.calcularBono();
+    }
+};
+
+window.actualizarPesoKPI = function(id, value) {
+    const kpi = kpiConfig.find(k => k.id === id);
+    if (kpi) {
+        kpi.peso = parseInt(value) || 0;
+        guardarConfiguracionKPI();
+        // Rebalancear para que sumen 100
+        rebalancearPesos();
+        window.renderizarConfigKPI();
+        window.calcularBono();
+    }
+};
+
+window.reestablecerKPIs = function() {
+    if (confirm('¿Restablecer la configuración de KPIs a los valores por defecto?')) {
+        kpiConfig = DEFAULT_KPIS.map(k => JSON.parse(JSON.stringify(k)));
+        guardarConfiguracionKPI();
+        window.renderizarConfigKPI();
+        window.calcularBono();
+    }
+};
+
+// Calcular indicadores automáticos desde los datos
+window.calcularIndicadoresAutomaticos = function() {
+    const allRemates = getSelectedRemates();
+    if (!allRemates || allRemates.length === 0) return;
+
+    // 1. Crecimiento de clientes en RRSS (usamos clientes nuevos vs total)
+    const totalClientesUnicos = new Set();
+    const clientesNuevos = new Set();
+    const clientesRecurrentes = new Set();
+
+    // Procesar todos los remates
+    let allAdjudicaciones = [];
+    allRemates.forEach(r => {
+        r.adjudicaciones.forEach(a => {
+            if (!a.esFalso) {
+                allAdjudicaciones.push({ ...a, fecha: r.fechaData?.timestamp || 0, remateId: r.id });
+            }
+        });
+    });
+
+    // Ordenar por fecha
+    allAdjudicaciones.sort((a, b) => a.fecha - b.fecha);
+
+    // Identificar nuevos vs recurrentes (primera compra en el período seleccionado)
+    const clientesVistos = new Set();
+    allAdjudicaciones.forEach(a => {
+        const cliente = a.clienteReal;
+        if (!cliente) return;
+        if (!clientesVistos.has(cliente)) {
+            clientesVistos.add(cliente);
+            clientesNuevos.add(cliente);
+        } else {
+            clientesRecurrentes.add(cliente);
+        }
+        totalClientesUnicos.add(cliente);
+    });
+
+    // Calcular métricas
+    const totalUnicos = totalClientesUnicos.size;
+    const nuevos = clientesNuevos.size;
+    const recurrentes = clientesRecurrentes.size;
+    const tasaCrecimiento = totalUnicos > 0 ? (nuevos / totalUnicos) * 100 : 0;
+
+    // 2. RUTs distintos que adjudican (usamos clientes únicos)
+    const rutsDistintos = new Set();
+    allAdjudicaciones.forEach(a => {
+        if (a.rut) rutsDistintos.add(a.rut);
+    });
+    const totalRUTs = rutsDistintos.size;
+
+    // 3. Feedback positivo (no tenemos datos, dejamos como input manual)
+    // 4. Innovación (input manual)
+    // 5. Google Reviews (input manual)
+
+    // Actualizar KPIs automáticos
+    const kpiRRSS = kpiConfig.find(k => k.id === 'kpi_rrss_clientes');
+    if (kpiRRSS) {
+        // Usar la tasa de crecimiento como valor
+        kpiRRSS.valorActual = Math.round(tasaCrecimiento * 10) / 10;
+        // También guardamos el valor calculado para mostrarlo
+        kpiRRSS._valorCalculado = `+${tasaCrecimiento.toFixed(1)}% (${nuevos} nuevos de ${totalUnicos})`;
+    }
+
+    const kpiRUTS = kpiConfig.find(k => k.id === 'kpi_ruts_distintos');
+    if (kpiRUTS) {
+        // Calcular crecimiento de RUTs comparando con período anterior si es posible
+        // Simplificado: usamos el total de RUTs como indicador
+        kpiRUTS.valorActual = Math.round(totalRUTs * 10) / 10;
+        kpiRUTS._valorCalculado = `${totalRUTs} RUTs distintos`;
+    }
+
+    guardarConfiguracionKPI();
+    return { totalUnicos, nuevos, recurrentes, tasaCrecimiento, totalRUTs };
+};
+
+// Renderizar indicadores automáticos
+window.renderizarIndicadoresAuto = function() {
+    const container = document.getElementById('auto-indicators-container');
+    if (!container) return;
+
+    const allRemates = getSelectedRemates();
+    if (!allRemates || allRemates.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center text-gray-400 py-8">
+                <p class="text-sm font-medium">Selecciona matrices para ver indicadores automáticos</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Calcular métricas básicas del dashboard
+    const agg = buildAgg(allRemates);
+
+    // Calcular crecimiento de clientes
+    let clientesNuevos = 0;
+    let clientesRecurrentes = 0;
+    const clientesVistos = new Set();
+    const clientesUnicos = new Set();
+
+    // Ordenar adjudicaciones por fecha
+    let allAdj = [];
+    allRemates.forEach(r => {
+        r.adjudicaciones.forEach(a => {
+            if (!a.esFalso && a.clienteReal) {
+                allAdj.push({ ...a, fecha: r.fechaData?.timestamp || 0 });
+            }
+        });
+    });
+    allAdj.sort((a, b) => a.fecha - b.fecha);
+
+    allAdj.forEach(a => {
+        const cliente = a.clienteReal;
+        if (!cliente) return;
+        if (!clientesVistos.has(cliente)) {
+            clientesVistos.add(cliente);
+            clientesNuevos++;
+        } else {
+            clientesRecurrentes++;
+        }
+        clientesUnicos.add(cliente);
+    });
+
+    const totalClientes = clientesUnicos.size;
+    const tasaCrecimiento = totalClientes > 0 ? (clientesNuevos / totalClientes) * 100 : 0;
+
+    // Obtener valores de KPIs
+    const kpiRRSS = kpiConfig.find(k => k.id === 'kpi_rrss_clientes');
+    const kpiRUTS = kpiConfig.find(k => k.id === 'kpi_ruts_distintos');
+
+    container.innerHTML = `
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Clientes Activos</p>
+            <p class="text-xl font-black text-gray-900">${totalClientes}</p>
+            <p class="text-[10px] text-gray-400">${clientesNuevos} nuevos / ${clientesRecurrentes} recurrentes</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Crecimiento RRSS</p>
+            <p class="text-xl font-black ${tasaCrecimiento >= 5 ? 'text-emerald-600' : 'text-yellow-600'}">${tasaCrecimiento.toFixed(1)}%</p>
+            <p class="text-[10px] text-gray-400">Meta: ${kpiRRSS?.meta || 5}%</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">RUTs Distintos</p>
+            <p class="text-xl font-black text-gray-900">${kpiRUTS?.valorActual || 0}</p>
+            <p class="text-[10px] text-gray-400">Meta: ${kpiRUTS?.meta || 5}%</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Eficacia de Lotes</p>
+            <p class="text-xl font-black text-blue-600">${agg.eficaciaLotes.toFixed(1)}%</p>
+            <p class="text-[10px] text-gray-400">${agg.lotes} de ${agg.lotesDisponibles}</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Ticket Promedio</p>
+            <p class="text-xl font-black text-gray-900">${formatMoney(agg.ticketPromedio)}</p>
+            <p class="text-[10px] text-gray-400">Por lote vendido</p>
+        </div>
+    `;
+};
+
+// Calcular Bono
+window.calcularBono = function() {
+    const sueldoBase = 50000;
+    const bonoMaximo = 200000;
+    let bonoAlcanzado = 0;
+
+    // Calcular % de cumplimiento por cada KPI
+    let cumplimientoTotal = 0;
+    let pesoTotal = 0;
+
+    kpiConfig.forEach(kpi => {
+        const peso = kpi.peso || 0;
+        pesoTotal += peso;
+
+        let cumplimiento = 0;
+        if (kpi.meta > 0) {
+            cumplimiento = Math.min(1, kpi.valorActual / kpi.meta);
+        }
+        // Si es 0, no sumamos
+        if (kpi.valorActual === 0) cumplimiento = 0;
+
+        cumplimientoTotal += (cumplimiento * peso);
+    });
+
+    // Normalizar a porcentaje (0-100)
+    const porcentajeCumplimiento = pesoTotal > 0 ? (cumplimientoTotal / pesoTotal) * 100 : 0;
+    bonoAlcanzado = Math.round((porcentajeCumplimiento / 100) * bonoMaximo);
+
+    // Mostrar resultados
+    document.getElementById('bono-sueldo-base').innerText = formatMoney(sueldoBase);
+    document.getElementById('bono-monto-alcanzado').innerText = formatMoney(bonoAlcanzado);
+    document.getElementById('bono-porcentaje-alcanzado').innerText = `${porcentajeCumplimiento.toFixed(1)}% del máximo`;
+    document.getElementById('bono-total').innerText = formatMoney(sueldoBase + bonoAlcanzado);
+
+    // Actualizar también el módulo de conclusiones si está visible
+    if (currentModule === 'conclusiones') {
+        window.renderConclusiones();
+    }
+};
+
+// Función para calcular bono en conclusiones (extensión)
+function getBonoData() {
+    const sueldoBase = 50000;
+    const bonoMaximo = 200000;
+    let bonoAlcanzado = 0;
+    let cumplimientoTotal = 0;
+    let pesoTotal = 0;
+
+    kpiConfig.forEach(kpi => {
+        const peso = kpi.peso || 0;
+        pesoTotal += peso;
+        let cumplimiento = 0;
+        if (kpi.meta > 0) {
+            cumplimiento = Math.min(1, kpi.valorActual / kpi.meta);
+        }
+        cumplimientoTotal += (cumplimiento * peso);
+    });
+
+    const porcentaje = pesoTotal > 0 ? (cumplimientoTotal / pesoTotal) * 100 : 0;
+    bonoAlcanzado = Math.round((porcentaje / 100) * bonoMaximo);
+
+    return { sueldoBase, bonoMaximo, bonoAlcanzado, porcentaje, total: sueldoBase + bonoAlcanzado };
+}
+
+// ============================================================
+// FIN NUEVO MÓDULO: GESTIÓN DIRECTIVA
+// ============================================================
+
 </script>
 </body>
 </html>
