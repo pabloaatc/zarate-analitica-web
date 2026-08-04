@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zárate Analítica | Control Directivo</title>
+    <title>Zárate Analítica | Control Directivo v17.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -11,19 +11,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Roboto', sans-serif; background-color: #F3F4F6; color: #111827; -webkit-font-smoothing: antialiased; }
-        
         ::-webkit-scrollbar { width: 6px; height: 6px; } 
         ::-webkit-scrollbar-track { background: transparent; } 
         ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
-
         input[type="checkbox"] { appearance: none; background-color: #f9fafb; margin: 0; width: 1.15rem; height: 1.15rem; border: 1.5px solid #d1d5db; border-radius: 0.25rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
         input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
         input[type="checkbox"]:checked { background-color: #111827; border-color: #111827; }
         input[type="checkbox"]:checked::before { transform: scale(1); }
-
         .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
-        
+        .dragover { background-color: #E5E7EB !important; border: 2px dashed #111827 !important; }
         @media print {
             aside, header, #paraguas-bar, .no-print { display: none !important; }
             main { padding: 0 !important; background: white !important; }
@@ -33,7 +30,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v17.0 (Bonos Simplificados)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v17.1 (Retail + Carpeta)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -54,7 +51,6 @@
                     <p class="text-[12px] text-gray-500 mt-1">Control de Gestión</p>
                 </div>
             </div>
-            
             <form id="login-form" onsubmit="window.handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="text-[11px] font-semibold tracking-widest text-gray-500 uppercase">Email</label>
@@ -85,7 +81,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="flex items-center gap-3">
                 <button onclick="window.handleLogout()" class="flex items-center gap-2 text-[12px] font-medium px-3 h-8 rounded-full border border-gray-200 hover:bg-gray-50 text-gray-700 transition shadow-sm">
                     <span id="user-display-email" class="hidden sm:inline"></span> <span>Salir ✕</span>
@@ -96,23 +91,21 @@
         <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
         <div id="paraguas-bar" class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between shrink-0 z-20 no-print">
             <div class="flex flex-wrap items-center gap-2 relative">
-                
                 <div class="flex items-center gap-2">
                     <span class="text-[14px]">📊</span>
-                    <select id="macro-segment" onchange="window.aplicarCambioSegmento()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-[13px] font-medium outline-none cursor-pointer hover:bg-gray-100 transition shadow-sm text-gray-800"></select>
+                    <select id="macro-segment" onchange="window.aplicarCambioSegmento()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-[13px] font-medium outline-none cursor-pointer hover:bg-gray-100 transition shadow-sm text-gray-800">
+                        <option value="Todos">📊 Segmentos: Todos</option>
+                        <option value="Siniestrados">Siniestrados</option>
+                        <option value="Retail">Retail</option>
+                    </select>
                 </div>
-                
                 <div class="relative ml-2" id="dropdown-container">
                     <button type="button" onclick="window.toggleDropdown(event)" class="h-9 px-3 rounded-lg border border-gray-200 bg-white text-[13px] font-medium flex items-center gap-2 hover:bg-gray-50 shadow-sm text-gray-800 transition">
                         <span id="dropdown-label">📅 Cargando...</span>
                         <span class="text-[10px]">▼</span>
                     </button>
-
-                    <!-- SUPER FILTRO DE TIEMPO -->
                     <div id="dropdown-menu" onclick="event.stopPropagation()" class="hidden absolute top-[44px] left-0 w-[360px] max-w-[90vw] bg-white rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-gray-200 p-3 z-40 flex-col">
-                        
                         <div class="flex gap-1.5 mb-3" id="dropdown-years-grid"></div>
-
                         <div class="flex flex-wrap gap-1 mb-3">
                             <button type="button" onclick="window.quickSelect('TODO')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">TODO</button>
                             <button type="button" onclick="window.quickSelect('S1')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">S1</button>
@@ -123,18 +116,14 @@
                             <button type="button" onclick="window.quickSelect('Q4')" class="px-2.5 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-[11px] font-semibold text-gray-700 transition">Q4</button>
                             <button type="button" onclick="window.quickSelect('NADA')" class="px-2.5 h-6 rounded-full bg-red-50 hover:bg-red-100 text-[11px] font-semibold text-red-600 transition ml-auto border border-red-200">Limpiar</button>
                         </div>
-
                         <div class="max-h-[280px] overflow-auto space-y-2 pr-1" id="dropdown-tree"></div>
-                        
                         <button type="button" onclick="window.applyDropdown()" class="mt-3 w-full h-8 bg-[#111827] text-white rounded-lg text-[12px] font-semibold hover:bg-black transition shadow-sm">Aplicar filtros</button>
                     </div>
                 </div>
-
                 <button onclick="window.abrirModalGestor()" class="h-9 px-3 rounded-lg bg-white border border-gray-200 text-[12px] font-medium hover:bg-gray-50 items-center gap-1 shadow-sm text-gray-800 transition hidden sm:flex">
                     <span>🗂️</span> Gestor (<span id="count-matrices-btn">0</span>)
                 </button>
             </div>
-
             <div class="flex items-center shrink-0 ml-auto lg:ml-0">
                 <button onclick="window.seleccionarUltimoRemate()" class="h-9 px-3 rounded-lg bg-[#111827] text-white text-[12px] font-medium flex items-center gap-1 shadow-sm hover:bg-black transition">
                     <span>⚡</span> Último remate
@@ -151,7 +140,6 @@
                     <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Navegación</div>
                     <button onclick="window.toggleSidebar(event)" class="text-gray-400 hover:text-gray-800 p-1 bg-gray-100 rounded">✕</button>
                 </div>
-                
                 <div class="space-y-1 overflow-y-auto flex-1">
                     <button id="nav-mod-remates" onclick="window.cambiarSeccion('remates')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white"><span>📊</span> Resumen General</button>
                     <button id="nav-mod-comparativa" onclick="window.cambiarSeccion('comparativa')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>📈</span> Comparativa Histórica</button>
@@ -161,14 +149,13 @@
                     <button id="nav-mod-buscador" onclick="window.cambiarSeccion('buscador')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-4"><span>🔍</span> Buscador Global</button>
                     <button id="nav-mod-bonos" onclick="window.cambiarSeccion('bonos')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white mt-1"><span>🏆</span> Bonos de Gestión</button>
                 </div>
-
                 <div id="admin-controls" class="hidden flex-col mt-auto pt-4 border-t border-gray-100 space-y-2">
                     <div class="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
                         <div class="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2">Admin Controls</div>
                         <label for="file-input" class="w-full block text-left text-[12px] py-1.5 hover:text-blue-600 font-medium cursor-pointer transition">
-                            <span>📁</span> Carga Excel Múltiple
+                            <span>📁</span> Carga Excel Múltiple / Carpeta
                         </label>
-                        <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" onchange="window.iniciarProcesamiento(this.files)">
+                        <input type="file" id="file-input" class="hidden" multiple accept=".xlsx,.xls" webkitdirectory onchange="window.iniciarProcesamiento(this.files)">
                         <button onclick="window.limpiarBase()" class="w-full text-left text-[12px] py-1.5 text-red-500 hover:text-red-700 font-medium transition" id="btn-vaciar-base"><span>🗑️</span> Vaciar Nube DB</button>
                     </div>
                 </div>
@@ -182,6 +169,7 @@
                     <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
                     <p class="font-bold text-lg text-gray-800 tracking-tight text-center">Sin Datos Seleccionados</p>
                     <p class="text-sm text-gray-500 mt-2 text-center max-w-sm">Abre el Filtro Global o sube una matriz en Admin Controls para comenzar.</p>
+                    <p class="text-xs text-gray-400 mt-2">💡 Arrastra archivos o carpetas completas</p>
                 </div>
 
                 <!-- MODULE: REMATES -->
@@ -190,7 +178,6 @@
                         <h2 class="text-[22px] font-black tracking-tight text-gray-900" id="dash-titulo">-</h2>
                         <p class="text-[13px] text-gray-500" id="dash-subtitulo">Control operativo • 0 seleccionados</p>
                     </div>
-
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                         <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
                             <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Ticket Prom.</span><span>🏷️</span></div>
@@ -243,7 +230,26 @@
                             <div class="text-[11px] text-gray-500 font-medium">compras > 1 lote</div>
                         </div>
                     </div>
-
+                    <div id="segment-stats" class="grid grid-cols-2 gap-4 no-print">
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div class="text-[11px] font-bold uppercase tracking-widest text-gray-400">🛡️ Siniestrados</div>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <div><span class="text-[10px] text-gray-400">Venta</span><div class="text-[14px] font-bold text-emerald-600" id="dash-venta-siniestros">$0</div></div>
+                                <div><span class="text-[10px] text-gray-400">Lotes</span><div class="text-[14px] font-bold" id="dash-lotes-siniestros">0</div></div>
+                                <div><span class="text-[10px] text-gray-400">Ganadores</span><div class="text-[14px] font-bold text-emerald-700" id="dash-ganadores-siniestros">0</div></div>
+                                <div><span class="text-[10px] text-gray-400">Ticket</span><div class="text-[14px] font-bold" id="dash-ticket-siniestros">$0</div></div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div class="text-[11px] font-bold uppercase tracking-widest text-gray-400">🛒 Retail</div>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <div><span class="text-[10px] text-gray-400">Venta</span><div class="text-[14px] font-bold text-emerald-600" id="dash-venta-retail">$0</div></div>
+                                <div><span class="text-[10px] text-gray-400">Lotes</span><div class="text-[14px] font-bold" id="dash-lotes-retail">0</div></div>
+                                <div><span class="text-[10px] text-gray-400">Ganadores</span><div class="text-[14px] font-bold text-emerald-700" id="dash-ganadores-retail">0</div></div>
+                                <div><span class="text-[10px] text-gray-400">Ticket</span><div class="text-[14px] font-bold" id="dash-ticket-retail">$0</div></div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid lg:grid-cols-3 gap-4 no-print">
                         <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                             <div class="flex justify-between items-center mb-3">
@@ -261,7 +267,6 @@
                             <div class="relative h-[280px] w-full"><canvas id="dash-chartClientes"></canvas></div>
                         </div>
                     </div>
-
                     <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                         <div class="p-4 flex flex-col md:flex-row gap-3 justify-between border-b border-gray-100 bg-gray-50/50">
                             <div class="text-[12px] font-bold uppercase tracking-widest text-gray-800 flex items-center gap-2"><span>🚗</span> Lotes Detallados</div>
@@ -307,12 +312,10 @@
                             </select>
                         </div>
                     </div>
-                    
                     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
                         <div class="text-[12px] font-bold uppercase tracking-widest mb-4 text-gray-800">Evolución de Venta y Efectividad</div>
                         <div class="relative h-[300px] w-full"><canvas id="comp-chart"></canvas></div>
                     </div>
-                    
                     <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                         <div class="overflow-auto max-h-[500px]">
                             <table class="w-full text-[12px]">
@@ -391,7 +394,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
                             <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Clientes</div>
@@ -402,7 +404,6 @@
                             <div class="mt-1 text-[20px] font-black text-emerald-600" id="bi-kpi-ltv">$0</div>
                         </div>
                     </div>
-                    
                     <div class="grid lg:grid-cols-3 gap-4">
                         <div id="bi-ficha-cliente" class="lg:col-span-3 hidden bg-[#111827] text-white rounded-xl p-5 shadow-lg relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
@@ -430,7 +431,6 @@
                                 </table>
                             </div>
                         </div>
-
                         <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                             <div class="p-3 border-b border-gray-100 bg-gray-50/50"><h4 class="text-[12px] font-bold uppercase tracking-widest text-gray-800">Directorio General</h4></div>
                             <div class="overflow-auto max-h-[400px]">
@@ -507,8 +507,6 @@
                             <span class="font-bold">Bono máximo:</span> $200.000
                         </div>
                     </div>
-
-                    <!-- Resumen del Bono -->
                     <div id="bono-resumen-container" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                         <div class="bg-black text-white px-5 py-3 flex justify-between items-center">
                             <span class="font-bold text-sm">💰 Bono del Mes</span>
@@ -533,20 +531,15 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Detalle de KPIs -->
                     <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-5 py-3 border-b border-gray-100 bg-gray-50">
                             <span class="font-bold text-sm text-gray-800">📊 Detalle de KPIs</span>
                         </div>
                         <div class="p-5">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="bono-kpis-detalle">
-                                <!-- Se llena dinámicamente con JS -->
                             </div>
                         </div>
                     </div>
-
-                    <!-- Historial de Bonos -->
                     <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                             <span class="font-bold text-sm text-gray-800">📈 Historial de Bonos</span>
@@ -567,7 +560,6 @@
                                         </tr>
                                     </thead>
                                     <tbody id="bono-historial-tabla" class="divide-y divide-gray-100">
-                                        <!-- Se llena dinámicamente con JS -->
                                     </tbody>
                                 </table>
                             </div>
@@ -577,9 +569,9 @@
 
             </main>
         </div>
-    </div> <!-- FIN APP CONTENT -->
+    </div>
 
-    <!-- MODAL GESTOR MATRICES -->
+    <!-- MODALES -->
     <div id="modal-gestor" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalGestor(event)">
         <div class="bg-white w-full max-w-[720px] max-h-[90vh] rounded-[16px] shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
             <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 shrink-0">
@@ -589,16 +581,11 @@
                 </div>
                 <button onclick="window.cerrarModalGestor()" class="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-100 flex items-center justify-center transition text-gray-600">✕</button>
             </div>
-            
             <div class="p-3 border-b border-gray-100 bg-white shrink-0">
                 <input type="text" id="search-gestor" placeholder="🔍 Buscar por mes, año o nombre de matriz..." class="w-full h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-[12px] focus:outline-none focus:border-gray-400 transition" onkeyup="window.filtrarModalGestor()">
             </div>
-            
             <div id="gestor-tabs-container" class="shrink-0 bg-white border-b border-gray-100"></div>
-
-            <div class="flex-1 overflow-y-auto p-4 bg-gray-50" id="gestor-content-container">
-                <!-- Se llena con JS -->
-            </div>
+            <div class="flex-1 overflow-y-auto p-4 bg-gray-50" id="gestor-content-container"></div>
             <div class="p-4 border-t border-gray-200 bg-white shrink-0 flex justify-between items-center">
                 <div class="flex gap-2">
                     <button onclick="window.toggleGestorAll(true)" class="text-[11px] font-bold text-gray-600 hover:text-black transition">✔ Marcar Todas</button>
@@ -610,7 +597,6 @@
         </div>
     </div>
 
-    <!-- MODAL PUJAS -->
     <div id="modal-pujadores" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModal(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[480px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-5 flex justify-between items-start border-b border-gray-100 bg-gray-50 shrink-0">
@@ -645,7 +631,6 @@
         </div>
     </div>
 
-    <!-- MODAL FUGA -->
     <div id="modal-fuga" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalFuga(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[520px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-5 flex justify-between items-start border-b border-gray-100 bg-gray-50 shrink-0">
@@ -673,7 +658,6 @@
         </div>
     </div>
 
-    <!-- MODAL MULTILOTE -->
     <div id="modal-multilote" class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarModalMulti(event)">
         <div class="bg-white rounded-[16px] w-full max-w-[420px] p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-4 flex justify-between items-center border-b border-gray-100 bg-gray-50 shrink-0">
@@ -717,7 +701,7 @@ let biChartSegmentsInst = null;
 let flotaMarcasInst = null;
 let flotaAniosInst = null;
 let compChartInst = null;
-let currentModule = 'bonos'; 
+let currentModule = 'remates'; 
 let globalMapCMulti = {}; 
 let globalAgg = null;
 let currentGestorYearTab = null;
@@ -732,12 +716,12 @@ window.expandedDropMonths = new Set();
 let historialBonos = [];
 let bonoActual = null;
 
-// METAS POR REMATE (basadas en promedio × 1.5)
+// METAS POR REMATE (ajustadas para 80% de cumplimiento)
 const METAS_BONOS = {
-    ganadores: 30,   // 30 nuevos ganadores por remate
-    pujadores: 60,   // 60 nuevos pujadores por remate
-    garantes: 200,   // 200 nuevos garantes por remate
-    ventas: 5        // 5% de crecimiento en ventas
+    ganadores: 18,
+    pujadores: 42,
+    garantes: 51,
+    ventas: 5
 };
 
 // ============================================================
@@ -893,6 +877,9 @@ window.handleLogout = async function() {
     window.location.reload(); 
 };
 
+// ============================================================
+// FUNCIONES DE FORMATEO
+// ============================================================
 window.formatearNombreRemate = function(fileName, timestamp) {
     try {
         if(!fileName || typeof fileName !== 'string') fileName = "Matriz Desconocida";
@@ -914,6 +901,215 @@ window.formatearNombreRemate = function(fileName, timestamp) {
         return "Matriz"; 
     }
 };
+
+function formatMoney(n) {
+    if (n === null || n === undefined || isNaN(n)) return '$0';
+    const num = Math.round(Number(n));
+    return '$' + num.toLocaleString('es-CL');
+}
+
+window.formatExcelDate = function(ts) {
+    if (!ts || isNaN(ts)) return '-';
+    try {
+        const d = new Date(Number(ts));
+        if (isNaN(d.getTime())) return '-';
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    } catch (e) {
+        return '-';
+    }
+};
+
+function getSelectedRemates() {
+    if (!db || !db.remates || !checkedNodes) return [];
+    return db.remates.filter(r => checkedNodes.includes(r.id));
+}
+
+function normalizarCliente(nombre) {
+    if (!nombre) return '';
+    return String(nombre)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/[^A-Z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function esClienteFalso(nombre, email) {
+    if (!nombre && !email) return true;
+    const n = String(nombre || '').toLowerCase();
+    const e = String(email || '').toLowerCase();
+
+    const falsos = [
+        'zarate', 'zárate', 'prueba', 'test', 'interno', 'admin',
+        'sistema', 'demo', 'falso', 'no adjudicado', 'sin adjudicar',
+        'casa matriz', 'casa de remate', 'rematadora'
+    ];
+
+    for (const f of falsos) {
+        if (n.includes(f) || e.includes(f)) return true;
+    }
+
+    if (e.includes('@zarate') || e.includes('@remate') || e.includes('noreply') || e.includes('no-reply')) {
+        return true;
+    }
+
+    return false;
+}
+
+function extraerMarcaModelo(texto) {
+    if (!texto || typeof texto !== 'string') {
+        return { categoria: 'SIN MARCA', modeloStr: '' };
+    }
+
+    const t = texto.toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const marcas = [
+        'TOYOTA', 'CHEVROLET', 'NISSAN', 'HYUNDAI', 'KIA', 'SUZUKI',
+        'FORD', 'MAZDA', 'VOLKSWAGEN', 'VW', 'PEUGEOT', 'RENAULT',
+        'CITROEN', 'CITROËN', 'FIAT', 'JEEP', 'MITSUBISHI', 'HONDA',
+        'SUBARU', 'BMW', 'MERCEDES', 'AUDI', 'VOLVO', 'SSANGYONG',
+        'GREAT WALL', 'CHERY', 'MG', 'JAC', 'BYD',
+        'RAM', 'DODGE', 'CHRYSLER', 'ISUZU', 'MAXUS', 'DFSK',
+        'FOTON', 'HAVAL', 'GEELY', 'CHANGAN', 'DONGFENG', 'FAW',
+        'SKODA', 'SEAT', 'OPEL', 'LAND ROVER', 'JAGUAR', 'PORSCHE',
+        'MINI', 'SMART', 'DAIHATSU', 'LADA', 'PROTON', 'TATA',
+        'MAHINDRA', 'BAIC', 'GWM', 'ORA', 'ZEEKR'
+    ];
+
+    let categoria = 'OTROS';
+    let modeloStr = t;
+
+    for (const marca of marcas) {
+        if (t.includes(marca)) {
+            categoria = marca === 'VW' ? 'VOLKSWAGEN' : marca;
+            modeloStr = t.replace(new RegExp(marca, 'g'), '').replace(/\s+/g, ' ').trim();
+            break;
+        }
+    }
+
+    if (modeloStr.length > 40) {
+        modeloStr = modeloStr.substring(0, 40).trim();
+    }
+
+    if (!modeloStr) modeloStr = '';
+
+    return { categoria, modeloStr };
+}
+
+// ============================================================
+// EXTRACCIÓN DE FECHA (MEJORADO PARA RETAIL)
+// ============================================================
+function extraerFechaInfo(file, rowsAdj) {
+    let year = new Date().getFullYear();
+    let timestamp = Date.now();
+
+    const name = (file && file.name) ? file.name : '';
+
+    // 1. Buscar en el nombre del archivo: dd-mm-yyyy / dd/mm/yyyy / dd_mm_yyyy
+    let m = name.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
+    if (m) {
+        const d = parseInt(m[1], 10);
+        const mo = parseInt(m[2], 10) - 1;
+        const y = parseInt(m[3], 10);
+        if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
+            const dt = new Date(y, mo, d, 12, 0, 0);
+            if (!isNaN(dt.getTime())) {
+                return { year: y, timestamp: dt.getTime(), source: 'filename' };
+            }
+        }
+    }
+
+    // 2. Buscar en el nombre: yyyy-mm-dd
+    m = name.match(/(\d{4})[\/\-_\.](\d{1,2})[\/\-_\.](\d{1,2})/);
+    if (m) {
+        const y = parseInt(m[1], 10);
+        const mo = parseInt(m[2], 10) - 1;
+        const d = parseInt(m[3], 10);
+        if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
+            const dt = new Date(y, mo, d, 12, 0, 0);
+            if (!isNaN(dt.getTime())) {
+                return { year: y, timestamp: dt.getTime(), source: 'filename' };
+            }
+        }
+    }
+
+    // 3. Solo año en el nombre
+    m = name.match(/(20[1-3]\d)/);
+    if (m) {
+        year = parseInt(m[1], 10);
+        timestamp = new Date(year, 5, 15, 12, 0, 0).getTime();
+        return { year, timestamp, source: 'filename-year' };
+    }
+
+    // 4. Buscar en las filas del Excel (MEJORADO para Retail)
+    if (rowsAdj && Array.isArray(rowsAdj)) {
+        // Buscar en las primeras 20 filas
+        for (let i = 0; i < Math.min(rowsAdj.length, 20); i++) {
+            const row = rowsAdj[i];
+            if (!row || !Array.isArray(row)) continue;
+            for (const cell of row) {
+                if (cell === null || cell === undefined || cell === '') continue;
+
+                // 4a. Número serial de Excel
+                if (typeof cell === 'number' && cell > 40000 && cell < 60000) {
+                    const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+                    const dt = new Date(excelEpoch.getTime() + cell * 86400000);
+                    if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2015 && dt.getFullYear() <= 2035) {
+                        return { year: dt.getFullYear(), timestamp: dt.getTime(), source: 'excel-serial' };
+                    }
+                }
+
+                // 4b. String con formato YYYY-MM-DD HH:MM:SS (formato Retail)
+                const s = String(cell);
+                let dm = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+                if (dm) {
+                    const y = parseInt(dm[1], 10);
+                    const mo = parseInt(dm[2], 10) - 1;
+                    const d = parseInt(dm[3], 10);
+                    if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
+                        const dt = new Date(y, mo, d, 12, 0, 0);
+                        if (!isNaN(dt.getTime())) {
+                            return { year: y, timestamp: dt.getTime(), source: 'excel-text' };
+                        }
+                    }
+                }
+
+                // 4c. String con formato DD/MM/YYYY o DD-MM-YYYY
+                dm = s.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
+                if (dm) {
+                    const d = parseInt(dm[1], 10);
+                    const mo = parseInt(dm[2], 10) - 1;
+                    const y = parseInt(dm[3], 10);
+                    if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
+                        const dt = new Date(y, mo, d, 12, 0, 0);
+                        if (!isNaN(dt.getTime())) {
+                            return { year: y, timestamp: dt.getTime(), source: 'excel-text' };
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 5. lastModified del archivo
+    if (file && file.lastModified) {
+        const dt = new Date(file.lastModified);
+        if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2015) {
+            return { year: dt.getFullYear(), timestamp: dt.getTime(), source: 'file-mtime' };
+        }
+    }
+
+    return { year, timestamp, source: 'default' };
+}
 
 // ============================================================
 // INICIO DE LA APLICACIÓN
@@ -980,10 +1176,11 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     let segSelect = document.getElementById('macro-segment');
     let currentSeg = segSelect.value || Array.from(segments)[0];
     
+    // Mantener la selección actual si es posible
     let optionsHtml = `<option value="Todos">📊 Segmentos: Todos</option>`;
-    optionsHtml += Array.from(segments).map(s => {
-        return `<option value="${s}" ${s === currentSeg ? 'selected' : ''}>${s}</option>`;
-    }).join('');
+    segments.forEach(s => {
+        optionsHtml += `<option value="${s}" ${s === currentSeg ? 'selected' : ''}>${s}</option>`;
+    });
     
     segSelect.innerHTML = optionsHtml;
     
@@ -1013,6 +1210,9 @@ window.aplicarCambioSegmento = function() {
     window.quickSelect('TODO'); 
 }
 
+// ============================================================
+// DROPDOWN Y FILTROS
+// ============================================================
 window.toggleDropdown = function(e) {
     if(e) e.stopPropagation();
     const menu = document.getElementById('dropdown-menu');
@@ -1449,7 +1649,7 @@ window.toggleGestorRemate = function(el, id) {
 };
 
 // ============================================================
-// FUNCIONES DE AGREGACIÓN Y RENDERING
+// FUNCIONES DE AGREGACIÓN
 // ============================================================
 function buildAgg(rematesList) {
     const agg = { 
@@ -1464,6 +1664,12 @@ function buildAgg(rematesList) {
         antiguos: 0,
         ventaSiniestros: 0,
         ventaRetail: 0,
+        lotesSiniestros: 0,
+        lotesRetail: 0,
+        ganadoresSiniestros: 0,
+        ganadoresRetail: 0,
+        ticketSiniestros: 0,
+        ticketRetail: 0,
         ganadoresNuevos: 0,
         ventaGanadoresNuevos: 0,
         ventaGanadoresAntiguos: 0,
@@ -1474,6 +1680,12 @@ function buildAgg(rematesList) {
     };
     
     let uniqueGanadoresSet = new Set();
+    let ganadoresSiniestrosSet = new Set();
+    let ganadoresRetailSet = new Set();
+    let ventaSiniestros = 0;
+    let ventaRetail = 0;
+    let lotesSiniestros = 0;
+    let lotesRetail = 0;
     
     rematesList.forEach(r => {
         try {
@@ -1489,14 +1701,32 @@ function buildAgg(rematesList) {
             agg.ventaGanadoresNuevos += (Number(r.ventaNuevos) || 0);
             agg.ventaGanadoresAntiguos += (Number(r.ventaAntiguos) || 0);
             
+            // Métricas por segmento
+            if (r.tipo === 'Siniestrados') {
+                agg.ventaSiniestros += (Number(r.ventaTotal) || 0);
+                agg.lotesSiniestros += (Number(r.lotesCount) || 0);
+                ventaSiniestros += (Number(r.ventaTotal) || 0);
+                lotesSiniestros += (Number(r.lotesCount) || 0);
+            } else if (r.tipo === 'Retail') {
+                agg.ventaRetail += (Number(r.ventaTotal) || 0);
+                agg.lotesRetail += (Number(r.lotesCount) || 0);
+                ventaRetail += (Number(r.ventaTotal) || 0);
+                lotesRetail += (Number(r.lotesCount) || 0);
+            }
+            
             if(r.adjudicaciones && Array.isArray(r.adjudicaciones)) {
                 r.adjudicaciones.forEach(a => {
                     if(!a) return;
-                    let aCopy = {...a, origen: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)};
+                    let aCopy = {...a, origen: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp), tipo: r.tipo};
                     agg.adjudicaciones.push(aCopy);
                     
                     if(!a.esFalso && a.clienteReal) {
                         uniqueGanadoresSet.add(a.clienteReal);
+                        if (r.tipo === 'Siniestrados') {
+                            ganadoresSiniestrosSet.add(a.clienteReal);
+                        } else if (r.tipo === 'Retail') {
+                            ganadoresRetailSet.add(a.clienteReal);
+                        }
                     }
                     
                     if((Number(a.minimo) > 0) && (Number(a.monto) > 0) && !a.esFalso && !a.esChatarra) { 
@@ -1513,13 +1743,14 @@ function buildAgg(rematesList) {
                     }
                 }); 
             }
-            
-            if(r.tipo === 'Siniestrados') agg.ventaSiniestros += (Number(r.ventaTotal) || 0); 
-            if(r.tipo === 'Retail') agg.ventaRetail += (Number(r.ventaTotal) || 0);
         } catch(e) {}
     });
     
-    agg.ganadoresUnicosCount = uniqueGanadoresSet.size; 
+    agg.ganadoresUnicosCount = uniqueGanadoresSet.size;
+    agg.ganadoresSiniestros = ganadoresSiniestrosSet.size;
+    agg.ganadoresRetail = ganadoresRetailSet.size;
+    agg.ticketSiniestros = lotesSiniestros > 0 ? ventaSiniestros / lotesSiniestros : 0;
+    agg.ticketRetail = lotesRetail > 0 ? ventaRetail / lotesRetail : 0;
     agg.perdedoresCount = Math.max(0, agg.garantias - agg.ganadoresUnicosCount); 
     agg.conversion = agg.inscritos ? (agg.garantias / agg.inscritos * 100) : 0; 
     agg.ticketPromedio = agg.lotes ? (agg.venta / agg.lotes) : 0; 
@@ -1619,6 +1850,7 @@ window.renderDashboard = function() {
         const elSubtitulo = document.getElementById('dash-subtitulo'); 
         if(elSubtitulo) elSubtitulo.innerText = `Control operativo • ${checkedNodes.length} seleccionados`;
         
+        // KPIs principales
         try { document.getElementById('dash-kpi-ticket').innerText = formatMoney(globalAgg.ticketPromedio); } catch(e){}
         try { document.getElementById('dash-kpi-comision').innerText = formatMoney(globalAgg.comisionTotal); } catch(e){}
         try { document.getElementById('dash-kpi-venta').innerText = formatMoney(globalAgg.venta); } catch(e){}
@@ -1630,6 +1862,18 @@ window.renderDashboard = function() {
         try { document.getElementById('dash-kpi-perdedores').innerText = globalAgg.perdedoresCount.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-1racompra').innerText = globalAgg.ganadoresNuevos.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-1racompra-pct').innerText = `${globalAgg.pctVentaNuevos.toFixed(1)}%`; } catch(e){}
+        
+        // Métricas por segmento
+        try {
+            document.getElementById('dash-venta-siniestros').innerText = formatMoney(globalAgg.ventaSiniestros);
+            document.getElementById('dash-venta-retail').innerText = formatMoney(globalAgg.ventaRetail);
+            document.getElementById('dash-lotes-siniestros').innerText = globalAgg.lotesSiniestros.toLocaleString('es-CL');
+            document.getElementById('dash-lotes-retail').innerText = globalAgg.lotesRetail.toLocaleString('es-CL');
+            document.getElementById('dash-ganadores-siniestros').innerText = globalAgg.ganadoresSiniestros.toLocaleString('es-CL');
+            document.getElementById('dash-ganadores-retail').innerText = globalAgg.ganadoresRetail.toLocaleString('es-CL');
+            document.getElementById('dash-ticket-siniestros').innerText = formatMoney(globalAgg.ticketSiniestros);
+            document.getElementById('dash-ticket-retail').innerText = formatMoney(globalAgg.ticketRetail);
+        } catch(e){}
         
         try {
             const mapC = {}; 
@@ -2414,7 +2658,7 @@ window.renderConclusiones = function() {
             </table>
         </div>`;
 
-        // SECCIÓN 3: Tracción
+        // SECCIÓN 3: Tracción + Segmentos
         html += `
         <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
             <div class="text-[13px] font-black mb-1">Tracción y Audiencia</div>
@@ -2427,6 +2671,18 @@ window.renderConclusiones = function() {
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Limpieza Datos (Falsos)</td><td class="py-2.5 font-bold text-gray-400">${falsos}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pujas internas de prueba</td></tr>
                 </tbody>
             </table>
+            <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">🛡️ Siniestrados</span>
+                    <div class="mt-1 text-[13px] font-bold text-emerald-600">${formatMoney(agg.ventaSiniestros)}</div>
+                    <div class="text-[11px] text-gray-500">${agg.lotesSiniestros} lotes • ${agg.ganadoresSiniestros} ganadores</div>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">🛒 Retail</span>
+                    <div class="mt-1 text-[13px] font-bold text-emerald-600">${formatMoney(agg.ventaRetail)}</div>
+                    <div class="text-[11px] text-gray-500">${agg.lotesRetail} lotes • ${agg.ganadoresRetail} ganadores</div>
+                </div>
+            </div>
         </div>`;
 
         document.getElementById('conclusiones-content').innerHTML = html;
@@ -2457,7 +2713,6 @@ window.calcularBonos = function() {
         return;
     }
 
-    // 1. Agrupar remates por mes calendario
     const meses = agruparPorMes(allRemates);
     const mesesKeys = Object.keys(meses).sort();
 
@@ -2470,50 +2725,37 @@ window.calcularBonos = function() {
         return;
     }
 
-    // 2. Identificar clientes y su primera aparición
     const clientesInfo = identificarClientes(allRemates);
-    
-    // 3. Calcular KPIs para cada mes
     const resultadosMensuales = calcularKPIsMensuales(meses, clientesInfo, mesesKeys);
     
-    // 4. Guardar historial
     historialBonos = resultadosMensuales;
-    
-    // 5. Mostrar el mes más reciente
     const ultimoMes = resultadosMensuales[resultadosMensuales.length - 1];
     bonoActual = ultimoMes;
     
-    // 6. Renderizar UI
     renderizarBonoActual(ultimoMes);
     renderizarHistorialBonos(resultadosMensuales);
 };
 
 function agruparPorMes(remates) {
     const meses = {};
-    
     remates.forEach(r => {
         const fecha = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp) : new Date();
         const key = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
         const label = `${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
-        
         if (!meses[key]) {
             meses[key] = { key, label, remates: [], fecha: fecha.getTime(), ventaTotal: 0 };
         }
         meses[key].remates.push(r);
         meses[key].ventaTotal += (Number(r.ventaTotal) || 0);
     });
-    
     return meses;
 }
 
 function identificarClientes(remates) {
     const clientesMap = {};
-    
     const sortedRemates = [...remates].sort((a, b) => (a.fechaData?.timestamp || 0) - (b.fechaData?.timestamp || 0));
-    
     sortedRemates.forEach(r => {
         const fecha = r.fechaData?.timestamp || 0;
-        
         if (r.adjudicaciones) {
             r.adjudicaciones.forEach(a => {
                 if (!a.esFalso && a.clienteReal) {
@@ -2528,7 +2770,6 @@ function identificarClientes(remates) {
                 }
             });
         }
-        
         if (r.posturasPorLote) {
             Object.values(r.posturasPorLote).forEach(pujas => {
                 pujas.forEach(p => {
@@ -2545,7 +2786,6 @@ function identificarClientes(remates) {
                 });
             });
         }
-        
         if (r.garantiasListaDetallada) {
             r.garantiasListaDetallada.forEach(g => {
                 if (g.nombreNorm) {
@@ -2561,7 +2801,6 @@ function identificarClientes(remates) {
             });
         }
     });
-    
     return clientesMap;
 }
 
@@ -2607,7 +2846,6 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
             }
         });
         
-        // Nuevos Ganadores = clientes nuevos que adjudican en este mes
         const nuevosGanadores = new Set();
         const nuevosPujadores = new Set();
         const nuevosGarantes = new Set();
@@ -2638,7 +2876,6 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
             }
         });
         
-        // Calcular por remate
         const ganadoresPorRemate = numRemates > 0 ? nuevosGanadores.size / numRemates : 0;
         const pujadoresPorRemate = numRemates > 0 ? nuevosPujadores.size / numRemates : 0;
         const garantesPorRemate = numRemates > 0 ? nuevosGarantes.size / numRemates : 0;
@@ -2661,13 +2898,10 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
         
         if (index > 0) {
             const mesAnterior = resultados[index - 1];
-            
-            // Crecimiento de ventas
             const crecimientoVentas = mesAnterior.ventaTotal > 0 
                 ? ((resultado.ventaTotal - mesAnterior.ventaTotal) / mesAnterior.ventaTotal) * 100 
                 : 0;
             
-            // Evaluar KPIs
             resultado.kpis = {
                 ganadores: { 
                     valor: ganadoresPorRemate, 
@@ -2764,15 +2998,11 @@ function formatMoneyNumber(n) {
 
 function renderizarHistorialBonos(resultados) {
     const tbody = document.getElementById('bono-historial-tabla');
-    
     if (!resultados || resultados.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400">Sin datos históricos</td></tr>`;
         return;
     }
-    
-    // Mostrar últimos 6 meses o todos
     const historial = resultados.slice(-6);
-    
     tbody.innerHTML = historial.map(m => `
         <tr class="hover:bg-gray-50 transition">
             <td class="px-3 py-2 font-medium text-gray-900">${m.mes}</td>
@@ -2799,236 +3029,8 @@ function renderizarHistorialBonos(resultados) {
 }
 
 // ============================================================
-// FUNCIONES AUXILIARES
+// PROCESAMIENTO DE EXCEL (PARSE) - MEJORADO PARA RETAIL
 // ============================================================
-function formatMoney(n) {
-    if (n === null || n === undefined || isNaN(n)) return '$0';
-    const num = Math.round(Number(n));
-    return '$' + num.toLocaleString('es-CL');
-}
-
-window.formatExcelDate = function(ts) {
-    if (!ts || isNaN(ts)) return '-';
-    try {
-        const d = new Date(Number(ts));
-        if (isNaN(d.getTime())) return '-';
-        const dd = String(d.getDate()).padStart(2, '0');
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const yyyy = d.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
-    } catch (e) {
-        return '-';
-    }
-};
-
-function getSelectedRemates() {
-    if (!db || !db.remates || !checkedNodes) return [];
-    return db.remates.filter(r => checkedNodes.includes(r.id));
-}
-
-function normalizarCliente(nombre) {
-    if (!nombre) return '';
-    return String(nombre)
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toUpperCase()
-        .replace(/[^A-Z0-9\s]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-}
-
-function esClienteFalso(nombre, email) {
-    if (!nombre && !email) return true;
-    const n = String(nombre || '').toLowerCase();
-    const e = String(email || '').toLowerCase();
-
-    const falsos = [
-        'zarate', 'zárate', 'prueba', 'test', 'interno', 'admin',
-        'sistema', 'demo', 'falso', 'no adjudicado', 'sin adjudicar',
-        'casa matriz', 'casa de remate', 'rematadora'
-    ];
-
-    for (const f of falsos) {
-        if (n.includes(f) || e.includes(f)) return true;
-    }
-
-    if (e.includes('@zarate') || e.includes('@remate') || e.includes('noreply') || e.includes('no-reply')) {
-        return true;
-    }
-
-    return false;
-}
-
-function extraerMarcaModelo(texto) {
-    if (!texto || typeof texto !== 'string') {
-        return { categoria: 'SIN MARCA', modeloStr: '' };
-    }
-
-    const t = texto.toUpperCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^A-Z0-9\s]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-    const marcas = [
-        'TOYOTA', 'CHEVROLET', 'NISSAN', 'HYUNDAI', 'KIA', 'SUZUKI',
-        'FORD', 'MAZDA', 'VOLKSWAGEN', 'VW', 'PEUGEOT', 'RENAULT',
-        'CITROEN', 'CITROËN', 'FIAT', 'JEEP', 'MITSUBISHI', 'HONDA',
-        'SUBARU', 'BMW', 'MERCEDES', 'AUDI', 'VOLVO', 'SSANGYONG',
-        'GREAT WALL', 'CHERY', 'MG', 'JAC', 'BYD',
-        'RAM', 'DODGE', 'CHRYSLER', 'ISUZU', 'MAXUS', 'DFSK',
-        'FOTON', 'HAVAL', 'GEELY', 'CHANGAN', 'DONGFENG', 'FAW',
-        'SKODA', 'SEAT', 'OPEL', 'LAND ROVER', 'JAGUAR', 'PORSCHE',
-        'MINI', 'SMART', 'DAIHATSU', 'LADA', 'PROTON', 'TATA',
-        'MAHINDRA', 'BAIC', 'GWM', 'ORA', 'ZEEKR'
-    ];
-
-    let categoria = 'OTROS';
-    let modeloStr = t;
-
-    for (const marca of marcas) {
-        if (t.includes(marca)) {
-            categoria = marca === 'VW' ? 'VOLKSWAGEN' : marca;
-            modeloStr = t.replace(new RegExp(marca, 'g'), '').replace(/\s+/g, ' ').trim();
-            break;
-        }
-    }
-
-    if (modeloStr.length > 40) {
-        modeloStr = modeloStr.substring(0, 40).trim();
-    }
-
-    if (!modeloStr) modeloStr = '';
-
-    return { categoria, modeloStr };
-}
-
-function extraerFechaInfo(file, rowsAdj) {
-    let year = new Date().getFullYear();
-    let timestamp = Date.now();
-
-    const name = (file && file.name) ? file.name : '';
-
-    let m = name.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
-    if (m) {
-        const d = parseInt(m[1], 10);
-        const mo = parseInt(m[2], 10) - 1;
-        const y = parseInt(m[3], 10);
-        if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
-            const dt = new Date(y, mo, d, 12, 0, 0);
-            if (!isNaN(dt.getTime())) {
-                return { year: y, timestamp: dt.getTime(), source: 'filename' };
-            }
-        }
-    }
-
-    m = name.match(/(\d{4})[\/\-_\.](\d{1,2})[\/\-_\.](\d{1,2})/);
-    if (m) {
-        const y = parseInt(m[1], 10);
-        const mo = parseInt(m[2], 10) - 1;
-        const d = parseInt(m[3], 10);
-        if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
-            const dt = new Date(y, mo, d, 12, 0, 0);
-            if (!isNaN(dt.getTime())) {
-                return { year: y, timestamp: dt.getTime(), source: 'filename' };
-            }
-        }
-    }
-
-    m = name.match(/(20[1-3]\d)/);
-    if (m) {
-        year = parseInt(m[1], 10);
-        timestamp = new Date(year, 5, 15, 12, 0, 0).getTime();
-        return { year, timestamp, source: 'filename-year' };
-    }
-
-    if (rowsAdj && Array.isArray(rowsAdj)) {
-        for (let i = 0; i < Math.min(rowsAdj.length, 15); i++) {
-            const row = rowsAdj[i];
-            if (!row || !Array.isArray(row)) continue;
-            for (const cell of row) {
-                if (cell === null || cell === undefined || cell === '') continue;
-
-                if (typeof cell === 'number' && cell > 40000 && cell < 60000) {
-                    const excelEpoch = new Date(Date.UTC(1899, 11, 30));
-                    const dt = new Date(excelEpoch.getTime() + cell * 86400000);
-                    if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2015 && dt.getFullYear() <= 2035) {
-                        return { year: dt.getFullYear(), timestamp: dt.getTime(), source: 'excel-serial' };
-                    }
-                }
-
-                const s = String(cell);
-                let dm = s.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
-                if (dm) {
-                    const d = parseInt(dm[1], 10);
-                    const mo = parseInt(dm[2], 10) - 1;
-                    const y = parseInt(dm[3], 10);
-                    if (y >= 2015 && y <= 2035 && mo >= 0 && mo <= 11 && d >= 1 && d <= 31) {
-                        const dt = new Date(y, mo, d, 12, 0, 0);
-                        if (!isNaN(dt.getTime())) {
-                            return { year: y, timestamp: dt.getTime(), source: 'excel-text' };
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (file && file.lastModified) {
-        const dt = new Date(file.lastModified);
-        if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2015) {
-            return { year: dt.getFullYear(), timestamp: dt.getTime(), source: 'file-mtime' };
-        }
-    }
-
-    return { year, timestamp, source: 'default' };
-}
-
-// ============================================================
-// PROCESAMIENTO DE EXCEL Y CARGA DE DATOS
-// ============================================================
-window.limpiarBase = async function() {
-    if (!confirm('¿Estás seguro de vaciar TODA la base de datos en la nube? Esta acción no se puede deshacer.')) {
-        return;
-    }
-
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const loadingText = document.getElementById('loading-text');
-    loadingOverlay.classList.remove('hidden');
-    loadingOverlay.classList.add('flex');
-    loadingText.innerText = 'Vaciando base de datos...';
-
-    try {
-        const { error } = await supabaseClient
-            .from('app_state')
-            .delete()
-            .neq('id', 0);
-
-        if (error) throw error;
-
-        db = { remates: [] };
-        checkedNodes = [];
-        clientDB = [];
-        window.globalSelectedYears = [];
-
-        document.getElementById('db-status').innerHTML =
-            '<span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Base Vacía';
-
-        window.actualizarFiltrosGlobales();
-        window.actualizarEstadoApp();
-
-        alert('Base de datos vaciada correctamente.');
-    } catch (e) {
-        alert('Error al vaciar la base: ' + e.message);
-        document.getElementById('db-status').innerHTML =
-            '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
-    } finally {
-        loadingOverlay.classList.add('hidden');
-        loadingOverlay.classList.remove('flex');
-    }
-};
-
 window.parseExcel = function(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -3042,7 +3044,24 @@ window.parseExcel = function(file) {
                 const rowsAdj = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
 
                 let fechaData = extraerFechaInfo(file, rowsAdj);
-                let tipo = file.name.toLowerCase().includes('retail') ? 'Retail' : 'Siniestrados';
+                
+                // DETECCIÓN MEJORADA DE RETAIL
+                let tipo = 'Siniestrados';
+                // Buscar en la primera columna de las primeras filas si contiene "RETAIL"
+                for (let i = 0; i < Math.min(rowsAdj.length, 10); i++) {
+                    const row = rowsAdj[i];
+                    if (row && row.length > 0 && row[0]) {
+                        const cellStr = String(row[0]).toUpperCase();
+                        if (cellStr.includes('RETAIL')) {
+                            tipo = 'Retail';
+                            break;
+                        }
+                    }
+                }
+                // Si no se encontró en los datos, buscar en el nombre del archivo
+                if (tipo === 'Siniestrados' && file.name.toLowerCase().includes('retail')) {
+                    tipo = 'Retail';
+                }
 
                 let maxScore = 0;
                 let headerIdx = 0;
@@ -3199,6 +3218,7 @@ window.parseExcel = function(file) {
 
                 remate.lotesDisponibles = lotesSet.size > 0 ? lotesSet.size : remate.adjudicaciones.length;
 
+                // PESTAÑA GARANTÍAS
                 let sheetGarantiasName = workbook.SheetNames.find(s => String(s).toLowerCase() === 'garantías' || String(s).toLowerCase() === 'garantias');
                 if (sheetGarantiasName) {
                     try {
@@ -3252,6 +3272,7 @@ window.parseExcel = function(file) {
                     remate.garantias = remate.garantiasListaDetallada.length;
                 }
 
+                // PESTAÑA POSTURAS (PUJAS)
                 let sheetPosturasName = workbook.SheetNames.find(s => String(s).toLowerCase().includes('posturas') || String(s).toLowerCase().includes('pujas'));
                 if (sheetPosturasName) {
                     try {
@@ -3357,6 +3378,9 @@ window.parseExcel = function(file) {
     });
 }
 
+// ============================================================
+// CARGA DE ARCHIVOS (SOPORTE PARA CARPETA)
+// ============================================================
 const dropZone = document.getElementById('drop-zone');
 
 document.body.addEventListener('dragover', e => {
@@ -3414,6 +3438,8 @@ function traverseFileTree(item, filesArray) {
                 }); 
             }; 
             readEntries(); 
+        } else { 
+            resolve(); 
         } 
     }); 
 }
@@ -3536,6 +3562,50 @@ window.iniciarProcesamiento = async function(files) {
     window.actualizarEstadoApp();
     loadingOverlay.classList.remove('flex'); 
     loadingOverlay.classList.add('hidden');
+};
+
+// ============================================================
+// VACIAR BASE DE DATOS
+// ============================================================
+window.limpiarBase = async function() {
+    if (!confirm('¿Estás seguro de vaciar TODA la base de datos en la nube? Esta acción no se puede deshacer.')) {
+        return;
+    }
+
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.classList.add('flex');
+    loadingText.innerText = 'Vaciando base de datos...';
+
+    try {
+        const { error } = await supabaseClient
+            .from('app_state')
+            .delete()
+            .neq('id', 0);
+
+        if (error) throw error;
+
+        db = { remates: [] };
+        checkedNodes = [];
+        clientDB = [];
+        window.globalSelectedYears = [];
+
+        document.getElementById('db-status').innerHTML =
+            '<span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Base Vacía';
+
+        window.actualizarFiltrosGlobales();
+        window.actualizarEstadoApp();
+
+        alert('Base de datos vaciada correctamente.');
+    } catch (e) {
+        alert('Error al vaciar la base: ' + e.message);
+        document.getElementById('db-status').innerHTML =
+            '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
+    } finally {
+        loadingOverlay.classList.add('hidden');
+        loadingOverlay.classList.remove('flex');
+    }
 };
 
 // ============================================================
@@ -3732,6 +3802,41 @@ window.filtrarLotesMain = function() {
     }
 };
 
+// ============================================================
+// SORT TABLE (helper)
+// ============================================================
+window.sortTable = function(th, type) {
+    const table = th.closest('table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const index = Array.from(th.parentElement.children).indexOf(th);
+    const isAsc = th.dataset.asc === 'true' ? false : true;
+    th.dataset.asc = isAsc;
+    
+    const getValue = (row, idx) => {
+        const cell = row.querySelectorAll('td')[idx];
+        if (!cell) return '';
+        let val = cell.textContent.trim();
+        if (type === 'number' || type === 'money') {
+            val = parseFloat(val.replace(/[^0-9.-]/g, '')) || 0;
+        } else if (type === 'percent') {
+            val = parseFloat(val.replace('%', '')) || 0;
+        }
+        return val;
+    };
+    
+    rows.sort((a, b) => {
+        let va = getValue(a, index);
+        let vb = getValue(b, index);
+        if (typeof va === 'number' && typeof vb === 'number') {
+            return isAsc ? va - vb : vb - va;
+        }
+        return isAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+    });
+    
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+};
 </script>
 </body>
 </html>
