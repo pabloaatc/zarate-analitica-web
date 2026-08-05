@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zárate Analítica | Control Directivo v17.1</title>
+    <title>Zárate Analítica | Control Directivo v18.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -21,6 +21,15 @@
         input[type="checkbox"]:checked::before { transform: scale(1); }
         .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
         .dragover { background-color: #E5E7EB !important; border: 2px dashed #111827 !important; }
+        .tab-active { background-color: #111827; color: white; border-color: #111827; }
+        .tab-inactive { background-color: #f3f4f6; color: #4b5563; border-color: #d1d5db; }
+        .tab-inactive:hover { background-color: #e5e7eb; }
+        .badge-frecuente { background-color: #111827; color: white; }
+        .badge-recurrente { background-color: #3b82f6; color: white; }
+        .badge-nuevo { background-color: #10b981; color: white; }
+        .badge-riesgo { background-color: #ef4444; color: white; }
+        .badge-hybrid { background-color: #8b5cf6; color: white; }
+        .tooltip-trigger { cursor: help; border-bottom: 1px dashed #9ca3af; }
         @media print {
             aside, header, #paraguas-bar, .no-print { display: none !important; }
             main { padding: 0 !important; background: white !important; }
@@ -30,7 +39,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative" id="drop-zone" onclick="window.closeMenus(event)">
 
-    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v17.1 (Retail + Carpeta)</div>
+    <div class="fixed bottom-2 right-3 text-[10px] text-gray-400 font-mono z-50 pointer-events-none no-print tracking-wider">v18.0 (Latentes + Feedback + Retail)</div>
 
     <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-[200] flex-col items-center justify-center transition-all hidden">
@@ -143,11 +152,12 @@
                 <div class="space-y-1 overflow-y-auto flex-1">
                     <button id="nav-mod-remates" onclick="window.cambiarSeccion('remates')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white"><span>📊</span> Resumen General</button>
                     <button id="nav-mod-comparativa" onclick="window.cambiarSeccion('comparativa')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>📈</span> Comparativa Histórica</button>
-                    <button id="nav-mod-autos" onclick="window.cambiarSeccion('autos')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>🚗</span> Análisis Vehicular</button>
+                    <button id="nav-mod-productos" onclick="window.cambiarSeccion('productos')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>📦</span> Análisis de Productos</button>
                     <button id="nav-mod-clientes" onclick="window.cambiarSeccion('clientes')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>👥</span> Gestión de Clientes</button>
                     <button id="nav-mod-conclusiones" onclick="window.cambiarSeccion('conclusiones')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700"><span>📄</span> Datos</button>
                     <button id="nav-mod-buscador" onclick="window.cambiarSeccion('buscador')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-4"><span>🔍</span> Buscador Global</button>
-                    <button id="nav-mod-bonos" onclick="window.cambiarSeccion('bonos')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white mt-1"><span>🏆</span> Bonos de Gestión</button>
+                    <button id="nav-mod-bonos" onclick="window.cambiarSeccion('bonos')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1"><span>🏆</span> Bonos de Gestión</button>
+                    <button id="nav-mod-feedback" onclick="window.cambiarSeccion('feedback')" class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1"><span>💬</span> Feedback</button>
                 </div>
                 <div id="admin-controls" class="hidden flex-col mt-auto pt-4 border-t border-gray-100 space-y-2">
                     <div class="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
@@ -215,9 +225,9 @@
                             <div class="text-[11px] text-gray-500 font-medium">clientes únicos</div>
                         </div>
                         <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Perdedores</span><span>🏃</span></div>
-                            <div class="mt-1 text-[18px] font-black text-red-500" id="dash-kpi-perdedores">0</div>
-                            <div class="text-[11px] text-gray-500 font-medium">sin adjudicación</div>
+                            <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Conversión</span><span>🎯</span></div>
+                            <div class="mt-1 text-[18px] font-black text-purple-600" id="dash-kpi-conversion">0%</div>
+                            <div class="text-[11px] text-gray-500 font-medium">garantías→ganadores</div>
                         </div>
                         <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
                             <div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">1ra Compra</span><span>🌟</span></div>
@@ -335,58 +345,99 @@
                     </div>
                 </div>
 
-                <!-- MODULE: MODELOS Y VEHICULOS -->
-                <div id="module-autos" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
+                <!-- MODULE: ANÁLISIS DE PRODUCTOS (ex-Análisis Vehicular) -->
+                <div id="module-productos" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
-                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">Análisis Vehicular</h2>
-                            <p class="text-[13px] text-gray-500 mt-1">Flota, marcas y modelos adjudicados</p>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">📦 Análisis de Productos</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Análisis por segmento: Siniestrados y Retail</p>
                         </div>
                         <div class="relative">
                             <span class="absolute left-2.5 top-2.5 text-[12px] opacity-50">🔍</span>
-                            <input type="text" id="search-flota" placeholder="Buscar vehículo, marca..." class="h-9 pl-8 pr-3 rounded-lg border border-gray-200 bg-white text-[13px] w-[280px] shadow-sm outline-none" onkeyup="window.renderPanelAutos()">
+                            <input type="text" id="search-productos" placeholder="Buscar producto, categoría..." class="h-9 pl-8 pr-3 rounded-lg border border-gray-200 bg-white text-[13px] w-[280px] shadow-sm outline-none" onkeyup="window.renderPanelProductos()">
                         </div>
                     </div>
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                            <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Top Marcas</div>
-                            <div class="relative h-[240px] w-full"><canvas id="flota-marcas-chart"></canvas></div>
+                    
+                    <!-- TABS: Siniestrados / Retail -->
+                    <div class="flex gap-2 border-b border-gray-200">
+                        <button id="tab-siniestrados" onclick="window.switchProductosTab('siniestrados')" class="px-4 py-2 rounded-t-lg text-[13px] font-medium transition tab-active">🚗 Siniestrados</button>
+                        <button id="tab-retail" onclick="window.switchProductosTab('retail')" class="px-4 py-2 rounded-t-lg text-[13px] font-medium transition tab-inactive">🛒 Retail</button>
+                    </div>
+
+                    <!-- CONTENIDO SINIESTRADOS -->
+                    <div id="productos-siniestrados" class="space-y-4">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                                <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Top Marcas</div>
+                                <div class="relative h-[240px] w-full"><canvas id="flota-marcas-chart"></canvas></div>
+                            </div>
+                            <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                                <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Top Modelos</div>
+                                <div class="relative h-[240px] w-full"><canvas id="flota-modelos-chart"></canvas></div>
+                            </div>
                         </div>
-                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                            <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Top Modelos</div>
-                            <div class="relative h-[240px] w-full"><canvas id="flota-modelos-chart"></canvas></div>
+                        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="overflow-auto max-h-[500px]">
+                                <table class="w-full text-[12px]">
+                                    <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 shadow-sm text-gray-500">
+                                        <tr class="text-left">
+                                            <th class="px-4 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
+                                            <th class="px-3 py-3 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
+                                            <th class="px-3 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Producto ↕️</th>
+                                            <th class="px-3 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
+                                            <th class="px-4 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productos-tabla-siniestrados" class="divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                        <div class="overflow-auto max-h-[500px]">
-                            <table class="w-full text-[12px]">
-                                <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 shadow-sm text-gray-500">
-                                    <tr class="text-left">
-                                        <th class="px-4 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
-                                        <th class="px-3 py-3 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
-                                        <th class="px-3 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Vehículo Extraído ↕️</th>
-                                        <th class="px-3 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
-                                        <th class="px-4 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="flota-tabla-resultados" class="divide-y divide-gray-100"></tbody>
-                            </table>
+
+                    <!-- CONTENIDO RETAIL -->
+                    <div id="productos-retail" class="hidden space-y-4">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                                <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Top Categorías</div>
+                                <div class="relative h-[240px] w-full"><canvas id="retail-categorias-chart"></canvas></div>
+                            </div>
+                            <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                                <div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-center text-gray-800">Top Sub-Categorías</div>
+                                <div class="relative h-[240px] w-full"><canvas id="retail-subcategorias-chart"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="overflow-auto max-h-[500px]">
+                                <table class="w-full text-[12px]">
+                                    <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 shadow-sm text-gray-500">
+                                        <tr class="text-left">
+                                            <th class="px-4 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Matriz ↕️</th>
+                                            <th class="px-3 py-3 font-bold cursor-pointer text-center hover:text-black transition" onclick="window.sortTable(this, 'number')">Lote ↕️</th>
+                                            <th class="px-3 py-3 font-bold cursor-pointer hover:text-black transition" onclick="window.sortTable(this, 'string')">Producto / Categoría ↕️</th>
+                                            <th class="px-3 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Mínimo ↕️</th>
+                                            <th class="px-4 py-3 font-bold cursor-pointer text-right hover:text-black transition" onclick="window.sortTable(this, 'money')">Adjudicado ↕️</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productos-tabla-retail" class="divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- MODULE: CLIENTES -->
+                <!-- MODULE: GESTIÓN DE CLIENTES -->
                 <div id="module-clientes" class="hidden space-y-5 max-w-[1200px] mx-auto transition-all duration-200">
                     <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
                         <div>
-                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">Gestión de Clientes</h2>
-                            <p class="text-[13px] text-gray-500 mt-1">Directorio y segmentación</p>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">👥 Gestión de Clientes</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Directorio, segmentación y clientes latentes</p>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap gap-2">
                             <select id="filter-client-type" class="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] shadow-sm outline-none" onchange="window.filtrarClientes()">
                                 <option value="todos">Todos los segmentos</option>
                                 <option value="siniestrados">Solo Siniestros</option>
                                 <option value="retail">Solo Retail</option>
+                                <option value="ambos">🔄 Ambos segmentos</option>
                             </select>
                             <div class="relative">
                                 <span class="absolute left-2.5 top-2.5 text-[12px] opacity-50">🔍</span>
@@ -394,7 +445,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
+
+                    <!-- LEYENDA DE SEGMENTOS -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex flex-wrap items-center gap-4 text-[11px] no-print">
+                        <span class="font-bold text-gray-700">📊 Segmentos:</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-black"></span> Frecuente (+3 compras, activo)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Recurrente (2-3 compras, activo)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Nuevo (1 compra, activo)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500"></span> En Riesgo (inactivo 60+ días)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-purple-500"></span> Híbrido (compra en ambos segmentos)</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
                             <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Clientes</div>
                             <div class="mt-1 text-[20px] font-black text-gray-900" id="bi-kpi-total">0</div>
@@ -403,7 +465,45 @@
                             <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Prom.</div>
                             <div class="mt-1 text-[20px] font-black text-emerald-600" id="bi-kpi-ltv">$0</div>
                         </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Clientes Híbridos</div>
+                            <div class="mt-1 text-[20px] font-black text-purple-600" id="bi-kpi-hybrid">0</div>
+                            <div class="text-[10px] text-gray-400" id="bi-kpi-hybrid-pct">0% del total</div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Clientes Latentes</div>
+                            <div class="mt-1 text-[20px] font-black text-amber-600" id="bi-kpi-latentes">0</div>
+                            <div class="text-[10px] text-gray-400">Pagaron garantía sin comprar</div>
+                        </div>
                     </div>
+
+                    <!-- CLIENTES LATENTES (NUEVO) -->
+                    <div id="bi-latentes-container" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                            <span class="font-bold text-sm text-gray-800">📋 Clientes Latentes</span>
+                            <div class="flex gap-2">
+                                <button onclick="window.exportarLatentesExcel()" class="h-8 px-3 bg-[#111827] text-white rounded-lg text-[11px] font-bold hover:bg-black transition shadow-sm flex items-center gap-1">
+                                    <span>📤</span> Exportar Excel
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-auto max-h-[300px]">
+                            <table class="w-full text-[12px]">
+                                <thead class="sticky top-0 bg-gray-50 border-b border-gray-200 text-gray-500 shadow-sm">
+                                    <tr class="text-left">
+                                        <th class="px-4 py-2.5 font-bold">Cliente</th>
+                                        <th class="px-3 py-2.5 font-bold">RUT</th>
+                                        <th class="px-3 py-2.5 font-bold hidden sm:table-cell">Email</th>
+                                        <th class="px-3 py-2.5 font-bold text-center">Última Garantía</th>
+                                        <th class="px-3 py-2.5 font-bold text-right">Monto</th>
+                                        <th class="px-4 py-2.5 font-bold text-center">Intentos</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bi-tabla-latentes" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                     <div class="grid lg:grid-cols-3 gap-4">
                         <div id="bi-ficha-cliente" class="lg:col-span-3 hidden bg-[#111827] text-white rounded-xl p-5 shadow-lg relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
@@ -431,6 +531,7 @@
                                 </table>
                             </div>
                         </div>
+
                         <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                             <div class="p-3 border-b border-gray-100 bg-gray-50/50"><h4 class="text-[12px] font-bold uppercase tracking-widest text-gray-800">Directorio General</h4></div>
                             <div class="overflow-auto max-h-[400px]">
@@ -567,6 +668,57 @@
                     </div>
                 </div>
 
+                <!-- MODULE: FEEDBACK (CHAT) -->
+                <div id="module-feedback" class="hidden space-y-5 max-w-[1000px] mx-auto transition-all duration-200">
+                    <div class="flex flex-wrap items-end justify-between gap-3 border-b border-gray-200 pb-4 no-print">
+                        <div>
+                            <h2 class="text-[22px] font-black tracking-tight text-gray-900">💬 Feedback de Usuarios</h2>
+                            <p class="text-[13px] text-gray-500 mt-1">Mensajes del chat de usuarios durante los remates</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="window.exportarFeedbackExcel()" class="h-9 px-4 bg-[#111827] text-white rounded-lg text-[12px] font-bold hover:bg-black transition shadow-sm flex items-center gap-1">
+                                <span>📤</span> Exportar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex flex-wrap gap-3 items-center no-print">
+                        <div class="relative">
+                            <span class="absolute left-2.5 top-2.5 text-[12px] opacity-50">🔍</span>
+                            <input type="text" id="search-feedback" placeholder="Buscar en mensajes..." class="h-9 pl-8 pr-3 rounded-lg border border-gray-200 bg-white text-[13px] w-[200px] shadow-sm outline-none" onkeyup="window.filtrarFeedback()">
+                        </div>
+                        <select id="filter-feedback-usuario" onchange="window.filtrarFeedback()" class="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] shadow-sm outline-none">
+                            <option value="todos">Todos los usuarios</option>
+                        </select>
+                        <div class="flex items-center gap-2 ml-auto">
+                            <span class="text-[11px] text-gray-400">Total mensajes:</span>
+                            <span class="font-bold text-gray-900" id="feedback-total-msg">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Timeline de mensajes -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="overflow-auto max-h-[500px]">
+                            <div id="feedback-timeline" class="divide-y divide-gray-100">
+                                <!-- Se llena con JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Análisis rápido -->
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div class="text-[12px] font-bold uppercase tracking-widest mb-2 text-gray-800">📊 Usuarios más activos</div>
+                            <div id="feedback-top-usuarios" class="space-y-1"></div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                            <div class="text-[12px] font-bold uppercase tracking-widest mb-2 text-gray-800">⚠️ Palabras clave recurrentes</div>
+                            <div id="feedback-top-palabras" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -692,6 +844,8 @@ let sessionUser = null;
 let db = { remates: [] };
 let checkedNodes = []; 
 let clientDB = []; 
+let clientesLatentes = [];
+let feedbackMessages = [];
 let currentModalPujas = []; 
 let currentAdjudicadoModal = null; 
 let currentFiltroModal = 'todos';
@@ -700,11 +854,14 @@ let dashChartClientesInst = null;
 let biChartSegmentsInst = null;
 let flotaMarcasInst = null;
 let flotaAniosInst = null;
+let retailCategoriasInst = null;
+let retailSubcategoriasInst = null;
 let compChartInst = null;
 let currentModule = 'remates'; 
 let globalMapCMulti = {}; 
 let globalAgg = null;
 let currentGestorYearTab = null;
+let currentProductosTab = 'siniestrados';
 
 // ESTADO FILTRO GLOBAL
 window.globalSelectedYears = [];
@@ -716,7 +873,6 @@ window.expandedDropMonths = new Set();
 let historialBonos = [];
 let bonoActual = null;
 
-// METAS POR REMATE (ajustadas para 80% de cumplimiento)
 const METAS_BONOS = {
     ganadores: 18,
     pujadores: 42,
@@ -1014,7 +1170,6 @@ function extraerFechaInfo(file, rowsAdj) {
 
     const name = (file && file.name) ? file.name : '';
 
-    // 1. Buscar en el nombre del archivo: dd-mm-yyyy / dd/mm/yyyy / dd_mm_yyyy
     let m = name.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
     if (m) {
         const d = parseInt(m[1], 10);
@@ -1028,7 +1183,6 @@ function extraerFechaInfo(file, rowsAdj) {
         }
     }
 
-    // 2. Buscar en el nombre: yyyy-mm-dd
     m = name.match(/(\d{4})[\/\-_\.](\d{1,2})[\/\-_\.](\d{1,2})/);
     if (m) {
         const y = parseInt(m[1], 10);
@@ -1042,7 +1196,6 @@ function extraerFechaInfo(file, rowsAdj) {
         }
     }
 
-    // 3. Solo año en el nombre
     m = name.match(/(20[1-3]\d)/);
     if (m) {
         year = parseInt(m[1], 10);
@@ -1050,16 +1203,13 @@ function extraerFechaInfo(file, rowsAdj) {
         return { year, timestamp, source: 'filename-year' };
     }
 
-    // 4. Buscar en las filas del Excel (MEJORADO para Retail)
     if (rowsAdj && Array.isArray(rowsAdj)) {
-        // Buscar en las primeras 20 filas
         for (let i = 0; i < Math.min(rowsAdj.length, 20); i++) {
             const row = rowsAdj[i];
             if (!row || !Array.isArray(row)) continue;
             for (const cell of row) {
                 if (cell === null || cell === undefined || cell === '') continue;
 
-                // 4a. Número serial de Excel
                 if (typeof cell === 'number' && cell > 40000 && cell < 60000) {
                     const excelEpoch = new Date(Date.UTC(1899, 11, 30));
                     const dt = new Date(excelEpoch.getTime() + cell * 86400000);
@@ -1068,7 +1218,6 @@ function extraerFechaInfo(file, rowsAdj) {
                     }
                 }
 
-                // 4b. String con formato YYYY-MM-DD HH:MM:SS (formato Retail)
                 const s = String(cell);
                 let dm = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
                 if (dm) {
@@ -1083,7 +1232,6 @@ function extraerFechaInfo(file, rowsAdj) {
                     }
                 }
 
-                // 4c. String con formato DD/MM/YYYY o DD-MM-YYYY
                 dm = s.match(/(\d{1,2})[\/\-_\.](\d{1,2})[\/\-_\.](\d{4})/);
                 if (dm) {
                     const d = parseInt(dm[1], 10);
@@ -1100,7 +1248,6 @@ function extraerFechaInfo(file, rowsAdj) {
         }
     }
 
-    // 5. lastModified del archivo
     if (file && file.lastModified) {
         const dt = new Date(file.lastModified);
         if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2015) {
@@ -1176,7 +1323,6 @@ window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     let segSelect = document.getElementById('macro-segment');
     let currentSeg = segSelect.value || Array.from(segments)[0];
     
-    // Mantener la selección actual si es posible
     let optionsHtml = `<option value="Todos">📊 Segmentos: Todos</option>`;
     segments.forEach(s => {
         optionsHtml += `<option value="${s}" ${s === currentSeg ? 'selected' : ''}>${s}</option>`;
@@ -1676,7 +1822,8 @@ function buildAgg(rematesList) {
         adjudicaciones: [], 
         sumMontoValido: 0, 
         sumMinimoValido: 0, 
-        garantiasLista: [] 
+        garantiasLista: [],
+        garantiasNoAdjudicadas: []
     };
     
     let uniqueGanadoresSet = new Set();
@@ -1686,6 +1833,7 @@ function buildAgg(rematesList) {
     let ventaRetail = 0;
     let lotesSiniestros = 0;
     let lotesRetail = 0;
+    let garantiasSet = new Set();
     
     rematesList.forEach(r => {
         try {
@@ -1701,7 +1849,6 @@ function buildAgg(rematesList) {
             agg.ventaGanadoresNuevos += (Number(r.ventaNuevos) || 0);
             agg.ventaGanadoresAntiguos += (Number(r.ventaAntiguos) || 0);
             
-            // Métricas por segmento
             if (r.tipo === 'Siniestrados') {
                 agg.ventaSiniestros += (Number(r.ventaTotal) || 0);
                 agg.lotesSiniestros += (Number(r.lotesCount) || 0);
@@ -1738,7 +1885,8 @@ function buildAgg(rematesList) {
 
             if(r.garantiasListaDetallada && Array.isArray(r.garantiasListaDetallada)) { 
                 r.garantiasListaDetallada.forEach(g => { 
-                    if(!agg.garantiasLista.some(x => x.nombreNorm === g.nombreNorm)) {
+                    if(!garantiasSet.has(g.nombreNorm)) {
+                        garantiasSet.add(g.nombreNorm);
                         agg.garantiasLista.push(g); 
                     }
                 }); 
@@ -1746,13 +1894,18 @@ function buildAgg(rematesList) {
         } catch(e) {}
     });
     
+    // Clientes latentes = garantías - ganadores
+    const ganadoresSet = new Set(uniqueGanadoresSet);
+    agg.garantiasNoAdjudicadas = agg.garantiasLista.filter(g => !ganadoresSet.has(g.nombreNorm));
+    
     agg.ganadoresUnicosCount = uniqueGanadoresSet.size;
     agg.ganadoresSiniestros = ganadoresSiniestrosSet.size;
     agg.ganadoresRetail = ganadoresRetailSet.size;
     agg.ticketSiniestros = lotesSiniestros > 0 ? ventaSiniestros / lotesSiniestros : 0;
     agg.ticketRetail = lotesRetail > 0 ? ventaRetail / lotesRetail : 0;
     agg.perdedoresCount = Math.max(0, agg.garantias - agg.ganadoresUnicosCount); 
-    agg.conversion = agg.inscritos ? (agg.garantias / agg.inscritos * 100) : 0; 
+    agg.conversion = agg.garantias > 0 ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0; 
+    agg.tasaFuga = agg.garantias > 0 ? ((agg.garantias - agg.ganadoresUnicosCount) / agg.garantias * 100) : 0;
     agg.ticketPromedio = agg.lotes ? (agg.venta / agg.lotes) : 0; 
     agg.eficaciaLotes = agg.lotesDisponibles ? (agg.lotes / agg.lotesDisponibles * 100) : 0; 
     agg.pctVentaNuevos = agg.venta ? (agg.ventaGanadoresNuevos / agg.venta * 100) : 0; 
@@ -1772,11 +1925,12 @@ window.cambiarSeccion = function(mod) {
         currentModule = mod; 
         document.getElementById('nav-mod-remates').className = mod === 'remates' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
         document.getElementById('nav-mod-comparativa').className = mod === 'comparativa' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
-        document.getElementById('nav-mod-autos').className = mod === 'autos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-productos').className = mod === 'productos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
         document.getElementById('nav-mod-clientes').className = mod === 'clientes' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
         document.getElementById('nav-mod-conclusiones').className = mod === 'conclusiones' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
         document.getElementById('nav-mod-buscador').className = mod === 'buscador' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 hover:bg-gray-50 text-gray-700';
         document.getElementById('nav-mod-bonos').className = mod === 'bonos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 hover:bg-gray-50 text-gray-700';
+        document.getElementById('nav-mod-feedback').className = mod === 'feedback' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 hover:bg-gray-50 text-gray-700';
         
         window.renderApp();
         if(window.innerWidth < 768) { 
@@ -1790,7 +1944,7 @@ window.cambiarSeccion = function(mod) {
 window.renderApp = function() { 
     try {
         const emptyState = document.getElementById('empty-state');
-        ['module-remates', 'module-comparativa', 'module-autos', 'module-clientes', 'module-conclusiones', 'module-buscador', 'module-bonos'].forEach(id => {
+        ['module-remates', 'module-comparativa', 'module-productos', 'module-clientes', 'module-conclusiones', 'module-buscador', 'module-bonos', 'module-feedback'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.add('hidden');
         });
@@ -1808,7 +1962,7 @@ window.renderApp = function() {
 
         if (currentModule === 'remates') window.renderDashboard(); 
         else if (currentModule === 'comparativa') window.renderComparativa();
-        else if (currentModule === 'autos') window.renderPanelAutos(); 
+        else if (currentModule === 'productos') window.renderPanelProductos(); 
         else if (currentModule === 'conclusiones') window.renderConclusiones(); 
         else if (currentModule === 'clientes') { 
             procesarDatosClientes(); 
@@ -1817,6 +1971,10 @@ window.renderApp = function() {
         else if (currentModule === 'buscador') { window.buscarPatente(); }
         else if (currentModule === 'bonos') { 
             window.calcularBonos();
+        }
+        else if (currentModule === 'feedback') { 
+            procesarFeedback();
+            window.renderFeedback();
         }
     } catch(e) { 
         console.error(e); 
@@ -1850,7 +2008,6 @@ window.renderDashboard = function() {
         const elSubtitulo = document.getElementById('dash-subtitulo'); 
         if(elSubtitulo) elSubtitulo.innerText = `Control operativo • ${checkedNodes.length} seleccionados`;
         
-        // KPIs principales
         try { document.getElementById('dash-kpi-ticket').innerText = formatMoney(globalAgg.ticketPromedio); } catch(e){}
         try { document.getElementById('dash-kpi-comision').innerText = formatMoney(globalAgg.comisionTotal); } catch(e){}
         try { document.getElementById('dash-kpi-venta').innerText = formatMoney(globalAgg.venta); } catch(e){}
@@ -1859,11 +2016,11 @@ window.renderDashboard = function() {
         try { document.getElementById('dash-kpi-eficacia').innerText = `${globalAgg.eficaciaLotes.toFixed(1)}% eficacia`; } catch(e){}
         try { document.getElementById('dash-kpi-garantias').innerText = globalAgg.garantias.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-ganadores').innerText = globalAgg.ganadoresUnicosCount.toLocaleString('es-CL'); } catch(e){}
+        try { document.getElementById('dash-kpi-conversion').innerText = `${globalAgg.conversion.toFixed(1)}%`; } catch(e){}
         try { document.getElementById('dash-kpi-perdedores').innerText = globalAgg.perdedoresCount.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-1racompra').innerText = globalAgg.ganadoresNuevos.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-1racompra-pct').innerText = `${globalAgg.pctVentaNuevos.toFixed(1)}%`; } catch(e){}
         
-        // Métricas por segmento
         try {
             document.getElementById('dash-venta-siniestros').innerText = formatMoney(globalAgg.ventaSiniestros);
             document.getElementById('dash-venta-retail').innerText = formatMoney(globalAgg.ventaRetail);
@@ -1909,7 +2066,7 @@ window.renderDashboard = function() {
                             ${l.patente && l.patente !== '-' ? `<span class="text-gray-400 text-[10px] ml-1">(${l.patente})</span>` : ''}
                             <span class="text-gray-400 block text-[10px]">👤 ${l.clienteReal}</span>
                         </td>
-                        <td class="px-3 py-2 text-center"><span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount}</span></td>
+                        <td class="px-3 py-2 text-center"><span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded font-bold">${l.pujadoresRealesCount || 0}</span></td>
                         <td class="px-3 py-2 text-right font-medium text-gray-500">${formatMoney(l.minimo)}</td>
                         <td class="px-3 py-2 text-right font-semibold text-emerald-700">${formatMoney(l.monto)}</td>
                         <td class="px-4 py-2 text-right font-bold ${dColorL} hidden sm:table-cell">${l.minimo>0?(dSignL+formatMoney(deltaLote)):'-'}</td>
@@ -2227,43 +2384,63 @@ window.renderComparativa = function() {
 };
 
 // ============================================================
-// MÓDULO: ANÁLISIS VEHICULAR
+// MÓDULO: ANÁLISIS DE PRODUCTOS (ex-Análisis Vehicular)
 // ============================================================
-window.renderPanelAutos = function() {
+window.switchProductosTab = function(tab) {
+    currentProductosTab = tab;
+    document.getElementById('tab-siniestrados').className = tab === 'siniestrados' ? 'px-4 py-2 rounded-t-lg text-[13px] font-medium transition tab-active' : 'px-4 py-2 rounded-t-lg text-[13px] font-medium transition tab-inactive';
+    document.getElementById('tab-retail').className = tab === 'retail' ? 'px-4 py-2 rounded-t-lg text-[13px] font-medium transition tab-active' : 'px-4 py-2 rounded-t-lg text-[13px] font-medium transition tab-inactive';
+    document.getElementById('productos-siniestrados').style.display = tab === 'siniestrados' ? 'block' : 'none';
+    document.getElementById('productos-retail').style.display = tab === 'retail' ? 'block' : 'none';
+    window.renderPanelProductos();
+};
+
+window.renderPanelProductos = function() {
     try {
-        if(currentModule !== 'autos') return; 
+        if(currentModule !== 'productos') return;
         
-        let autos = []; 
-        let allRemates = getSelectedRemates(); 
+        const term = (document.getElementById('search-productos')?.value || '').toLowerCase().trim();
+        const allRemates = getSelectedRemates();
         
-        allRemates.forEach(r => { 
-            r.adjudicaciones.forEach(a => { 
+        // ====== SINIESTRADOS ======
+        let autosSiniestrados = [];
+        let allSiniestrados = allRemates.filter(r => r.tipo === 'Siniestrados');
+        allSiniestrados.forEach(r => {
+            r.adjudicaciones.forEach(a => {
                 if(!a.esFalso && !a.esChatarra) {
-                    autos.push({
-                        ...a, 
+                    autosSiniestrados.push({
+                        ...a,
                         remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)
-                    }); 
+                    });
                 }
-            }); 
+            });
         });
         
-        let marcasMap = {}; 
-        let modelosMap = {}; 
+        if (term) {
+            autosSiniestrados = autosSiniestrados.filter(a =>
+                (a.loteStr || '').toLowerCase().includes(term) ||
+                (a.categoria || '').toLowerCase().includes(term) ||
+                (a.numeroLote || '').toString().includes(term) ||
+                (a.modeloStr || '').toLowerCase().includes(term) ||
+                (a.patente || '').toLowerCase().includes(term)
+            );
+        }
         
-        autos.forEach(a => { 
+        let marcasMap = {};
+        let modelosMap = {};
+        autosSiniestrados.forEach(a => {
             if(a.categoria && a.categoria !== 'OTROS' && a.categoria !== 'SIN MARCA') {
-                marcasMap[a.categoria] = (marcasMap[a.categoria] || 0) + 1; 
+                marcasMap[a.categoria] = (marcasMap[a.categoria] || 0) + 1;
             }
             if(a.modeloStr && a.modeloStr.trim() !== '') {
-                modelosMap[a.modeloStr] = (modelosMap[a.modeloStr] || 0) + 1; 
+                modelosMap[a.modeloStr] = (modelosMap[a.modeloStr] || 0) + 1;
             }
         });
         
         const marcasSorted = Object.entries(marcasMap).sort((a,b) => b[1] - a[1]).slice(0,5);
-        
         try {
-            if(flotaMarcasInst) flotaMarcasInst.destroy(); 
-            if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) { 
+            if(flotaMarcasInst) flotaMarcasInst.destroy();
+            if(marcasSorted.length > 0 && document.getElementById('flota-marcas-chart')) {
                 flotaMarcasInst = new Chart(document.getElementById('flota-marcas-chart').getContext('2d'), {
                     type:'doughnut',
                     data:{
@@ -2279,19 +2456,15 @@ window.renderPanelAutos = function() {
                         maintainAspectRatio: false,
                         cutout:'75%',
                         plugins:{
-                            legend:{
-                                position:'right', 
-                                labels: {boxWidth: 10}
-                            }
+                            legend:{ position:'right', labels: {boxWidth: 10} }
                         }
                     }
-                }); 
+                });
             }
             
             const modelosSorted = Object.entries(modelosMap).sort((a,b) => b[1] - a[1]).slice(0,7);
-            
-            if(flotaAniosInst) flotaAniosInst.destroy(); 
-            if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) { 
+            if(flotaAniosInst) flotaAniosInst.destroy();
+            if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) {
                 flotaAniosInst = new Chart(document.getElementById('flota-modelos-chart').getContext('2d'), {
                     type:'bar',
                     data:{
@@ -2304,41 +2477,28 @@ window.renderPanelAutos = function() {
                         }]
                     },
                     options:{
-                        indexAxis: 'y', 
+                        indexAxis: 'y',
                         responsive: true,
-                        maintainAspectRatio: false, 
-                        plugins: { 
-                            legend: { display: false } 
-                        }, 
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
                         scales: {
                             x: {grid:{color:'#F3F4F6'}},
                             y: {grid:{display:false}}
                         }
                     }
-                }); 
+                });
             }
         } catch(ec) {}
         
-        const term = (document.getElementById('search-flota').value || '').toLowerCase().trim(); 
-        if(term) {
-            autos = autos.filter(a => 
-                (a.loteStr || '').toLowerCase().includes(term) || 
-                (a.categoria || '').toLowerCase().includes(term) || 
-                (a.numeroLote || '').toString().includes(term) || 
-                (a.modeloStr || '').toLowerCase().includes(term) || 
-                (a.patente || '').toLowerCase().includes(term)
-            );
-        }
-        
-        if(document.getElementById('flota-tabla-resultados')) {
-            document.getElementById('flota-tabla-resultados').innerHTML = autos.map(a => {
+        if(document.getElementById('productos-tabla-siniestrados')) {
+            document.getElementById('productos-tabla-siniestrados').innerHTML = autosSiniestrados.map(a => {
                 return `
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-4 py-2 font-medium text-gray-500 max-w-[150px] truncate" title="${a.remate}">${a.remate}</td>
                     <td class="px-3 py-2 text-center text-gray-800">Lote ${a.numeroLote||'-'}</td>
                     <td class="px-3 py-2 max-w-[200px] truncate">
-                        <span class="font-bold text-gray-900">${a.categoria}</span> 
-                        <span class="text-gray-500 font-medium">${a.modeloStr}</span> 
+                        <span class="font-bold text-gray-900">${a.categoria}</span>
+                        <span class="text-gray-500 font-medium">${a.modeloStr}</span>
                         ${a.patente && a.patente!=='-' ? `<span class="text-[10px] text-gray-400 ml-1">(${a.patente})</span>` : ''}
                     </td>
                     <td class="px-3 py-2 text-right text-gray-500 font-medium">${formatMoney(a.minimo)}</td>
@@ -2346,130 +2506,252 @@ window.renderPanelAutos = function() {
                 </tr>`;
             }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin vehículos en la selección actual.</td></tr>';
         }
-    } catch (e) {}
+        
+        // ====== RETAIL ======
+        let productosRetail = [];
+        let allRetail = allRemates.filter(r => r.tipo === 'Retail');
+        allRetail.forEach(r => {
+            r.adjudicaciones.forEach(a => {
+                if(!a.esFalso && !a.esChatarra) {
+                    const categoria = a.categoria || 'OTROS';
+                    const subcategoria = a.modeloStr || a.loteStr?.substring(0,30) || 'Sin descripción';
+                    productosRetail.push({
+                        ...a,
+                        remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),
+                        categoria: categoria,
+                        subcategoria: subcategoria
+                    });
+                }
+            });
+        });
+        
+        if (term) {
+            productosRetail = productosRetail.filter(a =>
+                (a.loteStr || '').toLowerCase().includes(term) ||
+                (a.categoria || '').toLowerCase().includes(term) ||
+                (a.subcategoria || '').toLowerCase().includes(term) ||
+                (a.numeroLote || '').toString().includes(term)
+            );
+        }
+        
+        let categoriasMap = {};
+        let subcategoriasMap = {};
+        productosRetail.forEach(a => {
+            categoriasMap[a.categoria] = (categoriasMap[a.categoria] || 0) + 1;
+            if (a.subcategoria && a.subcategoria !== 'Sin descripción') {
+                subcategoriasMap[a.subcategoria] = (subcategoriasMap[a.subcategoria] || 0) + 1;
+            }
+        });
+        
+        const categoriasSorted = Object.entries(categoriasMap).sort((a,b) => b[1] - a[1]).slice(0,5);
+        try {
+            if(retailCategoriasInst) retailCategoriasInst.destroy();
+            if(categoriasSorted.length > 0 && document.getElementById('retail-categorias-chart')) {
+                retailCategoriasInst = new Chart(document.getElementById('retail-categorias-chart').getContext('2d'), {
+                    type:'doughnut',
+                    data:{
+                        labels: categoriasSorted.map(m => m[0]),
+                        datasets:[{
+                            data: categoriasSorted.map(m => m[1]),
+                            backgroundColor: ['#111827','#374151','#6B7280','#9CA3AF','#D1D5DB','#E5E7EB'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options:{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout:'75%',
+                        plugins:{
+                            legend:{ position:'right', labels: {boxWidth: 10} }
+                        }
+                    }
+                });
+            }
+            
+            const subcategoriasSorted = Object.entries(subcategoriasMap).sort((a,b) => b[1] - a[1]).slice(0,7);
+            if(retailSubcategoriasInst) retailSubcategoriasInst.destroy();
+            if(subcategoriasSorted.length > 0 && document.getElementById('retail-subcategorias-chart')) {
+                retailSubcategoriasInst = new Chart(document.getElementById('retail-subcategorias-chart').getContext('2d'), {
+                    type:'bar',
+                    data:{
+                        labels: subcategoriasSorted.map(a => a[0]),
+                        datasets:[{
+                            label: 'Unidades',
+                            data: subcategoriasSorted.map(a => a[1]),
+                            backgroundColor: '#111827',
+                            borderRadius: 4
+                        }]
+                    },
+                    options:{
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {grid:{color:'#F3F4F6'}},
+                            y: {grid:{display:false}}
+                        }
+                    }
+                });
+            }
+        } catch(ec) {}
+        
+        if(document.getElementById('productos-tabla-retail')) {
+            document.getElementById('productos-tabla-retail').innerHTML = productosRetail.map(a => {
+                return `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-2 font-medium text-gray-500 max-w-[150px] truncate" title="${a.remate}">${a.remate}</td>
+                    <td class="px-3 py-2 text-center text-gray-800">Lote ${a.numeroLote||'-'}</td>
+                    <td class="px-3 py-2 max-w-[200px] truncate">
+                        <span class="font-bold text-gray-900">${a.categoria}</span>
+                        <span class="text-gray-500 text-[11px]">${a.subcategoria}</span>
+                    </td>
+                    <td class="px-3 py-2 text-right text-gray-500 font-medium">${formatMoney(a.minimo)}</td>
+                    <td class="px-4 py-2 text-right font-bold text-emerald-700">${formatMoney(a.monto)}</td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin productos Retail en la selección actual.</td></tr>';
+        }
+        
+    } catch(e) { console.error(e); }
 };
 
 // ============================================================
 // MÓDULO: GESTIÓN DE CLIENTES
 // ============================================================
-function procesarDatosClientes() { 
+function procesarDatosClientes() {
     try {
-        let allRemates = getSelectedRemates(); 
-        if(!allRemates.length) { 
-            clientDB = []; 
-            return; 
+        let allRemates = getSelectedRemates();
+        if(!allRemates.length) {
+            clientDB = [];
+            clientesLatentes = [];
+            return;
         }
         
-        const mapBI = {}; 
-        const MAX_TIMESTAMP = Math.max(...allRemates.map(r => r.fechaData?.timestamp || 0)); 
+        const mapBI = {};
+        const MAX_TIMESTAMP = Math.max(...allRemates.map(r => r.fechaData?.timestamp || 0));
         
-        allRemates.forEach(r => { 
-            r.adjudicaciones.forEach(adj => { 
-                if(adj.esFalso) return; 
-                
-                const c = adj.clienteReal; 
-                
+        allRemates.forEach(r => {
+            r.adjudicaciones.forEach(adj => {
+                if(adj.esFalso) return;
+                const c = adj.clienteReal;
                 if(!mapBI[c]) {
                     mapBI[c] = {
-                        nombre: c, 
-                        rut: adj.rut || '-', 
-                        email: adj.email || '-', 
+                        nombre: c,
+                        rut: adj.rut || '-',
+                        email: adj.email || '-',
                         compras: [],
                         totalGastado: 0,
                         lotesSiniestrados: 0,
                         lotesRetail: 0,
                         tipos: new Set()
-                    }; 
+                    };
                 }
-                
                 mapBI[c].compras.push({
                     fecha: r.fechaData?.timestamp,
-                    monto: adj.monto, 
-                    tipo: r.tipo, 
-                    lote: adj.numeroLote ? 'Lote ' + adj.numeroLote : (adj.loteStr ? adj.loteStr.substring(0,10) : ''), 
+                    monto: adj.monto,
+                    tipo: r.tipo,
+                    lote: adj.numeroLote ? 'Lote ' + adj.numeroLote : (adj.loteStr ? adj.loteStr.substring(0,10) : ''),
                     remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp)
-                }); 
-                
-                mapBI[c].totalGastado += (Number(adj.monto) || 0); 
-                
+                });
+                mapBI[c].totalGastado += (Number(adj.monto) || 0);
                 if(r.tipo === 'Siniestrados') {
-                    mapBI[c].lotesSiniestrados++; 
+                    mapBI[c].lotesSiniestrados++;
                 } else {
-                    mapBI[c].lotesRetail++; 
+                    mapBI[c].lotesRetail++;
                 }
-                
-                mapBI[c].tipos.add(r.tipo); 
-            }); 
-        }); 
+                mapBI[c].tipos.add(r.tipo);
+            });
+        });
         
-        clientDB = Object.values(mapBI).map(c => { 
-            c.compras.sort((a,b) => b.fecha - a.fecha); 
-            c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null; 
-            c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null; 
-            c.frecuencia = c.compras.length; 
-            c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP - c.ultimaCompra) / (1000*60*60*24)) : 0; 
+        clientDB = Object.values(mapBI).map(c => {
+            c.compras.sort((a,b) => b.fecha - a.fecha);
+            c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null;
+            c.ultimaCompra = c.compras.length > 0 ? c.compras[0].fecha : null;
+            c.frecuencia = c.compras.length;
+            c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP - c.ultimaCompra) / (1000*60*60*24)) : 0;
+            c.isHybrid = c.tipos.size > 1;
             
-            if(c.frecuencia > 3 && c.recencyDias <= 60) { 
-                c.segmento = "Frecuente"; 
-                c.color = "text-gray-900"; 
-                c.bg = "bg-black text-white"; 
-            } else if(c.frecuencia > 1 && c.recencyDias <= 60) { 
-                c.segmento = "Recurrente"; 
-                c.color = "text-blue-700"; 
-                c.bg = "bg-black text-white"; 
-            } else if(c.frecuencia === 1 && c.recencyDias <= 60) { 
-                c.segmento = "Nuevo"; 
-                c.color = "text-emerald-700"; 
-                c.bg = "bg-gray-100 text-gray-700"; 
-            } else { 
-                c.segmento = "En Riesgo"; 
-                c.color = "text-red-600"; 
-                c.bg = "bg-red-50 text-red-600"; 
-            } 
-            return c; 
-        }).sort((a,b) => b.totalGastado - a.totalGastado); 
-    } catch(e) {}
+            if(c.frecuencia > 3 && c.recencyDias <= 60) {
+                c.segmento = "Frecuente";
+                c.bg = "badge-frecuente";
+            } else if(c.frecuencia > 1 && c.recencyDias <= 60) {
+                c.segmento = "Recurrente";
+                c.bg = "badge-recurrente";
+            } else if(c.frecuencia === 1 && c.recencyDias <= 60) {
+                c.segmento = "Nuevo";
+                c.bg = "badge-nuevo";
+            } else {
+                c.segmento = "En Riesgo";
+                c.bg = "badge-riesgo";
+            }
+            if(c.isHybrid) c.bg = "badge-hybrid";
+            return c;
+        }).sort((a,b) => b.totalGastado - a.totalGastado);
+        
+        // Clientes latentes = garantías no adjudicadas
+        const agg = buildAgg(allRemates);
+        clientesLatentes = agg.garantiasNoAdjudicadas || [];
+        
+    } catch(e) { console.error(e); }
 }
 
-window.renderPanelClientesData = function(filtered, isFiltered = false) { 
+window.renderPanelClientesData = function(filtered, isFiltered = false) {
     try {
-        if(document.getElementById('bi-kpi-total')) {
-            document.getElementById('bi-kpi-total').innerText = clientDB.length; 
-        }
-        if(document.getElementById('bi-kpi-ltv')) {
-            document.getElementById('bi-kpi-ltv').innerText = formatMoney(clientDB.length ? clientDB.reduce((a,b) => a + b.totalGastado, 0) / clientDB.length : 0); 
-        }
-        if(document.getElementById('bi-kpi-inactivos')) {
-            document.getElementById('bi-kpi-inactivos').innerText = clientDB.filter(c => c.segmento === "En Riesgo").length; 
-        }
+        const total = clientDB.length;
+        const hybrid = clientDB.filter(c => c.isHybrid).length;
+        const hybridPct = total > 0 ? (hybrid / total * 100) : 0;
+        const latentes = clientesLatentes.length;
         
-        if(document.getElementById('bi-tabla-clientes')) { 
+        document.getElementById('bi-kpi-total').innerText = total;
+        document.getElementById('bi-kpi-ltv').innerText = formatMoney(total ? clientDB.reduce((a,b) => a + b.totalGastado, 0) / total : 0);
+        document.getElementById('bi-kpi-hybrid').innerText = hybrid;
+        document.getElementById('bi-kpi-hybrid-pct').innerText = hybridPct.toFixed(1) + '% del total';
+        document.getElementById('bi-kpi-latentes').innerText = latentes;
+        
+        // Tabla de clientes
+        if(document.getElementById('bi-tabla-clientes')) {
             document.getElementById('bi-tabla-clientes').innerHTML = filtered.map(c => `
                 <tr onclick="window.abrirFichaCliente('${c.nombre.replace(/'/g,"\\'")}')" class="cursor-pointer hover:bg-gray-50 transition">
-                    <td class="px-4 py-2 font-medium text-gray-900 max-w-[150px] truncate">${c.nombre}</td>
+                    <td class="px-4 py-2 font-medium text-gray-900 max-w-[150px] truncate">
+                        ${c.nombre}
+                        ${c.isHybrid ? '<span class="text-[9px] font-bold text-purple-600 ml-1">🔄</span>' : ''}
+                    </td>
                     <td class="px-3 py-2 text-center text-gray-500">${c.frecuencia}</td>
                     <td class="px-3 py-2 text-right font-semibold text-emerald-600">${formatMoney(c.totalGastado)}</td>
                     <td class="px-4 py-2 text-center hidden sm:table-cell"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.bg}">${c.segmento}</span></td>
                 </tr>
-            `).join(''); 
+            `).join('');
         }
         
-        if(!isFiltered) { 
-            const segCount = {}; 
-            clientDB.forEach(c => { 
-                segCount[c.segmento] = (segCount[c.segmento] || 0) + 1; 
-            }); 
-            
-            if(biChartSegmentsInst) biChartSegmentsInst.destroy(); 
-            
-            if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) { 
+        // Tabla de clientes latentes
+        if(document.getElementById('bi-tabla-latentes')) {
+            const latentesOrdenados = [...clientesLatentes].sort((a,b) => (b.fechaRemate || 0) - (a.fechaRemate || 0)).slice(0,50);
+            document.getElementById('bi-tabla-latentes').innerHTML = latentesOrdenados.map(l => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-2 font-medium text-gray-900 truncate max-w-[150px]">${l.nombre || 'Sin nombre'}</td>
+                    <td class="px-3 py-2 text-gray-500">${l.rut || '-'}</td>
+                    <td class="px-3 py-2 hidden sm:table-cell text-gray-500 truncate max-w-[150px]">${l.email || '-'}</td>
+                    <td class="px-3 py-2 text-center text-gray-500">${l.fechaRemate ? window.formatExcelDate(l.fechaRemate) : '-'}</td>
+                    <td class="px-3 py-2 text-right font-semibold text-gray-700">${formatMoney(l.montoGarantia || 0)}</td>
+                    <td class="px-4 py-2 text-center text-gray-400">${l.intentos || 1}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" class="p-8 text-center text-gray-400 font-medium">No hay clientes latentes en la selección actual.</td></tr>';
+        }
+        
+        if(!isFiltered) {
+            const segCount = {};
+            clientDB.forEach(c => {
+                segCount[c.segmento] = (segCount[c.segmento] || 0) + 1;
+            });
+            if(biChartSegmentsInst) biChartSegmentsInst.destroy();
+            if(Object.keys(segCount).length > 0 && document.getElementById('bi-chartSegments')) {
                 biChartSegmentsInst = new Chart(document.getElementById('bi-chartSegments').getContext('2d'), {
                     type:'doughnut',
                     data:{
                         labels: Object.keys(segCount),
                         datasets:[{
                             data: Object.values(segCount),
-                            backgroundColor: ['#111827','#6B7280','#D1D5DB','#DC2626'],
+                            backgroundColor: ['#111827','#3b82f6','#10b981','#ef4444','#8b5cf6'],
                             borderWidth: 0
                         }]
                     },
@@ -2478,135 +2760,88 @@ window.renderPanelClientesData = function(filtered, isFiltered = false) {
                         maintainAspectRatio: false,
                         cutout: '75%',
                         plugins:{
-                            legend:{
-                                position:'right', 
-                                labels:{boxWidth:10}
-                            }
+                            legend:{ position:'right', labels:{boxWidth:10} }
                         }
                     }
-                }); 
-            } 
-        } 
-    } catch(e) {}
+                });
+            }
+        }
+    } catch(e) { console.error(e); }
 };
 
-window.filtrarClientes = function() { 
-    try { 
-        const term = (document.getElementById('search-client').value || '').toLowerCase(); 
-        const tipo = document.getElementById('filter-client-type').value; 
-        
-        let filtered = clientDB.filter(c => { 
-            const matchName = (c.nombre || '').toLowerCase().includes(term); 
-            let matchTipo = true; 
-            
-            if(tipo === 'siniestrados') matchTipo = c.lotesSiniestrados > 0 && c.lotesRetail === 0; 
-            if(tipo === 'retail') matchTipo = c.lotesRetail > 0 && c.lotesSiniestrados === 0; 
-            
-            return matchName && matchTipo; 
-        }); 
-        
-        window.renderPanelClientesData(filtered, term !== "" || tipo !== "todos"); 
-    } catch(e) {} 
-};
-
-window.abrirFichaCliente = function(nombreStr) { 
+window.filtrarClientes = function() {
     try {
-        const c = clientDB.find(x => x.nombre === nombreStr); 
-        if(!c) return; 
+        const term = (document.getElementById('search-client').value || '').toLowerCase();
+        const tipo = document.getElementById('filter-client-type').value;
         
-        if(document.getElementById('bi-ficha-cliente')) {
-            document.getElementById('bi-ficha-cliente').classList.remove('hidden'); 
-        }
-        
-        if(document.getElementById('ficha-nombre')) document.getElementById('ficha-nombre').innerText = c.nombre; 
-        if(document.getElementById('ficha-rut')) document.getElementById('ficha-rut').innerText = c.rut; 
-        if(document.getElementById('ficha-email')) document.getElementById('ficha-email').innerText = c.email; 
-        if(document.getElementById('ficha-primera')) document.getElementById('ficha-primera').innerText = c.primeraCompra ? window.formatExcelDate(c.primeraCompra) : '-'; 
-        if(document.getElementById('ficha-ultima')) document.getElementById('ficha-ultima').innerText = `Hace ${c.recencyDias} d`; 
-        if(document.getElementById('ficha-lotes')) document.getElementById('ficha-lotes').innerText = c.frecuencia; 
-        if(document.getElementById('ficha-monto-sin')) document.getElementById('ficha-monto-sin').innerText = formatMoney(c.compras.filter(x => x.tipo === 'Siniestrados').reduce((a,b) => a + (Number(b.monto) || 0), 0)); 
-        if(document.getElementById('ficha-monto-ret')) document.getElementById('ficha-monto-ret').innerText = formatMoney(c.compras.filter(x => x.tipo === 'Retail').reduce((a,b) => a + (Number(b.monto) || 0), 0)); 
-        
-        if(document.getElementById('ficha-historial-tabla')) {
-            document.getElementById('ficha-historial-tabla').innerHTML = c.compras.map(h => `
-                <tr class="hover:bg-white/5">
-                    <td class="py-2 px-3 text-[11px] text-gray-400">${h.fecha ? window.formatExcelDate(h.fecha) : '-'}</td>
-                    <td class="py-2 px-3 text-[11px] text-white truncate max-w-[120px]">${h.remate ? h.remate : '-'}</td>
-                    <td class="py-2 px-3 text-[11px] text-gray-400">${h.tipo}</td>
-                    <td class="py-2 px-3 text-[11px] font-bold text-blue-400">${h.lote}</td>
-                    <td class="py-2 px-3 text-right text-[11px] font-bold text-emerald-400">${formatMoney(h.monto)}</td>
-                </tr>
-            `).join(''); 
-        }
-        
-        if(document.getElementById('bi-ficha-cliente')) {
-            document.getElementById('bi-ficha-cliente').scrollIntoView({behavior:'smooth'}); 
-        }
-    } catch(e) {}
+        let filtered = clientDB.filter(c => {
+            const matchName = (c.nombre || '').toLowerCase().includes(term);
+            let matchTipo = true;
+            if(tipo === 'siniestrados') matchTipo = c.lotesSiniestrados > 0 && c.lotesRetail === 0;
+            if(tipo === 'retail') matchTipo = c.lotesRetail > 0 && c.lotesSiniestrados === 0;
+            if(tipo === 'ambos') matchTipo = c.isHybrid;
+            return matchName && matchTipo;
+        });
+        window.renderPanelClientesData(filtered, term !== "" || tipo !== "todos");
+    } catch(e) { console.error(e); }
 };
 
-window.cerrarFicha = function() { 
-    if(document.getElementById('bi-ficha-cliente')) {
-        document.getElementById('bi-ficha-cliente').classList.add('hidden'); 
-    }
-};
-
-// ============================================================
-// MÓDULO: BUSCADOR GLOBAL
-// ============================================================
-window.buscarPatente = function() { 
+window.abrirFichaCliente = function(nombreStr) {
     try {
-        const term = (document.getElementById('search-patente').value || '').toUpperCase().trim(); 
-        const tbody = document.getElementById('buscador-tabla-resultados'); 
+        const c = clientDB.find(x => x.nombre === nombreStr);
+        if(!c) return;
         
-        if(term.length < 3) { 
-            tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-10 text-center text-gray-400 font-medium">Usa la barra superior para buscar en toda la base de datos sincronizada.</td></tr>'; 
-            return; 
-        } 
+        const ficha = document.getElementById('bi-ficha-cliente');
+        if(ficha) ficha.classList.remove('hidden');
         
-        let resultados = []; 
-        db.remates.forEach(r => { 
-            r.adjudicaciones.forEach(adj => { 
-                if((adj.loteStr || '').includes(term) || 
-                   (adj.clienteReal || '').includes(term) || 
-                   (adj.numeroLote || '').toString().includes(term) || 
-                   (adj.rut || '').includes(term) || 
-                   (adj.email || '').toUpperCase().includes(term) || 
-                   (adj.patente || '').toUpperCase().includes(term)) { 
-                       
-                    resultados.push({
-                        fecha: r.fechaData?.timestamp,
-                        remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),
-                        lote: adj.loteStr,
-                        numeroLote: adj.numeroLote,
-                        monto: adj.monto,
-                        cliente: adj.clienteReal,
-                        patente: adj.patente
-                    }); 
-                } 
-            }); 
-        }); 
+        document.getElementById('ficha-nombre').innerText = c.nombre;
+        document.getElementById('ficha-rut').innerText = c.rut;
+        document.getElementById('ficha-email').innerText = c.email;
+        document.getElementById('ficha-primera').innerText = c.primeraCompra ? window.formatExcelDate(c.primeraCompra) : '-';
+        document.getElementById('ficha-ultima').innerText = `Hace ${c.recencyDias} d`;
+        document.getElementById('ficha-lotes').innerText = c.frecuencia;
+        document.getElementById('ficha-monto-sin').innerText = formatMoney(c.compras.filter(x => x.tipo === 'Siniestrados').reduce((a,b) => a + (Number(b.monto) || 0), 0));
+        document.getElementById('ficha-monto-ret').innerText = formatMoney(c.compras.filter(x => x.tipo === 'Retail').reduce((a,b) => a + (Number(b.monto) || 0), 0));
         
-        resultados.sort((a,b) => b.fecha - a.fecha); 
-        
-        if(!resultados.length) { 
-            tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center font-bold text-red-500">Sin resultados para la búsqueda "${term}"</td></tr>`; 
-            return; 
-        } 
-        
-        tbody.innerHTML = resultados.map(res => `
-            <tr class="hover:bg-gray-50 transition">
-                <td class="px-4 py-2 text-gray-500 font-medium">${res.fecha ? window.formatExcelDate(res.fecha) : '-'}</td>
-                <td class="px-3 py-2 font-medium text-gray-900 truncate max-w-[150px]">${res.remate ? res.remate : '-'}</td>
-                <td class="px-3 py-2 text-center text-gray-500">Lote ${res.numeroLote||'-'}</td>
-                <td class="px-3 py-2 max-w-[200px] truncate hidden sm:table-cell text-gray-700">
-                    ${res.lote} ${res.patente && res.patente !== '-' ? `<span class="text-[10px] text-gray-400 ml-1">(${res.patente})</span>` : ''}
-                </td>
-                <td class="px-3 py-2 font-bold text-gray-900 truncate max-w-[150px]">${res.cliente}</td>
-                <td class="px-4 py-2 text-right font-black text-emerald-600">${formatMoney(res.monto)}</td>
+        document.getElementById('ficha-historial-tabla').innerHTML = c.compras.map(h => `
+            <tr class="hover:bg-white/5">
+                <td class="py-2 px-3 text-[11px] text-gray-400">${h.fecha ? window.formatExcelDate(h.fecha) : '-'}</td>
+                <td class="py-2 px-3 text-[11px] text-white truncate max-w-[120px]">${h.remate ? h.remate : '-'}</td>
+                <td class="py-2 px-3 text-[11px] text-gray-400">${h.tipo}</td>
+                <td class="py-2 px-3 text-[11px] font-bold text-blue-400">${h.lote}</td>
+                <td class="py-2 px-3 text-right text-[11px] font-bold text-emerald-400">${formatMoney(h.monto)}</td>
             </tr>
-        `).join(''); 
-    } catch(e) {}
+        `).join('');
+        
+        if(ficha) ficha.scrollIntoView({behavior:'smooth'});
+    } catch(e) { console.error(e); }
+};
+
+window.cerrarFicha = function() {
+    const ficha = document.getElementById('bi-ficha-cliente');
+    if(ficha) ficha.classList.add('hidden');
+};
+
+window.exportarLatentesExcel = function() {
+    try {
+        if(!clientesLatentes || clientesLatentes.length === 0) {
+            alert('No hay clientes latentes para exportar.');
+            return;
+        }
+        const wsData = clientesLatentes.map(l => ({
+            "Cliente": l.nombre || 'Sin nombre',
+            "RUT": l.rut || '-',
+            "Email": l.email || '-',
+            "Fecha Última Garantía": l.fechaRemate ? window.formatExcelDate(l.fechaRemate) : '-',
+            "Monto Garantía": l.montoGarantia || 0,
+            "Intentos": l.intentos || 1,
+            "Segmento": "Latente"
+        }));
+        const ws = XLSX.utils.json_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Clientes_Latentes");
+        XLSX.writeFile(wb, `Clientes_Latentes_${new Date().getTime()}.xlsx`);
+    } catch(e) { console.error(e); }
 };
 
 // ============================================================
@@ -2614,23 +2849,21 @@ window.buscarPatente = function() {
 // ============================================================
 window.renderConclusiones = function() {
     try {
-        if(currentModule !== 'conclusiones') return; 
-        let allRemates = getSelectedRemates(); 
-        const agg = buildAgg(allRemates); 
-        let html = ''; 
-        globalAgg = agg; 
+        if(currentModule !== 'conclusiones') return;
+        let allRemates = getSelectedRemates();
+        const agg = buildAgg(allRemates);
+        let html = '';
+        globalAgg = agg;
         
         if(!clientDB.length) {
-            procesarDatosClientes(); 
+            procesarDatosClientes();
         }
 
-        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : ''; 
+        let sobreSigno = agg.sobreprecioReal >= 0 ? '+' : '';
         let sobreColor = agg.sobreprecioReal >= 0 ? 'text-emerald-600' : 'text-red-500';
         let tasaExito = agg.garantias ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
-        
         let falsos = agg.adjudicaciones.filter(a => a.esFalso).length;
 
-        // SECCIÓN 1: Resultados Financieros
         html += `
         <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
             <div class="text-[13px] font-black mb-1">Resultados Financieros</div>
@@ -2640,11 +2873,11 @@ window.renderConclusiones = function() {
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Venta Total Adjudicada</td><td class="py-2.5 font-bold text-lg">${formatMoney(agg.venta)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Suma operaciones válidas</td></tr>
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Comisiones Estimadas</td><td class="py-2.5 font-bold text-blue-600">${formatMoney(agg.comisionTotal)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Ingresos al 8/12%</td></tr>
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Ticket Promedio</td><td class="py-2.5 font-bold">${formatMoney(agg.ticketPromedio)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${agg.lotes} ops</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Tasa de Conversión</td><td class="py-2.5 font-bold text-purple-600">${tasaExito.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Garantías → Ganadores</td></tr>
                 </tbody>
             </table>
         </div>`;
 
-        // SECCIÓN 2: Rendimiento de Catálogo
         html += `
         <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
             <div class="text-[13px] font-black mb-1">Rendimiento de Catálogo</div>
@@ -2658,7 +2891,6 @@ window.renderConclusiones = function() {
             </table>
         </div>`;
 
-        // SECCIÓN 3: Tracción + Segmentos
         html += `
         <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
             <div class="text-[13px] font-black mb-1">Tracción y Audiencia</div>
@@ -2666,7 +2898,7 @@ window.renderConclusiones = function() {
             <table class="w-full text-[12px]">
                 <tbody class="divide-y divide-gray-100">
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Tasa de Cierre</td><td class="py-2.5 font-bold text-emerald-600 text-lg">${tasaExito.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">De ${agg.garantias.toLocaleString('es-CL')} garantías</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Fuga de Clientes</td><td class="py-2.5 font-bold text-red-500">${agg.perdedoresCount.toLocaleString('es-CL')} <button onclick="window.abrirModalFuga()" class="ml-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-[10px] font-bold transition">VER</button></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pagaron garantía sin compra</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Clientes Latentes</td><td class="py-2.5 font-bold text-amber-600">${agg.garantiasNoAdjudicadas.length.toLocaleString('es-CL')}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pagaron garantía sin comprar</td></tr>
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Clientes Nuevos</td><td class="py-2.5 font-bold">${agg.ganadoresNuevos.toLocaleString('es-CL')} <span class="font-normal text-gray-400 text-[10px]">(${agg.pctVentaNuevos.toFixed(1)}% vta)</span></td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Adquisición pura</td></tr>
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Limpieza Datos (Falsos)</td><td class="py-2.5 font-bold text-gray-400">${falsos}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Pujas internas de prueba</td></tr>
                 </tbody>
@@ -2686,9 +2918,59 @@ window.renderConclusiones = function() {
         </div>`;
 
         document.getElementById('conclusiones-content').innerHTML = html;
-    } catch (e) { 
-        console.error(e); 
-    }
+    } catch(e) { console.error(e); }
+};
+
+// ============================================================
+// MÓDULO: BUSCADOR GLOBAL
+// ============================================================
+window.buscarPatente = function() {
+    try {
+        const term = (document.getElementById('search-patente').value || '').toUpperCase().trim();
+        const tbody = document.getElementById('buscador-tabla-resultados');
+        if(term.length < 3) {
+            tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-10 text-center text-gray-400 font-medium">Usa la barra superior para buscar en toda la base de datos sincronizada.</td></tr>';
+            return;
+        }
+        let resultados = [];
+        db.remates.forEach(r => {
+            r.adjudicaciones.forEach(adj => {
+                if((adj.loteStr || '').includes(term) ||
+                   (adj.clienteReal || '').includes(term) ||
+                   (adj.numeroLote || '').toString().includes(term) ||
+                   (adj.rut || '').includes(term) ||
+                   (adj.email || '').toUpperCase().includes(term) ||
+                   (adj.patente || '').toUpperCase().includes(term)) {
+                    resultados.push({
+                        fecha: r.fechaData?.timestamp,
+                        remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),
+                        lote: adj.loteStr,
+                        numeroLote: adj.numeroLote,
+                        monto: adj.monto,
+                        cliente: adj.clienteReal,
+                        patente: adj.patente
+                    });
+                }
+            });
+        });
+        resultados.sort((a,b) => b.fecha - a.fecha);
+        if(!resultados.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center font-bold text-red-500">Sin resultados para la búsqueda "${term}"</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = resultados.map(res => `
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-2 text-gray-500 font-medium">${res.fecha ? window.formatExcelDate(res.fecha) : '-'}</td>
+                <td class="px-3 py-2 font-medium text-gray-900 truncate max-w-[150px]">${res.remate ? res.remate : '-'}</td>
+                <td class="px-3 py-2 text-center text-gray-500">Lote ${res.numeroLote||'-'}</td>
+                <td class="px-3 py-2 max-w-[200px] truncate hidden sm:table-cell text-gray-700">
+                    ${res.lote} ${res.patente && res.patente !== '-' ? `<span class="text-[10px] text-gray-400 ml-1">(${res.patente})</span>` : ''}
+                </td>
+                <td class="px-3 py-2 font-bold text-gray-900 truncate max-w-[150px]">${res.cliente}</td>
+                <td class="px-4 py-2 text-right font-black text-emerald-600">${formatMoney(res.monto)}</td>
+            </tr>
+        `).join('');
+    } catch(e) { console.error(e); }
 };
 
 // ============================================================
@@ -2727,11 +3009,9 @@ window.calcularBonos = function() {
 
     const clientesInfo = identificarClientes(allRemates);
     const resultadosMensuales = calcularKPIsMensuales(meses, clientesInfo, mesesKeys);
-    
     historialBonos = resultadosMensuales;
     const ultimoMes = resultadosMensuales[resultadosMensuales.length - 1];
     bonoActual = ultimoMes;
-    
     renderizarBonoActual(ultimoMes);
     renderizarHistorialBonos(resultadosMensuales);
 };
@@ -2807,12 +3087,10 @@ function identificarClientes(remates) {
 function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
     const resultados = [];
     let clientesAcumulados = new Set();
-    
     mesesKeys.forEach((key, index) => {
         const mesData = meses[key];
         const clientesDelMes = new Set();
         const numRemates = mesData.remates.length;
-        
         mesData.remates.forEach(r => {
             if (r.adjudicaciones) {
                 r.adjudicaciones.forEach(a => {
@@ -2838,18 +3116,15 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
                 });
             }
         });
-        
         const nuevosClientes = new Set();
         clientesDelMes.forEach(c => {
             if (!clientesAcumulados.has(c)) {
                 nuevosClientes.add(c);
             }
         });
-        
         const nuevosGanadores = new Set();
         const nuevosPujadores = new Set();
         const nuevosGarantes = new Set();
-        
         mesData.remates.forEach(r => {
             if (r.adjudicaciones) {
                 r.adjudicaciones.forEach(a => {
@@ -2875,11 +3150,9 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
                 });
             }
         });
-        
         const ganadoresPorRemate = numRemates > 0 ? nuevosGanadores.size / numRemates : 0;
         const pujadoresPorRemate = numRemates > 0 ? nuevosPujadores.size / numRemates : 0;
         const garantesPorRemate = numRemates > 0 ? nuevosGarantes.size / numRemates : 0;
-        
         let resultado = {
             mes: mesData.label,
             key: key,
@@ -2895,63 +3168,36 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
             bono: 0,
             kpis: {}
         };
-        
         if (index > 0) {
             const mesAnterior = resultados[index - 1];
-            const crecimientoVentas = mesAnterior.ventaTotal > 0 
-                ? ((resultado.ventaTotal - mesAnterior.ventaTotal) / mesAnterior.ventaTotal) * 100 
-                : 0;
-            
+            const crecimientoVentas = mesAnterior.ventaTotal > 0 ? ((resultado.ventaTotal - mesAnterior.ventaTotal) / mesAnterior.ventaTotal) * 100 : 0;
             resultado.kpis = {
-                ganadores: { 
-                    valor: ganadoresPorRemate, 
-                    meta: METAS_BONOS.ganadores, 
-                    cumple: ganadoresPorRemate >= METAS_BONOS.ganadores 
-                },
-                pujadores: { 
-                    valor: pujadoresPorRemate, 
-                    meta: METAS_BONOS.pujadores, 
-                    cumple: pujadoresPorRemate >= METAS_BONOS.pujadores 
-                },
-                garantes: { 
-                    valor: garantesPorRemate, 
-                    meta: METAS_BONOS.garantes, 
-                    cumple: garantesPorRemate >= METAS_BONOS.garantes 
-                },
-                ventas: { 
-                    valor: crecimientoVentas, 
-                    meta: METAS_BONOS.ventas, 
-                    cumple: crecimientoVentas >= METAS_BONOS.ventas 
-                }
+                ganadores: { valor: ganadoresPorRemate, meta: METAS_BONOS.ganadores, cumple: ganadoresPorRemate >= METAS_BONOS.ganadores },
+                pujadores: { valor: pujadoresPorRemate, meta: METAS_BONOS.pujadores, cumple: pujadoresPorRemate >= METAS_BONOS.pujadores },
+                garantes: { valor: garantesPorRemate, meta: METAS_BONOS.garantes, cumple: garantesPorRemate >= METAS_BONOS.garantes },
+                ventas: { valor: crecimientoVentas, meta: METAS_BONOS.ventas, cumple: crecimientoVentas >= METAS_BONOS.ventas }
             };
-            
             let bonoTotal = 0;
             if (resultado.kpis.ganadores.cumple) bonoTotal += 50000;
             if (resultado.kpis.pujadores.cumple) bonoTotal += 50000;
             if (resultado.kpis.garantes.cumple) bonoTotal += 50000;
             if (resultado.kpis.ventas.cumple) bonoTotal += 50000;
-            
             resultado.bono = bonoTotal;
         }
-        
         resultados.push(resultado);
         clientesAcumulados = new Set([...clientesAcumulados, ...clientesDelMes]);
     });
-    
     return resultados;
 }
 
 function renderizarBonoActual(ultimoMes) {
     document.getElementById('bono-total-mes').innerText = formatMoney(ultimoMes.bono || 0);
-    
     const cumplidos = ultimoMes.kpis ? Object.values(ultimoMes.kpis).filter(k => k.cumple).length : 0;
     document.getElementById('bono-kpis-cumplidos').innerText = `${cumplidos}/4`;
     document.getElementById('bono-nuevos-clientes').innerText = ultimoMes.totalNuevos || 0;
-    
     const crecimientoVentas = ultimoMes.kpis?.ventas?.valor || 0;
     document.getElementById('bono-crecimiento-ventas').innerText = `${crecimientoVentas.toFixed(1)}%`;
     document.getElementById('bono-mes-label').innerText = `Mes: ${ultimoMes.mes} (${ultimoMes.numRemates} remates)`;
-    
     const detalleContainer = document.getElementById('bono-kpis-detalle');
     if (ultimoMes.kpis) {
         const kpis = [
@@ -2960,7 +3206,6 @@ function renderizarBonoActual(ultimoMes) {
             { key: 'garantes', label: '🛡️ Nuevos Garantes', data: ultimoMes.kpis.garantes, extra: `${ultimoMes.nuevosGarantes} total / ${ultimoMes.numRemates} remates` },
             { key: 'ventas', label: '💰 Crecimiento Ventas', data: ultimoMes.kpis.ventas, extra: `$${formatMoneyNumber(ultimoMes.ventaTotal)}` }
         ];
-        
         detalleContainer.innerHTML = kpis.map(k => `
             <div class="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
                 <div class="flex justify-between items-start">
@@ -2976,18 +3221,13 @@ function renderizarBonoActual(ultimoMes) {
                     <span class="text-[11px] text-gray-400">Meta: ${k.key === 'ventas' ? k.data.meta + '%' : k.data.meta}</span>
                 </div>
                 <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
-                    <div class="h-full rounded-full ${k.data.cumple ? 'bg-emerald-500' : 'bg-red-400'}" 
-                         style="width: ${k.data.cumple ? 100 : Math.min(100, (k.data.valor / k.data.meta) * 100)}%"></div>
+                    <div class="h-full rounded-full ${k.data.cumple ? 'bg-emerald-500' : 'bg-red-400'}" style="width: ${k.data.cumple ? 100 : Math.min(100, (k.data.valor / k.data.meta) * 100)}%"></div>
                 </div>
                 <div class="text-[9px] text-gray-400 mt-1">${k.extra}</div>
             </div>
         `).join('');
     } else {
-        detalleContainer.innerHTML = `
-            <div class="col-span-full text-center text-gray-400 py-4">
-                <p class="text-sm font-medium">No hay datos suficientes para el primer mes</p>
-            </div>
-        `;
+        detalleContainer.innerHTML = `<div class="col-span-full text-center text-gray-400 py-4"><p class="text-sm font-medium">No hay datos suficientes para el primer mes</p></div>`;
     }
 }
 
@@ -3029,6 +3269,149 @@ function renderizarHistorialBonos(resultados) {
 }
 
 // ============================================================
+// MÓDULO: FEEDBACK (CHAT)
+// ============================================================
+function procesarFeedback() {
+    feedbackMessages = [];
+    const allRemates = getSelectedRemates();
+    allRemates.forEach(r => {
+        if (r.chatMessages && Array.isArray(r.chatMessages)) {
+            r.chatMessages.forEach(msg => {
+                feedbackMessages.push({
+                    ...msg,
+                    remate: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp),
+                    remateId: r.id
+                });
+            });
+        }
+    });
+    feedbackMessages.sort((a,b) => (a.fecha || 0) - (b.fecha || 0));
+}
+
+window.renderFeedback = function() {
+    if (currentModule !== 'feedback') return;
+    
+    const container = document.getElementById('feedback-timeline');
+    const totalMsg = document.getElementById('feedback-total-msg');
+    const usuariosSelect = document.getElementById('filter-feedback-usuario');
+    
+    if (!feedbackMessages || feedbackMessages.length === 0) {
+        container.innerHTML = '<div class="p-8 text-center text-gray-400 font-medium">No hay mensajes de feedback en los remates seleccionados.</div>';
+        totalMsg.innerText = '0';
+        usuariosSelect.innerHTML = '<option value="todos">Todos los usuarios</option>';
+        document.getElementById('feedback-top-usuarios').innerHTML = '<p class="text-gray-400 text-[11px]">Sin datos</p>';
+        document.getElementById('feedback-top-palabras').innerHTML = '<span class="text-gray-400 text-[11px]">Sin datos</span>';
+        return;
+    }
+    
+    totalMsg.innerText = feedbackMessages.length;
+    
+    // Poblar select de usuarios
+    const usuarios = [...new Set(feedbackMessages.map(m => m.usuario || 'Anónimo'))];
+    usuariosSelect.innerHTML = '<option value="todos">Todos los usuarios</option>' + 
+        usuarios.map(u => `<option value="${u}">${u}</option>`).join('');
+    
+    window.filtrarFeedback();
+    
+    // Top usuarios
+    const userCount = {};
+    feedbackMessages.forEach(m => {
+        const u = m.usuario || 'Anónimo';
+        userCount[u] = (userCount[u] || 0) + 1;
+    });
+    const topUsers = Object.entries(userCount).sort((a,b) => b[1] - a[1]).slice(0,10);
+    document.getElementById('feedback-top-usuarios').innerHTML = topUsers.map(([u, c]) => 
+        `<div class="flex justify-between text-[12px]"><span class="text-gray-700">${u}</span><span class="font-bold text-gray-900">${c}</span></div>`
+    ).join('') || '<p class="text-gray-400 text-[11px]">Sin datos</p>';
+    
+    // Palabras clave
+    const palabras = {};
+    const stopWords = ['que', 'de', 'la', 'el', 'en', 'y', 'a', 'los', 'del', 'las', 'un', 'por', 'con', 'no', 'su', 'para', 'es', 'al', 'lo', 'como', 'mas', 'pero', 'sus', 'le', 'ya', 'este', 'entre', 'cuando', 'todo', 'esta', 'ser', 'son', 'dos', 'tres', 'nos', 'una', 'sin', 'sobre', 'se', 'me', 'te', 'lo', 'mi'];
+    feedbackMessages.forEach(m => {
+        const texto = (m.mensaje || m.texto || '').toLowerCase();
+        texto.split(/[^a-záéíóúñ0-9]+/).forEach(p => {
+            if (p.length > 3 && !stopWords.includes(p)) {
+                palabras[p] = (palabras[p] || 0) + 1;
+            }
+        });
+    });
+    const topPalabras = Object.entries(palabras).sort((a,b) => b[1] - a[1]).slice(0,15);
+    document.getElementById('feedback-top-palabras').innerHTML = topPalabras.map(([p, c]) => 
+        `<span class="px-3 py-1 bg-gray-100 rounded-full text-[11px] text-gray-700">${p} <span class="text-gray-400">${c}</span></span>`
+    ).join('') || '<span class="text-gray-400 text-[11px]">Sin datos</span>';
+};
+
+window.filtrarFeedback = function() {
+    const term = (document.getElementById('search-feedback')?.value || '').toLowerCase();
+    const usuario = document.getElementById('filter-feedback-usuario')?.value || 'todos';
+    
+    let filtered = feedbackMessages;
+    if (term) {
+        filtered = filtered.filter(m => (m.mensaje || m.texto || '').toLowerCase().includes(term));
+    }
+    if (usuario !== 'todos') {
+        filtered = filtered.filter(m => (m.usuario || 'Anónimo') === usuario);
+    }
+    
+    const container = document.getElementById('feedback-timeline');
+    if (!filtered.length) {
+        container.innerHTML = '<div class="p-8 text-center text-gray-400 font-medium">No hay mensajes que coincidan con los filtros.</div>';
+        return;
+    }
+    
+    container.innerHTML = filtered.map(m => {
+        const esQueja = (m.mensaje || m.texto || '').toLowerCase().includes('queja') || 
+                       (m.mensaje || m.texto || '').toLowerCase().includes('problema') ||
+                       (m.mensaje || m.texto || '').toLowerCase().includes('error') ||
+                       (m.mensaje || m.texto || '').toLowerCase().includes('malo') ||
+                       (m.mensaje || m.texto || '').toLowerCase().includes('no sirve');
+        const esPositivo = (m.mensaje || m.texto || '').toLowerCase().includes('gracias') || 
+                          (m.mensaje || m.texto || '').toLowerCase().includes('excelente') ||
+                          (m.mensaje || m.texto || '').toLowerCase().includes('bueno');
+        let badge = '';
+        if (esQueja) badge = '<span class="ml-2 text-[10px] font-bold text-red-500">⚠️ Queja</span>';
+        if (esPositivo) badge = '<span class="ml-2 text-[10px] font-bold text-emerald-500">✅ Positivo</span>';
+        
+        return `
+        <div class="px-4 py-3 hover:bg-gray-50 transition flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[14px] font-bold text-gray-600 flex-shrink-0">
+                ${(m.usuario || 'A')[0].toUpperCase()}
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-bold text-gray-900 text-[13px]">${m.usuario || 'Anónimo'}</span>
+                    <span class="text-[10px] text-gray-400">${m.fecha ? window.formatExcelDate(m.fecha) : '-'}</span>
+                    <span class="text-[10px] text-gray-400">• ${m.remate || 'Remate'}</span>
+                    ${badge}
+                </div>
+                <p class="text-[13px] text-gray-700 mt-0.5">${m.mensaje || m.texto || ''}</p>
+            </div>
+        </div>`;
+    }).join('');
+};
+
+window.exportarFeedbackExcel = function() {
+    try {
+        if (!feedbackMessages || feedbackMessages.length === 0) {
+            alert('No hay mensajes de feedback para exportar.');
+            return;
+        }
+        const wsData = feedbackMessages.map(m => ({
+            "Remate": m.remate || 'Remate',
+            "Fecha": m.fecha ? window.formatExcelDate(m.fecha) : '-',
+            "Usuario": m.usuario || 'Anónimo',
+            "Mensaje": m.mensaje || m.texto || '',
+            "Tipo": (m.mensaje || m.texto || '').toLowerCase().includes('queja') ? 'Queja' : 
+                    (m.mensaje || m.texto || '').toLowerCase().includes('gracias') ? 'Positivo' : 'Neutral'
+        }));
+        const ws = XLSX.utils.json_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Feedback");
+        XLSX.writeFile(wb, `Feedback_Usuarios_${new Date().getTime()}.xlsx`);
+    } catch(e) { console.error(e); }
+};
+
+// ============================================================
 // PROCESAMIENTO DE EXCEL (PARSE) - MEJORADO PARA RETAIL
 // ============================================================
 window.parseExcel = function(file) {
@@ -3044,10 +3427,7 @@ window.parseExcel = function(file) {
                 const rowsAdj = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
 
                 let fechaData = extraerFechaInfo(file, rowsAdj);
-                
-                // DETECCIÓN MEJORADA DE RETAIL
                 let tipo = 'Siniestrados';
-                // Buscar en la primera columna de las primeras filas si contiene "RETAIL"
                 for (let i = 0; i < Math.min(rowsAdj.length, 10); i++) {
                     const row = rowsAdj[i];
                     if (row && row.length > 0 && row[0]) {
@@ -3058,7 +3438,6 @@ window.parseExcel = function(file) {
                         }
                     }
                 }
-                // Si no se encontró en los datos, buscar en el nombre del archivo
                 if (tipo === 'Siniestrados' && file.name.toLowerCase().includes('retail')) {
                     tipo = 'Retail';
                 }
@@ -3066,7 +3445,6 @@ window.parseExcel = function(file) {
                 let maxScore = 0;
                 let headerIdx = 0;
                 let headers = [];
-                
                 for(let i=0; i<Math.min(rowsAdj.length, 20); i++){
                     if(!rowsAdj[i] || !Array.isArray(rowsAdj[i])) continue;
                     let rowStr = rowsAdj[i].map(c => String(c).toLowerCase().trim()).join(' ');
@@ -3076,14 +3454,12 @@ window.parseExcel = function(file) {
                     if(rowStr.includes('monto') || rowStr.includes('adjudicad') || rowStr.includes('total')) score++;
                     if(rowStr.includes('lote') || rowStr.includes('numero')) score++;
                     if(rowStr.includes('patente') || rowStr.includes('descripci') || rowStr.includes('vehiculo')) score++;
-                    
                     if(score > maxScore) {
                         maxScore = score;
                         headerIdx = i;
                         headers = rowsAdj[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
                     }
                 }
-                
                 if(headers.length === 0 && rowsAdj.length > 0) {
                     headers = rowsAdj[0].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
                 }
@@ -3113,31 +3489,28 @@ window.parseExcel = function(file) {
                     garantiasEmailsReales: [],
                     garantiasListaDetallada: [],
                     adjudicaciones: [],
-                    posturasPorLote: {}
+                    posturasPorLote: {},
+                    chatMessages: []
                 };
 
                 let lotesSet = new Set();
                 let garantiasSet = new Set();
+                let pujasPorLote = {};
 
                 parsedData.forEach(rowNorm => {
                     try {
                         let numVal = String(rowNorm['numero'] || rowNorm['nrolote'] || rowNorm['nlote'] || rowNorm['item'] || rowNorm['id'] || '').replace(/\D/g, '');
                         let nombre = rowNorm['nombre'] || rowNorm['adjudicatario'] || rowNorm['cliente'] || rowNorm['nombresorazonsocial'] || rowNorm['razonsocial'] || '';
-                        
                         let montoRaw = rowNorm['montoadjudicacion'] || rowNorm['totaladjudicacion'] || rowNorm['montoadjudicado'] || rowNorm['totaladjudicado'] || rowNorm['monto'] || rowNorm['adjudicado'] || rowNorm['total'] || rowNorm['valor'] || rowNorm['precio'] || 0;
                         let minimoRaw = rowNorm['minimo'] || rowNorm['preciobase'] || rowNorm['base'] || rowNorm['montoautorizado'] || rowNorm['valorbase'] || rowNorm['montominimo'] || rowNorm['montoestimado'] || 0;
-                        
                         let rut = rowNorm['rut'] || rowNorm['nrorut'] || rowNorm['rutcliente'] || '';
                         let email = rowNorm['email'] || rowNorm['correo'] || rowNorm['correoelectronico'] || '';
-                        
                         let monto = typeof montoRaw === 'number' ? montoRaw : parseFloat(String(montoRaw).replace(/[^\d]/g, '')) || 0;
                         let minimo = typeof minimoRaw === 'number' ? minimoRaw : parseFloat(String(minimoRaw).replace(/[^\d]/g, '')) || 0;
-
                         let textLote = String(rowNorm['lote'] || '').trim();
                         let textDetalle = String(rowNorm['detalle'] || '').trim();
                         let textDesc = String(rowNorm['descripcion'] || '').trim();
                         let textEstado = String(rowNorm['estado'] || '').trim();
-                        
                         let patente = rowNorm['patente'] || '';
                         let vehiculoText = '';
 
@@ -3148,12 +3521,10 @@ window.parseExcel = function(file) {
                         } else {
                             vehiculoText = textLote;
                         }
-
                         if (!patente && textDetalle.includes('Patente')) {
                             let match = textDetalle.match(/Patente<\/b><\/td><td[^>]*>:<\/td><td>([^<]+)/i);
                             if (match && match[1]) patente = match[1].trim();
                         }
-
                         if (!vehiculoText || vehiculoText.length < 4) {
                             let matchMarca = textDetalle.match(/Marca<\/b><\/td><td[^>]*>:<\/td><td>([^<]+)/i);
                             let matchModelo = textDetalle.match(/Modelo<\/b><\/td><td[^>]*>:<\/td><td>([^<]+)/i);
@@ -3161,17 +3532,13 @@ window.parseExcel = function(file) {
                             let modelo = matchModelo && matchModelo[1] ? matchModelo[1].trim() : '';
                             vehiculoText = `${marca} ${modelo}`.trim();
                         }
-
                         vehiculoText = vehiculoText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-                        
                         let extraDesc = textDesc + " " + textEstado;
 
                         if (numVal || vehiculoText) {
                             lotesSet.add(String(numVal || vehiculoText).trim());
-                            
                             let esFalso = esClienteFalso(nombre, email);
                             let esChatarra = extraDesc.toLowerCase().includes('chatarra') || String(vehiculoText).toLowerCase().includes('chatarra') || String(vehiculoText).toLowerCase().includes('restos');
-                            
                             let { categoria, modeloStr } = extraerMarcaModelo(String(vehiculoText));
 
                             if(monto > 0 && nombre) {
@@ -3189,9 +3556,8 @@ window.parseExcel = function(file) {
                                     esChatarra: esChatarra,
                                     categoria: categoria,
                                     modeloStr: modeloStr,
-                                    pujadoresRealesCount: 1 
+                                    pujadoresRealesCount: 0
                                 });
-
                                 if (!esFalso) {
                                     remate.ventaTotal += monto;
                                     remate.lotesCount++;
@@ -3207,7 +3573,8 @@ window.parseExcel = function(file) {
                                             email: String(email),
                                             rut: String(rut),
                                             fechaRemate: fechaData.timestamp,
-                                            numRemate: String(numVal)
+                                            numRemate: String(numVal),
+                                            montoGarantia: 0
                                         });
                                     }
                                 }
@@ -3218,7 +3585,7 @@ window.parseExcel = function(file) {
 
                 remate.lotesDisponibles = lotesSet.size > 0 ? lotesSet.size : remate.adjudicaciones.length;
 
-                // PESTAÑA GARANTÍAS
+                // GARANTÍAS
                 let sheetGarantiasName = workbook.SheetNames.find(s => String(s).toLowerCase() === 'garantías' || String(s).toLowerCase() === 'garantias');
                 if (sheetGarantiasName) {
                     try {
@@ -3248,7 +3615,7 @@ window.parseExcel = function(file) {
                                 let email = obj['email'] || obj['correo'];
                                 let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['titular'] || obj['razonsocial'];
                                 let rut = obj['rut'] || obj['rutcliente'];
-                                
+                                let montoGarantia = parseFloat(String(obj['montogarantía'] || obj['montogarantia'] || obj['monto'] || 0).replace(/[^\d]/g, '')) || 0;
                                 if(nombre && !esClienteFalso(nombre, email)) {
                                     garantiasCount++;
                                     remate.garantiasListaDetallada.push({
@@ -3257,7 +3624,8 @@ window.parseExcel = function(file) {
                                         email: String(email),
                                         rut: String(rut),
                                         fechaRemate: fechaData.timestamp,
-                                        numRemate: ""
+                                        numRemate: "",
+                                        montoGarantia: montoGarantia
                                     });
                                 }
                             }
@@ -3272,7 +3640,7 @@ window.parseExcel = function(file) {
                     remate.garantias = remate.garantiasListaDetallada.length;
                 }
 
-                // PESTAÑA POSTURAS (PUJAS)
+                // POSTURAS (PUJAS) - AHORA CONTANDO BIEN
                 let sheetPosturasName = workbook.SheetNames.find(s => String(s).toLowerCase().includes('posturas') || String(s).toLowerCase().includes('pujas'));
                 if (sheetPosturasName) {
                     try {
@@ -3280,7 +3648,6 @@ window.parseExcel = function(file) {
                         const rowsPosturas = XLSX.utils.sheet_to_json(wsPosturas, {header: 1, defval: ""});
                         let headerPIdx = -1;
                         let pHeaders = [];
-                        
                         for(let i=0; i<Math.min(rowsPosturas.length, 20); i++){
                             if(!rowsPosturas[i] || !Array.isArray(rowsPosturas[i])) continue;
                             let rowStr = rowsPosturas[i].map(c => String(c).toLowerCase().trim()).join(' ');
@@ -3291,7 +3658,6 @@ window.parseExcel = function(file) {
                                 break;
                             }
                         }
-                        
                         if(headerPIdx !== -1) {
                             let parseMoney = (val) => {
                                 if(!val) return 0;
@@ -3304,32 +3670,24 @@ window.parseExcel = function(file) {
                                 let intPart = str.split(',')[0].replace(/[^\d-]/g, '');
                                 return parseInt(intPart, 10) || 0;
                             };
-
                             for(let i = headerPIdx + 1; i < rowsPosturas.length; i++) {
                                 let rowData = rowsPosturas[i];
                                 if(!rowData || !Array.isArray(rowData) || rowData.join('').trim() === '') continue;
-                                
                                 let obj = {};
                                 for(let j = 0; j < pHeaders.length; j++) {
                                     obj[pHeaders[j] || ('col' + j)] = rowData[j];
                                 }
-                                
                                 let nombreP = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['adjudicatario'];
                                 let montoRawP = obj['postura'] || obj['monto'] || obj['oferta'] || obj['valor'];
                                 let montoP = parseMoney(montoRawP);
                                 let emailP = obj['email'] || obj['correo'] || '';
                                 let rutP = obj['rut'] || obj['rutcliente'] || '';
-                                
                                 let loteRaw = String(obj['lote'] || obj['detalle'] || obj['descripcion'] || '').replace(/<[^>]+>/g, '').trim();
                                 let numP = String(obj['numero'] || obj['nrolote'] || '').replace(/\D/g, '');
-                                
                                 if (!numP && loteRaw) {
                                     let matchLoteP = loteRaw.match(/^(\d+)\s/);
-                                    if(matchLoteP) {
-                                        numP = matchLoteP[1];
-                                    }
+                                    if(matchLoteP) numP = matchLoteP[1];
                                 }
-
                                 if(montoP > 0 && nombreP) {
                                     let isFalso = esClienteFalso(nombreP, emailP);
                                     let puja = {
@@ -3341,17 +3699,19 @@ window.parseExcel = function(file) {
                                         esFalso: isFalso,
                                         fecha: fechaData.timestamp
                                     };
-                                    
                                     let matchAdj = remate.adjudicaciones.find(a => {
                                         let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
                                         let matchNum = a.numeroLote && numP && a.numeroLote === numP;
                                         return matchStr || matchNum;
                                     });
-
                                     if (matchAdj) {
                                         let loteKey = matchAdj.loteStr;
                                         if (!remate.posturasPorLote[loteKey]) remate.posturasPorLote[loteKey] = [];
                                         remate.posturasPorLote[loteKey].push(puja);
+                                        // ACTUALIZAR CONTADOR DE PUJAS REALES
+                                        if (!isFalso) {
+                                            matchAdj.pujadoresRealesCount = (matchAdj.pujadoresRealesCount || 0) + 1;
+                                        }
                                     } else if (loteRaw) {
                                         if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
                                         remate.posturasPorLote[loteRaw].push(puja);
@@ -3359,6 +3719,42 @@ window.parseExcel = function(file) {
                                         if (!remate.posturasPorLote[numP]) remate.posturasPorLote[numP] = [];
                                         remate.posturasPorLote[numP].push(puja);
                                     }
+                                }
+                            }
+                        }
+                    } catch(e) {}
+                }
+
+                // CHAT
+                let sheetChatName = workbook.SheetNames.find(s => String(s).toLowerCase().includes('chat'));
+                if (sheetChatName) {
+                    try {
+                        const wsChat = workbook.Sheets[sheetChatName];
+                        const rowsChat = XLSX.utils.sheet_to_json(wsChat, {header: 1, defval: ""});
+                        let headerCIdx = -1;
+                        let cHeaders = [];
+                        for(let i=0; i<Math.min(rowsChat.length, 10); i++){
+                            if(!rowsChat[i] || !Array.isArray(rowsChat[i])) continue;
+                            let rowStr = rowsChat[i].map(c => String(c).toLowerCase().trim()).join(' ');
+                            if(rowStr.includes('mensaje') || rowStr.includes('usuario') || rowStr.includes('fecha')) {
+                                headerCIdx = i;
+                                cHeaders = rowsChat[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
+                                break;
+                            }
+                        }
+                        if(headerCIdx !== -1) {
+                            for(let i = headerCIdx + 1; i < rowsChat.length; i++) {
+                                let rowData = rowsChat[i];
+                                if(!rowData || !Array.isArray(rowData) || rowData.join('').trim() === '') continue;
+                                let obj = {};
+                                for(let j = 0; j < cHeaders.length; j++) {
+                                    obj[cHeaders[j] || ('col' + j)] = rowData[j];
+                                }
+                                let mensaje = obj['mensaje'] || obj['texto'] || '';
+                                let usuario = obj['usuario'] || 'Anónimo';
+                                let fecha = obj['fecha'] || fechaData.timestamp;
+                                if (mensaje) {
+                                    remate.chatMessages.push({ mensaje, usuario, fecha });
                                 }
                             }
                         }
@@ -3396,10 +3792,8 @@ document.body.addEventListener('dragleave', e => {
 document.body.addEventListener('drop', async e => { 
     e.preventDefault(); 
     dropZone.classList.remove('dragover'); 
-    
     const items = e.dataTransfer.items; 
     const allFiles = []; 
-    
     if(items) { 
         const promises = []; 
         for(let i=0; i<items.length; i++) { 
@@ -3410,7 +3804,6 @@ document.body.addEventListener('drop', async e => {
     } else { 
         allFiles.push(...e.dataTransfer.files); 
     } 
-    
     window.iniciarProcesamiento(allFiles);
 });
 
@@ -3497,7 +3890,6 @@ window.iniciarProcesamiento = async function(files) {
     
     db.remates.forEach(remate => { 
         let nuevos = 0, antiguos = 0; 
-        
         remate.garantiasEmailsReales.forEach(email => { 
             if(clientesGlobales.includes(email)) {
                 antiguos++; 
@@ -3506,17 +3898,13 @@ window.iniciarProcesamiento = async function(files) {
                 clientesGlobales.push(email); 
             } 
         }); 
-        
         remate.nuevos = nuevos; 
         remate.antiguos = antiguos; 
-        
         let ganadoresNuevos = 0;
         let ventaNuevos = 0;
         let ventaAntiguos = 0; 
         let statusCliente = {}; 
-        
         const ganadoresUnicos = [...new Set(remate.adjudicaciones.filter(a => !a.esFalso).map(a => a.clienteReal))]; 
-        
         ganadoresUnicos.forEach(cliente => { 
             if(adjudicatariosGlobales.includes(cliente)) { 
                 statusCliente[cliente] = 'antiguo'; 
@@ -3526,7 +3914,6 @@ window.iniciarProcesamiento = async function(files) {
                 statusCliente[cliente] = 'nuevo'; 
             } 
         }); 
-        
         remate.adjudicaciones.forEach(a => { 
             if(!a.esFalso) { 
                 if(statusCliente[a.clienteReal] === 'nuevo') {
@@ -3536,7 +3923,6 @@ window.iniciarProcesamiento = async function(files) {
                 }
             }
         }); 
-        
         remate.ganadoresNuevos = ganadoresNuevos; 
         remate.ventaNuevos = ventaNuevos; 
         remate.ventaAntiguos = ventaAntiguos; 
@@ -3571,37 +3957,27 @@ window.limpiarBase = async function() {
     if (!confirm('¿Estás seguro de vaciar TODA la base de datos en la nube? Esta acción no se puede deshacer.')) {
         return;
     }
-
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingText = document.getElementById('loading-text');
     loadingOverlay.classList.remove('hidden');
     loadingOverlay.classList.add('flex');
     loadingText.innerText = 'Vaciando base de datos...';
-
     try {
-        const { error } = await supabaseClient
-            .from('app_state')
-            .delete()
-            .neq('id', 0);
-
+        const { error } = await supabaseClient.from('app_state').delete().neq('id', 0);
         if (error) throw error;
-
         db = { remates: [] };
         checkedNodes = [];
         clientDB = [];
+        clientesLatentes = [];
+        feedbackMessages = [];
         window.globalSelectedYears = [];
-
-        document.getElementById('db-status').innerHTML =
-            '<span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Base Vacía';
-
+        document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Base Vacía';
         window.actualizarFiltrosGlobales();
         window.actualizarEstadoApp();
-
         alert('Base de datos vaciada correctamente.');
     } catch (e) {
         alert('Error al vaciar la base: ' + e.message);
-        document.getElementById('db-status').innerHTML =
-            '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
+        document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
     } finally {
         loadingOverlay.classList.add('hidden');
         loadingOverlay.classList.remove('flex');
@@ -3623,7 +3999,6 @@ window.abrirModalMultiLote = function() {
             </tr>`; 
         } 
     }); 
-    
     document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; 
     document.getElementById('modal-multilote').classList.remove('hidden'); 
     document.getElementById('modal-multilote').classList.add('flex'); 
@@ -3656,10 +4031,7 @@ window.abrirModalFuga = function() {
         } else { 
             html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">No hay registros de fuga.</td></tr>'; 
         }
-        
-        if(document.getElementById('modal-tabla-fuga')) {
-            document.getElementById('modal-tabla-fuga').innerHTML = html; 
-        }
+        document.getElementById('modal-tabla-fuga').innerHTML = html; 
         document.getElementById('modal-fuga').classList.remove('hidden'); 
         document.getElementById('modal-fuga').classList.add('flex');
     } catch (e) {}
@@ -3687,7 +4059,6 @@ window.exportarFugaExcel = function() {
                 "Email": f.email || 'No Registrado' 
             }; 
         });
-        
         const ws = XLSX.utils.json_to_sheet(wsData); 
         const wb = XLSX.utils.book_new(); 
         XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); 
@@ -3700,88 +4071,48 @@ window.abrirModalPujadores = function(loteEncoded, nodeId) {
         const loteStr = decodeURIComponent(loteEncoded); 
         let remate = db.remates.find(r => r.id === nodeId);
         if(!remate) return;
-
         let todasPujas = remate.posturasPorLote ? (remate.posturasPorLote[loteStr] || []) : [];
         let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null; 
-        
         currentAdjudicadoModal = adjudicado; 
         currentModalPujas = todasPujas.sort((a,b) => b.monto - a.monto);
-        
-        if(document.getElementById('modal-subtitulo')) {
-            document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'FALSO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
-        }
-        
-        if(document.getElementById('modal-total-pujas')) {
-            document.getElementById('modal-total-pujas').innerText = todasPujas.length; 
-        }
-        
-        if(document.getElementById('modal-unicos-reales')) {
-            document.getElementById('modal-unicos-reales').innerText = [...new Set(todasPujas.filter(p => !p.esFalso).map(p => p.nombreNorm))].length; 
-        }
-        
+        document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'FALSO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
+        document.getElementById('modal-total-pujas').innerText = todasPujas.length; 
+        document.getElementById('modal-unicos-reales').innerText = [...new Set(todasPujas.filter(p => !p.esFalso).map(p => p.nombreNorm))].length; 
         currentFiltroModal = 'todos'; 
-        
-        if(document.getElementById('btn-filtro-todos')) {
-            document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition'; 
-        }
-        
-        if(document.getElementById('btn-filtro-reales')) {
-            document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
-        }
-        
+        document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition'; 
+        document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
         renderModalTabla(); 
-        
         document.getElementById('modal-pujadores').classList.remove('hidden'); 
         document.getElementById('modal-pujadores').classList.add('flex');
-    } catch(e) { 
-        console.error("Error modal pujas:", e); 
-    }
+    } catch(e) { console.error("Error modal pujas:", e); }
 };
 
 function renderModalTabla() {
     try {
         let lista = currentModalPujas; 
         let adjudicado = currentAdjudicadoModal;
-        
         if(currentFiltroModal === 'reales') lista = lista.filter(p => !p.esFalso); 
         if(currentFiltroModal === 'falsos') lista = lista.filter(p => p.esFalso);
-        
-        if(document.getElementById('modal-tabla-pujas')) {
-            document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
-                let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
-                
-                let badge = p.esFalso 
-                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">FALSO</span>' 
-                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>'; 
-                    
-                if(esAdj) {
-                    badge += ' <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 ml-1">ADJUDICADO</span>';
-                }
-                
-                return `
-                <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.esFalso ? 'opacity-40' : ''}">
-                    <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
-                    <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
-                    <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
-                    <td class="text-right py-2 text-[12px] font-black ${esAdj ? 'text-emerald-600' : 'text-gray-900'}">${formatMoney(p.monto)}</td>
-                    <td class="text-center pr-5 py-2">${badge}</td>
-                </tr>`;
-            }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin pujas registradas en el excel</td></tr>';
-        }
+        document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
+            let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
+            let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">FALSO</span>' : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>';
+            if(esAdj) badge += ' <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 ml-1">ADJUDICADO</span>';
+            return `
+            <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.esFalso ? 'opacity-40' : ''}">
+                <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
+                <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
+                <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
+                <td class="text-right py-2 text-[12px] font-black ${esAdj ? 'text-emerald-600' : 'text-gray-900'}">${formatMoney(p.monto)}</td>
+                <td class="text-center pr-5 py-2">${badge}</td>
+            </tr>`;
+        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin pujas registradas en el excel</td></tr>';
     } catch(e) {}
 }
 
 window.filtrarModal = function(tipo) { 
     currentFiltroModal = tipo; 
-    
-    if(document.getElementById('btn-filtro-todos')) {
-        document.getElementById('btn-filtro-todos').className = tipo === 'todos' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
-    }
-    
-    if(document.getElementById('btn-filtro-reales')) {
-        document.getElementById('btn-filtro-reales').className = tipo === 'reales' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
-    }
-    
+    document.getElementById('btn-filtro-todos').className = tipo === 'todos' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+    document.getElementById('btn-filtro-reales').className = tipo === 'reales' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
     renderModalTabla(); 
 };
 
@@ -3802,9 +4133,6 @@ window.filtrarLotesMain = function() {
     }
 };
 
-// ============================================================
-// SORT TABLE (helper)
-// ============================================================
 window.sortTable = function(th, type) {
     const table = th.closest('table');
     const tbody = table.querySelector('tbody');
@@ -3812,7 +4140,6 @@ window.sortTable = function(th, type) {
     const index = Array.from(th.parentElement.children).indexOf(th);
     const isAsc = th.dataset.asc === 'true' ? false : true;
     th.dataset.asc = isAsc;
-    
     const getValue = (row, idx) => {
         const cell = row.querySelectorAll('td')[idx];
         if (!cell) return '';
@@ -3824,7 +4151,6 @@ window.sortTable = function(th, type) {
         }
         return val;
     };
-    
     rows.sort((a, b) => {
         let va = getValue(a, index);
         let vb = getValue(b, index);
@@ -3833,7 +4159,6 @@ window.sortTable = function(th, type) {
         }
         return isAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
     });
-    
     tbody.innerHTML = '';
     rows.forEach(row => tbody.appendChild(row));
 };
