@@ -127,6 +127,9 @@ async function checkSession() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').classList.remove('hidden');
             document.getElementById('app-content').classList.add('flex');
+
+            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('app-content').classList.add('flex');
             initApp();
         } else {
             document.getElementById('loading-overlay').classList.add('hidden');

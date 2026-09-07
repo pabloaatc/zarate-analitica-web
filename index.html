@@ -129,9 +129,13 @@
 <div class="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
 <div class="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2">Admin Controls</div>
 <label class="w-full block text-left text-[12px] py-1.5 hover:text-blue-600 font-medium cursor-pointer transition" for="file-input">
-<span>📁</span> Carga Excel Múltiple / Carpeta
+<span>📁</span> Carga de Carpeta Completa
                         </label>
 <input accept=".xlsx,.xls" class="hidden" id="file-input" multiple="" onchange="window.iniciarProcesamiento(this.files)" type="file" webkitdirectory=""/>
+<label class="w-full block text-left text-[12px] py-1.5 hover:text-blue-600 font-medium cursor-pointer transition" for="file-input-single">
+<span>📄</span> + Cargar Archivo(s)
+                        </label>
+<input accept=".xlsx,.xls" class="hidden" id="file-input-single" multiple="" onchange="window.iniciarProcesamiento(this.files)" type="file"/>
 <button class="w-full text-left text-[12px] py-1.5 text-red-500 hover:text-red-700 font-medium transition" id="btn-vaciar-base" onclick="window.limpiarBase()"><span>🗑️</span> Vaciar Nube DB</button>
 </div>
 </div>
