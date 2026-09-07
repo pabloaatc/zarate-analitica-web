@@ -1,0 +1,25 @@
+body { font-family: 'Roboto', sans-serif; background-color: #F3F4F6; color: #111827; -webkit-font-smoothing: antialiased; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+        input[type="checkbox"] { appearance: none; background-color: #f9fafb; margin: 0; width: 1.15rem; height: 1.15rem; border: 1.5px solid #d1d5db; border-radius: 0.25rem; display: grid; place-content: center; transition: all 0.1s; cursor: pointer;}
+        input[type="checkbox"]::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); transition: 120ms transform ease-in-out;}
+        input[type="checkbox"]:checked { background-color: #111827; border-color: #111827; }
+        input[type="checkbox"]:checked::before { transform: scale(1); }
+        .modal-bg { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
+        .dragover { background-color: #E5E7EB !important; border: 2px dashed #111827 !important; }
+        .tab-active { background-color: #111827; color: white; border-color: #111827; }
+        .tab-inactive { background-color: #f3f4f6; color: #4b5563; border-color: #d1d5db; }
+        .tab-inactive:hover { background-color: #e5e7eb; }
+        .badge-frecuente { background-color: #111827; color: white; }
+        .badge-recurrente { background-color: #3b82f6; color: white; }
+        .badge-nuevo { background-color: #10b981; color: white; }
+        .badge-riesgo { background-color: #ef4444; color: white; }
+        .badge-hybrid { background-color: #8b5cf6; color: white; }
+        .tooltip-trigger { cursor: help; border-bottom: 1px dashed #9ca3af; }
+        @media print {
+            aside, header, #paraguas-bar, .no-print { display: none !important; }
+            main { padding: 0 !important; background: white !important; }
+            .bg-white { box-shadow: none !important; border: 1px solid #e5e7eb !important; break-inside: avoid; }
+        }
