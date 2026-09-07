@@ -452,7 +452,7 @@ async function initApp() {
             }
             db.remates.forEach(r => {
                 if (!r.id) {
-                    r.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+                    r.id = 'UID-' + window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp).replace(/[^a-zA-Z0-9]/g, '');
                 }
             });
             statusLabel.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> En Línea (${db.remates.length})`;
@@ -3024,14 +3024,14 @@ window.iniciarProcesamiento = async function(files) {
         try {
             const data = await window.parseExcel(validFiles[i]);
             if(data) {
-                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName);
+                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName || window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp) === window.formatearNombreRemate(data.fileName, data.fechaData?.timestamp));
                 if (existsIdx >= 0) {
                     data._dbId = db.remates[existsIdx]._dbId;
                     data.id = db.remates[existsIdx].id;
                     db.remates[existsIdx] = data;
                 } else {
                     data._dbId = Math.floor(Math.random() * 2000000000);
-                    data.id = 'UID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+                    data.id = 'UID-' + window.formatearNombreRemate(data.fileName, data.fechaData?.timestamp).replace(/[^a-zA-Z0-9]/g, '');
                     db.remates.push(data);
                 }
                 upsertQueue.push({ id: data._dbId, payload: data });
