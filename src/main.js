@@ -2358,17 +2358,26 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
         if (index > 0) {
             const mesAnterior = resultados[index - 1];
             const crecimientoVentas = mesAnterior.ventaTotal > 0 ? ((resultado.ventaTotal - mesAnterior.ventaTotal) / mesAnterior.ventaTotal) * 100 : 0;
+
+            // Check if month is still in progress (e.g. current month or only 1 auction recorded)
+            const hoy = new Date();
+            const esMesActual = (hoy.getFullYear() === parseInt(key.split('-')[0])) && (hoy.getMonth() + 1 === parseInt(key.split('-')[1]));
+            resultado.enCurso = esMesActual;
+
             resultado.kpis = {
                 ganadores: { valor: ganadoresPorRemate, meta: METAS_BONOS.ganadores, cumple: ganadoresPorRemate >= METAS_BONOS.ganadores },
                 pujadores: { valor: pujadoresPorRemate, meta: METAS_BONOS.pujadores, cumple: pujadoresPorRemate >= METAS_BONOS.pujadores },
                 garantes: { valor: garantesPorRemate, meta: METAS_BONOS.garantes, cumple: garantesPorRemate >= METAS_BONOS.garantes },
                 ventas: { valor: crecimientoVentas, meta: METAS_BONOS.ventas, cumple: crecimientoVentas >= METAS_BONOS.ventas }
             };
+
             let bonoTotal = 0;
-            if (resultado.kpis.ganadores.cumple) bonoTotal += 50000;
-            if (resultado.kpis.pujadores.cumple) bonoTotal += 50000;
-            if (resultado.kpis.garantes.cumple) bonoTotal += 50000;
-            if (resultado.kpis.ventas.cumple) bonoTotal += 50000;
+            if (!resultado.enCurso) {
+                if (resultado.kpis.ganadores.cumple) bonoTotal += 50000;
+                if (resultado.kpis.pujadores.cumple) bonoTotal += 50000;
+                if (resultado.kpis.garantes.cumple) bonoTotal += 50000;
+                if (resultado.kpis.ventas.cumple) bonoTotal += 50000;
+            }
             resultado.bono = bonoTotal;
         }
         resultados.push(resultado);
@@ -2378,13 +2387,21 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
 }
 
 function renderizarBonoActual(ultimoMes) {
-    document.getElementById('bono-total-mes').innerText = formatMoney(ultimoMes.bono || 0);
+    if(ultimoMes.enCurso) {
+        document.getElementById('bono-total-mes').innerText = '⏳ Pendiente';
+        document.getElementById('bono-total-mes').className = 'text-xl font-bold text-slate-500 mt-1';
+    } else {
+        document.getElementById('bono-total-mes').innerText = formatMoney(ultimoMes.bono || 0);
+        document.getElementById('bono-total-mes').className = 'text-2xl font-black text-emerald-600 mt-1';
+    }
+
     const cumplidos = ultimoMes.kpis ? Object.values(ultimoMes.kpis).filter(k => k.cumple).length : 0;
-    document.getElementById('bono-kpis-cumplidos').innerText = `${cumplidos}/4`;
+    document.getElementById('bono-kpis-cumplidos').innerText = ultimoMes.enCurso ? 'En Curso' : `${cumplidos}/4`;
     document.getElementById('bono-nuevos-clientes').innerText = ultimoMes.totalNuevos || 0;
     const crecimientoVentas = ultimoMes.kpis?.ventas?.valor || 0;
     document.getElementById('bono-crecimiento-ventas').innerText = `${crecimientoVentas.toFixed(1)}%`;
     document.getElementById('bono-mes-label').innerText = `Mes: ${ultimoMes.mes} (${ultimoMes.numRemates} remates)`;
+
     const detalleContainer = document.getElementById('bono-kpis-detalle');
     if (ultimoMes.kpis) {
         const kpis = [
@@ -2393,26 +2410,34 @@ function renderizarBonoActual(ultimoMes) {
             { key: 'garantes', label: '🛡️ Nuevos Garantes', data: ultimoMes.kpis.garantes, extra: `${ultimoMes.nuevosGarantes} total / ${ultimoMes.numRemates} remates` },
             { key: 'ventas', label: '💰 Crecimiento Ventas', data: ultimoMes.kpis.ventas, extra: `$${formatMoneyNumber(ultimoMes.ventaTotal)}` }
         ];
-        detalleContainer.innerHTML = kpis.map(k => `
+        detalleContainer.innerHTML = kpis.map(k => {
+            let statusBadge = ultimoMes.enCurso ? '<span class="text-[11px] font-bold text-slate-400">⏳ En Curso</span>' :
+                (k.data.cumple ? '<span class="text-[11px] font-bold text-emerald-600">✅ Cumple</span>' : '<span class="text-[11px] font-bold text-red-500">❌ No cumple</span>');
+
+            let colorVal = ultimoMes.enCurso ? 'text-slate-600' : (k.data.cumple ? 'text-emerald-600' : 'text-red-500');
+            let colorBar = ultimoMes.enCurso ? 'bg-slate-400' : (k.data.cumple ? 'bg-emerald-500' : 'bg-red-400');
+
+            let valWidth = ultimoMes.enCurso ? (k.data.valor > 0 ? Math.min(100, (k.data.valor / k.data.meta) * 100) : 0) : (k.data.cumple ? 100 : Math.min(100, (k.data.valor / k.data.meta) * 100));
+
+            return `
             <div class="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
                 <div class="flex justify-between items-start">
-                    <span class="text-[12px] font-bold text-gray-800">${k.label}</span>
-                    <span class="text-[11px] font-bold ${k.data.cumple ? 'text-emerald-600' : 'text-red-500'}">
-                        ${k.data.cumple ? '✅ Cumple' : '❌ No cumple'}
-                    </span>
+                    <span class="text-[12px] font-bold text-slate-800">${k.label}</span>
+                    ${statusBadge}
                 </div>
                 <div class="mt-1 flex items-center gap-2">
-                    <span class="text-[14px] font-black ${k.data.cumple ? 'text-emerald-600' : 'text-red-500'}">
+                    <span class="text-[14px] font-black ${colorVal}">
                         ${k.key === 'ventas' ? k.data.valor.toFixed(1) + '%' : k.data.valor.toFixed(1)}
                     </span>
                     <span class="text-[11px] text-gray-400">Meta: ${k.key === 'ventas' ? k.data.meta + '%' : k.data.meta}</span>
                 </div>
                 <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
-                    <div class="h-full rounded-full ${k.data.cumple ? 'bg-emerald-500' : 'bg-red-400'}" style="width: ${k.data.cumple ? 100 : Math.min(100, (k.data.valor / k.data.meta) * 100)}%"></div>
+                    <div class="h-full rounded-full ${colorBar}" style="width: ${Math.max(0, valWidth)}%"></div>
                 </div>
                 <div class="text-[9px] text-gray-400 mt-1">${k.extra}</div>
             </div>
-        `).join('');
+            `;
+        }).join('');
     } else {
         detalleContainer.innerHTML = `<div class="col-span-full text-center text-gray-400 py-4"><p class="text-sm font-medium">No hay datos suficientes para el primer mes</p></div>`;
     }
@@ -2434,23 +2459,23 @@ function renderizarHistorialBonos(resultados) {
         <tr class="hover:bg-gray-50 transition">
             <td class="px-3 py-2 font-medium text-gray-900">${m.mes}</td>
             <td class="px-3 py-2 text-center text-gray-500">${m.numRemates}</td>
-            <td class="px-3 py-2 text-center ${m.kpis?.ganadores?.cumple ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
-                ${m.kpis?.ganadores ? (m.kpis.ganadores.cumple ? '✅' : '❌') : '-'}
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.ganadores?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+                ${m.kpis?.ganadores ? (m.enCurso ? '⏳' : (m.kpis.ganadores.cumple ? '✅' : '❌')) : '-'}
                 ${m.nuevosGanadores || 0}
             </td>
-            <td class="px-3 py-2 text-center ${m.kpis?.pujadores?.cumple ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
-                ${m.kpis?.pujadores ? (m.kpis.pujadores.cumple ? '✅' : '❌') : '-'}
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.pujadores?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+                ${m.kpis?.pujadores ? (m.enCurso ? '⏳' : (m.kpis.pujadores.cumple ? '✅' : '❌')) : '-'}
                 ${m.nuevosPujadores || 0}
             </td>
-            <td class="px-3 py-2 text-center ${m.kpis?.garantes?.cumple ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
-                ${m.kpis?.garantes ? (m.kpis.garantes.cumple ? '✅' : '❌') : '-'}
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.garantes?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+                ${m.kpis?.garantes ? (m.enCurso ? '⏳' : (m.kpis.garantes.cumple ? '✅' : '❌')) : '-'}
                 ${m.nuevosGarantes || 0}
             </td>
-            <td class="px-3 py-2 text-center ${m.kpis?.ventas?.cumple ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
-                ${m.kpis?.ventas ? (m.kpis.ventas.cumple ? '✅' : '❌') : '-'}
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.ventas?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+                ${m.kpis?.ventas ? (m.enCurso ? '⏳' : (m.kpis.ventas.cumple ? '✅' : '❌')) : '-'}
                 ${m.kpis?.ventas ? m.kpis.ventas.valor.toFixed(1) + '%' : '-'}
             </td>
-            <td class="px-3 py-2 text-right font-bold text-emerald-600">${formatMoney(m.bono || 0)}</td>
+            <td class="px-3 py-2 text-right font-bold ${m.enCurso ? 'text-slate-500' : 'text-emerald-600'}">${m.enCurso ? '⏳ Pendiente' : formatMoney(m.bono || 0)}</td>
         </tr>
     `).join('');
 }
@@ -3141,9 +3166,7 @@ window.iniciarProcesamiento = async function(files) {
 // VACIAR BASE DE DATOS
 // ============================================================
 window.limpiarBase = async function() {
-    if (!confirm('¿Estás seguro de vaciar TODA la base de datos en la nube? Esta acción no se puede deshacer.')) {
-        return;
-    }
+
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingText = document.getElementById('loading-text');
     loadingOverlay.classList.remove('hidden');
