@@ -265,21 +265,39 @@ function normalizarCliente(nombre) {
 
 function esClienteFalso(nombre, email) {
     if (!nombre && !email) return true;
-    const n = String(nombre || '').toLowerCase();
-    const e = String(email || '').toLowerCase();
+
+    // Normalize string: to lowercase, remove accents, and strip punctuation/extra spaces
+    const normalizeString = (str) => {
+        return String(str || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '')
+            .trim();
+    };
+
+    const nNorm = normalizeString(nombre);
+    const eNorm = normalizeString(email);
+    const eRaw = String(email || '').toLowerCase().trim();
+
+    // Check for short meaningless entries (<= 2 characters or repeated single characters)
+    if (nNorm.length <= 2) return true;
+    if (/^([a-z0-9])\1+$/.test(nNorm) && nNorm.length <= 3) return true;
 
     const falsos = [
-        'zarate', 'zárate', 'prueba', 'test', 'interno', 'admin',
-        'sistema', 'demo', 'falso', 'no adjudicado', 'sin adjudicar',
-        'casa matriz', 'casa de remate', 'rematadora'
+        'zarate', 'prueba', 'test', 'interno', 'admin',
+        'sistema', 'demo', 'falso', 'noadjudicado', 'sinadjudicar',
+        'casamatriz', 'casaderemate', 'rematadora', 'clienteprueba', 'clientegenerico',
+        'rz'
     ];
 
     for (const f of falsos) {
-        if (n.includes(f) || e.includes(f)) return true;
+        if (nNorm.includes(f) || eNorm.includes(f)) return true;
     }
 
-    if (e.includes('@zarate') || e.includes('@remate') || e.includes('noreply') || e.includes('no-reply')) {
-        return true;
+    const dominiosFalsos = ['@zarate', 'zarate.cl', '@plataforma', '@test', '@remate', 'noreply', 'no-reply'];
+    for (const d of dominiosFalsos) {
+        if (eRaw.includes(d)) return true;
     }
 
     return false;
