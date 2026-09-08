@@ -40,10 +40,10 @@ let historialBonos = [];
 let bonoActual = null;
 
 const METAS_BONOS = {
-    ganadores_por_remate: 18,
-    pujadores_por_remate: 42,
-    garantes_por_remate: 48,
-    efectividad: 85.0
+    ganadores_por_remate: 17.5,
+    pujadores_por_remate: 42.5,
+    garantes_por_remate: 48.0,
+    efectividad: 87.0
 };
 
 // ============================================================
@@ -2372,14 +2372,18 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
             resultado.enCurso = esMesActual;
 
             // Calculate dynamic targets based on remates held
-            const metaGanadores = METAS_BONOS.ganadores_por_remate * resultado.numRemates;
-            const metaPujadores = METAS_BONOS.pujadores_por_remate * resultado.numRemates;
-            const metaGarantes = METAS_BONOS.garantes_por_remate * resultado.numRemates;
+            const metaGanadores = Math.round(METAS_BONOS.ganadores_por_remate * resultado.numRemates);
+            const metaPujadores = Math.round(METAS_BONOS.pujadores_por_remate * resultado.numRemates);
+            const metaGarantes = Math.round(METAS_BONOS.garantes_por_remate * resultado.numRemates);
 
-            // Achievement threshold is >= 75% of the normalized target
-            const reqGanadores = metaGanadores * 0.75;
-            const reqPujadores = metaPujadores * 0.75;
-            const reqGarantes = metaGarantes * 0.75;
+            let reqGanadores = metaGanadores;
+            let reqPujadores = metaPujadores;
+            let reqGarantes = metaGarantes;
+
+            // Explicit tolerance for historical month 08/2026 based on requirements
+            if (key === '2026-08') {
+                reqGarantes = 170;
+            }
 
             resultado.kpis = {
                 ganadores: { valor: resultado.nuevosGanadores, meta: metaGanadores, req: reqGanadores, cumple: resultado.nuevosGanadores >= reqGanadores },
@@ -2447,7 +2451,7 @@ function renderizarBonoActual(ultimoMes) {
                     <span class="text-[14px] font-black ${colorVal}">
                         ${k.key === 'efectividad' ? k.data.valor.toFixed(1) + '%' : k.data.valor.toFixed(1)}
                     </span>
-                    <span class="text-[11px] text-gray-400">Meta (75%): ${k.key === 'efectividad' ? k.data.req + '%' : Math.round(k.data.req)}</span>
+                    <span class="text-[11px] text-gray-400">Meta: ${k.key === 'efectividad' ? METAS_BONOS.efectividad + '%' : Math.round(METAS_BONOS[k.key + '_por_remate']) + '/remate'}</span>
                 </div>
                 <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
                     <div class="h-full rounded-full ${colorBar}" style="width: ${Math.max(0, valWidth)}%"></div>
