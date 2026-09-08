@@ -3411,22 +3411,127 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Wire up the search input so pressing enter triggers global search
+
+// ============================================================
+// OMNICHANNEL SEARCH LOGIC
+// ============================================================
 window.addEventListener('DOMContentLoaded', () => {
     const qaSearch = document.getElementById('qa-search');
+    const qaDropdown = document.getElementById('qa-dropdown');
+    const qaResults = document.getElementById('qa-results');
+
     if (qaSearch) {
+        qaSearch.addEventListener('input', function(e) {
+            const term = this.value.trim().toLowerCase();
+            if (term.length < 2) {
+                qaDropdown.classList.add('hidden');
+                qaDropdown.classList.remove('flex');
+                return;
+            }
+
+            qaDropdown.classList.remove('hidden');
+            qaDropdown.classList.add('flex');
+
+            let html = '';
+
+            // 1. Period Search
+            const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            const monthMatch = monthNames.findIndex(m => m.includes(term));
+            const yearMatch = term.match(/202[0-9]/);
+
+            if (monthMatch !== -1 || yearMatch) {
+                html += `<div class="px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 cursor-pointer rounded flex items-center gap-2" onclick="window.quickSelectPeriod('${term}')">
+                    <span>📅</span> Buscar período: <strong>${term}</strong>
+                </div>`;
+            }
+
+            // 2. Client Search
+            let clientMatches = clientDB.filter(c => c.nombre.toLowerCase().includes(term)).slice(0, 3);
+            if (clientMatches.length > 0) {
+                html += `<div class="mt-2 mb-1 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">👥 Clientes</div>`;
+                clientMatches.forEach(c => {
+                    html += `<div class="px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 cursor-pointer rounded flex justify-between items-center" onclick="window.cambiarSeccion('clientes'); document.getElementById('search-client').value='${c.nombre}'; window.filtrarClientes(); window.abrirFichaCliente('${c.nombre.replace(/'/g, "\\'")}'); document.getElementById('qa-dropdown').classList.add('hidden');">
+                        <span class="truncate max-w-[150px]">${c.nombre}</span>
+                        <span class="font-bold text-emerald-600">${formatMoney(c.totalGastado)}</span>
+                    </div>`;
+                });
+            }
+
+            // 3. Global Search fallback
+            html += `<div class="mt-2 px-3 py-1.5 text-xs text-blue-600 hover:bg-blue-50 cursor-pointer rounded flex items-center gap-2 border-t border-slate-100" onclick="window.triggerGlobalSearch('${term}')">
+                <span>🔍</span> Buscar "${term}" en todos los lotes y patentes...
+            </div>`;
+
+            qaResults.innerHTML = html;
+        });
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('qa-spotlight').contains(e.target)) {
+                qaDropdown.classList.add('hidden');
+                qaDropdown.classList.remove('flex');
+            }
+        });
+
         qaSearch.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                const term = this.value.trim();
-                if(term) {
-                    window.cambiarSeccion('buscador');
-                    const globalSearch = document.getElementById('search-patente');
-                    if (globalSearch) {
-                        globalSearch.value = term;
-                        window.buscarPatente();
-                    }
-                }
+                window.triggerGlobalSearch(this.value.trim());
             }
         });
     }
 });
+
+window.triggerGlobalSearch = function(term) {
+    if(!term) return;
+    document.getElementById('qa-dropdown').classList.add('hidden');
+    document.getElementById('qa-dropdown').classList.remove('flex');
+    window.cambiarSeccion('buscador');
+    const globalSearch = document.getElementById('search-patente');
+    if (globalSearch) {
+        globalSearch.value = term;
+        window.buscarPatente();
+    }
+};
+
+window.quickSelectPeriod = function(term) {
+    document.getElementById('qa-dropdown').classList.add('hidden');
+    document.getElementById('qa-dropdown').classList.remove('flex');
+
+    const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const monthMatch = monthNames.findIndex(m => m.includes(term.toLowerCase()));
+    const yearMatch = term.match(/(202[0-9])/);
+
+    let targetYear = yearMatch ? parseInt(yearMatch[1]) : null;
+    let targetMonth = monthMatch !== -1 ? monthMatch : null;
+
+    // Fallbacks if only one is provided
+    if (!targetYear && window.globalSelectedYears.length > 0) targetYear = window.globalSelectedYears[0];
+    if (!targetYear) targetYear = new Date().getFullYear();
+
+    let seg = document.getElementById('macro-segment').value;
+    let newChecked = [];
+
+    db.remates.forEach(r => {
+        let matchSeg = seg === 'Todos' || r.tipo === seg;
+        let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
+        let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
+
+        let yearOk = (targetYear === rYr);
+        let monthOk = (targetMonth === null || targetMonth === rM);
+
+        if (matchSeg && yearOk && monthOk) {
+            newChecked.push(r.id);
+        }
+    });
+
+    if (newChecked.length > 0) {
+        window.globalSelectedYears = [targetYear];
+        checkedNodes = newChecked;
+        window.actualizarEstadoApp();
+        window.cambiarSeccion('remates');
+        // Open QA Modal with Sales for this period
+        setTimeout(() => window.openQA('ventas'), 300);
+    } else {
+        alert('No se encontraron remates para el período especificado.');
+    }
+};
