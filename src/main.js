@@ -263,44 +263,15 @@ function normalizarCliente(nombre) {
         .trim();
 }
 
-function esClienteFalso(nombre, email) {
+function esClienteFalso(nombre, email = '') {
     if (!nombre && !email) return true;
+    const str = `${nombre || ''} ${email || ''}`.toLowerCase().trim();
+    if (str.length <= 2) return true;
+    if (/\brz\b|\brz[\s\-_.]*rz\b|@zarate|zarate\.cl|\btest\b|\bprueba\b/i.test(str)) return true;
 
-    // Normalize string: to lowercase, remove accents, and strip punctuation/extra spaces
-    const normalizeString = (str) => {
-        return String(str || '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, '')
-            .trim();
-    };
-
-    const nNorm = normalizeString(nombre);
-    const eNorm = normalizeString(email);
-    const eRaw = String(email || '').toLowerCase().trim();
-
-    // Check for short meaningless entries (<= 2 characters or repeated single characters)
-    if (nNorm.length <= 2) return true;
-    if (/^([a-z0-9])\1+$/.test(nNorm) && nNorm.length <= 3) return true;
-
-    const falsos = [
-        'zarate', 'prueba', 'test', 'interno', 'admin',
-        'sistema', 'demo', 'falso', 'noadjudicado', 'sinadjudicar',
-        'casamatriz', 'casaderemate', 'rematadora', 'clienteprueba', 'clientegenerico',
-        'rz'
-    ];
-
-    for (const f of falsos) {
-        if (nNorm.includes(f) || eNorm.includes(f)) return true;
-    }
-
-    const dominiosFalsos = ['@zarate', 'zarate.cl', '@plataforma', '@test', '@remate', 'noreply', 'no-reply'];
-    for (const d of dominiosFalsos) {
-        if (eRaw.includes(d)) return true;
-    }
-
-    return false;
+    // Also catch original system terms that should be excluded
+    const regexFalso = /demo|cliente generico|interno|admin|sistema|falso|no adjudicado|sin adjudicar|casa matriz|casa de remate|rematadora|@plataforma|noreply|no-reply/i;
+    return regexFalso.test(str);
 }
 
 function extraerMarcaModelo(texto) {
@@ -3322,7 +3293,8 @@ window.abrirModalPujadores = function(loteEncoded, nodeId) {
         // And "completely hide all bids made by test/fake users" when toggling "Solo Reales".
         // Let's modify the total logic:
         document.getElementById('modal-total-pujas').innerText = todasPujas.length;
-        document.getElementById('modal-unicos-reales').innerText = todasPujas.filter(p => !p.esFalso).length;
+        const realBidsCount = todasPujas.filter(b => !esClienteFalso(b.nombre, b.email)).length;
+        document.getElementById('modal-unicos-reales').innerText = realBidsCount;
         currentFiltroModal = 'todos';
         document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition';
         document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition';
@@ -3336,14 +3308,26 @@ function renderModalTabla() {
     try {
         let lista = currentModalPujas;
         let adjudicado = currentAdjudicadoModal;
-        if(currentFiltroModal === 'reales') lista = lista.filter(p => !p.esFalso);
-        if(currentFiltroModal === 'falsos') lista = lista.filter(p => p.esFalso);
+
+        // Re-evaluate in real-time
+        lista.forEach(p => p.isFakeRealTime = esClienteFalso(p.nombre, p.email || ''));
+
+        if(currentFiltroModal === 'reales') lista = lista.filter(p => !p.isFakeRealTime);
+
         document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
-            let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
-            let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">INTERNO / TEST</span>' : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>';
-            if(esAdj) badge += ' <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 ml-1">ADJUDICADO</span>';
+            let esAdj = adjudicado && !esClienteFalso(adjudicado.nombreRaw, adjudicado.email) && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
+
+            let badge = '';
+            if (p.isFakeRealTime) {
+                badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">INTERNO</span>';
+            } else if (esAdj) {
+                badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">ADJUDICADO</span>';
+            } else {
+                badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">REAL</span>';
+            }
+
             return `
-            <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.esFalso ? 'bg-slate-50 opacity-60' : ''}">
+            <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.isFakeRealTime ? 'bg-slate-50 opacity-60' : ''}">
                 <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
                 <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
                 <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
