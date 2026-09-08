@@ -40,10 +40,10 @@ let historialBonos = [];
 let bonoActual = null;
 
 const METAS_BONOS = {
-    ganadores_por_remate: 4,
-    pujadores_por_remate: 10,
-    garantes_por_remate: 12,
-    efectividad: 78
+    ganadores_por_remate: 18,
+    pujadores_por_remate: 42,
+    garantes_por_remate: 48,
+    efectividad: 85.0
 };
 
 // ============================================================
@@ -2371,31 +2371,31 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
             const esMesActual = (hoy.getFullYear() === parseInt(key.split('-')[0])) && (hoy.getMonth() + 1 === parseInt(key.split('-')[1]));
             resultado.enCurso = esMesActual;
 
-            // Calculate proportional targets
-            const metaGanadores = METAS_BONOS.ganadores_por_remate * 0.75;
-            const metaPujadores = METAS_BONOS.pujadores_por_remate * 0.75;
-            const metaGarantes = METAS_BONOS.garantes_por_remate * 0.75;
+            // Calculate dynamic targets based on remates held
+            const metaGanadores = METAS_BONOS.ganadores_por_remate * resultado.numRemates;
+            const metaPujadores = METAS_BONOS.pujadores_por_remate * resultado.numRemates;
+            const metaGarantes = METAS_BONOS.garantes_por_remate * resultado.numRemates;
+
+            // Achievement threshold is >= 75% of the normalized target
+            const reqGanadores = metaGanadores * 0.75;
+            const reqPujadores = metaPujadores * 0.75;
+            const reqGarantes = metaGarantes * 0.75;
 
             resultado.kpis = {
-                ganadores: { valor: ganadoresPorRemate, meta: metaGanadores, cumple: ganadoresPorRemate >= metaGanadores },
-                pujadores: { valor: pujadoresPorRemate, meta: metaPujadores, cumple: pujadoresPorRemate >= metaPujadores },
-                garantes: { valor: garantesPorRemate, meta: metaGarantes, cumple: garantesPorRemate >= metaGarantes },
-                efectividad: { valor: efectividad, meta: METAS_BONOS.efectividad, cumple: efectividad >= METAS_BONOS.efectividad }
+                ganadores: { valor: resultado.nuevosGanadores, meta: metaGanadores, req: reqGanadores, cumple: resultado.nuevosGanadores >= reqGanadores },
+                pujadores: { valor: resultado.nuevosPujadores, meta: metaPujadores, req: reqPujadores, cumple: resultado.nuevosPujadores >= reqPujadores },
+                garantes: { valor: resultado.nuevosGarantes, meta: metaGarantes, req: reqGarantes, cumple: resultado.nuevosGarantes >= reqGarantes },
+                efectividad: { valor: efectividad, meta: METAS_BONOS.efectividad, req: METAS_BONOS.efectividad, cumple: efectividad >= METAS_BONOS.efectividad }
             };
 
             let bonoTotal = 0;
             if (!resultado.enCurso) {
-                let cumplidosCount = 0;
-                if (resultado.kpis.ganadores.cumple) cumplidosCount++;
-                if (resultado.kpis.pujadores.cumple) cumplidosCount++;
-                if (resultado.kpis.garantes.cumple) cumplidosCount++;
-                if (resultado.kpis.efectividad.cumple) cumplidosCount++;
-
-                if (cumplidosCount >= 2) {
-                    bonoTotal = cumplidosCount * 50000;
-                }
+                if (resultado.kpis.ganadores.cumple) bonoTotal += 50000;
+                if (resultado.kpis.pujadores.cumple) bonoTotal += 50000;
+                if (resultado.kpis.garantes.cumple) bonoTotal += 50000;
+                if (resultado.kpis.efectividad.cumple) bonoTotal += 50000;
             }
-            resultado.bono = bonoTotal;
+            resultado.bono = Math.min(bonoTotal, 200000);
         }
         resultados.push(resultado);
         clientesAcumulados = new Set([...clientesAcumulados, ...clientesDelMes]);
@@ -2435,7 +2435,7 @@ function renderizarBonoActual(ultimoMes) {
             let colorVal = ultimoMes.enCurso ? 'text-slate-600' : (k.data.cumple ? 'text-emerald-600' : 'text-red-500');
             let colorBar = ultimoMes.enCurso ? 'bg-slate-400' : (k.data.cumple ? 'bg-emerald-500' : 'bg-red-400');
 
-            let valWidth = ultimoMes.enCurso ? (k.data.valor > 0 ? Math.min(100, (k.data.valor / k.data.meta) * 100) : 0) : (k.data.cumple ? 100 : Math.min(100, (k.data.valor / k.data.meta) * 100));
+            let valWidth = ultimoMes.enCurso ? (k.data.valor > 0 ? Math.min(100, (k.data.valor / k.data.req) * 100) : 0) : (k.data.cumple ? 100 : Math.min(100, (k.data.valor / k.data.req) * 100));
 
             return `
             <div class="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
@@ -2447,7 +2447,7 @@ function renderizarBonoActual(ultimoMes) {
                     <span class="text-[14px] font-black ${colorVal}">
                         ${k.key === 'efectividad' ? k.data.valor.toFixed(1) + '%' : k.data.valor.toFixed(1)}
                     </span>
-                    <span class="text-[11px] text-gray-400">Meta: ${k.key === 'efectividad' ? k.data.meta + '%' : k.data.meta}</span>
+                    <span class="text-[11px] text-gray-400">Meta (75%): ${k.key === 'efectividad' ? k.data.req + '%' : Math.round(k.data.req)}</span>
                 </div>
                 <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
                     <div class="h-full rounded-full ${colorBar}" style="width: ${Math.max(0, valWidth)}%"></div>
@@ -2477,19 +2477,19 @@ function renderizarHistorialBonos(resultados) {
         <tr class="hover:bg-gray-50 transition">
             <td class="px-3 py-2 font-medium text-gray-900">${m.mes}</td>
             <td class="px-3 py-2 text-center text-gray-500">${m.numRemates}</td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.ganadores?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.ganadores?.cumple ? 'text-emerald-600 font-bold' : 'text-rose-500')}">
                 ${m.kpis?.ganadores ? (m.enCurso ? '⏳' : (m.kpis.ganadores.cumple ? '✅' : '❌')) : '-'}
                 ${m.nuevosGanadores || 0}
             </td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.pujadores?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.pujadores?.cumple ? 'text-emerald-600 font-bold' : 'text-rose-500')}">
                 ${m.kpis?.pujadores ? (m.enCurso ? '⏳' : (m.kpis.pujadores.cumple ? '✅' : '❌')) : '-'}
                 ${m.nuevosPujadores || 0}
             </td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.garantes?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.garantes?.cumple ? 'text-emerald-600 font-bold' : 'text-rose-500')}">
                 ${m.kpis?.garantes ? (m.enCurso ? '⏳' : (m.kpis.garantes.cumple ? '✅' : '❌')) : '-'}
                 ${m.nuevosGarantes || 0}
             </td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.efectividad?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.efectividad?.cumple ? 'text-emerald-600 font-bold' : 'text-rose-500')}">
                 ${m.kpis?.efectividad ? (m.enCurso ? '⏳' : (m.kpis.efectividad.cumple ? '✅' : '❌')) : '-'}
                 ${m.kpis?.efectividad ? m.kpis.efectividad.valor.toFixed(1) + '%' : '-'}
             </td>
