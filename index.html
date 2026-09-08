@@ -98,12 +98,26 @@
 </div>
 </div>
 <button class="h-9 px-3 rounded-lg bg-white border border-gray-200 text-[12px] font-medium hover:bg-gray-50 items-center gap-1 shadow-sm text-gray-800 transition hidden sm:flex" onclick="window.abrirModalGestor()">
-<span>🗂️</span> Gestor (<span id="count-matrices-btn">0</span>)
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Gestor (<span id="count-matrices-btn">0</span>)
                 </button>
 </div>
-<div class="flex items-center shrink-0 ml-auto lg:ml-0">
+
+<div id="qa-spotlight" class="flex-1 mx-4 max-w-xl hidden md:flex items-center bg-slate-100 rounded-full px-4 py-1.5 border border-slate-200 cursor-text shadow-inner transition hover:bg-white focus-within:bg-white focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100" onclick="document.getElementById('qa-search').focus()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" id="qa-search" placeholder="Comando rápido o buscar métrica... (Cmd+K)" class="bg-transparent border-none outline-none w-full text-xs text-slate-700 ml-2 font-medium" />
+    <div class="flex items-center gap-1 ml-2">
+        <button onclick="window.openQA('ventas')" class="px-2.5 py-1 bg-white rounded-full text-[10px] font-bold text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 transition">Ventas del Período</button>
+        <button onclick="window.openQA('comision')" class="px-2.5 py-1 bg-white rounded-full text-[10px] font-bold text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 transition">Comisión Estimada</button>
+        <button onclick="window.openQA('comprador')" class="px-2.5 py-1 bg-white rounded-full text-[10px] font-bold text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 transition">Top Comprador</button>
+    </div>
+</div>
+
+<div class="flex items-center shrink-0 ml-auto lg:ml-0 gap-2">
+<button onclick="window.print()" class="h-9 px-3 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12px] font-medium flex items-center gap-1.5 shadow-sm hover:bg-slate-50 transition">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Reporte PDF
+</button>
 <button class="h-9 px-3 rounded-lg bg-[#111827] text-white text-[12px] font-medium flex items-center gap-1 shadow-sm hover:bg-black transition" onclick="window.seleccionarUltimoRemate()">
-<span>⚡</span> Último remate
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Último remate
                 </button>
 </div>
 </div>
@@ -116,14 +130,14 @@
 <button class="text-gray-400 hover:text-gray-800 p-1 bg-gray-100 rounded" onclick="window.toggleSidebar(event)">✕</button>
 </div>
 <div class="space-y-1 overflow-y-auto flex-1">
-<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white" id="nav-mod-remates" onclick="window.cambiarSeccion('remates')"><span>📊</span> Resumen General</button>
-<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700" id="nav-mod-comparativa" onclick="window.cambiarSeccion('comparativa')"><span>📈</span> Comparativa Histórica</button>
-<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700" id="nav-mod-productos" onclick="window.cambiarSeccion('productos')"><span>📦</span> Análisis de Productos</button>
-<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700" id="nav-mod-clientes" onclick="window.cambiarSeccion('clientes')"><span>👥</span> Gestión de Clientes</button>
-<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700" id="nav-mod-conclusiones" onclick="window.cambiarSeccion('conclusiones')"><span>📄</span> Datos</button>
-<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-4" id="nav-mod-buscador" onclick="window.cambiarSeccion('buscador')"><span>🔍</span> Buscador Global</button>
-<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1" id="nav-mod-bonos" onclick="window.cambiarSeccion('bonos')"><span>🏆</span> Bonos de Gestión</button>
-<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1" id="nav-mod-feedback" onclick="window.cambiarSeccion('feedback')"><span>💬</span> Feedback</button>
+<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white" id="nav-mod-remates" onclick="window.cambiarSeccion('remates')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Resumen General</button>
+<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700" id="nav-mod-comparativa" onclick="window.cambiarSeccion('comparativa')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg> Comparativa Histórica</button>
+<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700" id="nav-mod-productos" onclick="window.cambiarSeccion('productos')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> Análisis de Productos</button>
+<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700" id="nav-mod-clientes" onclick="window.cambiarSeccion('clientes')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Gestión de Clientes</button>
+<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700" id="nav-mod-conclusiones" onclick="window.cambiarSeccion('conclusiones')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Datos</button>
+<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-4" id="nav-mod-buscador" onclick="window.cambiarSeccion('buscador')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Buscador Global</button>
+<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1" id="nav-mod-bonos" onclick="window.cambiarSeccion('bonos')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-500"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg> Bonos de Gestión</button>
+<button class="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700 mt-1" id="nav-mod-feedback" onclick="window.cambiarSeccion('feedback')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Feedback</button>
 </div>
 <div class="hidden flex-col mt-auto pt-4 border-t border-gray-100 space-y-2" id="admin-controls">
 <div class="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
@@ -133,7 +147,7 @@
                         </label>
 <input accept=".xlsx,.xls" class="hidden" id="file-input" multiple="" onchange="window.iniciarProcesamiento(this.files)" type="file" webkitdirectory=""/>
 <label class="w-full block text-left text-[12px] py-1.5 hover:text-blue-600 font-medium cursor-pointer transition" for="file-input-single">
-<span>📄</span> + Cargar Archivo(s)
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> + Cargar Archivo(s)
                         </label>
 <input accept=".xlsx,.xls" class="hidden" id="file-input-single" multiple="" onchange="window.iniciarProcesamiento(this.files)" type="file"/>
 <button class="w-full text-left text-[12px] py-1.5 text-red-500 hover:text-red-700 font-medium transition" id="btn-vaciar-base" onclick="window.limpiarBase()"><span>🗑️</span> Vaciar Nube DB</button>
@@ -157,54 +171,54 @@
 </div>
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Ticket Prom.</span><span>🏷️</span></div>
-<div class="mt-1 text-[18px] font-black text-gray-900" id="dash-kpi-ticket">$0</div>
-<div class="text-[11px] text-gray-500 font-medium">por lote vendido</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Ticket Prom.</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-gray-900" id="dash-kpi-ticket">$0</div>
+<div class="text-xs text-slate-500">por lote vendido</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Comisión Est.</span><span>💰</span></div>
-<div class="mt-1 text-[18px] font-black text-blue-700" id="dash-kpi-comision">$0</div>
-<div class="text-[11px] text-gray-500 font-medium">aprox. 12% + IVA</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Comisión Est.</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-blue-700" id="dash-kpi-comision">$0</div>
+<div class="text-xs text-slate-500">aprox. 12% + IVA</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm border-b-4 border-b-emerald-500 hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Venta Total</span><span>💵</span></div>
-<div class="mt-1 text-[18px] font-black text-emerald-600 tracking-tight" id="dash-kpi-venta">$0</div>
-<div class="text-[11px] text-gray-500 font-medium">monto adjudicado</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Venta Total</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-emerald-600 tracking-tight" id="dash-kpi-venta">$0</div>
+<div class="text-xs text-slate-500">monto adjudicado</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Lotes Disp.</span><span>📦</span></div>
-<div class="mt-1 text-[18px] font-black text-gray-900" id="dash-kpi-lotes-disp">0</div>
-<div class="text-[11px] text-gray-500 font-medium">catálogo base</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Lotes Disp.</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-gray-900" id="dash-kpi-lotes-disp">0</div>
+<div class="text-xs text-slate-500">catálogo base</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Lotes Vend.</span><span>✅</span></div>
-<div class="mt-1 text-[18px] font-black text-gray-900" id="dash-kpi-lotes">0</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Lotes Vend.</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-gray-900" id="dash-kpi-lotes">0</div>
 <div class="text-[11px] text-emerald-600 font-bold" id="dash-kpi-eficacia">0% eficacia</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Garantías</span><span>🛡️</span></div>
-<div class="mt-1 text-[18px] font-black text-gray-900" id="dash-kpi-garantias">0</div>
-<div class="text-[11px] text-gray-500 font-medium">pagadas totales</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Garantías</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-gray-900" id="dash-kpi-garantias">0</div>
+<div class="text-xs text-slate-500">pagadas totales</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Ganadores</span><span>🏆</span></div>
-<div class="mt-1 text-[18px] font-black text-emerald-700" id="dash-kpi-ganadores">0</div>
-<div class="text-[11px] text-gray-500 font-medium">clientes únicos</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Ganadores</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-500"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-emerald-700" id="dash-kpi-ganadores">0</div>
+<div class="text-xs text-slate-500">clientes únicos</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Conversión</span><span>🎯</span></div>
-<div class="mt-1 text-[18px] font-black text-purple-600" id="dash-kpi-conversion">0%</div>
-<div class="text-[11px] text-gray-500 font-medium">garantías→ganadores</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Conversión</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-500"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-purple-600" id="dash-kpi-conversion">0%</div>
+<div class="text-xs text-slate-500">garantías→ganadores</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">1ra Compra</span><span>🌟</span></div>
-<div class="mt-1 text-[18px] font-black text-blue-600 flex items-baseline gap-2"><span id="dash-kpi-1racompra">0</span> <span class="text-[10px] text-gray-400 font-bold" id="dash-kpi-1racompra-pct">0%</span></div>
-<div class="text-[11px] text-gray-500 font-medium">nuevos clientes</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">1ra Compra</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+<div class="mt-1 text-2xl font-bold font-mono text-blue-600 flex items-baseline gap-2"><span id="dash-kpi-1racompra">0</span> <span class="text-[10px] text-gray-400 font-bold" id="dash-kpi-1racompra-pct">0%</span></div>
+<div class="text-xs text-slate-500">nuevos clientes</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
-<div class="flex items-center justify-between"><span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Multilote</span><span>📚</span></div>
-<div class="mt-1 flex items-center gap-2"><span class="text-[18px] font-black text-gray-900" id="dash-kpi-multilote">0</span> <button class="text-[9px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold transition" onclick="window.abrirModalMultiLote()">VER</button></div>
-<div class="text-[11px] text-gray-500 font-medium">compras &gt; 1 lote</div>
+<div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Multilote</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+<div class="mt-1 flex items-center gap-2"><span class="text-2xl font-bold font-mono text-gray-900" id="dash-kpi-multilote">0</span> <button class="text-[9px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold transition" onclick="window.abrirModalMultiLote()">VER</button></div>
+<div class="text-xs text-slate-500">compras &gt; 1 lote</div>
 </div>
 </div>
 <div class="grid grid-cols-2 gap-4 no-print" id="segment-stats">
@@ -228,7 +242,7 @@
 </div>
 </div>
 <div class="grid lg:grid-cols-3 gap-4 no-print">
-<div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+<div class="lg:col-span-2 bg-white rounded-xl border border-slate-100 p-4 shadow-[0_2px_10px_rgba(0,0,0,0.04)]">
 <div class="flex justify-between items-center mb-3">
 <div class="text-[12px] font-bold uppercase tracking-widest text-gray-800">Ventas y Lotes en el Tiempo</div>
 <select class="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-[11px] font-bold text-gray-700 outline-none cursor-pointer" id="dash-groupby" onchange="window.actualizarEstadoApp()">
@@ -239,14 +253,14 @@
 </div>
 <div class="relative h-[280px] w-full"><canvas id="dash-chartVentas"></canvas></div>
 </div>
-<div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-<div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-gray-800">Tracción de Clientes</div>
+<div class="bg-white rounded-xl border border-slate-100 p-4 shadow-[0_2px_10px_rgba(0,0,0,0.04)]">
+<div class="text-[12px] font-bold uppercase tracking-widest mb-3 text-slate-800">Tracción de Clientes</div>
 <div class="relative h-[280px] w-full"><canvas id="dash-chartClientes"></canvas></div>
 </div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 <div class="p-4 flex flex-col md:flex-row gap-3 justify-between border-b border-gray-100 bg-gray-50/50">
-<div class="text-[12px] font-bold uppercase tracking-widest text-gray-800 flex items-center gap-2"><span>🚗</span> Lotes Detallados</div>
+<div class="text-[12px] font-bold uppercase tracking-widest text-gray-800 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><rect x="3" y="11" width="18" height="8" rx="2"></rect><circle cx="7" cy="19" r="2"></circle><circle cx="17" cy="19" r="2"></circle><path d="M3 11l2-5h14l2 5"></path><path d="M12 6v5"></path></svg> Lotes Detallados</div>
 <div class="relative">
 <span class="absolute left-2.5 top-2.5 text-[12px] opacity-50">🔍</span>
 <input class="h-9 pl-8 pr-3 rounded-lg border border-gray-200 bg-white text-[13px] w-full md:w-[280px] focus:outline-none focus:border-gray-400 transition shadow-sm" id="search-lotes-main" onkeyup="window.filtrarLotesMain()" placeholder="Buscar matriz, lote, vehículo..." type="text"/>
@@ -417,20 +431,20 @@
 </div>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
 <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
-<div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Clientes</div>
+<div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Total Clientes</div>
 <div class="mt-1 text-[20px] font-black text-gray-900" id="bi-kpi-total">0</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
-<div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Prom.</div>
+<div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Inversión Prom.</div>
 <div class="mt-1 text-[20px] font-black text-emerald-600" id="bi-kpi-ltv">$0</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
-<div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Clientes Híbridos</div>
+<div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Clientes Híbridos</div>
 <div class="mt-1 text-[20px] font-black text-purple-600" id="bi-kpi-hybrid">0</div>
 <div class="text-[10px] text-gray-400" id="bi-kpi-hybrid-pct">0% del total</div>
 </div>
 <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow transition">
-<div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Clientes Latentes</div>
+<div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Clientes Latentes</div>
 <div class="mt-1 text-[20px] font-black text-amber-600" id="bi-kpi-latentes">0</div>
 <div class="text-[10px] text-gray-400">Pagaron garantía sin comprar</div>
 </div>
@@ -475,11 +489,11 @@
 <button class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition" onclick="window.cerrarFicha()">✕</button>
 </div>
 <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 py-3 border-y border-gray-700 mb-4 pl-2">
-<div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">1ra Compra</div><div class="text-[13px] font-medium mt-0.5" id="ficha-primera">-</div></div>
-<div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Última Compra</div><div class="text-[13px] font-medium mt-0.5" id="ficha-ultima">-</div></div>
-<div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Lotes Adj.</div><div class="text-[13px] font-bold mt-0.5" id="ficha-lotes">0</div></div>
-<div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Sin.</div><div class="text-[13px] font-bold text-emerald-400 mt-0.5" id="ficha-monto-sin">$0</div></div>
-<div><div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inversión Ret.</div><div class="text-[13px] font-bold text-blue-400 mt-0.5" id="ficha-monto-ret">$0</div></div>
+<div><div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">1ra Compra</div><div class="text-[13px] font-medium mt-0.5" id="ficha-primera">-</div></div>
+<div><div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Última Compra</div><div class="text-[13px] font-medium mt-0.5" id="ficha-ultima">-</div></div>
+<div><div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Lotes Adj.</div><div class="text-[13px] font-bold mt-0.5" id="ficha-lotes">0</div></div>
+<div><div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Inversión Sin.</div><div class="text-[13px] font-bold text-emerald-400 mt-0.5" id="ficha-monto-sin">$0</div></div>
+<div><div class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Inversión Ret.</div><div class="text-[13px] font-bold text-blue-400 mt-0.5" id="ficha-monto-ret">$0</div></div>
 </div>
 <div class="overflow-auto max-h-[250px] bg-white/5 rounded-lg pl-2">
 <table class="w-full text-[12px] text-left">
@@ -568,19 +582,19 @@
 </div>
 <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
 <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
-<p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Bono Total</p>
+<p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Bono Total</p>
 <p class="text-2xl font-black text-emerald-600 mt-1" id="bono-total-mes">$0</p>
 </div>
 <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
-<p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">KPIs Cumplidos</p>
+<p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">KPIs Cumplidos</p>
 <p class="text-2xl font-black text-blue-600 mt-1" id="bono-kpis-cumplidos">0/4</p>
 </div>
 <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
-<p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Nuevos Clientes</p>
+<p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Nuevos Clientes</p>
 <p class="text-2xl font-black text-gray-900 mt-1" id="bono-nuevos-clientes">0</p>
 </div>
 <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-100">
-<p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Crecimiento Ventas</p>
+<p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Crecimiento Ventas</p>
 <p class="text-2xl font-black text-purple-600 mt-1" id="bono-crecimiento-ventas">0%</p>
 </div>
 </div>
@@ -671,6 +685,21 @@
 </div>
 </div>
 <!-- MODALES -->
+
+    <div id="modal-qa" class="fixed inset-0 z-[200] hidden modal-bg items-center justify-center p-4" onclick="window.cerrarQA(event)">
+        <div class="bg-white rounded-2xl w-full max-w-[400px] shadow-2xl overflow-hidden flex flex-col transform transition-all border border-slate-100" onclick="event.stopPropagation()">
+            <div class="p-6 text-center">
+                <div id="qa-icon" class="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4"></div>
+                <h3 id="qa-title" class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Cargando...</h3>
+                <div id="qa-value" class="text-4xl font-black text-slate-900 font-mono tracking-tight mb-2">-</div>
+                <p id="qa-subtitle" class="text-xs text-slate-500 font-medium"></p>
+            </div>
+            <div class="p-3 border-t border-slate-100 bg-slate-50 text-center">
+                <button onclick="window.cerrarQA()" class="text-xs font-bold text-slate-500 hover:text-slate-800 transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
 <div class="fixed inset-0 z-[100] hidden modal-bg items-center justify-center p-4" id="modal-gestor" onclick="window.cerrarModalGestor(event)">
 <div class="bg-white w-full max-w-[720px] max-h-[90vh] rounded-[16px] shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
 <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 shrink-0">

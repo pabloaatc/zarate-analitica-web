@@ -19,7 +19,8 @@ body { font-family: 'Roboto', sans-serif; background-color: #F3F4F6; color: #111
         .badge-hybrid { background-color: #8b5cf6; color: white; }
         .tooltip-trigger { cursor: help; border-bottom: 1px dashed #9ca3af; }
         @media print {
-            aside, header, #paraguas-bar, .no-print { display: none !important; }
-            main { padding: 0 !important; background: white !important; }
+            aside, header, #paraguas-bar, #qa-spotlight, .no-print { display: none !important; }
+            main { padding: 0 !important; background: white !important; width: 100% !important; margin: 0 !important; }
+            body { background: white !important; }
             .bg-white { box-shadow: none !important; border: 1px solid #e5e7eb !important; break-inside: avoid; }
         }

@@ -2949,7 +2949,7 @@ window.parseExcel = function(file) {
                 }
 
                 remate.inscritos = remate.garantias + Math.floor(remate.garantias * 0.1);
-                remate.comisionTotal = remate.ventaTotal * 0.12;
+                remate.comisionTotal = (remate.ventaTotal * 0.12) * 1.19;
 
                 resolve(remate);
             } catch(error) {
@@ -3349,3 +3349,64 @@ window.sortTable = function(th, type) {
     tbody.innerHTML = '';
     rows.forEach(row => tbody.appendChild(row));
 };
+
+// ============================================================
+// FAST Q&A SPOTLIGHT
+// ============================================================
+window.openQA = function(type) {
+    if (!globalAgg) return;
+
+    const modal = document.getElementById('modal-qa');
+    const title = document.getElementById('qa-title');
+    const value = document.getElementById('qa-value');
+    const subtitle = document.getElementById('qa-subtitle');
+    const icon = document.getElementById('qa-icon');
+
+    if(type === 'ventas') {
+        title.innerText = 'Ventas del Período';
+        value.innerText = formatMoney(globalAgg.venta);
+        value.className = 'text-4xl font-black text-emerald-600 font-mono tracking-tight mb-2';
+        subtitle.innerText = `${globalAgg.lotes.toLocaleString('es-CL')} lotes vendidos`;
+        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>';
+    } else if (type === 'comision') {
+        title.innerText = 'Comisión Estimada';
+        value.innerText = formatMoney(globalAgg.comisionTotal);
+        value.className = 'text-4xl font-black text-blue-600 font-mono tracking-tight mb-2';
+        subtitle.innerText = 'Cálculo al 12% + IVA';
+        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>';
+    } else if (type === 'comprador') {
+        title.innerText = 'Top Comprador';
+        let topClient = { nombre: 'N/A', total: 0, lotes: 0 };
+        if (globalMapCMulti) {
+            Object.entries(globalMapCMulti).forEach(([nombre, data]) => {
+                if(data.total > topClient.total) {
+                    topClient = { nombre, total: data.total, lotes: data.lotes };
+                }
+            });
+        }
+        value.innerText = topClient.nombre.substring(0, 15) + (topClient.nombre.length > 15 ? '...' : '');
+        value.className = 'text-3xl font-black text-slate-900 font-mono tracking-tight mb-2 truncate px-4';
+        subtitle.innerText = `${topClient.lotes} lotes por ${formatMoney(topClient.total)}`;
+        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+};
+
+window.cerrarQA = function(e) {
+    if(e && e.target.id !== 'modal-qa') return;
+    const modal = document.getElementById('modal-qa');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+};
+
+document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('qa-search');
+        if (searchInput) searchInput.focus();
+    }
+});
