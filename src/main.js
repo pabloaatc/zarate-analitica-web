@@ -3410,3 +3410,23 @@ document.addEventListener('keydown', (e) => {
         if (searchInput) searchInput.focus();
     }
 });
+
+// Wire up the search input so pressing enter triggers global search
+window.addEventListener('DOMContentLoaded', () => {
+    const qaSearch = document.getElementById('qa-search');
+    if (qaSearch) {
+        qaSearch.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const term = this.value.trim();
+                if(term) {
+                    window.cambiarSeccion('buscador');
+                    const globalSearch = document.getElementById('search-patente');
+                    if (globalSearch) {
+                        globalSearch.value = term;
+                        window.buscarPatente();
+                    }
+                }
+            }
+        });
+    }
+});

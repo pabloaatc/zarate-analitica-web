@@ -48,7 +48,7 @@
 <!-- CONTENIDO PRINCIPAL -->
 <div class="hidden flex-col h-screen" id="app-content">
 <!-- HEADER MAESTRO -->
-<header class="h-[56px] bg-white border-b border-gray-200 sticky top-0 z-30 flex items-center justify-between px-4 md:px-6 shrink-0 no-print">
+<header class="h-[56px] bg-white border-b border-gray-200 sticky top-0 z-30 shrink-0 no-print"><div class="flex items-center justify-between px-4 md:px-6 max-w-7xl mx-auto w-full h-full">
 <div class="flex items-center gap-3">
 <button class="md:hidden text-gray-400 hover:text-black transition p-1 bg-gray-50 rounded-lg" onclick="window.toggleSidebar(event)">☰</button>
 <div class="w-9 h-9 bg-[#111827] text-white rounded-lg flex items-center justify-center font-black shadow-sm">Z</div>
@@ -64,9 +64,9 @@
 <span class="hidden sm:inline" id="user-display-email"></span> <span>Salir ✕</span>
 </button>
 </div>
-</header>
+</div></header>
 <!-- PARAGUAS: BARRA DE CONTEXTO GLOBAL -->
-<div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between shrink-0 z-20 no-print" id="paraguas-bar">
+<div class="bg-white border-b border-gray-200 py-3 shrink-0 z-20 no-print" id="paraguas-bar"><div class="px-4 md:px-6 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between max-w-7xl mx-auto w-full">
 <div class="flex flex-wrap items-center gap-2 relative">
 <div class="flex items-center gap-2">
 <span class="text-[14px]">📊</span>
@@ -102,10 +102,10 @@
                 </button>
 </div>
 
-<div id="qa-spotlight" class="flex-1 mx-4 max-w-xl hidden md:flex items-center bg-slate-100 rounded-full px-4 py-1.5 border border-slate-200 cursor-text shadow-inner transition hover:bg-white focus-within:bg-white focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100" onclick="document.getElementById('qa-search').focus()">
+<div id="qa-spotlight" class="flex-1 mx-4 max-w-md w-full hidden md:flex items-center bg-slate-100 rounded-full px-4 py-1.5 border border-slate-200 cursor-text shadow-inner transition hover:bg-white focus-within:bg-white focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 relative" onclick="document.getElementById('qa-search').focus()">
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
     <input type="text" id="qa-search" placeholder="Comando rápido o buscar métrica... (Cmd+K)" class="bg-transparent border-none outline-none w-full text-xs text-slate-700 ml-2 font-medium" />
-    <div class="flex items-center gap-1 ml-2">
+    <div class="absolute top-[110%] left-0 right-0 flex justify-center gap-1 mt-1 z-50">
         <button onclick="window.openQA('ventas')" class="px-2.5 py-1 bg-white rounded-full text-[10px] font-bold text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 transition">Ventas del Período</button>
         <button onclick="window.openQA('comision')" class="px-2.5 py-1 bg-white rounded-full text-[10px] font-bold text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 transition">Comisión Estimada</button>
         <button onclick="window.openQA('comprador')" class="px-2.5 py-1 bg-white rounded-full text-[10px] font-bold text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 transition">Top Comprador</button>
@@ -121,7 +121,7 @@
                 </button>
 </div>
 </div>
-<div class="flex-1 flex overflow-hidden relative">
+</div><div class="flex-1 flex overflow-hidden relative">
 <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden md:hidden" id="mobile-overlay" onclick="window.toggleSidebar(event)"></div>
 <!-- SIDEBAR NAVEGACIÓN -->
 <aside class="absolute md:relative z-40 w-[240px] bg-white border-r border-gray-200 flex flex-col p-3 gap-1 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 shrink-0 no-print" id="sidebar">
@@ -155,7 +155,7 @@
 </div>
 </aside>
 <!-- ÁREA DE TRABAJO -->
-<main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#F3F4F6] w-full pb-[80px] md:pb-6 relative">
+<main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#F3F4F6] w-full pb-[80px] md:pb-6 relative"><div class="max-w-7xl mx-auto px-4 sm:px-6 w-full h-full">
 <!-- EMPTY STATE -->
 <div class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[#F3F4F6]/95 no-print p-6 transition-all duration-200" id="empty-state">
 <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center mb-4 border border-gray-200 shadow-sm text-3xl">📁</div>
@@ -169,7 +169,7 @@
 <h2 class="text-[22px] font-black tracking-tight text-gray-900" id="dash-titulo">-</h2>
 <p class="text-[13px] text-gray-500" id="dash-subtitulo">Control operativo • 0 seleccionados</p>
 </div>
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
 <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm hover:shadow transition">
 <div class="flex items-center justify-between"><span class="text-[11px] font-medium uppercase tracking-wider text-slate-400">Ticket Prom.</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></div>
 <div class="mt-1 text-2xl font-bold font-mono text-gray-900" id="dash-kpi-ticket">$0</div>
@@ -681,7 +681,7 @@
 </div>
 </div>
 </div>
-</main>
+</div></main>
 </div>
 </div>
 <!-- MODALES -->
