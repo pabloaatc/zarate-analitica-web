@@ -2232,7 +2232,7 @@ function identificarClientes(remates) {
         if (r.posturasPorLote) {
             Object.values(r.posturasPorLote).forEach(pujas => {
                 pujas.forEach(p => {
-                    if (p.nombreNorm) {
+                    if (p.nombreNorm && !p.esFalso) {
                         const nombre = p.nombreNorm;
                         if (!clientesMap[nombre]) {
                             clientesMap[nombre] = {
@@ -2281,7 +2281,7 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
             if (r.posturasPorLote) {
                 Object.values(r.posturasPorLote).forEach(pujas => {
                     pujas.forEach(p => {
-                        if (p.nombreNorm) {
+                        if (p.nombreNorm && !p.esFalso) {
                             clientesDelMes.add(p.nombreNorm);
                         }
                     });
@@ -2315,7 +2315,7 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
             if (r.posturasPorLote) {
                 Object.values(r.posturasPorLote).forEach(pujas => {
                     pujas.forEach(p => {
-                        if (p.nombreNorm && nuevosClientes.has(p.nombreNorm)) {
+                        if (p.nombreNorm && !p.esFalso && nuevosClientes.has(p.nombreNorm)) {
                             nuevosPujadores.add(p.nombreNorm);
                         }
                     });
@@ -3315,9 +3315,14 @@ window.abrirModalPujadores = function(loteEncoded, nodeId) {
         let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null;
         currentAdjudicadoModal = adjudicado;
         currentModalPujas = todasPujas.sort((a,b) => b.monto - a.monto);
-        document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'FALSO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
+        document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'TEST/INTERNO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
+
+        // Strict separation: Total pujas (excluding fakes entirely from the real metrics view if we want)
+        // Wait, the prompt says: "Recalculate the header counter: PUJAS: {total} | REALES: {realesOnly} so test bids are strictly excluded from the real count"
+        // And "completely hide all bids made by test/fake users" when toggling "Solo Reales".
+        // Let's modify the total logic:
         document.getElementById('modal-total-pujas').innerText = todasPujas.length;
-        document.getElementById('modal-unicos-reales').innerText = [...new Set(todasPujas.filter(p => !p.esFalso).map(p => p.nombreNorm))].length;
+        document.getElementById('modal-unicos-reales').innerText = todasPujas.filter(p => !p.esFalso).length;
         currentFiltroModal = 'todos';
         document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition';
         document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition';
@@ -3335,10 +3340,10 @@ function renderModalTabla() {
         if(currentFiltroModal === 'falsos') lista = lista.filter(p => p.esFalso);
         document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
             let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
-            let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">FALSO</span>' : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>';
+            let badge = p.esFalso ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">INTERNO / TEST</span>' : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">REAL</span>';
             if(esAdj) badge += ' <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 ml-1">ADJUDICADO</span>';
             return `
-            <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.esFalso ? 'opacity-40' : ''}">
+            <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.esFalso ? 'bg-slate-50 opacity-60' : ''}">
                 <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
                 <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
                 <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
