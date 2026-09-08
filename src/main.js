@@ -2449,14 +2449,14 @@ function renderizarBonoActual(ultimoMes) {
                 </div>
                 <div class="mt-1 flex items-center gap-2">
                     <span class="text-[14px] font-black ${colorVal}">
-                        ${k.key === 'efectividad' ? k.data.valor.toFixed(1) + '%' : k.data.valor.toFixed(1)}
+                        ${k.key === 'efectividad' ? k.data.valor.toFixed(1) + '%' : Math.round(k.data.valor)}
                     </span>
-                    <span class="text-[11px] text-gray-400">Meta: ${k.key === 'efectividad' ? METAS_BONOS.efectividad + '%' : Math.round(METAS_BONOS[k.key + '_por_remate']) + '/remate'}</span>
+                    <span class="text-[11px] text-gray-400">${k.key === 'efectividad' ? 'Meta: ' + METAS_BONOS.efectividad + '%' : 'Meta mes: ' + Math.round(k.data.req)}</span>
                 </div>
                 <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
                     <div class="h-full rounded-full ${colorBar}" style="width: ${Math.max(0, valWidth)}%"></div>
                 </div>
-                <div class="text-[9px] text-gray-400 mt-1">${k.extra}</div>
+                <div class="text-[9px] text-gray-400 mt-1">${k.key === 'efectividad' ? 'Venta vs Catálogo (' + ultimoMes.numRemates + ' remate' + (ultimoMes.numRemates > 1 ? 's' : '') + ')' : Math.round(k.data.valor) + ' de ' + Math.round(k.data.req) + ' logrados (' + Math.round(valWidth) + '%)'}</div>
             </div>
             `;
         }).join('');
