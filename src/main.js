@@ -2433,30 +2433,50 @@ function renderizarBonoActual(ultimoMes) {
             { key: 'efectividad', label: '📈 Efectividad Remate', data: ultimoMes.kpis.efectividad, extra: `Venta vs Catálogo` }
         ];
         detalleContainer.innerHTML = kpis.map(k => {
-            let statusBadge = ultimoMes.enCurso ? '<span class="text-[11px] font-bold text-slate-400">⏳ En Curso</span>' :
-                (k.data.cumple ? '<span class="text-[11px] font-bold text-emerald-600">✅ Cumple</span>' : '<span class="text-[11px] font-bold text-red-500">❌ No cumple</span>');
+            let statusBadge = ultimoMes.enCurso ? '<span class="text-slate-500 bg-slate-50 border border-slate-200/80 px-2 py-0.5 rounded-md font-medium text-xs">⏳ En Curso</span>' :
+                (k.data.cumple ? '<span class="text-emerald-700 bg-emerald-50/90 border border-emerald-200/80 px-2 py-0.5 rounded-md font-medium text-xs">✓ Cumple</span>' : '<span class="text-slate-600 bg-slate-100 border border-slate-200/70 px-2 py-0.5 rounded-md font-medium text-xs">— No cumple</span>');
 
-            let colorVal = ultimoMes.enCurso ? 'text-slate-600' : (k.data.cumple ? 'text-emerald-600' : 'text-red-500');
-            let colorBar = ultimoMes.enCurso ? 'bg-slate-400' : (k.data.cumple ? 'bg-emerald-500' : 'bg-red-400');
+            let colorVal = 'text-slate-800';
+            let colorBar = 'bg-gradient-to-r from-blue-600 to-sky-400';
 
-            let valWidth = ultimoMes.enCurso ? (k.data.valor > 0 ? Math.min(100, (k.data.valor / k.data.req) * 100) : 0) : (k.data.cumple ? 100 : Math.min(100, (k.data.valor / k.data.req) * 100));
+            let metaMensualFija = k.data.req;
+            if (k.key === 'ganadores') metaMensualFija = 70;
+            else if (k.key === 'pujadores') metaMensualFija = 170;
+            else if (k.key === 'garantes') metaMensualFija = 192;
+            else if (k.key === 'efectividad') metaMensualFija = METAS_BONOS.efectividad;
+
+            let percentage = metaMensualFija > 0 ? (k.data.valor / metaMensualFija) * 100 : 0;
+            let valWidth = Math.min(100, Math.round(percentage));
+
+            let subtitleHtml = '';
+            if (k.key === 'efectividad') {
+                subtitleHtml = `<div class="flex justify-between items-center text-[11px] text-slate-500 font-mono mt-1.5">
+                    <span>${ultimoMes.numRemates} remate${ultimoMes.numRemates > 1 ? 's' : ''} registrado${ultimoMes.numRemates > 1 ? 's' : ''}</span>
+                    <span class="font-semibold text-slate-700">${valWidth}% del objetivo</span>
+                </div>`;
+            } else {
+                subtitleHtml = `<div class="flex justify-between items-center text-[11px] text-slate-500 font-mono mt-1.5">
+                    <span>${Math.round(k.data.valor)} de ${metaMensualFija} logrados</span>
+                    <span class="font-semibold text-slate-700">${valWidth}% del objetivo</span>
+                </div>`;
+            }
 
             return `
-            <div class="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
-                <div class="flex justify-between items-start">
+            <div class="border border-slate-200 rounded-lg p-4 bg-white shadow-sm">
+                <div class="flex justify-between items-center mb-2">
                     <span class="text-[12px] font-bold text-slate-800">${k.label}</span>
                     ${statusBadge}
                 </div>
-                <div class="mt-1 flex items-center gap-2">
-                    <span class="text-[14px] font-black ${colorVal}">
+                <div class="mb-3 flex items-baseline gap-2">
+                    <span class="text-2xl font-black font-mono ${colorVal}">
                         ${k.key === 'efectividad' ? k.data.valor.toFixed(1) + '%' : Math.round(k.data.valor)}
                     </span>
-                    <span class="text-[11px] text-gray-400">${k.key === 'efectividad' ? 'Meta: ' + METAS_BONOS.efectividad + '%' : 'Meta mes: ' + Math.round(k.data.req)}</span>
+                    <span class="text-[11px] text-slate-400 font-medium">${k.key === 'efectividad' ? 'Meta: ' + METAS_BONOS.efectividad.toFixed(1) + '%' : 'Meta mes: ' + metaMensualFija}</span>
                 </div>
-                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
-                    <div class="h-full rounded-full ${colorBar}" style="width: ${Math.max(0, valWidth)}%"></div>
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-2 rounded-full ${colorBar} transition-all duration-500 ease-out" style="width: ${Math.max(0, valWidth)}%"></div>
                 </div>
-                <div class="text-[9px] text-gray-400 mt-1">${k.key === 'efectividad' ? 'Venta vs Catálogo (' + ultimoMes.numRemates + ' remate' + (ultimoMes.numRemates > 1 ? 's' : '') + ')' : Math.round(k.data.valor) + ' de ' + Math.round(k.data.req) + ' logrados (' + Math.round(valWidth) + '%)'}</div>
+                ${subtitleHtml}
             </div>
             `;
         }).join('');
@@ -2481,21 +2501,17 @@ function renderizarHistorialBonos(resultados) {
         <tr class="hover:bg-gray-50 transition">
             <td class="px-3 py-2 font-medium text-gray-900">${m.mes}</td>
             <td class="px-3 py-2 text-center text-gray-500">${m.numRemates}</td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.ganadores?.cumple ? 'text-emerald-600 font-bold' : 'text-rose-500')}">
-                ${m.kpis?.ganadores ? (m.enCurso ? '⏳' : (m.kpis.ganadores.cumple ? '✅' : '❌')) : '-'}
-                ${m.nuevosGanadores || 0}
+                        <td class="px-3 py-2 text-center">
+                ${m.kpis?.ganadores ? (m.enCurso ? '<span class="text-slate-500 font-medium">⏳ ' + (m.nuevosGanadores || 0) + '</span>' : (m.kpis.ganadores.cumple ? '<span class="text-emerald-700 bg-emerald-50/90 border border-emerald-200/80 px-2 py-0.5 rounded-md font-medium text-xs">✓ ' + (m.nuevosGanadores || 0) + '</span>' : '<span class="text-slate-600 bg-slate-100 border border-slate-200/70 px-2 py-0.5 rounded-md font-medium text-xs">— ' + (m.nuevosGanadores || 0) + '</span>')) : '-'}
             </td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.pujadores?.cumple ? 'text-emerald-600 font-bold' : 'text-rose-500')}">
-                ${m.kpis?.pujadores ? (m.enCurso ? '⏳' : (m.kpis.pujadores.cumple ? '✅' : '❌')) : '-'}
-                ${m.nuevosPujadores || 0}
+            <td class="px-3 py-2 text-center">
+                ${m.kpis?.pujadores ? (m.enCurso ? '<span class="text-slate-500 font-medium">⏳ ' + (m.nuevosPujadores || 0) + '</span>' : (m.kpis.pujadores.cumple ? '<span class="text-emerald-700 bg-emerald-50/90 border border-emerald-200/80 px-2 py-0.5 rounded-md font-medium text-xs">✓ ' + (m.nuevosPujadores || 0) + '</span>' : '<span class="text-slate-600 bg-slate-100 border border-slate-200/70 px-2 py-0.5 rounded-md font-medium text-xs">— ' + (m.nuevosPujadores || 0) + '</span>')) : '-'}
             </td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.garantes?.cumple ? 'text-emerald-600 font-bold' : 'text-rose-500')}">
-                ${m.kpis?.garantes ? (m.enCurso ? '⏳' : (m.kpis.garantes.cumple ? '✅' : '❌')) : '-'}
-                ${m.nuevosGarantes || 0}
+            <td class="px-3 py-2 text-center">
+                ${m.kpis?.garantes ? (m.enCurso ? '<span class="text-slate-500 font-medium">⏳ ' + (m.nuevosGarantes || 0) + '</span>' : (m.kpis.garantes.cumple ? '<span class="text-emerald-700 bg-emerald-50/90 border border-emerald-200/80 px-2 py-0.5 rounded-md font-medium text-xs">✓ ' + (m.nuevosGarantes || 0) + '</span>' : '<span class="text-slate-600 bg-slate-100 border border-slate-200/70 px-2 py-0.5 rounded-md font-medium text-xs">— ' + (m.nuevosGarantes || 0) + '</span>')) : '-'}
             </td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.efectividad?.cumple ? 'text-emerald-600 font-bold' : 'text-rose-500')}">
-                ${m.kpis?.efectividad ? (m.enCurso ? '⏳' : (m.kpis.efectividad.cumple ? '✅' : '❌')) : '-'}
-                ${m.kpis?.efectividad ? m.kpis.efectividad.valor.toFixed(1) + '%' : '-'}
+            <td class="px-3 py-2 text-center">
+                ${m.kpis?.efectividad ? (m.enCurso ? '<span class="text-slate-500 font-medium">⏳ ' + m.kpis.efectividad.valor.toFixed(1) + '%</span>' : (m.kpis.efectividad.cumple ? '<span class="text-emerald-700 bg-emerald-50/90 border border-emerald-200/80 px-2 py-0.5 rounded-md font-medium text-xs">✓ ' + m.kpis.efectividad.valor.toFixed(1) + '%</span>' : '<span class="text-slate-600 bg-slate-100 border border-slate-200/70 px-2 py-0.5 rounded-md font-medium text-xs">— ' + m.kpis.efectividad.valor.toFixed(1) + '%</span>')) : '-'}
             </td>
             <td class="px-3 py-2 text-right font-bold ${m.enCurso ? 'text-slate-500' : 'text-emerald-600'}">${m.enCurso ? '⏳ Pendiente' : formatMoney(m.bono || 0)}</td>
         </tr>
