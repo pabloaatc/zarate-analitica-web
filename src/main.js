@@ -40,10 +40,10 @@ let historialBonos = [];
 let bonoActual = null;
 
 const METAS_BONOS = {
-    ganadores: 18,
-    pujadores: 42,
-    garantes: 51,
-    ventas: 5
+    ganadores_por_remate: 4,
+    pujadores_por_remate: 10,
+    garantes_por_remate: 12,
+    efectividad: 78
 };
 
 // ============================================================
@@ -2357,26 +2357,43 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
         };
         if (index > 0) {
             const mesAnterior = resultados[index - 1];
-            const crecimientoVentas = mesAnterior.ventaTotal > 0 ? ((resultado.ventaTotal - mesAnterior.ventaTotal) / mesAnterior.ventaTotal) * 100 : 0;
 
-            // Check if month is still in progress (e.g. current month or only 1 auction recorded)
+            let lotesVendidos = 0;
+            let lotesDisponibles = 0;
+            mesData.remates.forEach(r => {
+                lotesVendidos += (Number(r.lotesCount) || 0);
+                lotesDisponibles += (Number(r.lotesDisponibles) || 0);
+            });
+            const efectividad = lotesDisponibles > 0 ? (lotesVendidos / lotesDisponibles) * 100 : 0;
+
+            // Check if month is still in progress (e.g. current month)
             const hoy = new Date();
             const esMesActual = (hoy.getFullYear() === parseInt(key.split('-')[0])) && (hoy.getMonth() + 1 === parseInt(key.split('-')[1]));
             resultado.enCurso = esMesActual;
 
+            // Calculate proportional targets
+            const metaGanadores = METAS_BONOS.ganadores_por_remate * 0.75;
+            const metaPujadores = METAS_BONOS.pujadores_por_remate * 0.75;
+            const metaGarantes = METAS_BONOS.garantes_por_remate * 0.75;
+
             resultado.kpis = {
-                ganadores: { valor: ganadoresPorRemate, meta: METAS_BONOS.ganadores, cumple: ganadoresPorRemate >= METAS_BONOS.ganadores },
-                pujadores: { valor: pujadoresPorRemate, meta: METAS_BONOS.pujadores, cumple: pujadoresPorRemate >= METAS_BONOS.pujadores },
-                garantes: { valor: garantesPorRemate, meta: METAS_BONOS.garantes, cumple: garantesPorRemate >= METAS_BONOS.garantes },
-                ventas: { valor: crecimientoVentas, meta: METAS_BONOS.ventas, cumple: crecimientoVentas >= METAS_BONOS.ventas }
+                ganadores: { valor: ganadoresPorRemate, meta: metaGanadores, cumple: ganadoresPorRemate >= metaGanadores },
+                pujadores: { valor: pujadoresPorRemate, meta: metaPujadores, cumple: pujadoresPorRemate >= metaPujadores },
+                garantes: { valor: garantesPorRemate, meta: metaGarantes, cumple: garantesPorRemate >= metaGarantes },
+                efectividad: { valor: efectividad, meta: METAS_BONOS.efectividad, cumple: efectividad >= METAS_BONOS.efectividad }
             };
 
             let bonoTotal = 0;
             if (!resultado.enCurso) {
-                if (resultado.kpis.ganadores.cumple) bonoTotal += 50000;
-                if (resultado.kpis.pujadores.cumple) bonoTotal += 50000;
-                if (resultado.kpis.garantes.cumple) bonoTotal += 50000;
-                if (resultado.kpis.ventas.cumple) bonoTotal += 50000;
+                let cumplidosCount = 0;
+                if (resultado.kpis.ganadores.cumple) cumplidosCount++;
+                if (resultado.kpis.pujadores.cumple) cumplidosCount++;
+                if (resultado.kpis.garantes.cumple) cumplidosCount++;
+                if (resultado.kpis.efectividad.cumple) cumplidosCount++;
+
+                if (cumplidosCount >= 2) {
+                    bonoTotal = cumplidosCount * 50000;
+                }
             }
             resultado.bono = bonoTotal;
         }
@@ -2399,7 +2416,8 @@ function renderizarBonoActual(ultimoMes) {
     document.getElementById('bono-kpis-cumplidos').innerText = ultimoMes.enCurso ? 'En Curso' : `${cumplidos}/4`;
     document.getElementById('bono-nuevos-clientes').innerText = ultimoMes.totalNuevos || 0;
     const crecimientoVentas = ultimoMes.kpis?.ventas?.valor || 0;
-    document.getElementById('bono-crecimiento-ventas').innerText = `${crecimientoVentas.toFixed(1)}%`;
+    const efectividadVal = ultimoMes.kpis?.efectividad?.valor || 0;
+    document.getElementById('bono-crecimiento-ventas').innerText = `${efectividadVal.toFixed(1)}%`;
     document.getElementById('bono-mes-label').innerText = `Mes: ${ultimoMes.mes} (${ultimoMes.numRemates} remates)`;
 
     const detalleContainer = document.getElementById('bono-kpis-detalle');
@@ -2408,7 +2426,7 @@ function renderizarBonoActual(ultimoMes) {
             { key: 'ganadores', label: '🏆 Nuevos Ganadores', data: ultimoMes.kpis.ganadores, extra: `${ultimoMes.nuevosGanadores} total / ${ultimoMes.numRemates} remates` },
             { key: 'pujadores', label: '📊 Nuevos Pujadores', data: ultimoMes.kpis.pujadores, extra: `${ultimoMes.nuevosPujadores} total / ${ultimoMes.numRemates} remates` },
             { key: 'garantes', label: '🛡️ Nuevos Garantes', data: ultimoMes.kpis.garantes, extra: `${ultimoMes.nuevosGarantes} total / ${ultimoMes.numRemates} remates` },
-            { key: 'ventas', label: '💰 Crecimiento Ventas', data: ultimoMes.kpis.ventas, extra: `$${formatMoneyNumber(ultimoMes.ventaTotal)}` }
+            { key: 'efectividad', label: '📈 Efectividad Remate', data: ultimoMes.kpis.efectividad, extra: `Venta vs Catálogo` }
         ];
         detalleContainer.innerHTML = kpis.map(k => {
             let statusBadge = ultimoMes.enCurso ? '<span class="text-[11px] font-bold text-slate-400">⏳ En Curso</span>' :
@@ -2427,9 +2445,9 @@ function renderizarBonoActual(ultimoMes) {
                 </div>
                 <div class="mt-1 flex items-center gap-2">
                     <span class="text-[14px] font-black ${colorVal}">
-                        ${k.key === 'ventas' ? k.data.valor.toFixed(1) + '%' : k.data.valor.toFixed(1)}
+                        ${k.key === 'efectividad' ? k.data.valor.toFixed(1) + '%' : k.data.valor.toFixed(1)}
                     </span>
-                    <span class="text-[11px] text-gray-400">Meta: ${k.key === 'ventas' ? k.data.meta + '%' : k.data.meta}</span>
+                    <span class="text-[11px] text-gray-400">Meta: ${k.key === 'efectividad' ? k.data.meta + '%' : k.data.meta}</span>
                 </div>
                 <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
                     <div class="h-full rounded-full ${colorBar}" style="width: ${Math.max(0, valWidth)}%"></div>
@@ -2471,9 +2489,9 @@ function renderizarHistorialBonos(resultados) {
                 ${m.kpis?.garantes ? (m.enCurso ? '⏳' : (m.kpis.garantes.cumple ? '✅' : '❌')) : '-'}
                 ${m.nuevosGarantes || 0}
             </td>
-            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.ventas?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
-                ${m.kpis?.ventas ? (m.enCurso ? '⏳' : (m.kpis.ventas.cumple ? '✅' : '❌')) : '-'}
-                ${m.kpis?.ventas ? m.kpis.ventas.valor.toFixed(1) + '%' : '-'}
+            <td class="px-3 py-2 text-center ${m.enCurso ? 'text-slate-500' : (m.kpis?.efectividad?.cumple ? 'text-emerald-600 font-bold' : 'text-slate-500')}">
+                ${m.kpis?.efectividad ? (m.enCurso ? '⏳' : (m.kpis.efectividad.cumple ? '✅' : '❌')) : '-'}
+                ${m.kpis?.efectividad ? m.kpis.efectividad.valor.toFixed(1) + '%' : '-'}
             </td>
             <td class="px-3 py-2 text-right font-bold ${m.enCurso ? 'text-slate-500' : 'text-emerald-600'}">${m.enCurso ? '⏳ Pendiente' : formatMoney(m.bono || 0)}</td>
         </tr>
