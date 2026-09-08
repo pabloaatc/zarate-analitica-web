@@ -3596,3 +3596,25 @@ window.quickSelectPeriod = function(term) {
         alert('No se encontraron remates para el período especificado.');
     }
 };
+
+
+
+// ============================================================
+// METODOLOGÍA MODAL HANDLERS
+// ============================================================
+window.abrirModalMetodologia = function() {
+    const modal = document.getElementById('modal-metodologia');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+};
+
+window.cerrarModalMetodologia = function(e) {
+    if(e && e.target.id !== 'modal-metodologia') return;
+    const modal = document.getElementById('modal-metodologia');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+};
