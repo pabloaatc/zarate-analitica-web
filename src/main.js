@@ -1086,6 +1086,7 @@ function buildAgg(rematesList) {
     agg.garantiasNoAdjudicadas = agg.garantiasLista.filter(g => !ganadoresSet.has(g.nombreNorm));
 
     agg.ganadoresUnicosCount = uniqueGanadoresSet.size;
+    agg.ganadoresNuevos = Math.min(agg.ganadoresNuevos, agg.ganadoresUnicosCount);
     agg.ganadoresSiniestros = ganadoresSiniestrosSet.size;
     agg.ganadoresRetail = ganadoresRetailSet.size;
     agg.ticketSiniestros = lotesSiniestros > 0 ? ventaSiniestros / lotesSiniestros : 0;
@@ -1196,8 +1197,8 @@ window.renderDashboard = function() {
         if(elSubtitulo) elSubtitulo.innerText = `Control operativo • ${checkedNodes.length} seleccionados`;
 
         try { document.getElementById('dash-kpi-ticket').innerText = formatMoney(globalAgg.ticketPromedio); } catch(e){}
-        try { document.getElementById('dash-kpi-comision').innerText = formatMoney(globalAgg.comisionTotal); } catch(e){}
-        try { document.getElementById('dash-kpi-venta').innerText = formatMoney(globalAgg.venta); } catch(e){}
+
+
         try { document.getElementById('dash-kpi-lotes-disp').innerText = globalAgg.lotesDisponibles.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-lotes').innerText = globalAgg.lotes.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-eficacia').innerText = `${globalAgg.eficaciaLotes.toFixed(1)}% eficacia`; } catch(e){}
@@ -1208,16 +1209,7 @@ window.renderDashboard = function() {
         try { document.getElementById('dash-kpi-1racompra').innerText = globalAgg.ganadoresNuevos.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-1racompra-pct').innerText = `${globalAgg.pctVentaNuevos.toFixed(1)}%`; } catch(e){}
 
-        try {
-            document.getElementById('dash-venta-siniestros').innerText = formatMoney(globalAgg.ventaSiniestros);
-            document.getElementById('dash-venta-retail').innerText = formatMoney(globalAgg.ventaRetail);
-            document.getElementById('dash-lotes-siniestros').innerText = globalAgg.lotesSiniestros.toLocaleString('es-CL');
-            document.getElementById('dash-lotes-retail').innerText = globalAgg.lotesRetail.toLocaleString('es-CL');
-            document.getElementById('dash-ganadores-siniestros').innerText = globalAgg.ganadoresSiniestros.toLocaleString('es-CL');
-            document.getElementById('dash-ganadores-retail').innerText = globalAgg.ganadoresRetail.toLocaleString('es-CL');
-            document.getElementById('dash-ticket-siniestros').innerText = formatMoney(globalAgg.ticketSiniestros);
-            document.getElementById('dash-ticket-retail').innerText = formatMoney(globalAgg.ticketRetail);
-        } catch(e){}
+
 
         try {
             const mapC = {};
@@ -2058,7 +2050,7 @@ window.renderConclusiones = function() {
             <table class="w-full text-[12px]">
                 <tbody class="divide-y divide-gray-100">
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Venta Total Adjudicada</td><td class="py-2.5 font-bold text-lg">${formatMoney(agg.venta)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Suma operaciones válidas</td></tr>
-                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Comisiones Estimadas</td><td class="py-2.5 font-bold text-blue-600">${formatMoney(agg.comisionTotal)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Ingresos al 8/12%</td></tr>
+                    <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Comisiones Estimadas</td><td class="py-2.5 font-bold text-blue-600">${formatMoney((agg.venta * 0.12) * 1.19)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Cálculo al 12% + IVA</td></tr>
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Ticket Promedio</td><td class="py-2.5 font-bold">${formatMoney(agg.ticketPromedio)}</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">${agg.lotes} ops</td></tr>
                     <tr><td class="py-2.5 font-medium w-1/3 text-gray-700">Tasa de Conversión</td><td class="py-2.5 font-bold text-purple-600">${tasaExito.toFixed(1)}%</td><td class="py-2.5 text-gray-500 hidden sm:table-cell">Garantías → Ganadores</td></tr>
                 </tbody>
