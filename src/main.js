@@ -1210,7 +1210,7 @@ window.renderDashboard = function() {
                     let dSignL = deltaLote >= 0 ? '+' : '';
                     let dColorL = deltaLote > 0 ? 'text-emerald-600' : (deltaLote < 0 ? 'text-red-500' : 'text-gray-500');
                     let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData?.timestamp) === l.origen)?.id || checkedNodes[0];
-                    return `<tr class="hover:bg-gray-50 transition cursor-pointer" onclick="window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
+                    return `<tr class="hover:bg-gray-50 transition cursor-pointer" onclick="if(arguments[0] && arguments[0].stopPropagation) arguments[0].stopPropagation(); window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
                         <td class="px-4 py-2 font-medium truncate max-w-[120px]" title="${l.origen}">${l.origen}</td>
                         <td class="px-3 py-2 text-center text-gray-500">Lote ${l.numeroLote||'-'}</td>
                         <td class="px-3 py-2 max-w-[280px] truncate" title="${l.loteStr}">
@@ -3298,18 +3298,24 @@ window.abrirModalPujadores = function(loteEncoded, nodeId) {
         currentModalPujas = todasPujas.sort((a,b) => b.monto - a.monto);
         document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'TEST/INTERNO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
 
-        // Strict separation: Total pujas (excluding fakes entirely from the real metrics view if we want)
-        // Wait, the prompt says: "Recalculate the header counter: PUJAS: {total} | REALES: {realesOnly} so test bids are strictly excluded from the real count"
-        // And "completely hide all bids made by test/fake users" when toggling "Solo Reales".
-        // Let's modify the total logic:
         document.getElementById('modal-total-pujas').innerText = todasPujas.length;
         document.getElementById('modal-unicos-reales').innerText = todasPujas.length;
+
+        const btnTodos = document.getElementById('btn-filtro-todos');
+        if (btnTodos) btnTodos.className = 'px-3 py-1.5 rounded-md bg-black text-white transition';
+
+        const btnReales = document.getElementById('btn-filtro-reales');
+        if (btnReales) btnReales.className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition';
+
         currentFiltroModal = 'todos';
-        document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition';
-        document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition';
         renderModalTabla();
-        document.getElementById('modal-pujadores').classList.remove('hidden');
-        document.getElementById('modal-pujadores').classList.add('flex');
+
+        const modalEl = document.getElementById('modal-pujadores');
+        if (modalEl) {
+            modalEl.classList.remove('hidden');
+            modalEl.classList.add('flex');
+            modalEl.style.zIndex = '9999';
+        }
     } catch(e) { console.error("Error modal pujas:", e); }
 };
 
@@ -3318,14 +3324,23 @@ function renderModalTabla() {
         let lista = currentModalPujas;
         let adjudicado = currentAdjudicadoModal;
 
-        // Note: fake bids are now entirely excluded from `posturasPorLote` at ingestion time,
-        // so `lista` inherently contains ONLY REAL bids.
+        if (!lista || lista.length === 0) {
+            document.getElementById('modal-tabla-pujas').innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">No se registran posturas para este lote</td></tr>';
+            return;
+        }
 
         document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
-            let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
+            const isFake = (p && (p.nombre || p.email)) ? esClienteFalso(p.nombre, p.email) : false;
+            let esAdj = false;
+
+            if (adjudicado && adjudicado.nombreRaw) {
+               esAdj = !adjudicado.esFalso && String(p.nombre).toUpperCase().includes(String(adjudicado.nombreRaw).split(' ')[0]) && Math.abs(Number(p.monto) - Number(adjudicado.monto)) < 1000;
+            }
 
             let badge = '';
-            if (esAdj) {
+            if (isFake) {
+                badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">INTERNO</span>';
+            } else if (esAdj) {
                 badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">ADJUDICADO</span>';
             } else {
                 badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">REAL</span>';
@@ -3334,13 +3349,13 @@ function renderModalTabla() {
             return `
             <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''}">
                 <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
-                <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
+                <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${p.fecha ? window.formatExcelDate(p.fecha) : '-'}</td>
                 <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
                 <td class="text-right py-2 text-[12px] font-black ${esAdj ? 'text-emerald-600' : 'text-gray-900'}">${formatMoney(p.monto)}</td>
                 <td class="text-center pr-5 py-2">${badge}</td>
             </tr>`;
-        }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin pujas registradas en el excel</td></tr>';
-    } catch(e) {}
+        }).join('');
+    } catch(e) { console.error(e); }
 }
 
 window.filtrarModal = function(tipo) {
