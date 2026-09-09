@@ -1054,6 +1054,8 @@ function buildAgg(rematesList) {
 
     // Clientes latentes = garantías - ganadores
     const ganadoresSet = new Set(uniqueGanadoresSet);
+    // Extra safety: make absolutely sure no test/fake name made it into garantiasLista due to weird edge cases
+    agg.garantiasLista = agg.garantiasLista.filter(g => !esClienteFalso(g.nombre, g.email));
     agg.garantiasNoAdjudicadas = agg.garantiasLista.filter(g => !ganadoresSet.has(g.nombreNorm));
 
     agg.ganadoresUnicosCount = uniqueGanadoresSet.size;
@@ -1782,7 +1784,7 @@ function procesarDatosClientes() {
 
         allRemates.forEach(r => {
             r.adjudicaciones.forEach(adj => {
-                if(adj.esFalso) return;
+                if(adj.esFalso || esClienteFalso(adj.nombreRaw, adj.email)) return;
                 const c = adj.clienteReal;
                 if(!mapBI[c]) {
                     mapBI[c] = {
@@ -2703,7 +2705,8 @@ window.parseExcel = function(file) {
                     garantiasListaDetallada: [],
                     adjudicaciones: [],
                     posturasPorLote: {},
-                    chatMessages: []
+                    chatMessages: [],
+                    auditoriaInterna: { pujasTestCount: 0, clientesTestCount: 0 }
                 };
 
                 let lotesSet = new Set();
@@ -2790,6 +2793,8 @@ window.parseExcel = function(file) {
                                             montoGarantia: 0
                                         });
                                     }
+                                } else {
+                                    remate.auditoriaInterna.clientesTestCount++;
                                 }
                             }
                         }
@@ -2829,17 +2834,21 @@ window.parseExcel = function(file) {
                                 let nombre = obj['nombre'] || obj['nombresorazonsocial'] || obj['cliente'] || obj['titular'] || obj['razonsocial'];
                                 let rut = obj['rut'] || obj['rutcliente'];
                                 let montoGarantia = parseFloat(String(obj['montogarantía'] || obj['montogarantia'] || obj['monto'] || 0).replace(/[^\d]/g, '')) || 0;
-                                if(nombre && !esClienteFalso(nombre, email)) {
-                                    garantiasCount++;
-                                    remate.garantiasListaDetallada.push({
-                                        nombreNorm: normalizarCliente(nombre),
-                                        nombre: String(nombre),
-                                        email: String(email),
-                                        rut: String(rut),
-                                        fechaRemate: fechaData.timestamp,
-                                        numRemate: "",
-                                        montoGarantia: montoGarantia
-                                    });
+                                if(nombre) {
+                                    if (!esClienteFalso(nombre, email)) {
+                                        garantiasCount++;
+                                        remate.garantiasListaDetallada.push({
+                                            nombreNorm: normalizarCliente(nombre),
+                                            nombre: String(nombre),
+                                            email: String(email),
+                                            rut: String(rut),
+                                            fechaRemate: fechaData.timestamp,
+                                            numRemate: "",
+                                            montoGarantia: montoGarantia
+                                        });
+                                    } else {
+                                        remate.auditoriaInterna.clientesTestCount++;
+                                    }
                                 }
                             }
                         }
@@ -2903,34 +2912,35 @@ window.parseExcel = function(file) {
                                 }
                                 if(montoP > 0 && nombreP) {
                                     let isFalso = esClienteFalso(nombreP, emailP);
-                                    let puja = {
-                                        nombre: String(nombreP),
-                                        nombreNorm: normalizarCliente(nombreP),
-                                        monto: montoP,
-                                        email: emailP,
-                                        rut: rutP,
-                                        esFalso: isFalso,
-                                        fecha: fechaData.timestamp
-                                    };
-                                    let matchAdj = remate.adjudicaciones.find(a => {
-                                        let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
-                                        let matchNum = a.numeroLote && numP && a.numeroLote === numP;
-                                        return matchStr || matchNum;
-                                    });
-                                    if (matchAdj) {
-                                        let loteKey = matchAdj.loteStr;
-                                        if (!remate.posturasPorLote[loteKey]) remate.posturasPorLote[loteKey] = [];
-                                        remate.posturasPorLote[loteKey].push(puja);
-                                        // ACTUALIZAR CONTADOR DE PUJAS REALES
-                                        if (!isFalso) {
+                                    if (isFalso) {
+                                        remate.auditoriaInterna.pujasTestCount++;
+                                    } else {
+                                        let puja = {
+                                            nombre: String(nombreP),
+                                            nombreNorm: normalizarCliente(nombreP),
+                                            monto: montoP,
+                                            email: emailP,
+                                            rut: rutP,
+                                            esFalso: false, // We hard filter them out now, so everything pushed here is real
+                                            fecha: fechaData.timestamp
+                                        };
+                                        let matchAdj = remate.adjudicaciones.find(a => {
+                                            let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
+                                            let matchNum = a.numeroLote && numP && a.numeroLote === numP;
+                                            return matchStr || matchNum;
+                                        });
+                                        if (matchAdj) {
+                                            let loteKey = matchAdj.loteStr;
+                                            if (!remate.posturasPorLote[loteKey]) remate.posturasPorLote[loteKey] = [];
+                                            remate.posturasPorLote[loteKey].push(puja);
                                             matchAdj.pujadoresRealesCount = (matchAdj.pujadoresRealesCount || 0) + 1;
+                                        } else if (loteRaw) {
+                                            if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
+                                            remate.posturasPorLote[loteRaw].push(puja);
+                                        } else if (numP) {
+                                            if (!remate.posturasPorLote[numP]) remate.posturasPorLote[numP] = [];
+                                            remate.posturasPorLote[numP].push(puja);
                                         }
-                                    } else if (loteRaw) {
-                                        if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
-                                        remate.posturasPorLote[loteRaw].push(puja);
-                                    } else if (numP) {
-                                        if (!remate.posturasPorLote[numP]) remate.posturasPorLote[numP] = [];
-                                        remate.posturasPorLote[numP].push(puja);
                                     }
                                 }
                             }
@@ -3293,8 +3303,7 @@ window.abrirModalPujadores = function(loteEncoded, nodeId) {
         // And "completely hide all bids made by test/fake users" when toggling "Solo Reales".
         // Let's modify the total logic:
         document.getElementById('modal-total-pujas').innerText = todasPujas.length;
-        const realBidsCount = todasPujas.filter(b => !esClienteFalso(b.nombre, b.email)).length;
-        document.getElementById('modal-unicos-reales').innerText = realBidsCount;
+        document.getElementById('modal-unicos-reales').innerText = todasPujas.length;
         currentFiltroModal = 'todos';
         document.getElementById('btn-filtro-todos').className = 'px-3 py-1.5 rounded-md bg-black text-white transition';
         document.getElementById('btn-filtro-reales').className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition';
@@ -3309,25 +3318,21 @@ function renderModalTabla() {
         let lista = currentModalPujas;
         let adjudicado = currentAdjudicadoModal;
 
-        // Re-evaluate in real-time
-        lista.forEach(p => p.isFakeRealTime = esClienteFalso(p.nombre, p.email || ''));
-
-        if(currentFiltroModal === 'reales') lista = lista.filter(p => !p.isFakeRealTime);
+        // Note: fake bids are now entirely excluded from `posturasPorLote` at ingestion time,
+        // so `lista` inherently contains ONLY REAL bids.
 
         document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
-            let esAdj = adjudicado && !esClienteFalso(adjudicado.nombreRaw, adjudicado.email) && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
+            let esAdj = adjudicado && !adjudicado.esFalso && p.nombre.toUpperCase().includes(adjudicado.nombreRaw.split(' ')[0]) && Math.abs(p.monto - adjudicado.monto) < 1000;
 
             let badge = '';
-            if (p.isFakeRealTime) {
-                badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">INTERNO</span>';
-            } else if (esAdj) {
+            if (esAdj) {
                 badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">ADJUDICADO</span>';
             } else {
                 badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">REAL</span>';
             }
 
             return `
-            <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''} ${p.isFakeRealTime ? 'bg-slate-50 opacity-60' : ''}">
+            <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''}">
                 <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
                 <td class="hidden sm:table-cell py-2 text-[11px] text-gray-500">${window.formatExcelDate(p.fecha)}</td>
                 <td class="py-2 font-bold text-[11px] text-gray-900 max-w-[150px] truncate" title="${p.nombre}">${p.nombre}</td>
