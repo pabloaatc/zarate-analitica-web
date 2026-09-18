@@ -8,12 +8,12 @@ const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 let sessionUser = null;
 let db = { remates: [] };
-let checkedNodes = [];
-let clientDB = [];
+let checkedNodes = []; 
+let clientDB = []; 
 let clientesLatentes = [];
 let feedbackMessages = [];
-let currentModalPujas = [];
-let currentAdjudicadoModal = null;
+let currentModalPujas = []; 
+let currentAdjudicadoModal = null; 
 let currentFiltroModal = 'todos';
 let dashChartVentasInst = null;
 let dashChartClientesInst = null;
@@ -23,15 +23,15 @@ let flotaAniosInst = null;
 let retailCategoriasInst = null;
 let retailSubcategoriasInst = null;
 let compChartInst = null;
-let currentModule = 'remates';
-let globalMapCMulti = {};
+let currentModule = 'remates'; 
+let globalMapCMulti = {}; 
 let globalAgg = null;
 let currentGestorYearTab = null;
 let currentProductosTab = 'siniestrados';
 
 // ESTADO FILTRO GLOBAL
 window.globalSelectedYears = [];
-window.expandedDropMonths = new Set();
+window.expandedDropMonths = new Set(); 
 
 // ============================================================
 // VARIABLES PARA BONOS DE GESTIÓN
@@ -49,9 +49,9 @@ const METAS_BONOS = {
 // ============================================================
 // INICIALIZACIÓN DE CHART.JS
 // ============================================================
-if(typeof Chart !== 'undefined') {
-    Chart.defaults.color = '#6B7280';
-    Chart.defaults.font.family = 'Roboto, sans-serif';
+if(typeof Chart !== 'undefined') { 
+    Chart.defaults.color = '#6B7280'; 
+    Chart.defaults.font.family = 'Roboto, sans-serif'; 
     Chart.defaults.font.size = 11;
 }
 
@@ -63,15 +63,15 @@ window.actualizarEstadoApp = function(keepGestorScroll = false) {
     window.updateDropdownLabel();
     window.updateAdminButtonCount();
     window.renderApp();
-
+    
     const modalGestor = document.getElementById('modal-gestor');
     if(modalGestor && !modalGestor.classList.contains('hidden')) {
         window.abrirModalGestor(keepGestorScroll);
     }
 };
 
-window.actualizarVistaActual = function() {
-    window.renderApp();
+window.actualizarVistaActual = function() { 
+    window.renderApp(); 
 };
 
 window.toggleSidebar = function(e) {
@@ -92,7 +92,7 @@ window.closeMenus = function(e) {
     const container = document.getElementById('dropdown-container');
     if(dropdown && !dropdown.classList.contains('hidden')) {
         if(!container.contains(e.target)) {
-            dropdown.classList.add('hidden');
+            dropdown.classList.add('hidden'); 
             dropdown.classList.remove('flex');
         }
     }
@@ -104,26 +104,26 @@ async function checkSession() {
         const sessionP = supabaseClient.auth.getSession();
         const { data, error } = await Promise.race([sessionP, timeoutP]);
         if (error) throw error;
-
+        
         if (data && data.session) {
             sessionUser = data.session.user;
             const displayEl = document.getElementById('user-display-email');
             if(displayEl) {
                 displayEl.innerText = sessionUser.email.substring(0,12) + "...";
             }
-
+            
             const esAdmin = sessionUser.email.toLowerCase() === 'pabloaat@gmail.com';
             const adminControls = document.getElementById('admin-controls');
             if (adminControls) {
-                if (esAdmin) {
-                    adminControls.classList.remove('hidden');
-                    adminControls.classList.add('flex');
-                } else {
-                    adminControls.classList.add('hidden');
-                    adminControls.classList.remove('flex');
+                if (esAdmin) { 
+                    adminControls.classList.remove('hidden'); 
+                    adminControls.classList.add('flex'); 
+                } else { 
+                    adminControls.classList.add('hidden'); 
+                    adminControls.classList.remove('flex'); 
                 }
             }
-
+            
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').classList.remove('hidden');
             document.getElementById('app-content').classList.add('flex');
@@ -134,27 +134,27 @@ async function checkSession() {
         } else {
             document.getElementById('loading-overlay').classList.add('hidden');
             document.getElementById('loading-overlay').classList.remove('flex');
-
+            
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('app-content').classList.add('hidden');
             document.getElementById('app-content').classList.remove('flex');
             const btn = document.getElementById('btn-login');
-            if(btn) {
-                btn.innerHTML = "Ingresar al Panel";
-                btn.disabled = false;
+            if(btn) { 
+                btn.innerHTML = "Ingresar al Panel"; 
+                btn.disabled = false; 
             }
         }
     } catch(e) {
         document.getElementById('loading-overlay').classList.add('hidden');
         document.getElementById('loading-overlay').classList.remove('flex');
-
+        
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('app-content').classList.add('hidden');
         document.getElementById('app-content').classList.remove('flex');
         const err = document.getElementById('login-error');
-        if(err) {
-            err.innerText = "Error: " + e.message;
-            err.classList.remove('hidden');
+        if(err) { 
+            err.innerText = "Error: " + e.message; 
+            err.classList.remove('hidden'); 
         }
     }
 }
@@ -163,10 +163,10 @@ window.handleLogin = async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-login');
     const err = document.getElementById('login-error');
-    btn.innerHTML = "Validando...";
-    btn.disabled = true;
+    btn.innerHTML = "Validando..."; 
+    btn.disabled = true; 
     err.classList.add('hidden');
-
+    
     try {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
@@ -174,32 +174,32 @@ window.handleLogin = async function(e) {
         if (error) throw error;
         if (data && !data.session) throw new Error("Cuenta inactiva.");
         btn.innerHTML = "Abriendo...";
-
+        
         document.getElementById('loading-overlay').classList.remove('hidden');
         document.getElementById('loading-overlay').classList.add('flex');
-
+        
         await checkSession();
     } catch (ex) {
         let msj = ex.message || "Error desconocido";
         if(msj.includes("Email not confirmed")) msj = "Cuenta requiere confirmación en BD.";
         if(msj.includes("Invalid login")) msj = "Credenciales incorrectas.";
-        err.innerText = msj;
+        err.innerText = msj; 
         err.classList.remove('hidden');
-        btn.innerHTML = "Ingresar al Panel";
+        btn.innerHTML = "Ingresar al Panel"; 
         btn.disabled = false;
-
+        
         document.getElementById('loading-overlay').classList.add('hidden');
         document.getElementById('loading-overlay').classList.remove('flex');
     }
 };
 
-window.onload = () => {
-    checkSession();
+window.onload = () => { 
+    checkSession(); 
 };
 
-window.handleLogout = async function() {
-    await supabaseClient.auth.signOut();
-    window.location.reload();
+window.handleLogout = async function() { 
+    await supabaseClient.auth.signOut(); 
+    window.location.reload(); 
 };
 
 // ============================================================
@@ -216,14 +216,14 @@ window.formatearNombreRemate = function(fileName, timestamp) {
             let dd = String(d.getDate()).padStart(2, '0');
             let mm = String(d.getMonth() + 1).padStart(2, '0');
             let yyyy = d.getFullYear();
-            dateStr = `${dd}/${mm}/${yyyy}`;
+            dateStr = `${dd}/${mm}/${yyyy}`; 
         }
         if(num && dateStr) return `Remate ${num} (${dateStr})`;
         if(num) return `Remate ${num}`;
         let base = fileName.replace(/\.xlsx?$|\.xls$/i,'').substring(0,18);
         return dateStr ? `${base} (${dateStr})` : base;
-    } catch(e) {
-        return "Matriz";
+    } catch(e) { 
+        return "Matriz"; 
     }
 };
 
@@ -263,15 +263,43 @@ function normalizarCliente(nombre) {
         .trim();
 }
 
-function esClienteFalso(nombre, email = '') {
-    if (!nombre && !email) return true;
-    const str = `${nombre || ''} ${email || ''}`.toLowerCase().trim();
-    if (str.length <= 2) return true;
-    if (/\brz\b|\brz[\s\-_.]*rz\b|@zarate|zarate\.cl|\btest\b|\bprueba\b/i.test(str)) return true;
+function esClienteFalso(nombre, email = '', rut = '') {
+    if (!nombre && !email && !rut) return true;
 
-    // Also catch original system terms that should be excluded
-    const regexFalso = /demo|cliente generico|interno|admin|sistema|falso|no adjudicado|sin adjudicar|casa matriz|casa de remate|rematadora|@plataforma|noreply|no-reply/i;
-    return regexFalso.test(str);
+    // Nombre normalizado (sin tildes, mayúsculas, sin puntuación) para
+    // detectar palabras completas sin falsos positivos por substrings
+    // (ej. que "ARZOLA" no se confunda con el token "RZ").
+    const n = normalizarCliente(nombre);
+    const tokens = n.split(' ').filter(Boolean);
+    const e = String(email || '').toLowerCase().trim();
+    const rutLimpio = String(rut || '').toUpperCase().replace(/[^0-9K]/g, '');
+
+    if ((n + e).length <= 2) return true;
+
+    // Frases que identifican clientes internos, de prueba o genéricos
+    const frasesFalsas = [
+        'ZARATE', 'PRUEBA', 'TEST', 'INTERNO', 'ADMIN', 'SISTEMA', 'DEMO',
+        'FALSO', 'NO ADJUDICADO', 'SIN ADJUDICAR', 'CASA MATRIZ',
+        'CASA DE REMATE', 'REMATADORA', 'RZ RZ', 'CLIENTE GENERICO'
+    ];
+    for (const f of frasesFalsas) {
+        if (n.includes(f)) return true;
+    }
+
+    // "RZ" o "ADMIN" como palabra completa (no como substring de otro nombre)
+    if (tokens.includes('RZ') || tokens.includes('ADMIN')) return true;
+
+    // RUT interno de prueba: mismo dígito repetido en todo el RUT
+    // (99.999.999-9, 88.888.888-8, 77.777.777-7, etc.) — cualquier dígito.
+    if (rutLimpio.length >= 5 && /^(\d)\1+$/.test(rutLimpio)) return true;
+
+    // Email interno o de sistemas
+    if (e.endsWith('@zarate.cl') || e.includes('@zarate') || e.includes('@remate') ||
+        e.includes('@plataforma') || e.includes('noreply') || e.includes('no-reply')) {
+        return true;
+    }
+
+    return false;
 }
 
 function extraerMarcaModelo(texto) {
@@ -422,26 +450,26 @@ function extraerFechaInfo(file, rowsAdj) {
 async function initApp() {
     const statusLabel = document.getElementById('db-status');
     const loadingOverlay = document.getElementById('loading-overlay');
-    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.classList.remove('hidden'); 
     loadingOverlay.classList.add('flex');
 
     try {
         statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Sincronizando...';
         const { data, error } = await supabaseClient.from('app_state').select('*');
-
+        
         if (data && data.length > 0) {
-            if (data.length === 1 && data[0].payload && data[0].payload.remates) {
-                db = data[0].payload;
-            } else {
-                db.remates = data.map(row => {
-                    let r = row.payload;
-                    r._dbId = row.id;
-                    return r;
-                });
+            if (data.length === 1 && data[0].payload && data[0].payload.remates) { 
+                db = data[0].payload; 
+            } else { 
+                db.remates = data.map(row => { 
+                    let r = row.payload; 
+                    r._dbId = row.id; 
+                    return r; 
+                }); 
             }
-            db.remates.forEach(r => {
+            db.remates.forEach(r => { 
                 if (!r.id) {
-                    r.id = 'UID-' + window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp).replace(/[^a-zA-Z0-9]/g, '');
+                    r.id = 'UID-' + window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp).replace(/[^a-zA-Z0-9]/g, ''); 
                 }
             });
             statusLabel.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> En Línea (${db.remates.length})`;
@@ -451,12 +479,12 @@ async function initApp() {
     } catch (e) {
         statusLabel.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
     } finally {
-        loadingOverlay.classList.add('hidden');
+        loadingOverlay.classList.add('hidden'); 
         loadingOverlay.classList.remove('flex');
     }
-
-    if(db.remates && db.remates.length > 0) {
-        window.actualizarFiltrosGlobales(true);
+    
+    if(db.remates && db.remates.length > 0) { 
+        window.actualizarFiltrosGlobales(true); 
     }
 }
 
@@ -472,46 +500,46 @@ window.updateAdminButtonCount = function() {
 // ============================================================
 window.actualizarFiltrosGlobales = function(isInitialLoad = false) {
     if(!db.remates || !db.remates.length) return;
-
+    
     let segments = new Set();
-    db.remates.forEach(r => {
-        segments.add(r.tipo || 'Desconocido');
+    db.remates.forEach(r => { 
+        segments.add(r.tipo || 'Desconocido'); 
     });
-
+    
     let segSelect = document.getElementById('macro-segment');
     let currentSeg = segSelect.value || Array.from(segments)[0];
-
+    
     let optionsHtml = `<option value="Todos">📊 Segmentos: Todos</option>`;
     segments.forEach(s => {
         optionsHtml += `<option value="${s}" ${s === currentSeg ? 'selected' : ''}>${s}</option>`;
     });
-
+    
     segSelect.innerHTML = optionsHtml;
-
+    
     if(isInitialLoad) {
         let years = new Set();
         db.remates.forEach(r => {
             let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
             if(!isNaN(y)) years.add(y);
         });
-
+        
         let maxYear = Math.max(...Array.from(years));
         window.globalSelectedYears = [maxYear];
-
+        
         let initialRemates = db.remates.filter(r => {
             let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
             let matchSeg = currentSeg === 'Todos' || r.tipo === currentSeg;
             return matchSeg && rYr === maxYear;
         }).map(r => r.id);
-
+        
         checkedNodes = initialRemates;
     }
-
+    
     window.actualizarEstadoApp();
 };
 
 window.aplicarCambioSegmento = function() {
-    window.quickSelect('TODO');
+    window.quickSelect('TODO'); 
 }
 
 // ============================================================
@@ -535,16 +563,16 @@ window.renderDropdownUI = function() {
         let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         if(!isNaN(y)) years.add(y);
     });
-
+    
     let yearsArr = Array.from(years).sort((a,b)=>b-a);
-
+    
     let yearsHtml = '';
     yearsArr.forEach(y => {
         let isChecked = window.globalSelectedYears.includes(Number(y)) ? 'checked' : '';
         let activeClass = isChecked ? 'bg-[#111827] text-white border-black' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200';
         yearsHtml += `
         <label class="flex items-center gap-2 cursor-pointer rounded-full px-4 py-1.5 transition justify-center border shadow-sm ${activeClass}">
-            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)" ${isChecked}>
+            <input type="checkbox" value="${y}" class="hidden" onchange="window.toggleTimeYear(${y}, this.checked)" ${isChecked}> 
             <span class="text-[12px] font-bold">Año ${y}</span>
         </label>`;
     });
@@ -560,10 +588,10 @@ window.renderDropdownUI = function() {
     rematesFiltrados.forEach(r => {
         let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         if(!byYear[y]) byYear[y] = {};
-
+        
         let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
         if(!byYear[y][m]) byYear[y][m] = [];
-
+        
         byYear[y][m].push(r);
     });
 
@@ -574,17 +602,17 @@ window.renderDropdownUI = function() {
         if(!window.globalSelectedYears.includes(Number(y))) return;
 
         html += `<div class="mb-3 dropdown-year-group">`;
-
+        
         Object.keys(byYear[y]).sort((a,b)=>a-b).forEach(m => {
             let rematesMes = byYear[y][m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
             let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
             let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
-
+            
             let dropId = `drop-${y}-${m}`;
             let isExpanded = window.expandedDropMonths.has(dropId);
             let hiddenClass = isExpanded ? '' : 'hidden';
             let arrowClass = isExpanded ? 'rotate-90' : '';
-
+            
             html += `
             <div class="dropdown-month-group border border-gray-100 rounded-lg mb-2">
                 <div class="flex items-center justify-between px-2 py-1.5 bg-gray-50 rounded-t-lg group">
@@ -614,13 +642,13 @@ window.renderDropdownUI = function() {
         });
         html += `</div>`;
     });
-
+    
     if(window.globalSelectedYears.length === 0) {
         html = '<p class="text-center text-[12px] font-medium text-gray-400 p-4">Selecciona un año arriba para ver los meses.</p>';
     } else if (html === '') {
         html = '<p class="text-center text-[12px] font-medium text-gray-400 p-4">No hay datos en el periodo.</p>';
     }
-
+    
     const dt = document.getElementById('dropdown-tree');
     if(dt) dt.innerHTML = html;
 };
@@ -636,9 +664,9 @@ window.toggleTimeYear = function(y, checked) {
             let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
             return matchSeg && rYr === y;
         }).map(r => r.id);
-
-        toAdd.forEach(id => {
-            if(!checkedNodes.includes(id)) checkedNodes.push(id);
+        
+        toAdd.forEach(id => { 
+            if(!checkedNodes.includes(id)) checkedNodes.push(id); 
         });
     } else {
         window.globalSelectedYears = window.globalSelectedYears.filter(val => val !== y);
@@ -646,7 +674,7 @@ window.toggleTimeYear = function(y, checked) {
             let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
             return rYr === y;
         }).map(r => r.id);
-
+        
         checkedNodes = checkedNodes.filter(id => !toRemove.includes(id));
     }
     window.actualizarEstadoApp();
@@ -658,38 +686,38 @@ window.toggleDropExpand = function(id) {
     } else {
         window.expandedDropMonths.add(id);
     }
-    window.renderDropdownUI();
+    window.renderDropdownUI(); 
 };
 
 window.toggleDropMes = function(el, year, mesIndex) {
     let isChecked = el.checked;
     let seg = document.getElementById('macro-segment').value;
-
+    
     let idsInMonth = db.remates.filter(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
         let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
         return matchSeg && rYr === Number(year) && rM === Number(mesIndex);
     }).map(r => r.id);
-
-    if(isChecked) {
-        idsInMonth.forEach(id => {
-            if(!checkedNodes.includes(id)) checkedNodes.push(id);
-        });
-    } else {
-        checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id));
+    
+    if(isChecked) { 
+        idsInMonth.forEach(id => { 
+            if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+        }); 
+    } else { 
+        checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); 
     }
-
+    
     window.actualizarEstadoApp(true);
 };
 
 window.toggleDropRemate = function(el, id) {
-    if(el.checked) {
-        if(!checkedNodes.includes(id)) checkedNodes.push(id);
-    } else {
-        checkedNodes = checkedNodes.filter(n => n !== id);
+    if(el.checked) { 
+        if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+    } else { 
+        checkedNodes = checkedNodes.filter(n => n !== id); 
     }
-
+    
     window.actualizarEstadoApp(true);
 };
 
@@ -702,7 +730,7 @@ window.quickSelect = function(type) {
     else if(type === 'Q2') allowedMonths = [3,4,5];
     else if(type === 'Q3') allowedMonths = [6,7,8];
     else if(type === 'Q4') allowedMonths = [9,10,11];
-
+    
     if(type === 'NADA') {
         checkedNodes = [];
     } else {
@@ -715,22 +743,22 @@ window.quickSelect = function(type) {
             return matchSeg && matchYr && allowedMonths.includes(rM);
         }).map(r => r.id);
     }
-
+    
     window.actualizarEstadoApp();
 };
 
 window.applyDropdown = function() {
     const menu = document.getElementById('dropdown-menu');
-    if(menu) {
-        menu.classList.add('hidden');
-        menu.classList.remove('flex');
+    if(menu) { 
+        menu.classList.add('hidden'); 
+        menu.classList.remove('flex'); 
     }
 };
 
 window.updateDropdownLabel = function() {
     let labelStr = '';
-    if(checkedNodes.length === 0) {
-        labelStr += '0 seleccionados';
+    if(checkedNodes.length === 0) { 
+        labelStr += '0 seleccionados'; 
     } else if(checkedNodes.length === 1) {
         let r = db.remates.find(x => x.id === checkedNodes[0]);
         labelStr += r ? window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp).substring(0,25) : 'Matriz Única';
@@ -745,7 +773,7 @@ window.updateDropdownLabel = function() {
 
 window.seleccionarUltimoRemate = function() {
     if (!db.remates || db.remates.length === 0) return;
-
+    
     const rematesOrdenados = [...db.remates].sort((a,b) => (b.fechaData?.timestamp||0) - (a.fechaData?.timestamp||0));
     const ultimo = rematesOrdenados[0];
 
@@ -753,12 +781,12 @@ window.seleccionarUltimoRemate = function() {
     if (segSelect) {
         segSelect.value = ultimo.tipo || 'Siniestrados';
     }
-
+    
     let y = ultimo.fechaData?.year ? Number(ultimo.fechaData.year) : new Date().getFullYear();
-
+    
     window.globalSelectedYears = [y];
     checkedNodes = [ultimo.id];
-
+    
     window.cambiarSeccion('remates');
     window.actualizarEstadoApp();
 };
@@ -768,14 +796,14 @@ window.seleccionarUltimoRemate = function() {
 // ============================================================
 window.switchGestorYear = function(y) {
     currentGestorYearTab = y;
-
+    
     const container = document.getElementById('gestor-content-container');
     const scrollPos = container ? container.scrollTop : 0;
-
+    
     window.abrirModalGestor(true);
-
-    if(container) {
-        container.scrollTop = scrollPos;
+    
+    if(container) { 
+        container.scrollTop = scrollPos; 
     }
 };
 
@@ -789,19 +817,19 @@ window.toggleGestorAll = function(check) {
 
     if(check) {
         let ids = rematesEnPantalla.map(r => r.id);
-        ids.forEach(id => {
-            if(!checkedNodes.includes(id)) checkedNodes.push(id);
+        ids.forEach(id => { 
+            if(!checkedNodes.includes(id)) checkedNodes.push(id); 
         });
     } else {
         checkedNodes = [];
     }
-
+    
     window.actualizarEstadoApp(true);
 };
 
 window.filtrarModalGestor = function() {
     let term = document.getElementById('search-gestor').value.toLowerCase();
-
+    
     document.querySelectorAll('.gestor-mes-group').forEach(mesGroup => {
         let monthTitle = mesGroup.querySelector('span[data-search]').getAttribute('data-search').toLowerCase();
         let monthMatches = monthTitle.includes(term);
@@ -816,7 +844,7 @@ window.filtrarModalGestor = function() {
                 remateItem.style.display = 'none';
             }
         });
-
+        
         mesGroup.style.display = hasVisibleChild ? 'block' : 'none';
     });
 };
@@ -824,9 +852,9 @@ window.filtrarModalGestor = function() {
 window.abrirModalGestor = function(keepScroll = false) {
     const tabsContainer = document.getElementById('gestor-tabs-container');
     const contentContainer = document.getElementById('gestor-content-container');
-
+    
     let currentScroll = keepScroll && contentContainer ? contentContainer.scrollTop : 0;
-
+    
     let seg = document.getElementById('macro-segment').value;
     let rematesFiltrados = db.remates.filter(r => seg === 'Todos' || r.tipo === seg);
 
@@ -834,10 +862,10 @@ window.abrirModalGestor = function(keepScroll = false) {
     rematesFiltrados.forEach(r => {
         let y = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         if(!byYear[y]) byYear[y] = {};
-
+        
         let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
         if(!byYear[y][m]) byYear[y][m] = [];
-
+        
         byYear[y][m].push(r);
     });
 
@@ -865,12 +893,12 @@ window.abrirModalGestor = function(keepScroll = false) {
     } else {
         let currentData = byYear[currentGestorYearTab] || {};
         contentHtml += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-
+        
         Object.keys(currentData).sort((a,b)=>a-b).forEach(m => {
             let rematesMes = currentData[m].sort((a,b)=> (a.fechaData?.timestamp||0) - (b.fechaData?.timestamp||0));
             let allChecked = rematesMes.every(r => checkedNodes.includes(r.id));
             let someChecked = rematesMes.some(r => checkedNodes.includes(r.id));
-
+            
             contentHtml += `
             <div class="gestor-mes-group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm transition">
                 <div class="flex justify-between items-center px-4 py-2.5 bg-gray-50 border-b border-gray-100">
@@ -899,21 +927,21 @@ window.abrirModalGestor = function(keepScroll = false) {
 
     contentContainer.innerHTML = contentHtml;
     window.filtrarModalGestor();
-
+    
     document.getElementById('modal-gestor').classList.remove('hidden');
     document.getElementById('modal-gestor').classList.add('flex');
-
+    
     if (keepScroll && contentContainer) {
         contentContainer.scrollTop = currentScroll;
     }
 };
 
-window.cerrarModalGestor = function(e) {
+window.cerrarModalGestor = function(e) { 
     if(e && e.target.id !== 'modal-gestor') return;
-
-    document.getElementById('modal-gestor').classList.add('hidden');
-    document.getElementById('modal-gestor').classList.remove('flex');
-
+    
+    document.getElementById('modal-gestor').classList.add('hidden'); 
+    document.getElementById('modal-gestor').classList.remove('flex'); 
+    
     let searchEl = document.getElementById('search-gestor');
     if(searchEl) {
         searchEl.value = '';
@@ -923,32 +951,32 @@ window.cerrarModalGestor = function(e) {
 window.toggleGestorMes = function(el, year, mesIndex) {
     let isChecked = el.checked;
     let seg = document.getElementById('macro-segment').value;
-
+    
     let idsInMonth = db.remates.filter(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
         let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
         return matchSeg && rYr === Number(year) && rM === Number(mesIndex);
     }).map(r => r.id);
-
-    if(isChecked) {
-        idsInMonth.forEach(id => {
-            if(!checkedNodes.includes(id)) checkedNodes.push(id);
-        });
-    } else {
-        checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id));
+    
+    if(isChecked) { 
+        idsInMonth.forEach(id => { 
+            if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+        }); 
+    } else { 
+        checkedNodes = checkedNodes.filter(id => !idsInMonth.includes(id)); 
     }
 
     window.actualizarEstadoApp(true);
 };
 
 window.toggleGestorRemate = function(el, id) {
-    if(el.checked) {
-        if(!checkedNodes.includes(id)) checkedNodes.push(id);
-    } else {
-        checkedNodes = checkedNodes.filter(n => n !== id);
+    if(el.checked) { 
+        if(!checkedNodes.includes(id)) checkedNodes.push(id); 
+    } else { 
+        checkedNodes = checkedNodes.filter(n => n !== id); 
     }
-
+    
     window.actualizarEstadoApp(true);
 };
 
@@ -956,7 +984,7 @@ window.toggleGestorRemate = function(el, id) {
 // FUNCIONES DE AGREGACIÓN
 // ============================================================
 function buildAgg(rematesList) {
-    const agg = {
+    const agg = { 
         venta: 0,
         comisionTotal: 0,
         lotes: 0,
@@ -977,13 +1005,13 @@ function buildAgg(rematesList) {
         ganadoresNuevos: 0,
         ventaGanadoresNuevos: 0,
         ventaGanadoresAntiguos: 0,
-        adjudicaciones: [],
-        sumMontoValido: 0,
-        sumMinimoValido: 0,
+        adjudicaciones: [], 
+        sumMontoValido: 0, 
+        sumMinimoValido: 0, 
         garantiasLista: [],
         garantiasNoAdjudicadas: []
     };
-
+    
     let uniqueGanadoresSet = new Set();
     let ganadoresSiniestrosSet = new Set();
     let ganadoresRetailSet = new Set();
@@ -992,7 +1020,7 @@ function buildAgg(rematesList) {
     let lotesSiniestros = 0;
     let lotesRetail = 0;
     let garantiasSet = new Set();
-
+    
     rematesList.forEach(r => {
         try {
             agg.venta += (Number(r.ventaTotal) || 0);
@@ -1006,7 +1034,7 @@ function buildAgg(rematesList) {
             agg.ganadoresNuevos += (Number(r.ganadoresNuevos) || 0);
             agg.ventaGanadoresNuevos += (Number(r.ventaNuevos) || 0);
             agg.ventaGanadoresAntiguos += (Number(r.ventaAntiguos) || 0);
-
+            
             if (r.tipo === 'Siniestrados') {
                 agg.ventaSiniestros += (Number(r.ventaTotal) || 0);
                 agg.lotesSiniestros += (Number(r.lotesCount) || 0);
@@ -1018,13 +1046,13 @@ function buildAgg(rematesList) {
                 ventaRetail += (Number(r.ventaTotal) || 0);
                 lotesRetail += (Number(r.lotesCount) || 0);
             }
-
+            
             if(r.adjudicaciones && Array.isArray(r.adjudicaciones)) {
                 r.adjudicaciones.forEach(a => {
                     if(!a) return;
                     let aCopy = {...a, origen: window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp), tipo: r.tipo};
                     agg.adjudicaciones.push(aCopy);
-
+                    
                     if(!a.esFalso && a.clienteReal) {
                         uniqueGanadoresSet.add(a.clienteReal);
                         if (r.tipo === 'Siniestrados') {
@@ -1033,76 +1061,76 @@ function buildAgg(rematesList) {
                             ganadoresRetailSet.add(a.clienteReal);
                         }
                     }
-
-                    if((Number(a.minimo) > 0) && (Number(a.monto) > 0) && !a.esFalso && !a.esChatarra) {
-                        agg.sumMontoValido += Number(a.monto);
-                        agg.sumMinimoValido += Number(a.minimo);
+                    
+                    if((Number(a.minimo) > 0) && (Number(a.monto) > 0) && !a.esFalso && !a.esChatarra) { 
+                        agg.sumMontoValido += Number(a.monto); 
+                        agg.sumMinimoValido += Number(a.minimo); 
                     }
                 });
             }
 
-            if(r.garantiasListaDetallada && Array.isArray(r.garantiasListaDetallada)) {
-                r.garantiasListaDetallada.forEach(g => {
+            if(r.garantiasListaDetallada && Array.isArray(r.garantiasListaDetallada)) { 
+                r.garantiasListaDetallada.forEach(g => { 
                     if(!garantiasSet.has(g.nombreNorm)) {
                         garantiasSet.add(g.nombreNorm);
-                        agg.garantiasLista.push(g);
+                        agg.garantiasLista.push(g); 
                     }
-                });
+                }); 
             }
         } catch(e) {}
     });
-
+    
     // Clientes latentes = garantías - ganadores
     const ganadoresSet = new Set(uniqueGanadoresSet);
     // Extra safety: make absolutely sure no test/fake name made it into garantiasLista due to weird edge cases
-    agg.garantiasLista = agg.garantiasLista.filter(g => !esClienteFalso(g.nombre, g.email));
+    agg.garantiasLista = agg.garantiasLista.filter(g => !esClienteFalso(g.nombre, g.email, g.rut));
     agg.garantiasNoAdjudicadas = agg.garantiasLista.filter(g => !ganadoresSet.has(g.nombreNorm));
-
+    
     agg.ganadoresUnicosCount = uniqueGanadoresSet.size;
     agg.ganadoresNuevos = Math.min(agg.ganadoresNuevos, agg.ganadoresUnicosCount);
     agg.ganadoresSiniestros = ganadoresSiniestrosSet.size;
     agg.ganadoresRetail = ganadoresRetailSet.size;
     agg.ticketSiniestros = lotesSiniestros > 0 ? ventaSiniestros / lotesSiniestros : 0;
     agg.ticketRetail = lotesRetail > 0 ? ventaRetail / lotesRetail : 0;
-    agg.perdedoresCount = Math.max(0, agg.garantias - agg.ganadoresUnicosCount);
-    agg.conversion = agg.garantias > 0 ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0;
+    agg.perdedoresCount = Math.max(0, agg.garantias - agg.ganadoresUnicosCount); 
+    agg.conversion = agg.garantias > 0 ? (agg.ganadoresUnicosCount / agg.garantias * 100) : 0; 
     agg.tasaFuga = agg.garantias > 0 ? ((agg.garantias - agg.ganadoresUnicosCount) / agg.garantias * 100) : 0;
-    agg.ticketPromedio = agg.lotes ? (agg.venta / agg.lotes) : 0;
-    agg.eficaciaLotes = agg.lotesDisponibles ? (agg.lotes / agg.lotesDisponibles * 100) : 0;
-    agg.pctVentaNuevos = agg.venta ? (agg.ventaGanadoresNuevos / agg.venta * 100) : 0;
-    agg.deltaPujaTotal = agg.sumMontoValido - agg.sumMinimoValido;
-    agg.deltaPujaPromedio = agg.lotes ? (agg.deltaPujaTotal / agg.lotes) : 0;
-    agg.sobreprecioReal = agg.sumMinimoValido > 0 ? ((agg.sumMontoValido / agg.sumMinimoValido) * 100) - 100 : 0;
+    agg.ticketPromedio = agg.lotes ? (agg.venta / agg.lotes) : 0; 
+    agg.eficaciaLotes = agg.lotesDisponibles ? (agg.lotes / agg.lotesDisponibles * 100) : 0; 
+    agg.pctVentaNuevos = agg.venta ? (agg.ventaGanadoresNuevos / agg.venta * 100) : 0; 
+    agg.deltaPujaTotal = agg.sumMontoValido - agg.sumMinimoValido; 
+    agg.deltaPujaPromedio = agg.lotes ? (agg.deltaPujaTotal / agg.lotes) : 0; 
+    agg.sobreprecioReal = agg.sumMinimoValido > 0 ? ((agg.sumMontoValido / agg.sumMinimoValido) * 100) - 100 : 0; 
     agg.fugaList = agg.garantiasLista.filter(g => !uniqueGanadoresSet.has(g.nombreNorm));
-
+    
     return agg;
 }
 
 // ============================================================
 // NAVEGACIÓN Y RENDER DE MÓDULOS
 // ============================================================
-window.cambiarSeccion = function(mod) {
+window.cambiarSeccion = function(mod) { 
     try {
-        currentModule = mod;
-        document.getElementById('nav-mod-remates').className = mod === 'remates' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700';
-        document.getElementById('nav-mod-comparativa').className = mod === 'comparativa' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700';
-        document.getElementById('nav-mod-productos').className = mod === 'productos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700';
-        document.getElementById('nav-mod-clientes').className = mod === 'clientes' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700';
-        document.getElementById('nav-mod-conclusiones').className = mod === 'conclusiones' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700';
+        currentModule = mod; 
+        document.getElementById('nav-mod-remates').className = mod === 'remates' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-comparativa').className = mod === 'comparativa' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-productos').className = mod === 'productos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-clientes').className = mod === 'clientes' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
+        document.getElementById('nav-mod-conclusiones').className = mod === 'conclusiones' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left hover:bg-gray-50 text-gray-700'; 
         document.getElementById('nav-mod-buscador').className = mod === 'buscador' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-4 hover:bg-gray-50 text-gray-700';
         document.getElementById('nav-mod-bonos').className = mod === 'bonos' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 hover:bg-gray-50 text-gray-700';
         document.getElementById('nav-mod-feedback').className = mod === 'feedback' ? 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 bg-[#111827] text-white' : 'w-full flex items-center gap-2.5 px-3 h-10 rounded-lg text-[13px] font-medium transition text-left mt-1 hover:bg-gray-50 text-gray-700';
-
+        
         window.renderApp();
-        if(window.innerWidth < 768) {
-            window.toggleSidebar();
+        if(window.innerWidth < 768) { 
+            window.toggleSidebar(); 
         }
-    } catch(e) {
-        console.error(e);
+    } catch(e) { 
+        console.error(e); 
     }
 };
 
-window.renderApp = function() {
+window.renderApp = function() { 
     try {
         const emptyState = document.getElementById('empty-state');
         ['module-remates', 'module-comparativa', 'module-productos', 'module-clientes', 'module-conclusiones', 'module-buscador', 'module-bonos', 'module-feedback'].forEach(id => {
@@ -1121,37 +1149,37 @@ window.renderApp = function() {
             if(currentEl) currentEl.classList.remove('hidden');
         }
 
-        if (currentModule === 'remates') window.renderDashboard();
+        if (currentModule === 'remates') window.renderDashboard(); 
         else if (currentModule === 'comparativa') window.renderComparativa();
-        else if (currentModule === 'productos') window.renderPanelProductos();
-        else if (currentModule === 'conclusiones') window.renderConclusiones();
-        else if (currentModule === 'clientes') {
-            procesarDatosClientes();
-            window.renderPanelClientesData(clientDB, false);
+        else if (currentModule === 'productos') window.renderPanelProductos(); 
+        else if (currentModule === 'conclusiones') window.renderConclusiones(); 
+        else if (currentModule === 'clientes') { 
+            procesarDatosClientes(); 
+            window.renderPanelClientesData(clientDB, false); 
         }
         else if (currentModule === 'buscador') { window.buscarPatente(); }
-        else if (currentModule === 'bonos') {
+        else if (currentModule === 'bonos') { 
             window.calcularBonos();
         }
-        else if (currentModule === 'feedback') {
+        else if (currentModule === 'feedback') { 
             procesarFeedback();
             window.renderFeedback();
         }
-    } catch(e) {
-        console.error(e);
+    } catch(e) { 
+        console.error(e); 
     }
 };
 
 // ============================================================
 // MÓDULO: DASHBOARD DE REMATES
 // ============================================================
-window.renderDashboard = function() {
+window.renderDashboard = function() { 
     try {
-        if(currentModule !== 'remates') return;
-
-        let allRemates = getSelectedRemates();
+        if(currentModule !== 'remates') return; 
+        
+        let allRemates = getSelectedRemates(); 
         globalAgg = buildAgg(allRemates);
-
+        
         let titulo = "Selección Activa";
         try {
             if(checkedNodes.length === 1 && allRemates.length === 1) {
@@ -1159,19 +1187,19 @@ window.renderDashboard = function() {
             } else {
                 titulo = "Dashboard de Remates";
             }
-        } catch(e) {
-            titulo = "Dashboard de Remates";
+        } catch(e) { 
+            titulo = "Dashboard de Remates"; 
         }
-
-        const elTitulo = document.getElementById('dash-titulo');
-        if(elTitulo) elTitulo.innerText = titulo;
-
-        const elSubtitulo = document.getElementById('dash-subtitulo');
+        
+        const elTitulo = document.getElementById('dash-titulo'); 
+        if(elTitulo) elTitulo.innerText = titulo; 
+        
+        const elSubtitulo = document.getElementById('dash-subtitulo'); 
         if(elSubtitulo) elSubtitulo.innerText = `Control operativo • ${checkedNodes.length} seleccionados`;
-
+        
         try { document.getElementById('dash-kpi-ticket').innerText = formatMoney(globalAgg.ticketPromedio); } catch(e){}
-
-
+        
+        
         try { document.getElementById('dash-kpi-lotes-disp').innerText = globalAgg.lotesDisponibles.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-lotes').innerText = globalAgg.lotes.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-eficacia').innerText = `${globalAgg.eficaciaLotes.toFixed(1)}% eficacia`; } catch(e){}
@@ -1181,33 +1209,33 @@ window.renderDashboard = function() {
         try { document.getElementById('dash-kpi-perdedores').innerText = globalAgg.perdedoresCount.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-1racompra').innerText = globalAgg.ganadoresNuevos.toLocaleString('es-CL'); } catch(e){}
         try { document.getElementById('dash-kpi-1racompra-pct').innerText = `${globalAgg.pctVentaNuevos.toFixed(1)}%`; } catch(e){}
-
-
-
+        
+        
+        
         try {
-            const mapC = {};
-            globalAgg.adjudicaciones.forEach(a => {
-                if(a.esFalso) return;
+            const mapC = {}; 
+            globalAgg.adjudicaciones.forEach(a => { 
+                if(a.esFalso) return; 
                 if(!mapC[a.clienteReal]) {
-                    mapC[a.clienteReal] = {lotes: 0, total: 0};
+                    mapC[a.clienteReal] = {lotes: 0, total: 0}; 
                 }
-                mapC[a.clienteReal].lotes++;
-                mapC[a.clienteReal].total += a.monto;
-            });
-            let multi = 0;
-            Object.values(mapC).forEach(c => {
-                if(c.lotes > 1) multi++;
-            });
-            document.getElementById('dash-kpi-multilote').innerText = multi;
+                mapC[a.clienteReal].lotes++; 
+                mapC[a.clienteReal].total += a.monto; 
+            }); 
+            let multi = 0; 
+            Object.values(mapC).forEach(c => { 
+                if(c.lotes > 1) multi++; 
+            }); 
+            document.getElementById('dash-kpi-multilote').innerText = multi; 
             globalMapCMulti = mapC;
         } catch(e){}
-
+        
         try {
             const lotesTabla = [...globalAgg.adjudicaciones].filter(a => !a.esFalso && a.monto > 0).sort((a,b) => (parseInt(a.numeroLote)||0) - (parseInt(b.numeroLote)||0));
             if(document.getElementById('dash-tabla-lotes')) {
                 document.getElementById('dash-tabla-lotes').innerHTML = lotesTabla.map(l => {
-                    let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0;
-                    let dSignL = deltaLote >= 0 ? '+' : '';
+                    let deltaLote = l.minimo > 0 ? l.monto - l.minimo : 0; 
+                    let dSignL = deltaLote >= 0 ? '+' : ''; 
                     let dColorL = deltaLote > 0 ? 'text-emerald-600' : (deltaLote < 0 ? 'text-red-500' : 'text-gray-500');
                     let orId = allRemates.find(rx => window.formatearNombreRemate(rx.fileName, rx.fechaData?.timestamp) === l.origen)?.id || checkedNodes[0];
                     return `<tr class="hover:bg-gray-50 transition cursor-pointer" onclick="if(arguments[0] && arguments[0].stopPropagation) arguments[0].stopPropagation(); window.abrirModalPujadores('${encodeURIComponent(l.loteStr).replace(/'/g, "\\'")}', '${orId}')">
@@ -1228,17 +1256,17 @@ window.renderDashboard = function() {
         } catch(e){}
 
         try {
-            let chartLabels = [];
-            let cSiniestros = [];
-            let cRetail = [];
-            let cNuevos = [];
-            let cRecurrentes = [];
-            let cMatrices = [];
+            let chartLabels = []; 
+            let cSiniestros = []; 
+            let cRetail = []; 
+            let cNuevos = []; 
+            let cRecurrentes = []; 
+            let cMatrices = []; 
             let cLotes = [];
             let monthNamesShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
+            
             let distinctMonths = new Set(allRemates.map(r => r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0)).size;
-
+            
             let forcedMode = document.getElementById('dash-groupby') ? document.getElementById('dash-groupby').value : 'auto';
             let groupMode = 'remate';
             if (forcedMode === 'auto') {
@@ -1253,27 +1281,27 @@ window.renderDashboard = function() {
                     let m = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
                     let y = r.fechaData?.year ? String(r.fechaData.year).slice(-2) : 'XX';
                     let labelStr = window.globalSelectedYears.length > 1 ? `${monthNamesShort[m]} '${y}` : monthNamesShort[m];
-
-                    let mk = `${y}-${m}`;
+                    
+                    let mk = `${y}-${m}`; 
                     if(!monthMap[mk]) {
                         monthMap[mk] = { siniestros:0, retail:0, nuevos:0, antiguos:0, lotes: 0, label: labelStr, rawD: r.fechaData?.timestamp||0, count: 0 };
                     }
-
+                    
                     monthMap[mk].count++;
                     monthMap[mk].lotes += (Number(r.lotesCount) || 0);
                     if(r.tipo === 'Siniestrados') monthMap[mk].siniestros += (Number(r.ventaTotal) || 0);
                     if(r.tipo === 'Retail') monthMap[mk].retail += (Number(r.ventaTotal) || 0);
-                    monthMap[mk].nuevos += (Number(r.nuevos) || 0);
+                    monthMap[mk].nuevos += (Number(r.nuevos) || 0); 
                     monthMap[mk].antiguos += (Number(r.antiguos) || 0);
                 });
-
+                
                 Object.values(monthMap).sort((a,b) => a.rawD - b.rawD).forEach(v => {
-                    chartLabels.push(v.label);
-                    cSiniestros.push(v.siniestros);
-                    cRetail.push(v.retail);
-                    cNuevos.push(v.nuevos);
-                    cRecurrentes.push(v.antiguos);
-                    cMatrices.push(v.count);
+                    chartLabels.push(v.label); 
+                    cSiniestros.push(v.siniestros); 
+                    cRetail.push(v.retail); 
+                    cNuevos.push(v.nuevos); 
+                    cRecurrentes.push(v.antiguos); 
+                    cMatrices.push(v.count); 
                     cLotes.push(v.lotes);
                 });
             } else {
@@ -1281,9 +1309,9 @@ window.renderDashboard = function() {
                     chartLabels.push(window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp));
                     cSiniestros.push(r.tipo === 'Siniestrados' ? (Number(r.ventaTotal) || 0) : 0);
                     cRetail.push(r.tipo === 'Retail' ? (Number(r.ventaTotal) || 0) : 0);
-                    cNuevos.push(Number(r.nuevos) || 0);
-                    cRecurrentes.push(Number(r.antiguos) || 0);
-                    cMatrices.push(1);
+                    cNuevos.push(Number(r.nuevos) || 0); 
+                    cRecurrentes.push(Number(r.antiguos) || 0); 
+                    cMatrices.push(1); 
                     cLotes.push(Number(r.lotesCount) || 0);
                 });
             }
@@ -1291,127 +1319,127 @@ window.renderDashboard = function() {
             const showRetail = cRetail.some(val => val > 0);
             let datasetsVentas = [
                 {
-                    label: 'Venta Siniestrados',
-                    data: cSiniestros,
-                    type: 'line',
-                    borderColor: '#111827',
-                    backgroundColor: '#111827',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    pointBackgroundColor: '#111827',
-                    pointRadius: 3,
+                    label: 'Venta Siniestrados', 
+                    data: cSiniestros, 
+                    type: 'line', 
+                    borderColor: '#111827', 
+                    backgroundColor: '#111827', 
+                    borderWidth: 2, 
+                    tension: 0.3, 
+                    pointBackgroundColor: '#111827', 
+                    pointRadius: 3, 
                     yAxisID: 'y'
                 }
             ];
-
+            
             if(showRetail) {
                 datasetsVentas.push({
-                    label: 'Venta Retail',
-                    data: cRetail,
-                    type: 'line',
-                    borderColor: '#9CA3AF',
-                    backgroundColor: '#9CA3AF',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    pointBackgroundColor: '#9CA3AF',
-                    pointRadius: 3,
+                    label: 'Venta Retail', 
+                    data: cRetail, 
+                    type: 'line', 
+                    borderColor: '#9CA3AF', 
+                    backgroundColor: '#9CA3AF', 
+                    borderWidth: 2, 
+                    tension: 0.3, 
+                    pointBackgroundColor: '#9CA3AF', 
+                    pointRadius: 3, 
                     yAxisID: 'y'
                 });
             }
-
+            
             datasetsVentas.push({
-                label: 'Lotes Vendidos',
-                data: cLotes,
-                type: 'bar',
-                backgroundColor: '#E5E7EB',
-                borderRadius: 4,
+                label: 'Lotes Vendidos', 
+                data: cLotes, 
+                type: 'bar', 
+                backgroundColor: '#E5E7EB', 
+                borderRadius: 4, 
                 yAxisID: 'y1'
             });
 
             const canvasVentas = document.getElementById('dash-chartVentas');
             if(canvasVentas) {
                 if(dashChartVentasInst) dashChartVentasInst.destroy();
-                dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), {
-                    type: 'line',
-                    data: { labels: chartLabels, datasets: datasetsVentas },
-                    options: {
-                        responsive: true,
+                dashChartVentasInst = new Chart(canvasVentas.getContext('2d'), { 
+                    type: 'line', 
+                    data: { labels: chartLabels, datasets: datasetsVentas }, 
+                    options: { 
+                        responsive: true, 
                         maintainAspectRatio: false,
                         plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    afterBody: function(context) {
-                                        return '\nMatrices: ' + cMatrices[context[0].dataIndex];
-                                    }
-                                }
+                            tooltip: { 
+                                callbacks: { 
+                                    afterBody: function(context) { 
+                                        return '\nMatrices: ' + cMatrices[context[0].dataIndex]; 
+                                    } 
+                                } 
                             },
-                            legend: {
-                                display: true,
-                                position: 'bottom',
-                                labels: { boxWidth: 10, usePointStyle: true }
+                            legend: { 
+                                display: true, 
+                                position: 'bottom', 
+                                labels: { boxWidth: 10, usePointStyle: true } 
                             }
                         },
-                        scales: {
-                            y: {
-                                type: 'linear',
-                                display: true,
-                                position: 'left',
-                                beginAtZero: true,
-                                grid: { color: '#F3F4F6' }
+                        scales: { 
+                            y: { 
+                                type: 'linear', 
+                                display: true, 
+                                position: 'left', 
+                                beginAtZero: true, 
+                                grid: { color: '#F3F4F6' } 
                             },
-                            y1: {
-                                type: 'linear',
-                                display: true,
-                                position: 'right',
-                                grid: { drawOnChartArea: false },
-                                beginAtZero: true
+                            y1: { 
+                                type: 'linear', 
+                                display: true, 
+                                position: 'right', 
+                                grid: { drawOnChartArea: false }, 
+                                beginAtZero: true 
                             }
-                        }
-                    }
+                        } 
+                    } 
                 });
             }
 
             const canvasClientes = document.getElementById('dash-chartClientes');
             if (canvasClientes) {
                 if(dashChartClientesInst) dashChartClientesInst.destroy();
-                dashChartClientesInst = new Chart(canvasClientes.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
+                dashChartClientesInst = new Chart(canvasClientes.getContext('2d'), { 
+                    type: 'bar', 
+                    data: { 
+                        labels: chartLabels, 
                         datasets: [
                             {
-                                label: 'Recurrentes',
-                                data: cRecurrentes,
-                                backgroundColor: '#111827',
+                                label: 'Recurrentes', 
+                                data: cRecurrentes, 
+                                backgroundColor: '#111827', 
                                 borderRadius: 4
-                            },
+                            }, 
                             {
-                                label: 'Nuevos',
-                                data: cNuevos,
-                                backgroundColor: '#D1D5DB',
+                                label: 'Nuevos', 
+                                data: cNuevos, 
+                                backgroundColor: '#D1D5DB', 
                                 borderRadius: 4
                             }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: true, position: 'bottom', labels: { boxWidth: 10 } }
-                        },
-                        scales: {
-                            x: { stacked: true, grid: { display: false } },
-                            y: { stacked: true, grid: { color: '#F3F4F6' } }
-                        }
-                    }
+                        ] 
+                    }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { display: true, position: 'bottom', labels: { boxWidth: 10 } } 
+                        }, 
+                        scales: { 
+                            x: { stacked: true, grid: { display: false } }, 
+                            y: { stacked: true, grid: { color: '#F3F4F6' } } 
+                        } 
+                    } 
                 });
             }
-        } catch(e) {
-            console.error("Error graficos", e);
+        } catch(e) { 
+            console.error("Error graficos", e); 
         }
 
-    } catch(e) {
-        console.error(e);
+    } catch(e) { 
+        console.error(e); 
     }
 };
 
@@ -1420,8 +1448,8 @@ window.renderDashboard = function() {
 // ============================================================
 window.renderComparativa = function() {
     try {
-        if(currentModule !== 'comparativa') return;
-
+        if(currentModule !== 'comparativa') return; 
+        
         let allRemates = getSelectedRemates();
         let groupMode = document.getElementById('comp-groupby').value;
         let groups = {};
@@ -1431,30 +1459,30 @@ window.renderComparativa = function() {
             let d = r.fechaData;
             let dateObj = d?.timestamp ? new Date(d.timestamp) : new Date();
             let y = d?.year || dateObj.getFullYear();
-            let m = dateObj.getMonth();
-
-            let key = '';
+            let m = dateObj.getMonth(); 
+            
+            let key = ''; 
             let label = '';
-
+            
             if(groupMode === 'remate') {
-                key = `R-${d?.timestamp || 0}-${r.id}`;
+                key = `R-${d?.timestamp || 0}-${r.id}`; 
                 label = window.formatearNombreRemate(r.fileName, d?.timestamp);
             } else if(groupMode === 'year') {
-                key = `${y}`;
+                key = `${y}`; 
                 label = `Año ${y}`;
             } else if(groupMode === 'semester') {
                 let s = m < 6 ? 1 : 2;
-                key = `${y}-S${s}`;
+                key = `${y}-S${s}`; 
                 label = `S${s} ${y}`;
             } else if(groupMode === 'quarter') {
                 let q = Math.floor(m/3) + 1;
-                key = `${y}-Q${q}`;
+                key = `${y}-Q${q}`; 
                 label = `Q${q} ${y}`;
             } else {
-                key = `${y}-${String(m).padStart(2,'0')}`;
+                key = `${y}-${String(m).padStart(2,'0')}`; 
                 label = `${monthNamesShort[m]} ${y}`;
             }
-
+            
             if(!groups[key]) {
                 groups[key] = { label, key, remates: [], timestamp: d?.timestamp || 0 };
             }
@@ -1481,9 +1509,9 @@ window.renderComparativa = function() {
             chartLabels.push(g.label);
             dataVenta.push(agg.venta);
             dataComision.push(agg.comisionTotal);
-            dataLotes.push(agg.lotes);
+            dataLotes.push(agg.lotes); 
             dataMatrices.push(g.remates.length);
-
+            
             tableHtml += `
             <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                 <td class="pl-4 py-3 font-medium text-gray-900">${g.label}</td>
@@ -1500,38 +1528,38 @@ window.renderComparativa = function() {
         const canvasComp = document.getElementById('comp-chart');
         if(canvasComp) {
             if(compChartInst) compChartInst.destroy();
-            compChartInst = new Chart(canvasComp.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: chartLabels,
+            compChartInst = new Chart(canvasComp.getContext('2d'), { 
+                type: 'line', 
+                data: { 
+                    labels: chartLabels, 
                     datasets: [
                         { label: 'Venta Total Adjudicada', data: dataVenta, type: 'line', borderColor: '#111827', backgroundColor: '#111827', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#111827', pointRadius: 3, yAxisID: 'y' },
                         { label: 'Comisiones Estimadas', data: dataComision, type: 'line', borderColor: '#9CA3AF', backgroundColor: '#9CA3AF', borderWidth: 1.5, borderDash: [5, 5], tension: 0.3, pointBackgroundColor: '#9CA3AF', pointRadius: 2, yAxisID: 'y' },
                         { label: 'Lotes Vendidos', data: dataLotes, type: 'bar', backgroundColor: '#E5E7EB', borderRadius: 4, yAxisID: 'y1' }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    ] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
                     plugins: {
-                        tooltip: {
-                            callbacks: {
-                                afterBody: function(context) {
-                                    return '\nMatrices: ' + dataMatrices[context[0].dataIndex];
-                                }
-                            }
+                        tooltip: { 
+                            callbacks: { 
+                                afterBody: function(context) { 
+                                    return '\nMatrices: ' + dataMatrices[context[0].dataIndex]; 
+                                } 
+                            } 
                         },
                         legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true } }
                     },
-                    scales: {
+                    scales: { 
                         y: { type: 'linear', display: true, position: 'left', beginAtZero: true, grid: { color: '#F3F4F6'} },
                         y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, beginAtZero: true }
-                    }
-                }
+                    } 
+                } 
             });
         }
-    } catch(e) {
-        console.error(e);
+    } catch(e) { 
+        console.error(e); 
     }
 };
 
@@ -1550,10 +1578,10 @@ window.switchProductosTab = function(tab) {
 window.renderPanelProductos = function() {
     try {
         if(currentModule !== 'productos') return;
-
+        
         const term = (document.getElementById('search-productos')?.value || '').toLowerCase().trim();
         const allRemates = getSelectedRemates();
-
+        
         // ====== SINIESTRADOS ======
         let autosSiniestrados = [];
         let allSiniestrados = allRemates.filter(r => r.tipo === 'Siniestrados');
@@ -1567,7 +1595,7 @@ window.renderPanelProductos = function() {
                 }
             });
         });
-
+        
         if (term) {
             autosSiniestrados = autosSiniestrados.filter(a =>
                 (a.loteStr || '').toLowerCase().includes(term) ||
@@ -1577,7 +1605,7 @@ window.renderPanelProductos = function() {
                 (a.patente || '').toLowerCase().includes(term)
             );
         }
-
+        
         let marcasMap = {};
         let modelosMap = {};
         autosSiniestrados.forEach(a => {
@@ -1588,7 +1616,7 @@ window.renderPanelProductos = function() {
                 modelosMap[a.modeloStr] = (modelosMap[a.modeloStr] || 0) + 1;
             }
         });
-
+        
         const marcasSorted = Object.entries(marcasMap).sort((a,b) => b[1] - a[1]).slice(0,5);
         try {
             if(flotaMarcasInst) flotaMarcasInst.destroy();
@@ -1613,7 +1641,7 @@ window.renderPanelProductos = function() {
                     }
                 });
             }
-
+            
             const modelosSorted = Object.entries(modelosMap).sort((a,b) => b[1] - a[1]).slice(0,7);
             if(flotaAniosInst) flotaAniosInst.destroy();
             if(modelosSorted.length > 0 && document.getElementById('flota-modelos-chart')) {
@@ -1641,7 +1669,7 @@ window.renderPanelProductos = function() {
                 });
             }
         } catch(ec) {}
-
+        
         if(document.getElementById('productos-tabla-siniestrados')) {
             document.getElementById('productos-tabla-siniestrados').innerHTML = autosSiniestrados.map(a => {
                 return `
@@ -1658,7 +1686,7 @@ window.renderPanelProductos = function() {
                 </tr>`;
             }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin vehículos en la selección actual.</td></tr>';
         }
-
+        
         // ====== RETAIL ======
         let productosRetail = [];
         let allRetail = allRemates.filter(r => r.tipo === 'Retail');
@@ -1676,7 +1704,7 @@ window.renderPanelProductos = function() {
                 }
             });
         });
-
+        
         if (term) {
             productosRetail = productosRetail.filter(a =>
                 (a.loteStr || '').toLowerCase().includes(term) ||
@@ -1685,7 +1713,7 @@ window.renderPanelProductos = function() {
                 (a.numeroLote || '').toString().includes(term)
             );
         }
-
+        
         let categoriasMap = {};
         let subcategoriasMap = {};
         productosRetail.forEach(a => {
@@ -1694,7 +1722,7 @@ window.renderPanelProductos = function() {
                 subcategoriasMap[a.subcategoria] = (subcategoriasMap[a.subcategoria] || 0) + 1;
             }
         });
-
+        
         const categoriasSorted = Object.entries(categoriasMap).sort((a,b) => b[1] - a[1]).slice(0,5);
         try {
             if(retailCategoriasInst) retailCategoriasInst.destroy();
@@ -1719,7 +1747,7 @@ window.renderPanelProductos = function() {
                     }
                 });
             }
-
+            
             const subcategoriasSorted = Object.entries(subcategoriasMap).sort((a,b) => b[1] - a[1]).slice(0,7);
             if(retailSubcategoriasInst) retailSubcategoriasInst.destroy();
             if(subcategoriasSorted.length > 0 && document.getElementById('retail-subcategorias-chart')) {
@@ -1747,7 +1775,7 @@ window.renderPanelProductos = function() {
                 });
             }
         } catch(ec) {}
-
+        
         if(document.getElementById('productos-tabla-retail')) {
             document.getElementById('productos-tabla-retail').innerHTML = productosRetail.map(a => {
                 return `
@@ -1763,7 +1791,7 @@ window.renderPanelProductos = function() {
                 </tr>`;
             }).join('') || '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">Sin productos Retail en la selección actual.</td></tr>';
         }
-
+        
     } catch(e) { console.error(e); }
 };
 
@@ -1778,13 +1806,13 @@ function procesarDatosClientes() {
             clientesLatentes = [];
             return;
         }
-
+        
         const mapBI = {};
         const MAX_TIMESTAMP = Math.max(...allRemates.map(r => r.fechaData?.timestamp || 0));
-
+        
         allRemates.forEach(r => {
             r.adjudicaciones.forEach(adj => {
-                if(adj.esFalso || esClienteFalso(adj.nombreRaw, adj.email)) return;
+                if(adj.esFalso || esClienteFalso(adj.nombreRaw, adj.email, adj.rut)) return;
                 const c = adj.clienteReal;
                 if(!mapBI[c]) {
                     mapBI[c] = {
@@ -1814,7 +1842,7 @@ function procesarDatosClientes() {
                 mapBI[c].tipos.add(r.tipo);
             });
         });
-
+        
         clientDB = Object.values(mapBI).map(c => {
             c.compras.sort((a,b) => b.fecha - a.fecha);
             c.primeraCompra = c.compras.length > 0 ? c.compras[c.compras.length-1].fecha : null;
@@ -1822,7 +1850,7 @@ function procesarDatosClientes() {
             c.frecuencia = c.compras.length;
             c.recencyDias = c.ultimaCompra ? Math.floor((MAX_TIMESTAMP - c.ultimaCompra) / (1000*60*60*24)) : 0;
             c.isHybrid = c.tipos.size > 1;
-
+            
             if(c.frecuencia > 3 && c.recencyDias <= 60) {
                 c.segmento = "Frecuente";
                 c.bg = "badge-frecuente";
@@ -1839,11 +1867,11 @@ function procesarDatosClientes() {
             if(c.isHybrid) c.bg = "badge-hybrid";
             return c;
         }).sort((a,b) => b.totalGastado - a.totalGastado);
-
+        
         // Clientes latentes = garantías no adjudicadas
         const agg = buildAgg(allRemates);
         clientesLatentes = agg.garantiasNoAdjudicadas || [];
-
+        
     } catch(e) { console.error(e); }
 }
 
@@ -1853,13 +1881,13 @@ window.renderPanelClientesData = function(filtered, isFiltered = false) {
         const hybrid = clientDB.filter(c => c.isHybrid).length;
         const hybridPct = total > 0 ? (hybrid / total * 100) : 0;
         const latentes = clientesLatentes.length;
-
+        
         document.getElementById('bi-kpi-total').innerText = total;
         document.getElementById('bi-kpi-ltv').innerText = formatMoney(total ? clientDB.reduce((a,b) => a + b.totalGastado, 0) / total : 0);
         document.getElementById('bi-kpi-hybrid').innerText = hybrid;
         document.getElementById('bi-kpi-hybrid-pct').innerText = hybridPct.toFixed(1) + '% del total';
         document.getElementById('bi-kpi-latentes').innerText = latentes;
-
+        
         // Tabla de clientes
         if(document.getElementById('bi-tabla-clientes')) {
             document.getElementById('bi-tabla-clientes').innerHTML = filtered.map(c => `
@@ -1874,7 +1902,7 @@ window.renderPanelClientesData = function(filtered, isFiltered = false) {
                 </tr>
             `).join('');
         }
-
+        
         // Tabla de clientes latentes
         if(document.getElementById('bi-tabla-latentes')) {
             const latentesOrdenados = [...clientesLatentes].sort((a,b) => (b.fechaRemate || 0) - (a.fechaRemate || 0)).slice(0,50);
@@ -1889,7 +1917,7 @@ window.renderPanelClientesData = function(filtered, isFiltered = false) {
                 </tr>
             `).join('') || '<tr><td colspan="6" class="p-8 text-center text-gray-400 font-medium">No hay clientes latentes en la selección actual.</td></tr>';
         }
-
+        
         if(!isFiltered) {
             const segCount = {};
             clientDB.forEach(c => {
@@ -1925,7 +1953,7 @@ window.filtrarClientes = function() {
     try {
         const term = (document.getElementById('search-client').value || '').toLowerCase();
         const tipo = document.getElementById('filter-client-type').value;
-
+        
         let filtered = clientDB.filter(c => {
             const matchName = (c.nombre || '').toLowerCase().includes(term);
             let matchTipo = true;
@@ -1942,10 +1970,10 @@ window.abrirFichaCliente = function(nombreStr) {
     try {
         const c = clientDB.find(x => x.nombre === nombreStr);
         if(!c) return;
-
+        
         const ficha = document.getElementById('bi-ficha-cliente');
         if(ficha) ficha.classList.remove('hidden');
-
+        
         document.getElementById('ficha-nombre').innerText = c.nombre;
         document.getElementById('ficha-rut').innerText = c.rut;
         document.getElementById('ficha-email').innerText = c.email;
@@ -1954,7 +1982,7 @@ window.abrirFichaCliente = function(nombreStr) {
         document.getElementById('ficha-lotes').innerText = c.frecuencia;
         document.getElementById('ficha-monto-sin').innerText = formatMoney(c.compras.filter(x => x.tipo === 'Siniestrados').reduce((a,b) => a + (Number(b.monto) || 0), 0));
         document.getElementById('ficha-monto-ret').innerText = formatMoney(c.compras.filter(x => x.tipo === 'Retail').reduce((a,b) => a + (Number(b.monto) || 0), 0));
-
+        
         document.getElementById('ficha-historial-tabla').innerHTML = c.compras.map(h => `
             <tr class="hover:bg-white/5">
                 <td class="py-2 px-3 text-[11px] text-gray-400">${h.fecha ? window.formatExcelDate(h.fecha) : '-'}</td>
@@ -1964,7 +1992,7 @@ window.abrirFichaCliente = function(nombreStr) {
                 <td class="py-2 px-3 text-right text-[11px] font-bold text-emerald-400">${formatMoney(h.monto)}</td>
             </tr>
         `).join('');
-
+        
         if(ficha) ficha.scrollIntoView({behavior:'smooth'});
     } catch(e) { console.error(e); }
 };
@@ -2006,7 +2034,7 @@ window.renderConclusiones = function() {
         const agg = buildAgg(allRemates);
         let html = '';
         globalAgg = agg;
-
+        
         if(!clientDB.length) {
             procesarDatosClientes();
         }
@@ -2322,7 +2350,7 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
         };
         if (index > 0) {
             const mesAnterior = resultados[index - 1];
-
+            
             let lotesVendidos = 0;
             let lotesDisponibles = 0;
             mesData.remates.forEach(r => {
@@ -2330,33 +2358,33 @@ function calcularKPIsMensuales(meses, clientesInfo, mesesKeys) {
                 lotesDisponibles += (Number(r.lotesDisponibles) || 0);
             });
             const efectividad = lotesDisponibles > 0 ? (lotesVendidos / lotesDisponibles) * 100 : 0;
-
+            
             // Check if month is still in progress (e.g. current month)
             const hoy = new Date();
             const esMesActual = (hoy.getFullYear() === parseInt(key.split('-')[0])) && (hoy.getMonth() + 1 === parseInt(key.split('-')[1]));
             resultado.enCurso = esMesActual;
-
+            
             // Calculate dynamic targets based on remates held
             const metaGanadores = Math.round(METAS_BONOS.ganadores_por_remate * resultado.numRemates);
             const metaPujadores = Math.round(METAS_BONOS.pujadores_por_remate * resultado.numRemates);
             const metaGarantes = Math.round(METAS_BONOS.garantes_por_remate * resultado.numRemates);
-
+            
             let reqGanadores = metaGanadores;
             let reqPujadores = metaPujadores;
             let reqGarantes = metaGarantes;
-
+            
             // Explicit tolerance for historical month 08/2026 based on requirements
             if (key === '2026-08') {
                 reqGarantes = 170;
             }
-
+            
             resultado.kpis = {
                 ganadores: { valor: resultado.nuevosGanadores, meta: metaGanadores, req: reqGanadores, cumple: resultado.nuevosGanadores >= reqGanadores },
                 pujadores: { valor: resultado.nuevosPujadores, meta: metaPujadores, req: reqPujadores, cumple: resultado.nuevosPujadores >= reqPujadores },
                 garantes: { valor: resultado.nuevosGarantes, meta: metaGarantes, req: reqGarantes, cumple: resultado.nuevosGarantes >= reqGarantes },
                 efectividad: { valor: efectividad, meta: METAS_BONOS.efectividad, req: METAS_BONOS.efectividad, cumple: efectividad >= METAS_BONOS.efectividad }
             };
-
+            
             let bonoTotal = 0;
             if (!resultado.enCurso) {
                 if (resultado.kpis.ganadores.cumple) bonoTotal += 50000;
@@ -2380,7 +2408,7 @@ function renderizarBonoActual(ultimoMes) {
         document.getElementById('bono-total-mes').innerText = formatMoney(ultimoMes.bono || 0);
         document.getElementById('bono-total-mes').className = 'text-2xl font-black text-emerald-600 mt-1';
     }
-
+    
     const cumplidos = ultimoMes.kpis ? Object.values(ultimoMes.kpis).filter(k => k.cumple).length : 0;
     document.getElementById('bono-kpis-cumplidos').innerText = ultimoMes.enCurso ? 'En Curso' : `${cumplidos}/4`;
     document.getElementById('bono-nuevos-clientes').innerText = ultimoMes.totalNuevos || 0;
@@ -2388,7 +2416,7 @@ function renderizarBonoActual(ultimoMes) {
     const efectividadVal = ultimoMes.kpis?.efectividad?.valor || 0;
     document.getElementById('bono-crecimiento-ventas').innerText = `${efectividadVal.toFixed(1)}%`;
     document.getElementById('bono-mes-label').innerText = `Mes: ${ultimoMes.mes} (${ultimoMes.numRemates} remates)`;
-
+    
     const detalleContainer = document.getElementById('bono-kpis-detalle');
     if (ultimoMes.kpis) {
         const kpis = [
@@ -2398,21 +2426,21 @@ function renderizarBonoActual(ultimoMes) {
             { key: 'efectividad', label: '📈 Efectividad Remate', data: ultimoMes.kpis.efectividad, extra: `Venta vs Catálogo` }
         ];
         detalleContainer.innerHTML = kpis.map(k => {
-            let statusBadge = ultimoMes.enCurso ? '<span class="text-slate-500 bg-slate-50 border border-slate-200/80 px-2 py-0.5 rounded-md font-medium text-xs">⏳ En Curso</span>' :
+            let statusBadge = ultimoMes.enCurso ? '<span class="text-slate-500 bg-slate-50 border border-slate-200/80 px-2 py-0.5 rounded-md font-medium text-xs">⏳ En Curso</span>' : 
                 (k.data.cumple ? '<span class="text-emerald-700 bg-emerald-50/90 border border-emerald-200/80 px-2 py-0.5 rounded-md font-medium text-xs">✓ Cumple</span>' : '<span class="text-slate-600 bg-slate-100 border border-slate-200/70 px-2 py-0.5 rounded-md font-medium text-xs">— No cumple</span>');
-
+            
             let colorVal = 'text-slate-800';
             let colorBar = 'bg-gradient-to-r from-blue-600 to-sky-400';
-
+            
             let metaMensualFija = k.data.req;
             if (k.key === 'ganadores') metaMensualFija = 70;
             else if (k.key === 'pujadores') metaMensualFija = 170;
             else if (k.key === 'garantes') metaMensualFija = 192;
             else if (k.key === 'efectividad') metaMensualFija = METAS_BONOS.efectividad;
-
+            
             let percentage = metaMensualFija > 0 ? (k.data.valor / metaMensualFija) * 100 : 0;
             let valWidth = Math.min(100, Math.round(percentage));
-
+            
             let subtitleHtml = '';
             if (k.key === 'efectividad') {
                 subtitleHtml = `<div class="flex justify-between items-center text-[11px] text-slate-500 font-mono mt-1.5">
@@ -2505,11 +2533,11 @@ function procesarFeedback() {
 
 window.renderFeedback = function() {
     if (currentModule !== 'feedback') return;
-
+    
     const container = document.getElementById('feedback-timeline');
     const totalMsg = document.getElementById('feedback-total-msg');
     const usuariosSelect = document.getElementById('filter-feedback-usuario');
-
+    
     if (!feedbackMessages || feedbackMessages.length === 0) {
         container.innerHTML = '<div class="p-8 text-center text-gray-400 font-medium">No hay mensajes de feedback en los remates seleccionados.</div>';
         totalMsg.innerText = '0';
@@ -2518,16 +2546,16 @@ window.renderFeedback = function() {
         document.getElementById('feedback-top-palabras').innerHTML = '<span class="text-gray-400 text-[11px]">Sin datos</span>';
         return;
     }
-
+    
     totalMsg.innerText = feedbackMessages.length;
-
+    
     // Poblar select de usuarios
     const usuarios = [...new Set(feedbackMessages.map(m => m.usuario || 'Anónimo'))];
-    usuariosSelect.innerHTML = '<option value="todos">Todos los usuarios</option>' +
+    usuariosSelect.innerHTML = '<option value="todos">Todos los usuarios</option>' + 
         usuarios.map(u => `<option value="${u}">${u}</option>`).join('');
-
+    
     window.filtrarFeedback();
-
+    
     // Top usuarios
     const userCount = {};
     feedbackMessages.forEach(m => {
@@ -2535,10 +2563,10 @@ window.renderFeedback = function() {
         userCount[u] = (userCount[u] || 0) + 1;
     });
     const topUsers = Object.entries(userCount).sort((a,b) => b[1] - a[1]).slice(0,10);
-    document.getElementById('feedback-top-usuarios').innerHTML = topUsers.map(([u, c]) =>
+    document.getElementById('feedback-top-usuarios').innerHTML = topUsers.map(([u, c]) => 
         `<div class="flex justify-between text-[12px]"><span class="text-gray-700">${u}</span><span class="font-bold text-gray-900">${c}</span></div>`
     ).join('') || '<p class="text-gray-400 text-[11px]">Sin datos</p>';
-
+    
     // Palabras clave
     const palabras = {};
     const stopWords = ['que', 'de', 'la', 'el', 'en', 'y', 'a', 'los', 'del', 'las', 'un', 'por', 'con', 'no', 'su', 'para', 'es', 'al', 'lo', 'como', 'mas', 'pero', 'sus', 'le', 'ya', 'este', 'entre', 'cuando', 'todo', 'esta', 'ser', 'son', 'dos', 'tres', 'nos', 'una', 'sin', 'sobre', 'se', 'me', 'te', 'lo', 'mi'];
@@ -2551,7 +2579,7 @@ window.renderFeedback = function() {
         });
     });
     const topPalabras = Object.entries(palabras).sort((a,b) => b[1] - a[1]).slice(0,15);
-    document.getElementById('feedback-top-palabras').innerHTML = topPalabras.map(([p, c]) =>
+    document.getElementById('feedback-top-palabras').innerHTML = topPalabras.map(([p, c]) => 
         `<span class="px-3 py-1 bg-gray-100 rounded-full text-[11px] text-gray-700">${p} <span class="text-gray-400">${c}</span></span>`
     ).join('') || '<span class="text-gray-400 text-[11px]">Sin datos</span>';
 };
@@ -2559,7 +2587,7 @@ window.renderFeedback = function() {
 window.filtrarFeedback = function() {
     const term = (document.getElementById('search-feedback')?.value || '').toLowerCase();
     const usuario = document.getElementById('filter-feedback-usuario')?.value || 'todos';
-
+    
     let filtered = feedbackMessages;
     if (term) {
         filtered = filtered.filter(m => (m.mensaje || m.texto || '').toLowerCase().includes(term));
@@ -2567,26 +2595,26 @@ window.filtrarFeedback = function() {
     if (usuario !== 'todos') {
         filtered = filtered.filter(m => (m.usuario || 'Anónimo') === usuario);
     }
-
+    
     const container = document.getElementById('feedback-timeline');
     if (!filtered.length) {
         container.innerHTML = '<div class="p-8 text-center text-gray-400 font-medium">No hay mensajes que coincidan con los filtros.</div>';
         return;
     }
-
+    
     container.innerHTML = filtered.map(m => {
-        const esQueja = (m.mensaje || m.texto || '').toLowerCase().includes('queja') ||
+        const esQueja = (m.mensaje || m.texto || '').toLowerCase().includes('queja') || 
                        (m.mensaje || m.texto || '').toLowerCase().includes('problema') ||
                        (m.mensaje || m.texto || '').toLowerCase().includes('error') ||
                        (m.mensaje || m.texto || '').toLowerCase().includes('malo') ||
                        (m.mensaje || m.texto || '').toLowerCase().includes('no sirve');
-        const esPositivo = (m.mensaje || m.texto || '').toLowerCase().includes('gracias') ||
+        const esPositivo = (m.mensaje || m.texto || '').toLowerCase().includes('gracias') || 
                           (m.mensaje || m.texto || '').toLowerCase().includes('excelente') ||
                           (m.mensaje || m.texto || '').toLowerCase().includes('bueno');
         let badge = '';
         if (esQueja) badge = '<span class="ml-2 text-[10px] font-bold text-red-500">⚠️ Queja</span>';
         if (esPositivo) badge = '<span class="ml-2 text-[10px] font-bold text-emerald-500">✅ Positivo</span>';
-
+        
         return `
         <div class="px-4 py-3 hover:bg-gray-50 transition flex items-start gap-3">
             <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[14px] font-bold text-gray-600 flex-shrink-0">
@@ -2616,7 +2644,7 @@ window.exportarFeedbackExcel = function() {
             "Fecha": m.fecha ? window.formatExcelDate(m.fecha) : '-',
             "Usuario": m.usuario || 'Anónimo',
             "Mensaje": m.mensaje || m.texto || '',
-            "Tipo": (m.mensaje || m.texto || '').toLowerCase().includes('queja') ? 'Queja' :
+            "Tipo": (m.mensaje || m.texto || '').toLowerCase().includes('queja') ? 'Queja' : 
                     (m.mensaje || m.texto || '').toLowerCase().includes('gracias') ? 'Positivo' : 'Neutral'
         }));
         const ws = XLSX.utils.json_to_sheet(wsData);
@@ -2636,7 +2664,7 @@ window.parseExcel = function(file) {
             try {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, {type: 'array'});
-
+                
                 let sheetAdjName = workbook.SheetNames.find(s => String(s).toLowerCase().includes('adjudicaciones')) || workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetAdjName];
                 const rowsAdj = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
@@ -2682,7 +2710,7 @@ window.parseExcel = function(file) {
                 let parsedData = [];
                 for(let i = headerIdx + 1; i < rowsAdj.length; i++) {
                     let rowData = rowsAdj[i];
-                    if(!rowData || !Array.isArray(rowData) || rowData.join('').trim() === '') continue;
+                    if(!rowData || !Array.isArray(rowData) || rowData.join('').trim() === '') continue; 
                     let obj = {};
                     for(let j = 0; j < headers.length; j++) {
                         let key = headers[j] || ('col' + j);
@@ -2753,7 +2781,7 @@ window.parseExcel = function(file) {
 
                         if (numVal || vehiculoText) {
                             lotesSet.add(String(numVal || vehiculoText).trim());
-                            let esFalso = esClienteFalso(nombre, email);
+                            let esFalso = esClienteFalso(nombre, email, rut);
                             let esChatarra = extraDesc.toLowerCase().includes('chatarra') || String(vehiculoText).toLowerCase().includes('chatarra') || String(vehiculoText).toLowerCase().includes('restos');
                             let { categoria, modeloStr } = extraerMarcaModelo(String(vehiculoText));
 
@@ -2815,7 +2843,7 @@ window.parseExcel = function(file) {
                         for(let i=0; i<Math.min(rowsGarantias.length, 15); i++){
                             if(!rowsGarantias[i] || !Array.isArray(rowsGarantias[i])) continue;
                             let rowStr = rowsGarantias[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                            if((rowStr.includes('rut') || rowStr.includes('cliente') || rowStr.includes('nombre')) &&
+                            if((rowStr.includes('rut') || rowStr.includes('cliente') || rowStr.includes('nombre')) && 
                                (rowStr.includes('monto') || rowStr.includes('garantia') || rowStr.includes('email'))) {
                                 headerGIdx = i;
                                 gHeaders = rowsGarantias[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
@@ -2835,7 +2863,7 @@ window.parseExcel = function(file) {
                                 let rut = obj['rut'] || obj['rutcliente'];
                                 let montoGarantia = parseFloat(String(obj['montogarantía'] || obj['montogarantia'] || obj['monto'] || 0).replace(/[^\d]/g, '')) || 0;
                                 if(nombre) {
-                                    if (!esClienteFalso(nombre, email)) {
+                                    if (!esClienteFalso(nombre, email, rut)) {
                                         garantiasCount++;
                                         remate.garantiasListaDetallada.push({
                                             nombreNorm: normalizarCliente(nombre),
@@ -2873,7 +2901,7 @@ window.parseExcel = function(file) {
                         for(let i=0; i<Math.min(rowsPosturas.length, 20); i++){
                             if(!rowsPosturas[i] || !Array.isArray(rowsPosturas[i])) continue;
                             let rowStr = rowsPosturas[i].map(c => String(c).toLowerCase().trim()).join(' ');
-                            if((rowStr.includes('rut') || rowStr.includes('nombre') || rowStr.includes('cliente')) &&
+                            if((rowStr.includes('rut') || rowStr.includes('nombre') || rowStr.includes('cliente')) && 
                                (rowStr.includes('postura') || rowStr.includes('monto') || rowStr.includes('oferta'))) {
                                 headerPIdx = i;
                                 pHeaders = rowsPosturas[i].map(c => String(c).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ''));
@@ -2911,36 +2939,42 @@ window.parseExcel = function(file) {
                                     if(matchLoteP) numP = matchLoteP[1];
                                 }
                                 if(montoP > 0 && nombreP) {
-                                    let isFalso = esClienteFalso(nombreP, emailP);
+                                    let isFalso = esClienteFalso(nombreP, emailP, rutP);
                                     if (isFalso) {
                                         remate.auditoriaInterna.pujasTestCount++;
-                                    } else {
-                                        let puja = {
-                                            nombre: String(nombreP),
-                                            nombreNorm: normalizarCliente(nombreP),
-                                            monto: montoP,
-                                            email: emailP,
-                                            rut: rutP,
-                                            esFalso: false, // We hard filter them out now, so everything pushed here is real
-                                            fecha: fechaData.timestamp
-                                        };
-                                        let matchAdj = remate.adjudicaciones.find(a => {
-                                            let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
-                                            let matchNum = a.numeroLote && numP && a.numeroLote === numP;
-                                            return matchStr || matchNum;
-                                        });
-                                        if (matchAdj) {
-                                            let loteKey = matchAdj.loteStr;
-                                            if (!remate.posturasPorLote[loteKey]) remate.posturasPorLote[loteKey] = [];
-                                            remate.posturasPorLote[loteKey].push(puja);
+                                    }
+                                    // Se guardan SIEMPRE (internas y reales) para que sigan
+                                    // siendo visibles en el detalle del lote con su badge
+                                    // correspondiente. Solo se EXCLUYEN de los conteos y
+                                    // métricas agregadas mediante el flag esFalso.
+                                    let puja = {
+                                        nombre: String(nombreP),
+                                        nombreNorm: normalizarCliente(nombreP),
+                                        monto: montoP,
+                                        email: emailP,
+                                        rut: rutP,
+                                        esFalso: isFalso,
+                                        fecha: fechaData.timestamp
+                                    };
+                                    let matchAdj = remate.adjudicaciones.find(a => {
+                                        let matchStr = a.loteStr && loteRaw && loteRaw.includes(a.loteStr);
+                                        let matchNum = a.numeroLote && numP && a.numeroLote === numP;
+                                        return matchStr || matchNum;
+                                    });
+                                    if (matchAdj) {
+                                        let loteKey = matchAdj.loteStr;
+                                        if (!remate.posturasPorLote[loteKey]) remate.posturasPorLote[loteKey] = [];
+                                        remate.posturasPorLote[loteKey].push(puja);
+                                        // Contador de pujadores REALES únicamente
+                                        if (!isFalso) {
                                             matchAdj.pujadoresRealesCount = (matchAdj.pujadoresRealesCount || 0) + 1;
-                                        } else if (loteRaw) {
-                                            if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
-                                            remate.posturasPorLote[loteRaw].push(puja);
-                                        } else if (numP) {
-                                            if (!remate.posturasPorLote[numP]) remate.posturasPorLote[numP] = [];
-                                            remate.posturasPorLote[numP].push(puja);
                                         }
+                                    } else if (loteRaw) {
+                                        if (!remate.posturasPorLote[loteRaw]) remate.posturasPorLote[loteRaw] = [];
+                                        remate.posturasPorLote[loteRaw].push(puja);
+                                    } else if (numP) {
+                                        if (!remate.posturasPorLote[numP]) remate.posturasPorLote[numP] = [];
+                                        remate.posturasPorLote[numP].push(puja);
                                     }
                                 }
                             }
@@ -2984,8 +3018,8 @@ window.parseExcel = function(file) {
                     } catch(e) {}
                 }
 
-                remate.inscritos = remate.garantias + Math.floor(remate.garantias * 0.1);
-                remate.comisionTotal = (remate.ventaTotal * 0.12) * 1.19;
+                remate.inscritos = remate.garantias + Math.floor(remate.garantias * 0.1); 
+                remate.comisionTotal = (remate.ventaTotal * 0.12) * 1.19; 
 
                 resolve(remate);
             } catch(error) {
@@ -3003,173 +3037,173 @@ window.parseExcel = function(file) {
 const dropZone = document.getElementById('drop-zone');
 
 document.body.addEventListener('dragover', e => {
-    e.preventDefault();
+    e.preventDefault(); 
     dropZone.classList.add('dragover');
-});
+}); 
 
 document.body.addEventListener('dragleave', e => {
-    e.preventDefault();
+    e.preventDefault(); 
     dropZone.classList.remove('dragover');
 });
 
-document.body.addEventListener('drop', async e => {
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
-    const items = e.dataTransfer.items;
-    const allFiles = [];
-    if(items) {
-        const promises = [];
-        for(let i=0; i<items.length; i++) {
-            const item = items[i].webkitGetAsEntry();
-            if(item) promises.push(traverseFileTree(item, allFiles));
-        }
-        await Promise.all(promises);
-    } else {
-        allFiles.push(...e.dataTransfer.files);
-    }
+document.body.addEventListener('drop', async e => { 
+    e.preventDefault(); 
+    dropZone.classList.remove('dragover'); 
+    const items = e.dataTransfer.items; 
+    const allFiles = []; 
+    if(items) { 
+        const promises = []; 
+        for(let i=0; i<items.length; i++) { 
+            const item = items[i].webkitGetAsEntry(); 
+            if(item) promises.push(traverseFileTree(item, allFiles)); 
+        } 
+        await Promise.all(promises); 
+    } else { 
+        allFiles.push(...e.dataTransfer.files); 
+    } 
     window.iniciarProcesamiento(allFiles);
 });
 
-function traverseFileTree(item, filesArray) {
-    return new Promise(resolve => {
-        if(item.isFile) {
+function traverseFileTree(item, filesArray) { 
+    return new Promise(resolve => { 
+        if(item.isFile) { 
             item.file(file => {
-                filesArray.push(file);
+                filesArray.push(file); 
                 resolve();
-            });
-        } else if(item.isDirectory) {
-            const dirReader = item.createReader();
-            const entries = [];
-            const readEntries = () => {
-                dirReader.readEntries(async results => {
-                    if(!results.length) {
+            }); 
+        } else if(item.isDirectory) { 
+            const dirReader = item.createReader(); 
+            const entries = []; 
+            const readEntries = () => { 
+                dirReader.readEntries(async results => { 
+                    if(!results.length) { 
                         for(let entry of entries) {
-                            await traverseFileTree(entry, filesArray);
+                            await traverseFileTree(entry, filesArray); 
                         }
-                        resolve();
-                    } else {
-                        entries.push(...results);
-                        readEntries();
-                    }
-                });
-            };
-            readEntries();
-        } else {
-            resolve();
-        }
-    });
+                        resolve(); 
+                    } else { 
+                        entries.push(...results); 
+                        readEntries(); 
+                    } 
+                }); 
+            }; 
+            readEntries(); 
+        } else { 
+            resolve(); 
+        } 
+    }); 
 }
 
 window.iniciarProcesamiento = async function(files) {
     const validFiles = Array.from(files).filter(f => f.name.match(/\.xlsx?$|\.xls$/i) && !f.name.startsWith('~$') && !f.name.includes('__MACOSX'));
     if(!validFiles.length) return;
-
+    
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingText = document.getElementById('loading-text');
-    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.classList.remove('hidden'); 
     loadingOverlay.classList.add('flex');
-
-    let successCount = 0;
+    
+    let successCount = 0; 
     let upsertQueue = [];
-
-    for(let i = 0; i < validFiles.length; i++) {
+    
+    for(let i = 0; i < validFiles.length; i++) { 
         loadingText.innerText = `Analizando Matriz ${i+1} de ${validFiles.length}...`;
-        await new Promise(r => setTimeout(r, 20));
-        try {
+        await new Promise(r => setTimeout(r, 20)); 
+        try { 
             const data = await window.parseExcel(validFiles[i]);
-            if(data) {
-                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName || window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp) === window.formatearNombreRemate(data.fileName, data.fechaData?.timestamp));
-                if (existsIdx >= 0) {
-                    data._dbId = db.remates[existsIdx]._dbId;
-                    data.id = db.remates[existsIdx].id;
-                    db.remates[existsIdx] = data;
-                } else {
-                    data._dbId = Math.floor(Math.random() * 2000000000);
+            if(data) { 
+                const existsIdx = db.remates.findIndex(r => r.fileName === data.fileName || window.formatearNombreRemate(r.fileName, r.fechaData?.timestamp) === window.formatearNombreRemate(data.fileName, data.fechaData?.timestamp)); 
+                if (existsIdx >= 0) { 
+                    data._dbId = db.remates[existsIdx]._dbId; 
+                    data.id = db.remates[existsIdx].id; 
+                    db.remates[existsIdx] = data; 
+                } else { 
+                    data._dbId = Math.floor(Math.random() * 2000000000); 
                     data.id = 'UID-' + window.formatearNombreRemate(data.fileName, data.fechaData?.timestamp).replace(/[^a-zA-Z0-9]/g, '');
-                    db.remates.push(data);
+                    db.remates.push(data); 
                 }
                 upsertQueue.push({ id: data._dbId, payload: data });
-                successCount++;
+                successCount++; 
             }
-        } catch(err) {
-            console.error("Error:", err);
-        }
+        } catch(err) { 
+            console.error("Error:", err); 
+        } 
     }
-
+    
     if(successCount === 0) {
-        loadingOverlay.classList.remove('flex');
+        loadingOverlay.classList.remove('flex'); 
         loadingOverlay.classList.add('hidden');
-        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`;
+        document.getElementById('db-status').innerText = `Error: Archivos Inválidos`; 
         return;
     }
 
-    loadingText.innerText = "Sincronizando Cruces...";
+    loadingText.innerText = "Sincronizando Cruces..."; 
     await new Promise(r => setTimeout(r, 20));
 
     db.remates.sort((a,b) => (a.fechaData?.timestamp || 0) - (b.fechaData?.timestamp || 0));
-
-    let clientesGlobales = [];
+    
+    let clientesGlobales = []; 
     let adjudicatariosGlobales = [];
-
-    db.remates.forEach(remate => {
-        let nuevos = 0, antiguos = 0;
-        remate.garantiasEmailsReales.forEach(email => {
+    
+    db.remates.forEach(remate => { 
+        let nuevos = 0, antiguos = 0; 
+        remate.garantiasEmailsReales.forEach(email => { 
             if(clientesGlobales.includes(email)) {
-                antiguos++;
-            } else {
-                nuevos++;
-                clientesGlobales.push(email);
-            }
-        });
-        remate.nuevos = nuevos;
-        remate.antiguos = antiguos;
+                antiguos++; 
+            } else { 
+                nuevos++; 
+                clientesGlobales.push(email); 
+            } 
+        }); 
+        remate.nuevos = nuevos; 
+        remate.antiguos = antiguos; 
         let ganadoresNuevos = 0;
         let ventaNuevos = 0;
-        let ventaAntiguos = 0;
-        let statusCliente = {};
-        const ganadoresUnicos = [...new Set(remate.adjudicaciones.filter(a => !a.esFalso).map(a => a.clienteReal))];
-        ganadoresUnicos.forEach(cliente => {
-            if(adjudicatariosGlobales.includes(cliente)) {
-                statusCliente[cliente] = 'antiguo';
-            } else {
-                ganadoresNuevos++;
-                adjudicatariosGlobales.push(cliente);
-                statusCliente[cliente] = 'nuevo';
-            }
-        });
-        remate.adjudicaciones.forEach(a => {
-            if(!a.esFalso) {
+        let ventaAntiguos = 0; 
+        let statusCliente = {}; 
+        const ganadoresUnicos = [...new Set(remate.adjudicaciones.filter(a => !a.esFalso).map(a => a.clienteReal))]; 
+        ganadoresUnicos.forEach(cliente => { 
+            if(adjudicatariosGlobales.includes(cliente)) { 
+                statusCliente[cliente] = 'antiguo'; 
+            } else { 
+                ganadoresNuevos++; 
+                adjudicatariosGlobales.push(cliente); 
+                statusCliente[cliente] = 'nuevo'; 
+            } 
+        }); 
+        remate.adjudicaciones.forEach(a => { 
+            if(!a.esFalso) { 
                 if(statusCliente[a.clienteReal] === 'nuevo') {
-                    ventaNuevos += a.monto;
+                    ventaNuevos += a.monto; 
                 } else {
-                    ventaAntiguos += a.monto;
+                    ventaAntiguos += a.monto; 
                 }
             }
-        });
-        remate.ganadoresNuevos = ganadoresNuevos;
-        remate.ventaNuevos = ventaNuevos;
-        remate.ventaAntiguos = ventaAntiguos;
-        remate.ganadoresUnicosCount = ganadoresUnicos.length;
+        }); 
+        remate.ganadoresNuevos = ganadoresNuevos; 
+        remate.ventaNuevos = ventaNuevos; 
+        remate.ventaAntiguos = ventaAntiguos; 
+        remate.ganadoresUnicosCount = ganadoresUnicos.length; 
     });
-
-    try {
+    
+    try { 
         for (let i = 0; i < upsertQueue.length; i++) {
             loadingText.innerText = `Subiendo a la Nube (${i+1}/${upsertQueue.length})...`;
             const { error } = await supabaseClient.from('app_state').upsert(upsertQueue[i]);
             if (error) throw error;
-            await new Promise(r => setTimeout(r, 50));
+            await new Promise(r => setTimeout(r, 50)); 
         }
         document.getElementById('db-status').innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> En Línea (${db.remates.length})`;
-    } catch (e) {
+    } catch (e) { 
         document.getElementById('db-status').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error BD';
         alert("Error de guardado en la nube: " + e.message);
     }
-
-    document.getElementById('file-input').value = "";
-    window.actualizarFiltrosGlobales();
-    procesarDatosClientes();
+    
+    document.getElementById('file-input').value = ""; 
+    window.actualizarFiltrosGlobales(); 
+    procesarDatosClientes(); 
     window.actualizarEstadoApp();
-    loadingOverlay.classList.remove('flex');
+    loadingOverlay.classList.remove('flex'); 
     loadingOverlay.classList.add('hidden');
 };
 
@@ -3177,7 +3211,7 @@ window.iniciarProcesamiento = async function(files) {
 // VACIAR BASE DE DATOS
 // ============================================================
 window.limpiarBase = async function() {
-
+    
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingText = document.getElementById('loading-text');
     loadingOverlay.classList.remove('hidden');
@@ -3208,111 +3242,111 @@ window.limpiarBase = async function() {
 // ============================================================
 // MODALES
 // ============================================================
-window.abrirModalMultiLote = function() {
-    let html = '';
-    Object.entries(globalMapCMulti).sort((a,b) => b[1].lotes - a[1].lotes).forEach(([nombre, data]) => {
-        if(data.lotes > 1) {
+window.abrirModalMultiLote = function() { 
+    let html = ''; 
+    Object.entries(globalMapCMulti).sort((a,b) => b[1].lotes - a[1].lotes).forEach(([nombre, data]) => { 
+        if(data.lotes > 1) { 
             html += `
             <tr>
                 <td class="pl-5 py-2 font-bold text-gray-900">${nombre}</td>
                 <td class="text-center py-2 font-black text-gray-700">${data.lotes}</td>
                 <td class="text-right pr-5 py-2 font-black text-emerald-600">${formatMoney(data.total)}</td>
-            </tr>`;
-        }
-    });
-    document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>';
-    document.getElementById('modal-multilote').classList.remove('hidden');
-    document.getElementById('modal-multilote').classList.add('flex');
+            </tr>`; 
+        } 
+    }); 
+    document.getElementById('modal-tabla-multilote').innerHTML = html || '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">Ningún cliente se adjudicó más de 1 lote.</td></tr>'; 
+    document.getElementById('modal-multilote').classList.remove('hidden'); 
+    document.getElementById('modal-multilote').classList.add('flex'); 
 };
 
-window.cerrarModalMulti = function(e) {
+window.cerrarModalMulti = function(e) { 
     if(e && e.target.id !== 'modal-multilote') return;
-    document.getElementById('modal-multilote').classList.add('hidden');
-    document.getElementById('modal-multilote').classList.remove('flex');
+    document.getElementById('modal-multilote').classList.add('hidden'); 
+    document.getElementById('modal-multilote').classList.remove('flex'); 
 };
 
 window.abrirModalFuga = function() {
     try {
-        if(!globalAgg) return;
+        if(!globalAgg) return; 
         let html = '';
         if(globalAgg.fugaList && globalAgg.fugaList.length > 0) {
-            globalAgg.fugaList.sort((a,b) => a.nombre.localeCompare(b.nombre));
+            globalAgg.fugaList.sort((a,b) => a.nombre.localeCompare(b.nombre)); 
             let hoy = Date.now();
-            globalAgg.fugaList.forEach(f => {
-                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0;
-                let textoDias = f.fechaRemate ? `${diasFuga} d` : '-';
-                let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate);
+            globalAgg.fugaList.forEach(f => { 
+                let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
+                let textoDias = f.fechaRemate ? `${diasFuga} d` : '-'; 
+                let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate); 
                 html += `
                 <tr class="hover:bg-gray-50">
                     <td class="pl-5 py-2 font-medium text-gray-900 truncate max-w-[150px]">${nombreRemate}</td>
                     <td class="py-2 text-red-500 font-bold">${textoDias}</td>
                     <td class="py-2 font-bold text-gray-900 truncate max-w-[200px]">${f.nombre}</td>
-                </tr>`;
+                </tr>`; 
             });
-        } else {
-            html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">No hay registros de fuga.</td></tr>';
+        } else { 
+            html = '<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">No hay registros de fuga.</td></tr>'; 
         }
-        document.getElementById('modal-tabla-fuga').innerHTML = html;
-        document.getElementById('modal-fuga').classList.remove('hidden');
+        document.getElementById('modal-tabla-fuga').innerHTML = html; 
+        document.getElementById('modal-fuga').classList.remove('hidden'); 
         document.getElementById('modal-fuga').classList.add('flex');
     } catch (e) {}
 };
 
-window.cerrarModalFuga = function(e) {
+window.cerrarModalFuga = function(e) { 
     if(e && e.target.id !== 'modal-fuga') return;
-    document.getElementById('modal-fuga').classList.add('hidden');
-    document.getElementById('modal-fuga').classList.remove('flex');
+    document.getElementById('modal-fuga').classList.add('hidden'); 
+    document.getElementById('modal-fuga').classList.remove('flex'); 
 };
 
 window.exportarFugaExcel = function() {
     try {
-        if(!globalAgg || !globalAgg.fugaList) return;
+        if(!globalAgg || !globalAgg.fugaList) return; 
         let hoy = Date.now();
-        const wsData = globalAgg.fugaList.map(f => {
-            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0;
+        const wsData = globalAgg.fugaList.map(f => { 
+            let diasFuga = f.fechaRemate ? Math.floor((hoy - f.fechaRemate) / (1000 * 60 * 60 * 24)) : 0; 
             let nombreRemate = window.formatearNombreRemate(`Remate ${f.numRemate||''}`, f.fechaRemate);
-            return {
-                "Matriz": nombreRemate,
-                "Días Inactivo": diasFuga,
-                "Fecha": f.fechaRemate ? window.formatExcelDate(f.fechaRemate) : '-',
-                "Cliente": f.nombre,
-                "RUT": f.rut || 'No Registrado',
-                "Email": f.email || 'No Registrado'
-            };
+            return { 
+                "Matriz": nombreRemate, 
+                "Días Inactivo": diasFuga, 
+                "Fecha": f.fechaRemate ? window.formatExcelDate(f.fechaRemate) : '-', 
+                "Cliente": f.nombre, 
+                "RUT": f.rut || 'No Registrado', 
+                "Email": f.email || 'No Registrado' 
+            }; 
         });
-        const ws = XLSX.utils.json_to_sheet(wsData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra");
+        const ws = XLSX.utils.json_to_sheet(wsData); 
+        const wb = XLSX.utils.book_new(); 
+        XLSX.utils.book_append_sheet(wb, ws, "Lista_Negra"); 
         XLSX.writeFile(wb, `Listado_Fuga_${new Date().getTime()}.xlsx`);
     } catch (e) {}
 };
 
 window.abrirModalPujadores = function(loteEncoded, nodeId) {
     try {
-        const loteStr = decodeURIComponent(loteEncoded);
+        const loteStr = decodeURIComponent(loteEncoded); 
         let remate = db.remates.find(r => r.id === nodeId);
         if(!remate) return;
         let todasPujas = remate.posturasPorLote ? (remate.posturasPorLote[loteStr] || []) : [];
-        let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null;
-        currentAdjudicadoModal = adjudicado;
+        let adjudicado = remate.adjudicaciones ? remate.adjudicaciones.find(a => a.loteStr === loteStr) : null; 
+        currentAdjudicadoModal = adjudicado; 
         currentModalPujas = todasPujas.sort((a,b) => b.monto - a.monto);
         document.getElementById('modal-subtitulo').innerText = `Adj: ${adjudicado && !adjudicado.esFalso ? formatMoney(adjudicado.monto) : 'TEST/INTERNO'} | Min: ${adjudicado ? formatMoney(adjudicado.minimo) : '-'}`;
-
-        document.getElementById('modal-total-pujas').innerText = todasPujas.length;
-        document.getElementById('modal-unicos-reales').innerText = todasPujas.length;
-
+        
+        document.getElementById('modal-total-pujas').innerText = todasPujas.length; 
+        document.getElementById('modal-unicos-reales').innerText = [...new Set(todasPujas.filter(p => !p.esFalso).map(p => p.nombreNorm))].length; 
+        
         const btnTodos = document.getElementById('btn-filtro-todos');
-        if (btnTodos) btnTodos.className = 'px-3 py-1.5 rounded-md bg-black text-white transition';
-
+        if (btnTodos) btnTodos.className = 'px-3 py-1.5 rounded-md bg-black text-white transition'; 
+        
         const btnReales = document.getElementById('btn-filtro-reales');
-        if (btnReales) btnReales.className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition';
-
-        currentFiltroModal = 'todos';
-        renderModalTabla();
-
+        if (btnReales) btnReales.className = 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+        
+        currentFiltroModal = 'todos'; 
+        renderModalTabla(); 
+        
         const modalEl = document.getElementById('modal-pujadores');
         if (modalEl) {
-            modalEl.classList.remove('hidden');
+            modalEl.classList.remove('hidden'); 
             modalEl.classList.add('flex');
             modalEl.style.zIndex = '9999';
         }
@@ -3321,22 +3355,22 @@ window.abrirModalPujadores = function(loteEncoded, nodeId) {
 
 function renderModalTabla() {
     try {
-        let lista = currentModalPujas;
+        let lista = currentModalPujas; 
         let adjudicado = currentAdjudicadoModal;
-
+        
         if (!lista || lista.length === 0) {
             document.getElementById('modal-tabla-pujas').innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium">No se registran posturas para este lote</td></tr>';
             return;
         }
-
+        
         document.getElementById('modal-tabla-pujas').innerHTML = lista.map((p,i) => {
-            const isFake = (p && (p.nombre || p.email)) ? esClienteFalso(p.nombre, p.email) : false;
+            const isFake = (p && (p.nombre || p.email)) ? esClienteFalso(p.nombre, p.email, p.rut) : false;
             let esAdj = false;
-
+            
             if (adjudicado && adjudicado.nombreRaw) {
                esAdj = !adjudicado.esFalso && String(p.nombre).toUpperCase().includes(String(adjudicado.nombreRaw).split(' ')[0]) && Math.abs(Number(p.monto) - Number(adjudicado.monto)) < 1000;
             }
-
+            
             let badge = '';
             if (isFake) {
                 badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">INTERNO</span>';
@@ -3345,7 +3379,7 @@ function renderModalTabla() {
             } else {
                 badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">REAL</span>';
             }
-
+            
             return `
             <tr class="hover:bg-gray-50 transition ${esAdj ? 'bg-emerald-50/20' : ''}">
                 <td class="pl-5 py-2 text-[11px] font-bold text-gray-400">${i+1}</td>
@@ -3358,17 +3392,17 @@ function renderModalTabla() {
     } catch(e) { console.error(e); }
 }
 
-window.filtrarModal = function(tipo) {
-    currentFiltroModal = tipo;
-    document.getElementById('btn-filtro-todos').className = tipo === 'todos' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition';
-    document.getElementById('btn-filtro-reales').className = tipo === 'reales' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition';
-    renderModalTabla();
+window.filtrarModal = function(tipo) { 
+    currentFiltroModal = tipo; 
+    document.getElementById('btn-filtro-todos').className = tipo === 'todos' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+    document.getElementById('btn-filtro-reales').className = tipo === 'reales' ? 'px-3 py-1.5 rounded-md bg-black text-white transition' : 'px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 hover:text-black transition'; 
+    renderModalTabla(); 
 };
 
-window.cerrarModal = function(e) {
+window.cerrarModal = function(e) { 
     if(e && e.target.id !== 'modal-pujadores') return;
-    document.getElementById('modal-pujadores').classList.add('hidden');
-    document.getElementById('modal-pujadores').classList.remove('flex');
+    document.getElementById('modal-pujadores').classList.add('hidden'); 
+    document.getElementById('modal-pujadores').classList.remove('flex'); 
 };
 
 window.filtrarLotesMain = function() {
@@ -3417,13 +3451,13 @@ window.sortTable = function(th, type) {
 // ============================================================
 window.openQA = function(type) {
     if (!globalAgg) return;
-
+    
     const modal = document.getElementById('modal-qa');
     const title = document.getElementById('qa-title');
     const value = document.getElementById('qa-value');
     const subtitle = document.getElementById('qa-subtitle');
     const icon = document.getElementById('qa-icon');
-
+    
     if(type === 'ventas') {
         title.innerText = 'Ventas del Período';
         value.innerText = formatMoney(globalAgg.venta);
@@ -3451,7 +3485,7 @@ window.openQA = function(type) {
         subtitle.innerText = `${topClient.lotes} lotes por ${formatMoney(topClient.total)}`;
         icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
     }
-
+    
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 };
@@ -3481,7 +3515,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const qaSearch = document.getElementById('qa-search');
     const qaDropdown = document.getElementById('qa-dropdown');
     const qaResults = document.getElementById('qa-results');
-
+    
     if (qaSearch) {
         qaSearch.addEventListener('input', function(e) {
             const term = this.value.trim().toLowerCase();
@@ -3490,17 +3524,17 @@ window.addEventListener('DOMContentLoaded', () => {
                 qaDropdown.classList.remove('flex');
                 return;
             }
-
+            
             qaDropdown.classList.remove('hidden');
             qaDropdown.classList.add('flex');
-
+            
             let html = '';
-
+            
             // 1. Period Search
             const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
             const monthMatch = monthNames.findIndex(m => m.includes(term));
             const yearMatch = term.match(/202[0-9]/);
-
+            
             if (monthMatch !== -1 || yearMatch) {
                 html += `<div class="px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 cursor-pointer rounded flex items-center gap-2" onclick="window.quickSelectPeriod('${term}')">
                     <span>📅</span> Buscar período: <strong>${term}</strong>
@@ -3523,7 +3557,7 @@ window.addEventListener('DOMContentLoaded', () => {
             html += `<div class="mt-2 px-3 py-1.5 text-xs text-blue-600 hover:bg-blue-50 cursor-pointer rounded flex items-center gap-2 border-t border-slate-100" onclick="window.triggerGlobalSearch('${term}')">
                 <span>🔍</span> Buscar "${term}" en todos los lotes y patentes...
             </div>`;
-
+            
             qaResults.innerHTML = html;
         });
 
@@ -3534,7 +3568,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 qaDropdown.classList.remove('flex');
             }
         });
-
+        
         qaSearch.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 window.triggerGlobalSearch(this.value.trim());
@@ -3558,34 +3592,34 @@ window.triggerGlobalSearch = function(term) {
 window.quickSelectPeriod = function(term) {
     document.getElementById('qa-dropdown').classList.add('hidden');
     document.getElementById('qa-dropdown').classList.remove('flex');
-
+    
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     const monthMatch = monthNames.findIndex(m => m.includes(term.toLowerCase()));
     const yearMatch = term.match(/(202[0-9])/);
-
+    
     let targetYear = yearMatch ? parseInt(yearMatch[1]) : null;
     let targetMonth = monthMatch !== -1 ? monthMatch : null;
-
+    
     // Fallbacks if only one is provided
     if (!targetYear && window.globalSelectedYears.length > 0) targetYear = window.globalSelectedYears[0];
     if (!targetYear) targetYear = new Date().getFullYear();
-
+    
     let seg = document.getElementById('macro-segment').value;
     let newChecked = [];
-
+    
     db.remates.forEach(r => {
         let matchSeg = seg === 'Todos' || r.tipo === seg;
         let rYr = r.fechaData?.year ? Number(r.fechaData.year) : new Date().getFullYear();
         let rM = r.fechaData?.timestamp ? new Date(r.fechaData.timestamp).getMonth() : 0;
-
+        
         let yearOk = (targetYear === rYr);
         let monthOk = (targetMonth === null || targetMonth === rM);
-
+        
         if (matchSeg && yearOk && monthOk) {
             newChecked.push(r.id);
         }
     });
-
+    
     if (newChecked.length > 0) {
         window.globalSelectedYears = [targetYear];
         checkedNodes = newChecked;
